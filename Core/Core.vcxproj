@@ -56,7 +56,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <LanguageStandard>stdcpp20</LanguageStandard>
@@ -72,7 +72,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -99,44 +99,6 @@
     <ClInclude Include="CoreSystem\FunctionCallManager.h" />
     <ClInclude Include="CoreSystem\FunctionQueue.h" />
     <ClInclude Include="DebugChannel\DebugChannel.h" />
-    <ClInclude Include="External\rapidjson\include\allocators.h" />
-    <ClInclude Include="External\rapidjson\include\cursorstreamwrapper.h" />
-    <ClInclude Include="External\rapidjson\include\document.h" />
-    <ClInclude Include="External\rapidjson\include\encodedstream.h" />
-    <ClInclude Include="External\rapidjson\include\encodings.h" />
-    <ClInclude Include="External\rapidjson\include\error\en.h" />
-    <ClInclude Include="External\rapidjson\include\error\error.h" />
-    <ClInclude Include="External\rapidjson\include\filereadstream.h" />
-    <ClInclude Include="External\rapidjson\include\filewritestream.h" />
-    <ClInclude Include="External\rapidjson\include\fwd.h" />
-    <ClInclude Include="External\rapidjson\include\internal\biginteger.h" />
-    <ClInclude Include="External\rapidjson\include\internal\clzll.h" />
-    <ClInclude Include="External\rapidjson\include\internal\diyfp.h" />
-    <ClInclude Include="External\rapidjson\include\internal\dtoa.h" />
-    <ClInclude Include="External\rapidjson\include\internal\ieee754.h" />
-    <ClInclude Include="External\rapidjson\include\internal\itoa.h" />
-    <ClInclude Include="External\rapidjson\include\internal\meta.h" />
-    <ClInclude Include="External\rapidjson\include\internal\pow10.h" />
-    <ClInclude Include="External\rapidjson\include\internal\regex.h" />
-    <ClInclude Include="External\rapidjson\include\internal\stack.h" />
-    <ClInclude Include="External\rapidjson\include\internal\strfunc.h" />
-    <ClInclude Include="External\rapidjson\include\internal\strtod.h" />
-    <ClInclude Include="External\rapidjson\include\internal\swap.h" />
-    <ClInclude Include="External\rapidjson\include\istreamwrapper.h" />
-    <ClInclude Include="External\rapidjson\include\memorybuffer.h" />
-    <ClInclude Include="External\rapidjson\include\memorystream.h" />
-    <ClInclude Include="External\rapidjson\include\msinttypes\inttypes.h" />
-    <ClInclude Include="External\rapidjson\include\msinttypes\stdint.h" />
-    <ClInclude Include="External\rapidjson\include\ostreamwrapper.h" />
-    <ClInclude Include="External\rapidjson\include\pointer.h" />
-    <ClInclude Include="External\rapidjson\include\prettywriter.h" />
-    <ClInclude Include="External\rapidjson\include\rapidjson.h" />
-    <ClInclude Include="External\rapidjson\include\reader.h" />
-    <ClInclude Include="External\rapidjson\include\schema.h" />
-    <ClInclude Include="External\rapidjson\include\stream.h" />
-    <ClInclude Include="External\rapidjson\include\stringbuffer.h" />
-    <ClInclude Include="External\rapidjson\include\uri.h" />
-    <ClInclude Include="External\rapidjson\include\writer.h" />
     <ClInclude Include="FileSystem\FileSystemInterface.h" />
     <ClInclude Include="FileSystem\FileSystemManager.h" />
     <ClInclude Include="FileSystem\StandardFileSystem.h" />
@@ -173,15 +135,15 @@
     <ClInclude Include="Reflection\ReflectionError.h" />
     <ClInclude Include="Reflection\ReflectionMap.h" />
     <ClInclude Include="Reflection\Types\Mat4.h" />
-    <ClInclude Include="Reflection\Types\primitivevector.h" />
-    <ClInclude Include="Reflection\Types\stringboolmap.h" />
     <ClInclude Include="Reflection\Types\Vec3.h" />
     <ClInclude Include="Reflection\Types\bool.h" />
     <ClInclude Include="Reflection\Types\component.h" />
     <ClInclude Include="Reflection\Types\float.h" />
     <ClInclude Include="Reflection\Types\int.h" />
     <ClInclude Include="Reflection\Types\object.h" />
+    <ClInclude Include="Reflection\Types\primitivevector.h" />
     <ClInclude Include="Reflection\Types\string.h" />
+    <ClInclude Include="Reflection\Types\stringboolmap.h" />
     <ClInclude Include="Reflection\Types\vec4.h" />
     <ClInclude Include="ResourceManager\ResourceManager.h" />
     <ClInclude Include="stdafx.h" />
@@ -233,8 +195,6 @@
     <None Include="Documentation\ResourceManagerDocumentation.html" />
     <None Include="Documentation\Vector3fDocumentation.html" />
     <None Include="Documentation\index.html" />
-    <None Include="External\rapidjson\doc\misc\footer.html" />
-    <None Include="External\rapidjson\doc\misc\header.html" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

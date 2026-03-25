@@ -9,7 +9,8 @@ project "Core"
    architecture "x86_64"
    
    includedirs { "./" }
-   
+   includedirs { "./External/"}
+
    
    files { "./**.cpp", "./**.h", "./**.html" }   
    

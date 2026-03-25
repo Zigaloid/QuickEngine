@@ -7,9 +7,9 @@
 #include <unordered_map>
 
 #include "Reflection/Reflection.h"
-#include "external/rapidjson/include/prettywriter.h"
-#include "external/rapidjson/include/stringbuffer.h"
-#include "external/rapidjson/include/Document.h"
+#include "../external/rapidjson/include/prettywriter.h"
+#include "../external/rapidjson/include/stringbuffer.h"
+#include "../external/rapidjson/include/Document.h"
 #include "CoreSystem/CoreSystem.h"
 #include "Math/Vector3f.h"
 #include "Math/Vector4f.h"

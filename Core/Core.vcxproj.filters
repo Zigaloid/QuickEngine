@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Analysis">
+      <UniqueIdentifier>{897E1B76-754B-7681-9E64-64298A90AB0F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="App">
+      <UniqueIdentifier>{46D6870B-B2DF-877C-3B5B-9E7CA763937C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ClassFactory">
+      <UniqueIdentifier>{530DDD5E-3F70-6C03-E8F5-A4B9D4373886}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ComponentSystem">
+      <UniqueIdentifier>{9D238DF0-09AF-FAB4-12C0-7DA97ECA56B5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="CoreSystem">
+      <UniqueIdentifier>{536ADC24-3F22-1E72-A829-F7CD9400B962}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DebugChannel">
+      <UniqueIdentifier>{65D372ED-5136-0292-FABB-3A48E6FDCD14}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Documentation">
+      <UniqueIdentifier>{FF149C1F-6BD5-1756-3410-61D3A08F5C32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSystem">
+      <UniqueIdentifier>{6A7A86EC-5632-C839-BF39-A195AB10632A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Input">
+      <UniqueIdentifier>{953A660D-014F-8EBE-CAD0-311E36A48AEF}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="JobSystem">
+      <UniqueIdentifier>{0590D650-71FA-8AC7-BA38-3C6D26E2681C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Log">
+      <UniqueIdentifier>{E704880B-530E-887C-DC89-9E7C4892937C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Math">
+      <UniqueIdentifier>{AFF4887C-9B2B-8A0D-4418-7010302E060F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Net">
+      <UniqueIdentifier>{2C0C880B-9815-887C-2191-9E7C8D99937C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Profiler">
+      <UniqueIdentifier>{28AC12A2-1479-6DAD-3D92-5B5529BEA23B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reflection">
+      <UniqueIdentifier>{104FCF04-FC06-1152-650E-EAAD51E5AB42}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reflection\BinaryParser">
+      <UniqueIdentifier>{719833C0-DDCF-7B57-E6D9-DF7A5290A250}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reflection\JSONParser">
+      <UniqueIdentifier>{264C29B8-92B8-E4B2-5BAC-7C10C7D7061B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Reflection\Types">
+      <UniqueIdentifier>{B41E49A0-A017-68F2-C949-4D77B5A147FE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ResourceManager">
+      <UniqueIdentifier>{2827463B-94B2-B3FF-9DC3-36F409CE0F00}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Analysis\HeatMapContainer.h">
+      <Filter>Analysis</Filter>
+    </ClInclude>
+    <ClInclude Include="App\AppInterface.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="App\ApplicationComponent.h">
+      <Filter>App</Filter>
+    </ClInclude>
+    <ClInclude Include="ClassFactory\ClassFactory.h">
+      <Filter>ClassFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\ComponentSystem.h">
+      <Filter>ComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\ComponentSystemScheduler.h">
+      <Filter>ComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreSystem\CoreDebugChannels.h">
+      <Filter>CoreSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreSystem\CoreSystem.h">
+      <Filter>CoreSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreSystem\FunctionCallManager.h">
+      <Filter>CoreSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreSystem\FunctionQueue.h">
+      <Filter>CoreSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugChannel\DebugChannel.h">
+      <Filter>DebugChannel</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\FileSystemInterface.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\FileSystemManager.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\StandardFileSystem.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\GamepadInputHandler.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\GamepadInterface.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\GamepadManager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\MouseInputHandler.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\MouseInterface.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\MouseManager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\WindowsGamepad.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\WindowsMouse.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="JobSystem\JobSystem.h">
+      <Filter>JobSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Log\ThreadSafeLog.h">
+      <Filter>Log</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\ConvexHull.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Matrix4f.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Quaternion.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector3f.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\Vector4f.h">
+      <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Net\BerkeleySocket.h">
+      <Filter>Net</Filter>
+    </ClInclude>
+    <ClInclude Include="Net\IBerkeleySocket.h">
+      <Filter>Net</Filter>
+    </ClInclude>
+    <ClInclude Include="Net\NexusClient.h">
+      <Filter>Net</Filter>
+    </ClInclude>
+    <ClInclude Include="Net\NexusProtocol.h">
+      <Filter>Net</Filter>
+    </ClInclude>
+    <ClInclude Include="Net\NexusServer.h">
+      <Filter>Net</Filter>
+    </ClInclude>
+    <ClInclude Include="Net\WinBerkeleySocket.h">
+      <Filter>Net</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler\Profiler.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Profiler\ProfilerAnalyzer.h">
+      <Filter>Profiler</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\BinaryParser\BinaryBufferParser.h">
+      <Filter>Reflection\BinaryParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\BinaryParser\BinaryParser.h">
+      <Filter>Reflection\BinaryParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\JSONParser\JSONBufferParser.h">
+      <Filter>Reflection\JSONParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\JSONParser\JSONParser.h">
+      <Filter>Reflection\JSONParser</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\RFL_Pareser.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Reflection.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\ReflectionBase.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\ReflectionError.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\ReflectionMap.h">
+      <Filter>Reflection</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\Mat4.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\Vec3.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\bool.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\component.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\float.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\int.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\object.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\primitivevector.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\string.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\stringboolmap.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="Reflection\Types\vec4.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
+    <ClInclude Include="ResourceManager\ResourceManager.h">
+      <Filter>ResourceManager</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Analysis\HeatMapContainer.cpp">
+      <Filter>Analysis</Filter>
+    </ClCompile>
+    <ClCompile Include="App\ApplicationComponent.cpp">
+      <Filter>App</Filter>
+    </ClCompile>
+    <ClCompile Include="ClassFactory\ClassFactory.cpp">
+      <Filter>ClassFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentSystem\ComponentSystem.cpp">
+      <Filter>ComponentSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentSystem\ComponentSystemScheduler.cpp">
+      <Filter>ComponentSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreSystem\CoreDebugChannels.cpp">
+      <Filter>CoreSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreSystem\CoreSystem.cpp">
+      <Filter>CoreSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreSystem\FunctionCallManager.cpp">
+      <Filter>CoreSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreSystem\FunctionQueue.cpp">
+      <Filter>CoreSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugChannel\DebugChannel.cpp">
+      <Filter>DebugChannel</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\StandardFileSystem.cpp">
+      <Filter>FileSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\GamepadInterface.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\GamepadManager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\MouseManager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\WindowsGamepad.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\WindowsMouse.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Log\ThreadSafeLog.cpp">
+      <Filter>Log</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\ConvexHull.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix4f.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Quaternion.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector3f.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Vector4f.cpp">
+      <Filter>Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Net\BerkeleySocket.cpp">
+      <Filter>Net</Filter>
+    </ClCompile>
+    <ClCompile Include="Net\NexusClient.cpp">
+      <Filter>Net</Filter>
+    </ClCompile>
+    <ClCompile Include="Net\NexusServer.cpp">
+      <Filter>Net</Filter>
+    </ClCompile>
+    <ClCompile Include="Net\WinBerkeleySocket.cpp">
+      <Filter>Net</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler\Profiler.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler\ProfilerAnalyzer.cpp">
+      <Filter>Profiler</Filter>
+    </ClCompile>
+    <ClCompile Include="Reflection\ReflectionBase.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="Reflection\ReflectionError.cpp">
+      <Filter>Reflection</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Documentation\ComponentSystemDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\CoreSystemDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\DebugChannelDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\FileSystemDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\GamepadInputHandlerDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\GamepadInterfaceDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\GamepadManagerDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\JobSystemDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\Matrix4fDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\QuaternionDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\RefectionDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\ResourceManagerDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\Vector3fDocumentation.html">
+      <Filter>Documentation</Filter>
+    </None>
+    <None Include="Documentation\index.html">
+      <Filter>Documentation</Filter>
+    </None>
+  </ItemGroup>
+</Project>
