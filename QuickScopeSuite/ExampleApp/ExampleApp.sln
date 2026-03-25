@@ -1,15 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36414.22 d17.14
-MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Core", "..\..\Core\Core.vcxproj", "{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExampleApp", "ExampleApp.vcxproj", "{921F763F-7ED7-B78C-E7DE-90E8D3B5527D}"
-	ProjectSection(ProjectDependencies) = postProject
-		{2EB4837C-1AEB-840D-C3D7-6A10AFED000F} = {2EB4837C-1AEB-840D-C3D7-6A10AFED000F}
-		{E3AE1F7C-4F19-D4F2-9857-85980401B247} = {E3AE1F7C-4F19-D4F2-9857-85980401B247}
-	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Rendering", "..\..\Rendering\Rendering.vcxproj", "{E3AE1F7C-4F19-D4F2-9857-85980401B247}"
 EndProject
@@ -34,8 +28,5 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {4C00302F-5A3E-44BC-A557-D639E85A8B1E}
 	EndGlobalSection
 EndGlobal

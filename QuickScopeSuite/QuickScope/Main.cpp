@@ -7,17 +7,11 @@
 #include "Input/GamepadManager.h"
 #include "app/ApplicationComponent.h"
 #include "ProfilerApp.h"
-#include "external/rapidjson/include/prettywriter.h"
-#include "external/rapidjson/include/stringbuffer.h"
-#include "external/rapidjson/include/Document.h"
 
 ProfilerApp g_theApp;
 
 int main()
-{
-
-    
-    
+{    
     if (!g_theApp.Initialize()) {
         printf("Failed to initialize application\n");
         return -1;

@@ -16,7 +16,6 @@
 
 #include "LevelComponent.h"
 #include "CameraComponent.h"
-#include "Tests/ComponentSchedulerLoadTest.h"
 #include "RenderComponent.h"
 #include "RenderComponentSelector.h"
 #include "ManipulatorComponent.h"

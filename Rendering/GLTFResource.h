@@ -1,6 +1,6 @@
 #pragma once
 #include "gl\glew.h"
-#include "external/rapidjson/include/document.h"
+#include "..\external/rapidjson/include/document.h"
 #include <unordered_map>
 #include <memory>
 #include <string>

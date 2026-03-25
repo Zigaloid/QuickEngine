@@ -6,9 +6,6 @@
 #include "Input/GamepadManager.h"
 #include "app/ApplicationComponent.h"
 #include "NexusServerApp.h"
-#include "external/rapidjson/include/prettywriter.h"
-#include "external/rapidjson/include/stringbuffer.h"
-#include "external/rapidjson/include/Document.h"
 
 int main()
 {
