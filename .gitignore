@@ -1,5 +1,6 @@
-# Created by https://www.toptal.com/developers/gitignore/api/c++,windows
-# Edit at https://www.toptal.com/developers/gitignore?templates=c++,windows
+
+# External folders
+External/*
 
 ### C++ ###
 # Prerequisites
@@ -19,10 +20,6 @@
 *.so
 *.dylib
 *.dll
-
-# Fortran module files
-*.mod
-*.smod
 
 # Compiled Static libraries
 *.lai
@@ -45,12 +42,6 @@ ehthumbs_vista.db
 # Dump file
 *.stackdump
 
-# Folder config file
-[Dd]esktop.ini
-
-# Recycle Bin used on file shares
-$RECYCLE.BIN/
-
 # Windows Installer files
 *.cab
 *.msi
@@ -60,9 +51,6 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
-
-# Created by https://www.toptal.com/developers/gitignore/api/visualstudio
-# Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio
 
 ### VisualStudio ###
 ## Ignore Visual Studio temporary files, build results, and
@@ -77,12 +65,6 @@ $RECYCLE.BIN/
 *.userosscache
 *.sln.docstates
 
-# User-specific files (MonoDevelop/Xamarin Studio)
-*.userprefs
-
-# Mono auto generated files
-mono_crash.*
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -96,8 +78,6 @@ x86/
 bld/
 [Bb]in/
 [Oo]bj/
-[Ll]og/
-[Ll]ogs/
 
 # Visual Studio 2015/2017 cache/options directory
 .vs/
@@ -156,7 +136,6 @@ StyleCopReport.xml
 *.tmp
 *.tmp_proj
 *_wpftmp.csproj
-*.log
 *.tlog
 *.vspscc
 *.vssscc

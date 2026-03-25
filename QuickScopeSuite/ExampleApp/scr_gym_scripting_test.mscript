@@ -1,0 +1,391 @@
+{
+	connectionsById = {
+		6 50 44 0,
+		12 50 31 0,
+		14 50 20 0,
+		1 101 14 0,
+		1 102 12 0,
+		1 104 6 0,
+		17 0 6 1,
+		17 0 12 1,
+		17 0 14 1,
+		27 0 28 1,
+		28 0 29 1,
+		39 0 40 1,
+		40 0 59 1,
+		53 0 57 1,
+		57 0 55 1,
+		22 0 20 11,
+		32 0 31 11,
+		45 0 44 11,
+		29 0 20 12,
+		66 0 31 12,
+		68 0 44 12,
+		59 0 31 13,
+		62 0 20 13,
+		69 0 44 13,
+		55 0 44 14,
+		63 0 20 14,
+		65 0 31 14,
+		26 0 20 15,
+		35 0 31 15,
+		47 0 44 15,
+		3 100 6 25,
+		3 100 12 25,
+		3 100 14 25,
+		6 100 44 25,
+		12 100 31 25,
+		14 100 20 25,
+	},
+	lastNodeId = 71,
+	layers = {},
+	locComp = {},
+	nodesById = {
+		[1] = {
+			defaults = {
+				connectionsById = {
+					9 0 8 101,
+					10 0 8 102,
+					11 0 8 104,
+				},
+				layers = {},
+				nodesById = {
+					[8] = {
+						editorData = {
+							position = 0 0,
+						},
+						type = "internal:CompoundDefaults",
+					},
+					{
+						editorData = {
+							hidden = true,
+						},
+						type = "native:Constant",
+						value = {
+							#&00000000000000000000000000000000,
+						},
+						valueType = "NC_Prop",
+					},
+					{
+						editorData = {
+							hidden = true,
+						},
+						type = "native:Constant",
+						value = {
+							#&00000000000000000000000000000000,
+						},
+						valueType = "NC_Prop",
+					},
+					{
+						editorData = {
+							hidden = true,
+						},
+						type = "native:Constant",
+						value = {
+							#&00000000000000000000000000000000,
+						},
+						valueType = "NC_Prop",
+					},
+				},
+			},
+			editorData = {
+				position = 0 0,
+			},
+			lastId = 104,
+			pins = {
+				{
+					id = 101,
+					name = "Visibility Button",
+				},
+				{
+					id = 102,
+					name = "Invincibility Button",
+				},
+				{
+					id = 104,
+					name = "Control Button",
+				},
+			},
+			type = "Script:Inputs",
+		},
+		{
+			editorData = {
+				position = 0 0,
+			},
+			lastId = -100,
+			pins = {},
+			type = "Script:Outputs",
+		},
+		{
+			editorData = {
+				position = -66 -8,
+			},
+			type = "Script:Init",
+		},
+		[6] = {
+			editorData = {
+				position = 300 267,
+			},
+			type = "NC_ScriptInteractionListenerNode",
+		},
+		[12] = {
+			editorData = {
+				position = 292 -36,
+			},
+			type = "NC_ScriptInteractionListenerNode",
+		},
+		[14] = {
+			editorData = {
+				position = 301 -303,
+			},
+			type = "NC_ScriptInteractionListenerNode",
+		},
+		[17] = {
+			editorData = {
+				position = 74 -234,
+			},
+			type = "native:Constant",
+			value = true,
+			valueType = "bool",
+		},
+		[20] = {
+			editorData = {
+				position = 713 -275,
+			},
+			type = "NC_GameScriptSetPlayerStateNode",
+		},
+		[22] = {
+			editorData = {
+				hidden = true,
+			},
+			type = "native:Constant",
+			value = "None",
+			valueType = "Player State",
+		},
+		[26] = {
+			editorData = {
+				hidden = true,
+			},
+			type = "native:Constant",
+			value = 0 0 0,
+			valueType = "float3",
+		},
+		{
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 195 -360,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D78150000225E83ED14CA,
+		},
+		{
+			editorData = {
+				position = 412 -380,
+			},
+			type = "native:Not",
+		},
+		{
+			accessTypeEnum = "GetSet",
+			editorData = {
+				position = 499 -387,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D78150000225E83ED14CA,
+		},
+		[31] = {
+			editorData = {
+				position = 785 -17,
+			},
+			type = "NC_GameScriptSetPlayerStateNode",
+		},
+		{
+			editorData = {
+				hidden = true,
+			},
+			type = "native:Constant",
+			value = "None",
+			valueType = "Player State",
+		},
+		[35] = {
+			editorData = {
+				hidden = true,
+			},
+			type = "native:Constant",
+			value = 0 0 0,
+			valueType = "float3",
+		},
+		[39] = {
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 251 -79,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D7821000022620025000E,
+		},
+		{
+			editorData = {
+				position = 468 -91,
+			},
+			type = "native:Not",
+		},
+		[44] = {
+			editorData = {
+				position = 758 281,
+			},
+			type = "NC_GameScriptSetPlayerStateNode",
+		},
+		{
+			editorData = {
+				hidden = true,
+			},
+			type = "native:Constant",
+			value = "None",
+			valueType = "Player State",
+		},
+		[47] = {
+			editorData = {
+				hidden = true,
+			},
+			type = "native:Constant",
+			value = 0 0 0,
+			valueType = "float3",
+		},
+		[53] = {
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 161 184,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D782400002264073D6220,
+		},
+		[55] = {
+			accessTypeEnum = "GetSet",
+			editorData = {
+				position = 500 165,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D782400002264073D6220,
+		},
+		[57] = {
+			editorData = {
+				position = 383 175,
+			},
+			type = "native:Not",
+		},
+		[59] = {
+			accessTypeEnum = "GetSet",
+			editorData = {
+				position = 568 -90,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D7821000022620025000E,
+		},
+		[62] = {
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 486 -230,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D7821000022620025000E,
+		},
+		{
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 486 -180,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D782400002264073D6220,
+		},
+		[65] = {
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 534 89,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D782400002264073D6220,
+		},
+		{
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 524 19,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D78150000225E83ED14CA,
+		},
+		[68] = {
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 515 326,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D78150000225E83ED14CA,
+		},
+		{
+			accessTypeEnum = "Get",
+			editorData = {
+				position = 517 371,
+			},
+			type = "internal:VariableNode",
+			varId = #&8EFBB957643D7821000022620025000E,
+		},
+	},
+	savecount = 18,
+	variableMetaData = {
+		[#8EFBB957643D78150000225E83ED14CA] = {
+			comment = "",
+			path = "HideAgent",
+			subType = "None",
+		},
+		[#8EFBB957643D7821000022620025000E] = {
+			comment = "",
+			path = "Invincibility",
+			subType = "None",
+		},
+		[#8EFBB957643D782400002264073D6220] = {
+			comment = "",
+			path = "PlayerControl",
+			subType = "None",
+		},
+	},
+	variables = {
+		{
+			arraysupport = "None",
+			data = {
+				false,
+			},
+			includeInWatchSummary = false,
+			modification = "None",
+			name = "HideAgent",
+			sharing = "Local",
+			storage = "None",
+			typeName = "bool",
+			varId = #&8EFBB957643D78150000225E83ED14CA,
+		},
+		{
+			arraysupport = "None",
+			data = {
+				false,
+			},
+			includeInWatchSummary = false,
+			modification = "None",
+			name = "Invincibility",
+			sharing = "Local",
+			storage = "None",
+			typeName = "bool",
+			varId = #&8EFBB957643D7821000022620025000E,
+		},
+		{
+			arraysupport = "None",
+			data = {
+				false,
+			},
+			includeInWatchSummary = false,
+			modification = "None",
+			name = "PlayerControl",
+			sharing = "Local",
+			storage = "None",
+			typeName = "bool",
+			varId = #&8EFBB957643D782400002264073D6220,
+		},
+	},
+}
