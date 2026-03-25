@@ -1,6 +1,10 @@
 # Created by https://www.toptal.com/developers/gitignore/api/c++,windows
 # Edit at https://www.toptal.com/developers/gitignore?templates=c++,windows
 
+
+# External folders
+External/*
+
 ### C++ ###
 # Prerequisites
 *.d
