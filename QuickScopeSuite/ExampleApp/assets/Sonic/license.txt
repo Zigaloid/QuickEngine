@@ -1,0 +1,11 @@
+Model Information:
+* title:	Sonic Movie | Free
+* source:	https://sketchfab.com/3d-models/sonic-movie-free-252ba8af381a4faf81a6bf0d89958d54
+* author:	TerrAxy (https://sketchfab.com/TerrAxy)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Sonic Movie | Free" (https://sketchfab.com/3d-models/sonic-movie-free-252ba8af381a4faf81a6bf0d89958d54) by TerrAxy (https://sketchfab.com/TerrAxy) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

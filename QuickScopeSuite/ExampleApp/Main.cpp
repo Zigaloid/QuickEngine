@@ -7,11 +7,8 @@
 #include "Input/GamepadManager.h"
 #include "app/ApplicationComponent.h"
 #include "ProfilerApp.h"
-#include "external/rapidjson/include/prettywriter.h"
-#include "external/rapidjson/include/stringbuffer.h"
-#include "external/rapidjson/include/Document.h"
 
-int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int main()
 {
     ProfilerApp app;
     

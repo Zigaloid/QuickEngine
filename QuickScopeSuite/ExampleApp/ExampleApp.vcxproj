@@ -65,7 +65,7 @@
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>..\..\External\OpenGL\libs\glfw\glfw3.lib;..\..\External\OpenGL\libs\gl\glew32.lib;opengl32.lib;..\..\External\OpenGL\Libs\Assimp\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -85,7 +85,7 @@
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>..\..\External\OpenGL\libs\glfw\glfw3.lib;..\..\External\OpenGL\libs\gl\glew32.lib;opengl32.lib;..\..\External\OpenGL\Libs\Assimp\assimp-vc142-mtd.lib;%(AdditionalDependencies)</AdditionalDependencies>
@@ -109,7 +109,6 @@
     <ClInclude Include="ProfilerApp.h" />
     <ClInclude Include="ProfilerController.h" />
     <ClInclude Include="Registration.h" />
-    <ClInclude Include="Tests\ComponentSchedulerLoadTest.h" />
     <ClInclude Include="UIWindowManager.h" />
     <ClInclude Include="ViewportLayoutManager.h" />
   </ItemGroup>
@@ -138,17 +137,15 @@
     <ClCompile Include="ProfilerApp.cpp" />
     <ClCompile Include="ProfilerController.cpp" />
     <ClCompile Include="Registration.cpp" />
-    <ClCompile Include="Test.cpp" />
-    <ClCompile Include="Tests\ComponentSchedulerLoadTest.cpp" />
     <ClCompile Include="UIWindowManager.cpp" />
     <ClCompile Include="ViewportLayoutManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Core\Core.vcxproj">
-      <Project>{2eb4837c-1aeb-840d-c3d7-6a10afed000f}</Project>
+      <Project>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\Rendering\Rendering.vcxproj">
-      <Project>{e3ae1f7c-4f19-d4f2-9857-85980401b247}</Project>
+      <Project>{E3AE1F7C-4F19-D4F2-9857-85980401B247}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

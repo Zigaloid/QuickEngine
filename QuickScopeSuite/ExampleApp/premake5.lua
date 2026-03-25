@@ -41,7 +41,10 @@ project "ExampleApp"
    filter "configurations:Debug"
       defines { "DEBUG" }
       symbols "On"
-	
+	  links { "Core" }
+	  links { "Rendering" }
    filter "configurations:Release"
       defines { "NDEBUG" }
       optimize "On"	  
+	  links { "Core" }
+	  links { "Rendering" }

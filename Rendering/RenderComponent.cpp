@@ -4,7 +4,6 @@
 
 #include <cmath>
 
-
 namespace Rendering {
 
 REFL_DEFINE_OBJECT(RenderComponent)
