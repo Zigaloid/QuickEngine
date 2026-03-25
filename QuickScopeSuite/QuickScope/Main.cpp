@@ -11,10 +11,7 @@
 ProfilerApp g_theApp;
 
 int main()
-{
-
-    
-    
+{    
     if (!g_theApp.Initialize()) {
         printf("Failed to initialize application\n");
         return -1;
