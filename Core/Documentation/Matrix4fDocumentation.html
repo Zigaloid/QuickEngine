@@ -1,0 +1,298 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrix4f Class Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #e67e22;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #d35400;
+            margin-top: 30px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-line;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .method-signature {
+            background-color: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 5px 0;
+        }
+
+        .matrix-diagram {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📐 Matrix4f Class Documentation</h1>
+
+        <div class="info">
+            <strong>Purpose:</strong> A 4x4 matrix class optimized for 3D graphics transformations with OpenGL-compatible column-major storage.<br>
+            <strong>Header:</strong> Core/Math/Matrix4f.h<br>
+            <strong>Dependencies:</strong> Vector3f, std::array, cmath
+        </div>
+
+        <div class="highlight">
+            <strong>OpenGL Compatibility:</strong> Uses column-major storage format making it directly compatible with OpenGL. Internal array stores columns consecutively: m_matrix[0-3] = column 0, m_matrix[4-7] = column 1, etc.
+        </div>
+
+        <div class="matrix-diagram">
+            <strong>4x4 Transformation Matrix Layout:</strong><br>
+            [ m00  m01  m02  tx ]<br>
+            [ m10  m11  m12  ty ]<br>
+            [ m20  m21  m22  tz ]<br>
+            [  0    0    0   1  ]<br>
+            <em>3x3 rotation/scale + translation vector + homogeneous row</em>
+        </div>
+
+        <h2>Constructors</h2>
+        <table>
+            <tr>
+                <th>Constructor</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>Matrix4f()</code></td>
+                <td>Creates identity matrix</td>
+            </tr>
+            <tr>
+                <td><code>Matrix4f(const std::array&lt;float, 16&gt;&)</code></td>
+                <td>From 16-element array (column-major)</td>
+            </tr>
+            <tr>
+                <td><code>Matrix4f(float m00, float m01, ...)</code></td>
+                <td>From 16 individual elements (row-major input)</td>
+            </tr>
+        </table>
+
+        <h2>Core Operations</h2>
+
+        <h3>Element Access</h3>
+        <div class="code-block">
+            float& operator()(int row, int col);              // Access element by row/column
+            float* data();                                    // Raw data pointer for OpenGL
+            auto& GetData() const;                            // Read-only data access
+            void setColumn(int col, const Vector3f& v);      // Set column from Vector3f
+        </div>
+
+        <h3>Basic Operations</h3>
+        <div class="code-block">
+            void identity();                                  // Set to identity matrix
+            void zero();                                      // Set all elements to zero
+            Matrix4f transpose() const;                       // Return transposed matrix
+            float determinant() const;                        // Calculate determinant
+            Matrix4f inverse() const;                         // Calculate inverse matrix
+            void print() const;                               // Print matrix to console
+        </div>
+
+        <h3>Arithmetic Operations</h3>
+        <div class="code-block">
+            Matrix4f operator+(const Matrix4f& other) const; // Matrix addition
+            Matrix4f operator-(const Matrix4f& other) const; // Matrix subtraction
+            Matrix4f operator*(const Matrix4f& other) const; // Matrix multiplication
+            Matrix4f operator*(float scalar) const;          // Scalar multiplication
+            Matrix4f& operator+=(const Matrix4f& other);     // In-place addition
+            Matrix4f& operator*=(const Matrix4f& other);     // In-place multiplication
+        </div>
+
+        <h2>3D Transformations</h2>
+
+        <h3>Static Factory Methods</h3>
+        <div class="code-block">
+            // Basic transformations
+            static Matrix4f translation(float x, float y, float z);
+            static Matrix4f scale(float x, float y, float z);
+
+            // Axis rotations (angles in radians)
+            static Matrix4f rotationX(float angleRad);
+            static Matrix4f rotationY(float angleRad);
+            static Matrix4f rotationZ(float angleRad);
+
+            // Arbitrary axis rotation (Rodrigues' formula)
+            static Matrix4f rotation(float x, float y, float z, float angleRad);
+        </div>
+
+        <h3>Camera and Projection</h3>
+        <div class="code-block">
+            // View matrix
+            static Matrix4f lookAt(float eyeX, float eyeY, float eyeZ,
+            float centerX, float centerY, float centerZ,
+            float upX, float upY, float upZ);
+
+            // Projection matrices
+            static Matrix4f perspective(float fovYRad, float aspect,
+            float nearPlane, float farPlane);
+            static Matrix4f orthographic(float left, float right, float bottom,
+            float top, float nearPlane, float farPlane);
+        </div>
+
+        <h2>Vector Transformations</h2>
+
+        <h3>Point and Vector Transforms</h3>
+        <div class="code-block">
+            // Transform points (includes translation, w=1)
+            void transformPoint(float& x, float& y, float& z) const;
+            Vector3f transformPoint(const Vector3f& point) const;
+            Vector3f operator*(const Vector3f& point) const;    // Convenience operator
+
+            // Transform vectors (no translation, w=0)
+            void transformVector(float& x, float& y, float& z) const;
+            Vector3f transformVector(const Vector3f& vector) const;
+
+            // Batch transformations
+            void transformPoints(std::vector&lt;Vector3f&gt;& points) const;
+            void transformVectors(std::vector&lt;Vector3f&gt;& vectors) const;
+            std::vector&lt;Vector3f&gt; getTransformedPoints(const std::vector&lt;Vector3f&gt;& points) const;
+        </div>
+
+        <h2>Matrix Decomposition</h2>
+        <div class="code-block">
+            Vector3f extractTranslation() const;             // Get translation component
+            Vector3f extractScale() const;                   // Get scale factors
+            Vector3f extractRotationEuler() const;           // Get rotation as Euler angles (degrees)
+
+            // Decompose into all components
+            void decompose(Vector3f& translation, Vector3f& rotationDegrees, Vector3f& scale) const;
+        </div>
+
+        <h2>Usage Examples</h2>
+
+        <h3>Basic Transformation</h3>
+        <div class="code-block">
+            // Create transformation matrix: Translation * Rotation * Scale
+            Matrix4f transform = Matrix4f::translation(5, 0, 0) *
+            Matrix4f::rotationY(M_PI / 4) *
+            Matrix4f::scale(2, 2, 2);
+
+            Vector3f point(1, 0, 0);
+            Vector3f transformedPoint = transform * point;  // Apply transformation
+        </div>
+
+        <h3>Camera Setup</h3>
+        <div class="code-block">
+            // Create view matrix (camera looking at origin from distance)
+            Matrix4f view = Matrix4f::lookAt(0, 5, 10,    // Eye position
+            0, 0, 0,      // Look at origin
+            0, 1, 0);     // Up vector
+
+            // Create perspective projection
+            Matrix4f projection = Matrix4f::perspective(M_PI / 3,      // 60° FOV
+            16.0f / 9.0f,    // Aspect ratio
+            0.1f, 1000.0f);  // Near/far planes
+
+            // Combined MVP matrix
+            Matrix4f mvp = projection * view * modelMatrix;
+        </div>
+
+        <h3>Matrix Decomposition</h3>
+        <div class="code-block">
+            Matrix4f transform = /* some complex transformation */;
+
+            Vector3f translation, rotation, scale;
+            transform.decompose(translation, rotation, scale);
+
+            std::cout << "Translation: (" << translation.getX() << ", "
+            << translation.getY() << ", " << translation.getZ() << ")\n";
+            std::cout << "Rotation: (" << rotation.getX() << "°, "
+            << rotation.getY() << "°, " << rotation.getZ() << "°)\n";
+            std::cout << "Scale: (" << scale.getX() << ", "
+            << scale.getY() << ", " << scale.getZ() << ")\n";
+        </div>
+
+        <h2>Important Notes</h2>
+        <div class="highlight">
+            <ul>
+                <li><strong>Matrix Order:</strong> A * B applies transformation B first, then A</li>
+                <li><strong>Column-Major:</strong> Compatible with OpenGL, may need transpose for row-major APIs</li>
+                <li><strong>Point vs Vector:</strong> Use transformPoint() for positions, transformVector() for directions</li>
+                <li><strong>Angles:</strong> All rotation methods expect angles in radians</li>
+                <li><strong>Singular Matrices:</strong> inverse() returns identity if determinant < 1e-6</li>
+            </ul>
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            <p>Matrix4f Class Documentation - C++20 Game Engine</p>
+        </footer>
+    </div>
+</body>
+</html>

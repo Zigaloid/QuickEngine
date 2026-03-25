@@ -1,0 +1,859 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quaternion Class Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+
+        h4 {
+            color: #27ae60;
+            margin-top: 20px;
+        }
+
+        .class-header {
+            background: #e8f4fd;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .method {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .method-signature {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 8px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .static-method {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .parameters {
+            margin: 10px 0;
+        }
+
+        .parameter {
+            margin: 5px 0;
+        }
+
+        .parameter-name {
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-line;
+        }
+
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .math {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+            .toc ul {
+                list-style-type: none;
+                padding-left: 0;
+            }
+
+            .toc li {
+                margin: 5px 0;
+            }
+
+            .toc a {
+                text-decoration: none;
+                color: #2980b9;
+            }
+
+                .toc a:hover {
+                    text-decoration: underline;
+                }
+
+        .code-inline {
+            background: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        .quaternion-diagram {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .component-box {
+            background: #ffffff;
+            border: 1px solid #adb5bd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 5px;
+            display: inline-block;
+            width: 80px;
+        }
+
+        .scalar-part {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .vector-part {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quaternion Class Documentation</h1>
+
+        <div class="class-header">
+            <h2>Class Overview</h2>
+            <div class="method-signature">class Quaternion</div>
+            <p><strong>Purpose:</strong> A mathematical representation of rotations in 3D space using quaternions. Provides gimbal-lock-free rotation operations, smooth interpolation, and efficient composition of rotations.</p>
+            <p><strong>Header:</strong> <code class="code-inline">Core/Quaternion.h</code></p>
+            <p><strong>Dependencies:</strong> Vector3f, Matrix4f, cmath</p>
+        </div>
+
+        <div class="math">
+            <h4>Mathematical Foundation</h4>
+            <p>A quaternion is represented as <strong>q = w + xi + yj + zk</strong> where:</p>
+            <div class="quaternion-diagram">
+                <div class="component-box scalar-part">w<br />(scalar)</div>
+                <div class="component-box vector-part">x<br />(i)</div>
+                <div class="component-box vector-part">y<br />(j)</div>
+                <div class="component-box vector-part">z<br />(k)</div>
+                <p><strong>w</strong> = scalar part, <strong>(x, y, z)</strong> = vector part</p>
+            </div>
+        </div>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#constructors">Constructors</a></li>
+                <li><a href="#accessors">Accessors (Getters/Setters)</a></li>
+                <li><a href="#arithmetic">Arithmetic Operations</a></li>
+                <li><a href="#quaternion-operations">Quaternion Operations</a></li>
+                <li><a href="#conversions">Conversion Methods</a></li>
+                <li><a href="#vector-operations">Vector Operations</a></li>
+                <li><a href="#interpolation">Interpolation Methods</a></li>
+                <li><a href="#static-factory">Static Factory Methods</a></li>
+                <li><a href="#utility">Utility Functions</a></li>
+                <li><a href="#examples">Usage Examples</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </div>
+
+        <h2 id="constructors">Constructors</h2>
+
+        <div class="method">
+            <div class="method-signature">Quaternion()</div>
+            <p>Default constructor. Creates an identity quaternion representing no rotation.</p>
+            <div class="example">Quaternion q;  // Creates (1, 0, 0, 0) - identity quaternion</div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Quaternion(float w, float x, float y, float z)</div>
+            <p>Constructs a quaternion with specified components.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">w:</span> Scalar component</div>
+                <div class="parameter"><span class="parameter-name">x:</span> i component of vector part</div>
+                <div class="parameter"><span class="parameter-name">y:</span> j component of vector part</div>
+                <div class="parameter"><span class="parameter-name">z:</span> k component of vector part</div>
+            </div>
+            <div class="example">Quaternion q(0.707f, 0.707f, 0.0f, 0.0f);  // 90-degree rotation around X-axis</div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Quaternion(const Vector3f& axis, float angleRad)</div>
+            <p>Constructs a quaternion from axis-angle representation.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">axis:</span> Rotation axis (will be normalized)</div>
+                <div class="parameter"><span class="parameter-name">angleRad:</span> Rotation angle in radians</div>
+            </div>
+            <div class="example">
+                Vector3f axis(0, 1, 0);  // Y-axis
+                float angle = M_PI / 4;     // 45 degrees
+                Quaternion q(axis, angle);  // 45-degree rotation around Y-axis
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Quaternion(float pitch, float yaw, float roll)</div>
+            <p>Constructs a quaternion from Euler angles (in radians).</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">pitch:</span> Rotation around X-axis (radians)</div>
+                <div class="parameter"><span class="parameter-name">yaw:</span> Rotation around Y-axis (radians)</div>
+                <div class="parameter"><span class="parameter-name">roll:</span> Rotation around Z-axis (radians)</div>
+            </div>
+            <div class="example">
+                float pitch = M_PI / 6;  // 30 degrees
+                float yaw = M_PI / 4;    // 45 degrees
+                float roll = 0.0f;       // 0 degrees
+                Quaternion q(pitch, yaw, roll);
+            </div>
+        </div>
+
+        <h2 id="accessors">Accessors (Getters/Setters)</h2>
+
+        <div class="method">
+            <div class="method-signature">float getW() const</div>
+            <div class="method-signature">float getX() const</div>
+            <div class="method-signature">float getY() const</div>
+            <div class="method-signature">float getZ() const</div>
+            <p>Getter methods to retrieve individual quaternion components.</p>
+            <div class="example">
+                Quaternion q(0.5f, 0.5f, 0.5f, 0.5f);
+                float w = q.getW();  // Returns 0.5f
+                float x = q.getX();  // Returns 0.5f
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void setW(float w)</div>
+            <div class="method-signature">void setX(float x)</div>
+            <div class="method-signature">void setY(float y)</div>
+            <div class="method-signature">void setZ(float z)</div>
+            <div class="method-signature">void set(float w, float x, float y, float z)</div>
+            <p>Setter methods to modify quaternion components.</p>
+            <div class="example">
+                Quaternion q;
+                q.setW(0.707f);
+                q.setX(0.707f);
+                q.setY(0.0f);
+                q.setZ(0.0f);
+                // Or set all at once:
+                q.set(0.707f, 0.707f, 0.0f, 0.0f);
+            </div>
+        </div>
+
+        <h2 id="arithmetic">Arithmetic Operations</h2>
+
+        <div class="method">
+            <div class="method-signature">Quaternion operator+(const Quaternion& other) const</div>
+            <div class="method-signature">Quaternion& operator+=(const Quaternion& other)</div>
+            <p>Quaternion addition (component-wise). Note: The sum of two unit quaternions is not necessarily a unit quaternion.</p>
+            <div class="example">
+                Quaternion q1(1, 0, 0, 0);
+                Quaternion q2(0, 1, 0, 0);
+                Quaternion sum = q1 + q2;  // (1, 1, 0, 0)
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Quaternion operator*(const Quaternion& other) const</div>
+            <div class="method-signature">Quaternion& operator*=(const Quaternion& other)</div>
+            <p>Quaternion multiplication (Hamilton product). This composes rotations: q1 * q2 applies q2 first, then q1.</p>
+            <div class="warning">
+                <strong>Note:</strong> Quaternion multiplication is not commutative! q1 * q2 ≠ q2 * q1
+            </div>
+            <div class="example">
+                Quaternion rotX = Quaternion::rotationX(M_PI / 2);  // 90° around X
+                Quaternion rotY = Quaternion::rotationY(M_PI / 2);  // 90° around Y
+                Quaternion combined = rotX * rotY;  // Apply Y rotation, then X rotation
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Quaternion operator*(float scalar) const</div>
+            <div class="method-signature">Quaternion& operator*=(float scalar)</div>
+            <p>Scalar multiplication. Multiplies all components by the scalar.</p>
+            <div class="example">
+                Quaternion q(1, 0, 0, 0);
+                Quaternion scaled = q * 2.0f;  // (2, 0, 0, 0)
+            </div>
+        </div>
+
+        <h2 id="quaternion-operations">Quaternion Operations</h2>
+
+        <div class="method">
+            <div class="method-signature">float dot(const Quaternion& other) const</div>
+            <p>Calculates the dot product of two quaternions. Useful for measuring similarity between rotations.</p>
+            <div class="example">
+                Quaternion q1(1, 0, 0, 0);
+                Quaternion q2(0.707f, 0.707f, 0, 0);
+                float similarity = q1.dot(q2);  // Returns ~0.707
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">float magnitude() const</div>
+            <div class="method-signature">float magnitudeSquared() const</div>
+            <p>Returns the magnitude (norm) of the quaternion. For unit quaternions, this should be 1.0.</p>
+            <div class="example">
+                Quaternion q(0.5f, 0.5f, 0.5f, 0.5f);
+                float mag = q.magnitude();        // Returns 1.0f
+                float magSq = q.magnitudeSquared(); // Returns 1.0f (more efficient)
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Quaternion& normalize()</div>
+            <div class="method-signature">Quaternion normalized() const</div>
+            <p>Normalizes the quaternion to unit length. Essential for representing valid rotations.</p>
+            <div class="warning">
+                <strong>Warning:</strong> These methods throw std::runtime_error if the quaternion is zero.
+            </div>
+            <div class="example">
+                Quaternion q(2, 2, 2, 2);
+                Quaternion unit = q.normalized();  // Returns (0.5, 0.5, 0.5, 0.5)
+                q.normalize();                     // q is now (0.5, 0.5, 0.5, 0.5)
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Quaternion conjugate() const</div>
+            <p>Returns the quaternion conjugate (w, -x, -y, -z). For unit quaternions, this represents the inverse rotation.</p>
+            <div class="example">
+                Quaternion q(0.707f, 0.707f, 0, 0);  // 90° around X
+                Quaternion conj = q.conjugate();   // Represents -90° around X
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Quaternion inverse() const</div>
+            <p>Returns the quaternion inverse. For unit quaternions, this is equivalent to the conjugate.</p>
+            <div class="warning">
+                <strong>Warning:</strong> Throws std::runtime_error if the quaternion is zero.
+            </div>
+            <div class="example">
+                Quaternion q(0.707f, 0.707f, 0, 0);
+                Quaternion inv = q.inverse();
+                Quaternion identity = q * inv;  // Should be approximately (1, 0, 0, 0)
+            </div>
+        </div>
+
+        <h2 id="conversions">Conversion Methods</h2>
+
+        <div class="method">
+            <div class="method-signature">void fromAxisAngle(const Vector3f& axis, float angleRad)</div>
+            <div class="method-signature">void toAxisAngle(Vector3f& axis, float& angleRad) const</div>
+            <p>Convert between quaternion and axis-angle representation.</p>
+            <div class="example">
+                // From axis-angle to quaternion
+                Vector3f axis(0, 1, 0);
+                float angle = M_PI / 3;  // 60 degrees
+                Quaternion q;
+                q.fromAxisAngle(axis, angle);
+
+                // From quaternion to axis-angle
+                Vector3f extractedAxis;
+                float extractedAngle;
+                q.toAxisAngle(extractedAxis, extractedAngle);
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void fromEulerAngles(float pitch, float yaw, float roll)</div>
+            <div class="method-signature">Vector3f toEulerAngles() const</div>
+            <p>Convert between quaternion and Euler angles (in radians).</p>
+            <div class="note">
+                <strong>Note:</strong> Euler angle conversion can suffer from gimbal lock. Use quaternions for intermediate calculations when possible.
+            </div>
+            <div class="example">
+                // From Euler angles to quaternion
+                Quaternion q;
+                q.fromEulerAngles(M_PI/6, M_PI/4, M_PI/3);  // 30°, 45°, 60°
+
+                // From quaternion to Euler angles
+                Vector3f eulerAngles = q.toEulerAngles();
+                float pitch = eulerAngles.getX();
+                float yaw = eulerAngles.getY();
+                float roll = eulerAngles.getZ();
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Matrix4f toMatrix() const</div>
+            <div class="method-signature">static Quaternion fromMatrix(const Matrix4f& matrix)</div>
+            <p>Convert between quaternion and 4x4 rotation matrix.</p>
+            <div class="example">
+                // Convert quaternion to matrix
+                Quaternion q = Quaternion::rotationY(M_PI / 4);
+                Matrix4f rotMatrix = q.toMatrix();
+
+                // Convert matrix to quaternion
+                Quaternion q2 = Quaternion::fromMatrix(rotMatrix);
+            </div>
+        </div>
+
+        <h2 id="vector-operations">Vector Operations</h2>
+
+        <div class="method">
+            <div class="method-signature">Vector3f rotateVector(const Vector3f& vector) const</div>
+            <div class="method-signature">Vector3f operator*(const Vector3f& vector) const</div>
+            <p>Rotates a 3D vector by this quaternion. The operator* provides convenient syntax.</p>
+            <div class="example">
+                Vector3f forward(0, 0, 1);
+                Quaternion q = Quaternion::rotationY(M_PI / 2);  // 90° around Y-axis
+
+                Vector3f rotated1 = q.rotateVector(forward);  // Method call
+                Vector3f rotated2 = q * forward;              // Operator syntax
+                // Both return (-1, 0, 0) - forward vector rotated to point left
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">Vector3f getForward() const</div>
+            <div class="method-signature">Vector3f getRight() const</div>
+            <div class="method-signature">Vector3f getUp() const</div>
+            <p>Gets the local coordinate axes after applying this rotation.</p>
+            <div class="example">
+                Quaternion q = Quaternion::rotationY(M_PI / 2);  // 90° around Y
+                Vector3f forward = q.getForward();  // (-1, 0, 0)
+                Vector3f right = q.getRight();      // (0, 0, 1)
+                Vector3f up = q.getUp();            // (0, 1, 0)
+            </div>
+        </div>
+
+        <h2 id="interpolation">Interpolation Methods</h2>
+
+        <div class="static-method">
+            <div class="method-signature">static Quaternion slerp(const Quaternion& a, const Quaternion& b, float t)</div>
+            <p>Spherical Linear Interpolation. Provides smooth, constant-speed interpolation between two rotations.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">a:</span> Start quaternion</div>
+                <div class="parameter"><span class="parameter-name">b:</span> End quaternion</div>
+                <div class="parameter"><span class="parameter-name">t:</span> Interpolation parameter (0.0 to 1.0)</div>
+            </div>
+            <div class="example">
+                Quaternion start = Quaternion::identity();
+                Quaternion end = Quaternion::rotationY(M_PI);  // 180° rotation
+
+                // Smooth rotation animation
+                for (float t = 0.0f; t <= 1.0f; t += 0.1f) {
+                Quaternion current = Quaternion::slerp(start, end, t);
+                // Use 'current' for animation frame
+                }
+            </div>
+        </div>
+
+        <div class="static-method">
+            <div class="method-signature">static Quaternion nlerp(const Quaternion& a, const Quaternion& b, float t)</div>
+            <p>Normalized Linear Interpolation. Faster than SLERP but with non-constant angular velocity.</p>
+            <div class="info">
+                <strong>Performance:</strong> NLERP is faster than SLERP and often visually acceptable for short interpolations.
+            </div>
+            <div class="example">
+                Quaternion start = Quaternion::identity();
+                Quaternion end = Quaternion::rotationX(M_PI / 4);
+
+                // Fast interpolation (good for small angle differences)
+                Quaternion interpolated = Quaternion::nlerp(start, end, 0.5f);
+            </div>
+        </div>
+
+        <h2 id="static-factory">Static Factory Methods</h2>
+
+        <div class="static-method">
+            <div class="method-signature">static Quaternion identity()</div>
+            <p>Creates an identity quaternion (no rotation).</p>
+            <div class="example">Quaternion q = Quaternion::identity();  // (1, 0, 0, 0)</div>
+        </div>
+
+        <div class="static-method">
+            <div class="method-signature">static Quaternion rotationX(float angleRad)</div>
+            <div class="method-signature">static Quaternion rotationY(float angleRad)</div>
+            <div class="method-signature">static Quaternion rotationZ(float angleRad)</div>
+            <p>Creates quaternions for rotation around principal axes.</p>
+            <div class="example">
+                Quaternion pitchDown = Quaternion::rotationX(-M_PI / 6);  // -30° pitch
+                Quaternion turnRight = Quaternion::rotationY(M_PI / 4);   // 45° yaw
+                Quaternion rollLeft = Quaternion::rotationZ(M_PI / 8);    // 22.5° roll
+            </div>
+        </div>
+
+        <div class="static-method">
+            <div class="method-signature">static Quaternion fromToRotation(const Vector3f& from, const Vector3f& to)</div>
+            <p>Creates a quaternion that rotates vector 'from' to align with vector 'to'.</p>
+            <div class="example">
+                Vector3f currentDir(1, 0, 0);    // Pointing right
+                Vector3f targetDir(0, 0, 1);     // Want to point forward
+
+                Quaternion rotation = Quaternion::fromToRotation(currentDir, targetDir);
+                Vector3f result = rotation * currentDir;  // Now points forward
+            </div>
+        </div>
+
+        <div class="static-method">
+            <div class="method-signature">static Quaternion lookRotation(const Vector3f& forward, const Vector3f& up = Vector3f(0, 1, 0))</div>
+            <p>Creates a rotation that looks in the specified direction. Useful for cameras and object orientation.</p>
+            <div class="example">
+                Vector3f lookDirection = (target - position).normalized();
+                Quaternion cameraOrientation = Quaternion::lookRotation(lookDirection);
+
+                // Apply to camera
+                camera.setOrientation(cameraOrientation);
+            </div>
+        </div>
+
+        <h2 id="utility">Utility Functions</h2>
+
+        <div class="method">
+            <div class="method-signature">bool isUnit() const</div>
+            <p>Checks if the quaternion is normalized (unit length). Essential for valid rotations.</p>
+            <div class="example">
+                Quaternion q(0.707f, 0.707f, 0, 0);
+                if (q.isUnit()) {
+                std::cout << "Valid rotation quaternion" << std::endl;
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">bool isZero() const</div>
+            <p>Checks if the quaternion is approximately zero.</p>
+            <div class="example">
+                Quaternion q(0.0000001f, 0, 0, 0);
+                if (q.isZero()) {
+                std::cout << "Quaternion is effectively zero" << std::endl;
+                }
+            </div>
+        </div>
+
+        <h2 id="examples">Usage Examples</h2>
+
+        <h3>Basic Rotation Operations</h3>
+        <div class="example">
+            // Create rotations
+            Quaternion rotX = Quaternion::rotationX(M_PI / 4);  // 45° around X-axis
+            Quaternion rotY = Quaternion::rotationY(M_PI / 3);  // 60° around Y-axis
+
+            // Combine rotations (order matters!)
+            Quaternion combined = rotY * rotX;  // Apply X rotation first, then Y
+
+            // Rotate a vector
+            Vector3f point(1, 0, 0);
+            Vector3f rotatedPoint = combined * point;
+
+            std::cout << "Original: " << point << std::endl;
+            std::cout << "Rotated: " << rotatedPoint << std::endl;
+        </div>
+
+        <h3>Camera System Integration</h3>
+        <div class="example">
+            class FPSCamera {
+            Vector3f position;
+            Quaternion orientation;
+
+            public:
+            void rotate(float deltaYaw, float deltaPitch) {
+            // Yaw around world Y-axis
+            Quaternion yawRotation = Quaternion::rotationY(deltaYaw);
+            orientation = yawRotation * orientation;
+
+            // Pitch around local X-axis
+            Quaternion pitchRotation = Quaternion::rotationX(deltaPitch);
+            orientation = orientation * pitchRotation;
+
+            orientation.normalize();
+            }
+
+            void moveForward(float distance) {
+            Vector3f forward = orientation.getForward();
+            position += forward * distance;
+            }
+
+            Matrix4f getViewMatrix() const {
+            Matrix4f rotation = orientation.conjugate().toMatrix();
+            Matrix4f translation = Matrix4f::translation(-position.getX(),
+            -position.getY(),
+            -position.getZ());
+            return rotation * translation;
+            }
+            };
+        </div>
+
+        <h3>Animation and Interpolation</h3>
+        <div class="example">
+            // Smooth rotation animation between two orientations
+            class RotationAnimator {
+            Quaternion startRotation;
+            Quaternion endRotation;
+            float duration;
+            float currentTime;
+
+            public:
+            RotationAnimator(const Quaternion& start, const Quaternion& end, float dur)
+            : startRotation(start), endRotation(end), duration(dur), currentTime(0) {}
+
+            Quaternion update(float deltaTime) {
+            currentTime += deltaTime;
+            float t = std::min(currentTime / duration, 1.0f);
+
+            // Use SLERP for smooth interpolation
+            return Quaternion::slerp(startRotation, endRotation, t);
+            }
+
+            bool isComplete() const {
+            return currentTime >= duration;
+            }
+            };
+
+            // Usage in game loop
+            RotationAnimator animator(Quaternion::identity(),
+            Quaternion::rotationY(M_PI),
+            2.0f);  // 2-second rotation
+
+            while (!animator.isComplete()) {
+            Quaternion currentRotation = animator.update(deltaTime);
+            object.setRotation(currentRotation);
+            render();
+            }
+        </div>
+
+        <h3>Physics Integration</h3>
+        <div class="example">
+            // Rigid body rotation using quaternions
+            class RigidBody {
+            Vector3f position;
+            Vector3f velocity;
+            Quaternion orientation;
+            Vector3f angularVelocity;  // Axis of rotation * angular speed
+
+            public:
+            void update(float deltaTime) {
+            // Update position
+            position += velocity * deltaTime;
+
+            // Update rotation using angular velocity
+            if (!angularVelocity.isZero()) {
+            float angularSpeed = angularVelocity.magnitude();
+            Vector3f axis = angularVelocity.normalized();
+
+            Quaternion deltaRotation(axis, angularSpeed * deltaTime);
+            orientation = deltaRotation * orientation;
+            orientation.normalize();
+            }
+            }
+
+            void applyTorque(const Vector3f& torque, float deltaTime) {
+            // Simple integration of angular velocity
+            angularVelocity += torque * deltaTime;
+            }
+
+            Matrix4f getTransformMatrix() const {
+            Matrix4f rotation = orientation.toMatrix();
+            Matrix4f translation = Matrix4f::translation(position.getX(),
+            position.getY(),
+            position.getZ());
+            return translation * rotation;
+            }
+            };
+        </div>
+
+        <h3>Converting Between Representations</h3>
+        <div class="example">
+            // Working with different rotation representations
+            void demonstrateConversions() {
+            // Start with Euler angles (degrees converted to radians)
+            float pitchDeg = 30.0f, yawDeg = 45.0f, rollDeg = 60.0f;
+            float pitch = pitchDeg * M_PI / 180.0f;
+            float yaw = yawDeg * M_PI / 180.0f;
+            float roll = rollDeg * M_PI / 180.0f;
+
+            // Convert to quaternion
+            Quaternion q;
+            q.fromEulerAngles(pitch, yaw, roll);
+
+            // Convert to axis-angle
+            Vector3f axis;
+            float angle;
+            q.toAxisAngle(axis, angle);
+
+            std::cout << "Axis: " << axis << ", Angle: " << (angle * 180.0f / M_PI) << "°" << std::endl;
+
+            // Convert to rotation matrix
+            Matrix4f rotMatrix = q.toMatrix();
+
+            // Convert back to quaternion from matrix
+            Quaternion q2 = Quaternion::fromMatrix(rotMatrix);
+
+            // Verify they're the same (accounting for potential sign flip)
+            float dot = q.dot(q2);
+            bool equivalent = (std::abs(dot) > 0.999f);
+            std::cout << "Conversion successful: " << equivalent << std::endl;
+            }
+        </div>
+
+        <h3>Object Alignment</h3>
+        <div class="example">
+            // Align one object to look at another
+            class GameObject {
+            Vector3f position;
+            Quaternion orientation;
+
+            public:
+            void lookAt(const Vector3f& target, const Vector3f& worldUp = Vector3f(0, 1, 0)) {
+            Vector3f direction = (target - position).normalized();
+
+            // Create rotation to look in that direction
+            orientation = Quaternion::lookRotation(direction, worldUp);
+            }
+
+            void smoothLookAt(const Vector3f& target, float turnSpeed, float deltaTime) {
+            Vector3f direction = (target - position).normalized();
+            Quaternion targetRotation = Quaternion::lookRotation(direction);
+
+            // Smoothly interpolate to target rotation
+            float t = std::min(turnSpeed * deltaTime, 1.0f);
+            orientation = Quaternion::slerp(orientation, targetRotation, t);
+            }
+
+            // Get the forward direction vector
+            Vector3f getForwardDirection() const {
+            return orientation.getForward();
+            }
+            };
+        </div>
+
+        <h2 id="best-practices">Best Practices</h2>
+
+        <div class="note">
+            <h4>Normalization</h4>
+            <ul>
+                <li><strong>Always normalize:</strong> Keep quaternions normalized when representing rotations</li>
+                <li><strong>Accumulation errors:</strong> Renormalize periodically during long sequences of operations</li>
+                <li><strong>Check validity:</strong> Use <code>isUnit()</code> to verify quaternion validity</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>Performance Optimization</h4>
+            <ul>
+                <li><strong>Use conjugate for unit quaternions:</strong> For unit quaternions, conjugate() is faster than inverse()</li>
+                <li><strong>NLERP vs SLERP:</strong> Use NLERP for small angle differences, SLERP for accurate interpolation</li>
+                <li><strong>Avoid Euler conversions:</strong> Minimize conversions to/from Euler angles in inner loops</li>
+                <li><strong>Cache results:</strong> Store converted matrices/vectors when used repeatedly</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Common Pitfalls</h4>
+            <ul>
+                <li><strong>Order of operations:</strong> Remember that quaternion multiplication is not commutative</li>
+                <li><strong>Double cover:</strong> q and -q represent the same rotation; handle this in interpolation</li>
+                <li><strong>Gimbal lock:</strong> Euler angles can still cause issues even when using quaternions for storage</li>
+                <li><strong>Precision loss:</strong> Repeated operations can accumulate floating-point errors</li>
+            </ul>
+        </div>
+
+        <div class="math">
+            <h4>Mathematical Properties</h4>
+            <ul>
+                <li><strong>Unit quaternions:</strong> For rotations, |q| = 1</li>
+                <li><strong>Inverse:</strong> For unit quaternions, q⁻¹ = q* (conjugate)</li>
+                <li><strong>Composition:</strong> q₂ * q₁ applies rotation q₁ first, then q₂</li>
+                <li><strong>Identity:</strong> (1, 0, 0, 0) represents no rotation</li>
+                <li><strong>Double cover:</strong> q and -q represent the same rotation</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>Integration with Graphics APIs</h4>
+            <ul>
+                <li><strong>OpenGL:</strong> Use toMatrix() to convert to 4x4 matrices for shaders</li>
+                <li><strong>Camera systems:</strong> Use conjugate for view matrix conversion</li>
+                <li><strong>Animation systems:</strong> SLERP provides smooth, professional-quality rotation animation</li>
+                <li><strong>Physics engines:</strong> Most physics engines accept quaternions directly for orientation</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

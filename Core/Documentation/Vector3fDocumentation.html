@@ -1,0 +1,310 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vector3f Class Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #27ae60;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #27ae60;
+            margin-top: 30px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-line;
+        }
+
+        .highlight {
+            background-color: #d4edda;
+            padding: 10px;
+            border-left: 4px solid #27ae60;
+            margin: 15px 0;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .vector-diagram {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📐 Vector3f Class Documentation</h1>
+
+        <div class="info">
+            <strong>Purpose:</strong> A 3D vector class for mathematical operations in 3D space with comprehensive geometric functionality.<br>
+            <strong>Header:</strong> Core/Math/Vector3f.h<br>
+            <strong>Dependencies:</strong> cmath, iostream, algorithm
+        </div>
+
+        <div class="highlight">
+            <strong>Key Features:</strong> Public member access (x, y, z), comprehensive mathematical operations, utility functions for common 3D vector operations, and exception-safe division/normalization.
+        </div>
+
+        <div class="vector-diagram">
+            <strong>3D Vector Representation:</strong><br>
+            Vector3f(x, y, z)<br>
+            <em>x: right/left, y: up/down, z: forward/back</em>
+        </div>
+
+        <h2>Constructors</h2>
+        <table>
+            <tr>
+                <th>Constructor</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td><code>Vector3f()</code></td>
+                <td>Creates zero vector (0, 0, 0)</td>
+            </tr>
+            <tr>
+                <td><code>Vector3f(float x, float y, float z)</code></td>
+                <td>Creates vector with specified components</td>
+            </tr>
+            <tr>
+                <td><code>Vector3f(const Vector3f& other)</code></td>
+                <td>Copy constructor</td>
+            </tr>
+        </table>
+
+        <h2>Member Access</h2>
+
+        <h3>Public Members</h3>
+        <div class="code-block">float x, y, z;                                   // Direct access to components</div>
+
+        <h3>Getters and Setters</h3>
+        <div class="code-block">
+            float getX() const;
+            float getY() const;
+            float getZ() const;
+            void setX(float x);
+            void setY(float y);
+            void setZ(float z);
+            void set(float x, float y, float z);             // Set all components at once
+        </div>
+
+        <h2>Arithmetic Operations</h2>
+
+        <h3>Vector Operations</h3>
+        <div class="code-block">
+            Vector3f operator+(const Vector3f& other) const; // Vector addition
+            Vector3f operator-(const Vector3f& other) const; // Vector subtraction
+            Vector3f operator-() const;                       // Unary negation
+            Vector3f& operator+=(const Vector3f& other);     // In-place addition
+            Vector3f& operator-=(const Vector3f& other);     // In-place subtraction
+        </div>
+
+        <h3>Scalar Operations</h3>
+        <div class="code-block">
+            Vector3f operator*(float scalar) const;          // Scalar multiplication
+            Vector3f operator/(float scalar) const;          // Scalar division (throws on zero)
+            Vector3f& operator*=(float scalar);              // In-place multiplication
+            Vector3f& operator/=(float scalar);              // In-place division (throws on zero)
+        </div>
+
+        <h3>Comparison</h3>
+        <div class="code-block">
+            bool operator==(const Vector3f& other) const;    // Equality (epsilon-based)
+            bool operator!=(const Vector3f& other) const;    // Inequality
+        </div>
+
+        <h2>Vector Mathematics</h2>
+
+        <h3>Core Vector Operations</h3>
+        <div class="code-block">
+            float dot(const Vector3f& other) const;          // Dot product
+            Vector3f cross(const Vector3f& other) const;     // Cross product
+            float magnitude() const;                          // Vector length
+            float length() const;                             // Alias for magnitude()
+            float magnitudeSquared() const;                   // Squared length (more efficient)
+        </div>
+
+        <h3>Normalization</h3>
+        <div class="code-block">
+            Vector3f& normalize();                            // Normalize in-place (throws on zero)
+            Vector3f normalized() const;                      // Return normalized copy (throws on zero)
+            bool isUnit() const;                              // Check if unit length
+            bool isZero() const;                              // Check if zero vector
+        </div>
+
+        <h2>Geometric Operations</h2>
+
+        <h3>Distance and Angles</h3>
+        <div class="code-block">
+            float distanceTo(const Vector3f& other) const;   // Distance between points
+            float distanceSquaredTo(const Vector3f& other) const; // Squared distance
+            float angleTo(const Vector3f& other) const;      // Angle in radians (throws on zero)
+        </div>
+
+        <h3>Projection and Reflection</h3>
+        <div class="code-block">
+            Vector3f projectOnto(const Vector3f& other) const; // Project onto another vector
+            Vector3f reflect(const Vector3f& normal) const;    // Reflect across normal
+        </div>
+
+        <h3>Interpolation</h3>
+        <div class="code-block">static Vector3f lerp(const Vector3f& a, const Vector3f& b, float t); // Linear interpolation</div>
+
+        <h2>Static Utility Functions</h2>
+        <div class="code-block">
+            static Vector3f zero();                           // (0, 0, 0)
+            static Vector3f one();                            // (1, 1, 1)
+            static Vector3f right();                          // (1, 0, 0) - X axis
+            static Vector3f up();                             // (0, 1, 0) - Y axis
+            static Vector3f forward();                        // (0, 0, 1) - Z axis
+        </div>
+
+        <h2>Usage Examples</h2>
+
+        <h3>Basic Vector Operations</h3>
+        <div class="code-block">
+            Vector3f a(1, 2, 3);
+            Vector3f b(4, 5, 6);
+
+            Vector3f sum = a + b;                             // (5, 7, 9)
+            Vector3f scaled = a * 2.0f;                       // (2, 4, 6)
+            float dotProduct = a.dot(b);                      // 32.0f
+            Vector3f crossProduct = a.cross(b);               // (-3, 6, -3)
+        </div>
+
+        <h3>Geometric Calculations</h3>
+        <div class="code-block">
+            Vector3f position(10, 0, 0);
+            Vector3f target(0, 0, 0);
+
+            Vector3f direction = (target - position).normalized(); // Direction to target
+            float distance = position.distanceTo(target);          // Distance to target
+            float angle = Vector3f::right().angleTo(direction);    // Angle from X-axis
+        </div>
+
+        <h3>Common 3D Operations</h3>
+        <div class="code-block">
+            // Calculate surface normal from three points
+            Vector3f p1(0, 0, 0), p2(1, 0, 0), p3(0, 1, 0);
+            Vector3f edge1 = p2 - p1;
+            Vector3f edge2 = p3 - p1;
+            Vector3f normal = edge1.cross(edge2).normalized();
+
+            // Reflect ray off surface
+            Vector3f incident(-1, -1, 0);
+            Vector3f surfaceNormal(0, 1, 0);
+            Vector3f reflected = incident.reflect(surfaceNormal);
+
+            // Linear interpolation for animation
+            Vector3f start(0, 0, 0);
+            Vector3f end(10, 5, -3);
+            Vector3f halfway = Vector3f::lerp(start, end, 0.5f);   // Midpoint
+        </div>
+
+        <h3>Error Handling</h3>
+        <div class="code-block">
+            try {
+            Vector3f zero = Vector3f::zero();
+            Vector3f normalized = zero.normalized();        // Throws runtime_error
+            } catch (const std::runtime_error& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            }
+
+            try {
+            Vector3f v(1, 2, 3);
+            Vector3f result = v / 0.0f;                     // Throws invalid_argument
+            } catch (const std::invalid_argument& e) {
+            std::cout << "Error: " << e.what() << std::endl;
+            }
+        </div>
+
+        <h2>Important Notes</h2>
+        <div class="highlight">
+            <ul>
+                <li><strong>Exception Safety:</strong> Division by zero and normalization of zero vectors throw exceptions</li>
+                <li><strong>Epsilon Comparison:</strong> Equality uses epsilon (1e-6f) for floating-point comparison</li>
+                <li><strong>Public Members:</strong> Direct access to x, y, z for performance-critical code</li>
+                <li><strong>Coordinate System:</strong> Right-handed coordinate system (X=right, Y=up, Z=forward)</li>
+                <li><strong>Performance:</strong> Use magnitudeSquared() when you don't need the actual magnitude</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <strong>Exception Handling:</strong> Methods that can throw exceptions include normalize(), normalized(), angleTo(), projectOnto(), and division operators. Always handle these appropriately in production code.
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            <p>Vector3f Class Documentation - C++20 Game Engine</p>
+        </footer>
+    </div>
+</body>
+</html>

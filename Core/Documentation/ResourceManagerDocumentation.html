@@ -1,0 +1,1353 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResourceManager API Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #9b59b6;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .success {
+            background-color: #d4edda;
+            padding: 10px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .method-signature {
+            background-color: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 5px 0;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .toc > ul {
+            padding-left: 0;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .architecture-diagram {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .lifecycle-diagram {
+            background-color: #e8f4f8;
+            border: 2px solid #17a2b8;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            font-family: monospace;
+        }
+
+        .state-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-right: 8px;
+        }
+
+        .state-uninitialized { background-color: #f8d7da; color: #721c24; }
+        .state-initialized { background-color: #fff3cd; color: #856404; }
+        .state-loaded { background-color: #d4edda; color: #155724; }
+        .state-finalized { background-color: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>??? ResourceManager API Documentation</h1>
+        
+        <div class="info">
+            <strong>Version:</strong> 1.0<br>
+            <strong>Compatibility:</strong> C++20<br>
+            <strong>Namespace:</strong> ResourceSystem<br>
+            <strong>Header:</strong> ResourceManager.h<br>
+            <strong>Last Updated:</strong> October 2025
+        </div>
+
+        <div class="toc">
+            <h3>?? Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#architecture">2. Architecture</a></li>
+                <li><a href="#core-classes">3. Core Classes</a></li>
+                <li><a href="#resource-class">4. Resource Base Class</a></li>
+                <li><a href="#resource-manager">5. ResourceManager Class</a></li>
+                <li><a href="#lifecycle">6. Resource Lifecycle</a></li>
+                <li><a href="#thread-safety">7. Thread Safety</a></li>
+                <li><a href="#basic-usage">8. Basic Usage Examples</a></li>
+                <li><a href="#advanced-usage">9. Advanced Usage</a></li>
+                <li><a href="#custom-resources">10. Custom Resource Types</a></li>
+                <li><a href="#performance">11. Performance Considerations</a></li>
+                <li><a href="#best-practices">12. Best Practices</a></li>
+                <li><a href="#troubleshooting">13. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">1. ?? Overview</h2>
+        <p>The ResourceManager provides an asynchronous, thread-safe resource loading and management system for C++20 applications. It handles the complete lifecycle of resources from loading to finalization, with support for custom resource types and automatic memory management.</p>
+
+        <div class="highlight">
+            <strong>Key Features:</strong>
+            <ul>
+                <li>? Asynchronous resource loading with dedicated worker thread</li>
+                <li>? Thread-safe resource access and management</li>
+                <li>? Template-based type-safe resource creation</li>
+                <li>? Automatic resource deduplication (same path = same instance)</li>
+                <li>? Complete resource lifecycle management</li>
+                <li>? Integration with FileSystemManager</li>
+                <li>? Extensible resource type system</li>
+                <li>? Comprehensive monitoring and statistics</li>
+            </ul>
+        </div>
+
+        <h2 id="architecture">2. ??? Architecture</h2>
+
+        <div class="architecture-diagram">
+            <h4>ResourceManager Architecture</h4>
+            <pre>
+???????????????????????????????????????????????????????????
+?                  ResourceManager                        ?
+?  ????????????????????????????????????????????????????????
+?  ?                Main Thread                          ??
+?  ?  ??????????????????? ?????????????????????????????????
+?  ?  ? RequestResource ? ?    UpdateFinalization      ???
+?  ?  ?      API        ? ?         API                ???
+?  ?  ??????????????????? ?????????????????????????????????
+?  ????????????????????????????????????????????????????????
+?                            ?                            ?
+?  ????????????????????????????????????????????????????????
+?  ?            Shared Resource Storage                  ??
+?  ?  ?????????????????????????????????????????????????????
+?  ?  ?     std::unordered_map<path, Resource>         ???
+?  ?  ?              (thread-safe)                     ???
+?  ?  ?????????????????????????????????????????????????????
+?  ????????????????????????????????????????????????????????
+?                        ?                               ?
+?  ????????????????????????????????????????????????????????
+?  ?              Worker Thread                          ??
+?  ?  ??????????????????? ?????????????????????????????????
+?  ?  ? Loading Queue   ? ?     Processing Loop         ???
+?  ?  ?                 ? ?  � Initialize               ???
+?  ?  ? Resource*       ? ?  � Update (File Loading)    ???
+?  ?  ? Resource*       ? ?  � Queue for Finalization  ???
+?  ?  ? Resource*       ? ?                             ???
+?  ?  ??????????????????? ?????????????????????????????????
+?  ????????????????????????????????????????????????????????
+?                                                         ?
+?  ????????????????????????????????????????????????????????
+?  ?            FileSystemManager                        ??
+?  ?              Integration                             ??
+?  ????????????????????????????????????????????????????????
+???????????????????????????????????????????????????????????
+            </pre>
+        </div>
+
+        <h2 id="core-classes">3. ??? Core Classes</h2>
+
+        <table>
+            <tr>
+                <th>Class</th>
+                <th>Purpose</th>
+                <th>Key Features</th>
+            </tr>
+            <tr>
+                <td><strong>Resource</strong></td>
+                <td>Base class for all resources</td>
+                <td>Lifecycle management, data storage, state tracking</td>
+            </tr>
+            <tr>
+                <td><strong>ResourceManager</strong></td>
+                <td>Central resource management system</td>
+                <td>Async loading, thread safety, type safety, deduplication</td>
+            </tr>
+        </table>
+
+        <h2 id="resource-class">4. ?? Resource Base Class</h2>
+
+        <p>The Resource class provides the foundation for all loadable resources in the system.</p>
+
+        <h3>Resource State Management</h3>
+        <div class="lifecycle-diagram">
+            <div class="state-indicator state-uninitialized">Uninitialized</div> ?
+            <div class="state-indicator state-initialized">Initialized</div> ?
+            <div class="state-indicator state-loaded">Loaded</div> ?
+            <div class="state-indicator state-finalized">Finalized</div>
+        </div>
+
+        <h3>Resource Interface</h3>
+        <div class="method-signature">class Resource</div>
+        <div class="code-block">class Resource {
+protected:
+    std::string path_;                      // Resource file path
+    std::vector&lt;uint8_t&gt; data_;             // Raw resource data
+    std::atomic&lt;bool&gt; isInitialized_{false}; // Initialization state
+    std::atomic&lt;bool&gt; isLoaded_{false};      // Loading state
+    std::atomic&lt;bool&gt; isFinalized_{false};   // Finalization state
+
+public:
+    Resource(const std::string& path);
+    virtual ~Resource() = default;
+
+    // Virtual lifecycle methods (override in derived classes)
+    virtual bool Initialize();
+    virtual bool Update(FileSystem::FileSystemManager& fileSystem);
+    virtual void Finalize();
+
+    // State queries
+    const std::string& GetPath() const;
+    const std::vector&lt;uint8_t&gt;& GetData() const;
+    bool IsInitialized() const;
+    bool IsLoaded() const;
+    bool IsFinalized() const;
+};</div>
+
+        <h3>Lifecycle Methods</h3>
+        <table>
+            <tr>
+                <th>Method</th>
+                <th>Thread</th>
+                <th>Purpose</th>
+                <th>Override</th>
+            </tr>
+            <tr>
+                <td><code>Initialize()</code></td>
+                <td>Worker</td>
+                <td>Prepare resource for loading</td>
+                <td>Optional</td>
+            </tr>
+            <tr>
+                <td><code>Update()</code></td>
+                <td>Worker</td>
+                <td>Load raw data from file system</td>
+                <td>Optional</td>
+            </tr>
+            <tr>
+                <td><code>Finalize()</code></td>
+                <td>Main</td>
+                <td>Process data, create GPU resources</td>
+                <td>Recommended</td>
+            </tr>
+        </table>
+
+        <h2 id="resource-manager">5. ??? ResourceManager Class</h2>
+
+        <h3>Core Methods</h3>
+
+        <h4>Lifecycle Management</h4>
+        <div class="method-signature">ResourceManager(FileSystem::FileSystemManager* fileSystemManager)</div>
+        <div class="method-signature">bool Start()</div>
+        <div class="method-signature">void Stop()</div>
+        <div class="method-signature">bool IsRunning() const</div>
+
+        <h4>Resource Operations</h4>
+        <div class="code-block">// Request a resource (creates if not exists, returns existing if already requested)
+template&lt;typename T = Resource&gt;
+std::shared_ptr&lt;T&gt; RequestResource(const std::string& path);
+
+// Get a resource if it exists and is loaded
+template&lt;typename T = Resource&gt;
+std::shared_ptr&lt;T&gt; GetResource(const std::string& path);
+
+// Update finalization queue (call from main thread)
+void UpdateFinalization();
+
+// Resource state queries
+bool IsResourceLoaded(const std::string& path) const;
+bool IsResourceFinalized(const std::string& path) const;
+
+// Resource management
+bool RemoveResource(const std::string& path);
+void ClearResources();</div>
+
+        <h4>Statistics and Monitoring</h4>
+        <div class="code-block">// Get resource counts
+size_t GetLoadedResourceCount() const;
+size_t GetPendingLoadCount() const;
+size_t GetPendingFinalizationCount() const;</div>
+
+        <h2 id="lifecycle">6. ?? Resource Lifecycle</h2>
+
+        <h3>Complete Lifecycle Flow</h3>
+        <div class="info">
+            <h4>1. Request Phase (Any Thread)</h4>
+            <ul>
+                <li>Call <code>RequestResource&lt;T&gt;(path)</code></li>
+                <li>Check if resource already exists</li>
+                <li>Create new resource if needed</li>
+                <li>Add to loading queue</li>
+                <li>Return shared_ptr immediately</li>
+            </ul>
+
+            <h4>2. Loading Phase (Worker Thread)</h4>
+            <ul>
+                <li>Initialize resource</li>
+                <li>Load data from file system</li>
+                <li>Move to finalization queue when complete</li>
+            </ul>
+
+            <h4>3. Finalization Phase (Main Thread)</h4>
+            <ul>
+                <li>Call <code>UpdateFinalization()</code> regularly</li>
+                <li>Process resources from finalization queue</li>
+                <li>Complete resource setup (GPU resources, etc.)</li>
+            </ul>
+
+            <h4>4. Usage Phase (Any Thread)</h4>
+            <ul>
+                <li>Use <code>GetResource&lt;T&gt;(path)</code> to access</li>
+                <li>Check <code>IsResourceFinalized()</code> for readiness</li>
+                <li>Shared ownership via shared_ptr</li>
+            </ul>
+        </div>
+
+        <h2 id="thread-safety">7. ?? Thread Safety</h2>
+
+        <h3>Thread-Safe Operations</h3>
+        <table>
+            <tr>
+                <th>Operation</th>
+                <th>Thread Safety</th>
+                <th>Synchronization</th>
+            </tr>
+            <tr>
+                <td><code>RequestResource()</code></td>
+                <td>? Thread-safe</td>
+                <td>Mutex on resource map</td>
+            </tr>
+            <tr>
+                <td><code>GetResource()</code></td>
+                <td>? Thread-safe</td>
+                <td>Mutex on resource map</td>
+            </tr>
+            <tr>
+                <td><code>IsResourceLoaded()</code></td>
+                <td>? Thread-safe</td>
+                <td>Atomic state checks</td>
+            </tr>
+            <tr>
+                <td><code>UpdateFinalization()</code></td>
+                <td>?? Main thread only</td>
+                <td>Queue synchronization</td>
+            </tr>
+            <tr>
+                <td>Resource state access</td>
+                <td>? Thread-safe</td>
+                <td>Atomic member variables</td>
+            </tr>
+        </table>
+
+        <h3>Threading Model</h3>
+        <div class="warning">
+            <strong>Important Threading Rules:</strong>
+            <ul>
+                <li><strong>Main Thread:</strong> Must call <code>UpdateFinalization()</code> regularly</li>
+                <li><strong>Worker Thread:</strong> Handles <code>Initialize()</code> and <code>Update()</code></li>
+                <li><strong>Any Thread:</strong> Can call <code>RequestResource()</code> and <code>GetResource()</code></li>
+                <li><strong>Resource Access:</strong> Always use shared_ptr for thread-safe access</li>
+            </ul>
+        </div>
+
+        <h2 id="basic-usage">8. ?? Basic Usage Examples</h2>
+
+        <h3>Setting Up ResourceManager</h3>
+        <div class="code-block">// Setup file system and resource manager
+FileSystem::FileSystemManager fileSystemManager;
+fileSystemManager.AddFileSystem(FileSystem::CreateStandardFileSystem());
+
+ResourceSystem::ResourceManager resourceManager(&fileSystemManager);
+
+// Start the resource manager
+if (!resourceManager.Start()) {
+    std::cerr << "Failed to start ResourceManager" << std::endl;
+    return -1;
+}
+
+std::cout << "ResourceManager started successfully" << std::endl;</div>
+
+        <h3>Basic Resource Loading</h3>
+        <div class="code-block">// Request resources (can be called from any thread)
+auto textureData = resourceManager.RequestResource("textures/grass.png");
+auto soundData = resourceManager.RequestResource("sounds/footstep.wav");
+auto modelData = resourceManager.RequestResource("models/tree.obj");
+
+// Main game loop
+while (gameRunning) {
+    // Update finalization on main thread (required!)
+    resourceManager.UpdateFinalization();
+    
+    // Check if resources are ready
+    if (resourceManager.IsResourceFinalized("textures/grass.png")) {
+        auto grass = resourceManager.GetResource("textures/grass.png");
+        if (grass && grass->IsFinalized()) {
+            // Resource is ready to use
+            std::cout << "Grass texture is ready!" << std::endl;
+            std::cout << "Data size: " << grass->GetData().size() << " bytes" << std::endl;
+        }
+    }
+    
+    // Other game logic...
+    std::this_thread::sleep_for(std::chrono::milliseconds(16)); // 60 FPS
+}
+
+// Cleanup
+resourceManager.Stop();</div>
+
+        <h3>Resource Deduplication</h3>
+        <div class="code-block">// Resource deduplication example
+auto texture1 = resourceManager.RequestResource("textures/stone.png");
+auto texture2 = resourceManager.RequestResource("textures/stone.png"); // Same path
+auto texture3 = resourceManager.RequestResource("textures/stone.png"); // Same path
+
+// All three shared_ptr instances point to the same Resource object
+std::cout << "texture1.get() == texture2.get(): " << (texture1.get() == texture2.get()) << std::endl; // true
+std::cout << "texture2.get() == texture3.get(): " << (texture2.get() == texture3.get()) << std::endl; // true
+
+// Only one instance is created and loaded
+std::cout << "Total resources: " << resourceManager.GetLoadedResourceCount() << std::endl; // 1</div>
+
+        <h3>Monitoring Resource Loading</h3>
+        <div class="code-block">// Resource monitoring example
+void MonitorResourceLoading(ResourceSystem::ResourceManager& manager) {
+    std::cout << "=== Resource Loading Status ===" << std::endl;
+    std::cout << "Loaded Resources: " << manager.GetLoadedResourceCount() << std::endl;
+    std::cout << "Pending Loads: " << manager.GetPendingLoadCount() << std::endl;
+    std::cout << "Pending Finalization: " << manager.GetPendingFinalizationCount() << std::endl;
+    std::cout << "Manager Running: " << (manager.IsRunning() ? "Yes" : "No") << std::endl;
+    std::cout << "===============================" << std::endl;
+}
+
+// Usage in main loop
+while (gameRunning) {
+    resourceManager.UpdateFinalization();
+    
+    // Monitor every second
+    static auto lastMonitorTime = std::chrono::steady_clock::now();
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast&lt;std::chrono::seconds&gt;(now - lastMonitorTime).count() >= 1) {
+        MonitorResourceLoading(resourceManager);
+        lastMonitorTime = now;
+    }
+    
+    // Game logic...
+}</div>
+
+        <h2 id="advanced-usage">9. ?? Advanced Usage</h2>
+
+        <h3>Batch Resource Loading</h3>
+        <div class="code-block">// Batch loading utility
+class ResourceBatch {
+private:
+    ResourceSystem::ResourceManager& manager_;
+    std::vector&lt;std::string&gt; paths_;
+    std::vector&lt;std::shared_ptr&lt;ResourceSystem::Resource&gt;&gt; resources_;
+    
+public:
+    ResourceBatch(ResourceSystem::ResourceManager& manager) : manager_(manager) {}
+    
+    template&lt;typename T = ResourceSystem::Resource&gt;
+    void AddResource(const std::string& path) {
+        paths_.push_back(path);
+        auto resource = manager_.RequestResource&lt;T&gt;(path);
+        resources_.push_back(std::static_pointer_cast&lt;ResourceSystem::Resource&gt;(resource));
+    }
+    
+    bool AreAllResourcesFinalized() const {
+        for (const auto& path : paths_) {
+            if (!manager_.IsResourceFinalized(path)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    float GetLoadingProgress() const {
+        size_t finalized = 0;
+        for (const auto& path : paths_) {
+            if (manager_.IsResourceFinalized(path)) {
+                finalized++;
+            }
+        }
+        return static_cast&lt;float&gt;(finalized) / paths_.size();
+    }
+    
+    void PrintProgress() const {
+        std::cout << "Loading progress: " << (GetLoadingProgress() * 100.0f) 
+                  << "% (" << GetFinalizedCount() << "/" << paths_.size() << ")" << std::endl;
+    }
+    
+private:
+    size_t GetFinalizedCount() const {
+        size_t count = 0;
+        for (const auto& path : paths_) {
+            if (manager_.IsResourceFinalized(path)) {
+                count++;
+            }
+        }
+        return count;
+    }
+};
+
+// Usage
+ResourceBatch levelAssets(resourceManager);
+levelAssets.AddResource("textures/ground.png");
+levelAssets.AddResource("textures/sky.png");
+levelAssets.AddResource("models/building.obj");
+levelAssets.AddResource("sounds/ambient.wav");
+
+// Wait for all assets to load
+while (!levelAssets.AreAllResourcesFinalized()) {
+    resourceManager.UpdateFinalization();
+    levelAssets.PrintProgress();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}
+
+std::cout << "All level assets loaded!" << std::endl;</div>
+
+        <h3>Resource Preloading System</h3>
+        <div class="code-block">// Resource preloading manager
+class ResourcePreloader {
+private:
+    ResourceSystem::ResourceManager& resourceManager_;
+    std::unordered_set&lt;std::string&gt; preloadedPaths_;
+    
+public:
+    ResourcePreloader(ResourceSystem::ResourceManager& manager) 
+        : resourceManager_(manager) {}
+    
+    void PreloadFromManifest(const std::string& manifestPath) {
+        auto manifestResource = resourceManager_.RequestResource(manifestPath);
+        
+        // Wait for manifest to load
+        while (!resourceManager_.IsResourceFinalized(manifestPath)) {
+            resourceManager_.UpdateFinalization();
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        }
+        
+        // Parse manifest and preload resources
+        auto manifest = resourceManager_.GetResource(manifestPath);
+        if (manifest && manifest->IsFinalized()) {
+            ParseAndPreload(manifest->GetData());
+        }
+    }
+    
+    bool IsPreloaded(const std::string& path) const {
+        return preloadedPaths_.find(path) != preloadedPaths_.end() &&
+               resourceManager_.IsResourceFinalized(path);
+    }
+    
+    float GetPreloadProgress() const {
+        if (preloadedPaths_.empty()) return 1.0f;
+        
+        size_t loaded = 0;
+        for (const auto& path : preloadedPaths_) {
+            if (resourceManager_.IsResourceFinalized(path)) {
+                loaded++;
+            }
+        }
+        return static_cast&lt;float&gt;(loaded) / preloadedPaths_.size();
+    }
+    
+private:
+    void ParseAndPreload(const std::vector&lt;uint8_t&gt;& manifestData) {
+        // Parse manifest format (JSON, XML, custom, etc.)
+        std::string manifest(manifestData.begin(), manifestData.end());
+        
+        // Simple line-based format for this example
+        std::istringstream stream(manifest);
+        std::string line;
+        
+        while (std::getline(stream, line)) {
+            if (!line.empty() && line[0] != '#') { // Skip comments
+                preloadedPaths_.insert(line);
+                resourceManager_.RequestResource(line);
+            }
+        }
+    }
+};
+
+// Create manifest file: resources.manifest
+/*
+# Level 1 Assets
+textures/level1_ground.png
+textures/level1_sky.png
+models/level1_building.obj
+sounds/level1_music.wav
+*/
+
+// Usage
+ResourcePreloader preloader(resourceManager);
+preloader.PreloadFromManifest("manifests/level1.manifest");
+
+// Monitor preloading
+while (preloader.GetPreloadProgress() < 1.0f) {
+    resourceManager.UpdateFinalization();
+    std::cout << "Preloading: " << (preloader.GetPreloadProgress() * 100.0f) << "%" << std::endl;
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+}</div>
+
+        <h3>Resource Cache Management</h3>
+        <div class="code-block">// Resource cache with automatic cleanup
+class ResourceCache {
+private:
+    ResourceSystem::ResourceManager& resourceManager_;
+    std::unordered_map&lt;std::string, std::chrono::steady_clock::time_point&gt; accessTimes_;
+    std::chrono::seconds maxAge_;
+    std::mutex accessMutex_;
+    
+public:
+    ResourceCache(ResourceSystem::ResourceManager& manager, std::chrono::seconds maxAge = std::chrono::seconds(300))
+        : resourceManager_(manager), maxAge_(maxAge) {}
+    
+    template&lt;typename T = ResourceSystem::Resource&gt;
+    std::shared_ptr&lt;T&gt; GetCachedResource(const std::string& path) {
+        // Update access time
+        {
+            std::lock_guard&lt;std::mutex&gt; lock(accessMutex_);
+            accessTimes_[path] = std::chrono::steady_clock::now();
+        }
+        
+        return resourceManager_.GetResource&lt;T&gt;(path);
+    }
+    
+    void CleanupOldResources() {
+        auto now = std::chrono::steady_clock::now();
+        std::vector&lt;std::string&gt; toRemove;
+        
+        {
+            std::lock_guard&lt;std::mutex&gt; lock(accessMutex_);
+            for (const auto& [path, lastAccess] : accessTimes_) {
+                if (now - lastAccess > maxAge_) {
+                    toRemove.push_back(path);
+                }
+            }
+        }
+        
+        for (const auto& path : toRemove) {
+            if (resourceManager_.RemoveResource(path)) {
+                std::lock_guard&lt;std::mutex&gt; lock(accessMutex_);
+                accessTimes_.erase(path);
+                std::cout << "Removed old resource: " << path << std::endl;
+            }
+        }
+    }
+    
+    void PrintCacheStats() const {
+        std::lock_guard&lt;std::mutex&gt; lock(accessMutex_);
+        std::cout << "Cache size: " << accessTimes_.size() << " resources" << std::endl;
+        std::cout << "Total loaded: " << resourceManager_.GetLoadedResourceCount() << std::endl;
+    }
+};
+
+// Usage
+ResourceCache cache(resourceManager, std::chrono::seconds(60)); // 1 minute cache
+
+// Access resources through cache
+auto texture = cache.GetCachedResource("textures/player.png");
+
+// Periodic cleanup
+auto lastCleanup = std::chrono::steady_clock::now();
+while (gameRunning) {
+    resourceManager.UpdateFinalization();
+    
+    // Cleanup every 30 seconds
+    auto now = std::chrono::steady_clock::now();
+    if (std::chrono::duration_cast&lt;std::chrono::seconds&gt;(now - lastCleanup).count() >= 30) {
+        cache.CleanupOldResources();
+        cache.PrintCacheStats();
+        lastCleanup = now;
+    }
+}</div>
+
+        <h2 id="custom-resources">10. ?? Custom Resource Types</h2>
+
+        <h3>Texture Resource Example</h3>
+        <div class="code-block">// Custom texture resource with image processing
+class TextureResource : public ResourceSystem::Resource {
+private:
+    int width_, height_, channels_;
+    unsigned int textureId_; // OpenGL texture ID
+    
+public:
+    TextureResource(const std::string& path) 
+        : Resource(path), width_(0), height_(0), channels_(0), textureId_(0) {}
+    
+    ~TextureResource() {
+        if (textureId_ != 0) {
+            // OpenGL cleanup (if on graphics thread)
+            // glDeleteTextures(1, &textureId_);
+        }
+    }
+    
+    bool Initialize() override {
+        // Custom initialization
+        std::cout << "Initializing texture: " << path_ << std::endl;
+        return Resource::Initialize();
+    }
+    
+    bool Update(FileSystem::FileSystemManager& fileSystem) override {
+        // Load raw image data
+        if (!Resource::Update(fileSystem)) {
+            return false;
+        }
+        
+        // Parse image format (this is simplified - use real image library)
+        if (ParseImageHeader()) {
+            std::cout << "Loaded image: " << width_ << "x" << height_ 
+                      << " (" << channels_ << " channels)" << std::endl;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    void Finalize() override {
+        // Create GPU texture (must be called from main/graphics thread)
+        if (IsLoaded() && !IsFinalized()) {
+            CreateGPUTexture();
+            std::cout << "GPU texture created for: " << path_ << std::endl;
+        }
+        Resource::Finalize();
+    }
+    
+    // Getters
+    int GetWidth() const { return width_; }
+    int GetHeight() const { return height_; }
+    int GetChannels() const { return channels_; }
+    unsigned int GetTextureId() const { return textureId_; }
+    
+private:
+    bool ParseImageHeader() {
+        // Simplified PNG header parsing
+        if (data_.size() < 24) return false;
+        
+        // Check PNG signature
+        if (data_[0] == 0x89 && data_[1] == 0x50 && data_[2] == 0x4E && data_[3] == 0x47) {
+            // Extract dimensions from IHDR chunk (simplified)
+            width_ = (data_[16] << 24) | (data_[17] << 16) | (data_[18] << 8) | data_[19];
+            height_ = (data_[20] << 24) | (data_[21] << 16) | (data_[22] << 8) | data_[23];
+            channels_ = 4; // Assume RGBA for simplicity
+            return true;
+        }
+        
+        return false;
+    }
+    
+    void CreateGPUTexture() {
+        // OpenGL texture creation (simplified)
+        /*
+        glGenTextures(1, &textureId_);
+        glBindTexture(GL_TEXTURE_2D, textureId_);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width_, height_, 0, 
+                     GL_RGBA, GL_UNSIGNED_BYTE, data_.data());
+        glGenerateMipmap(GL_TEXTURE_2D);
+        */
+        textureId_ = 12345; // Dummy ID for example
+    }
+};</div>
+
+        <h3>Audio Resource Example</h3>
+        <div class="code-block">// Custom audio resource
+class AudioResource : public ResourceSystem::Resource {
+private:
+    int sampleRate_;
+    int channels_;
+    int bitsPerSample_;
+    std::vector&lt;float&gt; audioSamples_;
+    unsigned int audioBufferId_;
+    
+public:
+    AudioResource(const std::string& path) 
+        : Resource(path), sampleRate_(0), channels_(0), bitsPerSample_(0), audioBufferId_(0) {}
+    
+    bool Update(FileSystem::FileSystemManager& fileSystem) override {
+        if (!Resource::Update(fileSystem)) {
+            return false;
+        }
+        
+        // Parse audio format (simplified WAV parsing)
+        if (ParseWAVHeader()) {
+            std::cout << "Loaded audio: " << sampleRate_ << "Hz, " 
+                      << channels_ << " channels, " << bitsPerSample_ << " bits" << std::endl;
+            return true;
+        }
+        
+        return false;
+    }
+    
+    void Finalize() override {
+        // Create audio buffer (OpenAL example)
+        if (IsLoaded() && !IsFinalized()) {
+            CreateAudioBuffer();
+            std::cout << "Audio buffer created for: " << path_ << std::endl;
+        }
+        Resource::Finalize();
+    }
+    
+    // Getters
+    int GetSampleRate() const { return sampleRate_; }
+    int GetChannels() const { return channels_; }
+    int GetBitsPerSample() const { return bitsPerSample_; }
+    const std::vector&lt;float&gt;& GetSamples() const { return audioSamples_; }
+    unsigned int GetBufferId() const { return audioBufferId_; }
+    
+private:
+    bool ParseWAVHeader() {
+        // Simplified WAV parsing
+        if (data_.size() < 44) return false;
+        
+        // Check WAV signature
+        if (data_[0] == 'R' && data_[1] == 'I' && data_[2] == 'F' && data_[3] == 'F') {
+            sampleRate_ = *reinterpret_cast&lt;const int*&gt;(&data_[24]);
+            channels_ = *reinterpret_cast&lt;const short*&gt;(&data_[22]);
+            bitsPerSample_ = *reinterpret_cast&lt;const short*&gt;(&data_[34]);
+            
+            // Convert to float samples (simplified)
+            ConvertToFloatSamples();
+            return true;
+        }
+        
+        return false;
+    }
+    
+    void ConvertToFloatSamples() {
+        // Convert raw audio data to float samples
+        size_t dataStart = 44; // Skip WAV header
+        size_t sampleCount = (data_.size() - dataStart) / (bitsPerSample_ / 8);
+        audioSamples_.reserve(sampleCount);
+        
+        for (size_t i = 0; i < sampleCount; ++i) {
+            // Simplified 16-bit to float conversion
+            if (bitsPerSample_ == 16) {
+                short sample = *reinterpret_cast&lt;const short*&gt;(&data_[dataStart + i * 2]);
+                audioSamples_.push_back(sample / 32768.0f);
+            }
+        }
+    }
+    
+    void CreateAudioBuffer() {
+        // OpenAL buffer creation (simplified)
+        /*
+        alGenBuffers(1, &audioBufferId_);
+        alBufferData(audioBufferId_, 
+                     channels_ == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16,
+                     data_.data() + 44, data_.size() - 44, sampleRate_);
+        */
+        audioBufferId_ = 67890; // Dummy ID for example
+    }
+};</div>
+
+        <h3>Using Custom Resources</h3>
+        <div class="code-block">// Using custom resource types
+ResourceSystem::ResourceManager resourceManager(&fileSystemManager);
+resourceManager.Start();
+
+// Request custom resources
+auto grassTexture = resourceManager.RequestResource&lt;TextureResource&gt;("textures/grass.png");
+auto footstepSound = resourceManager.RequestResource&lt;AudioResource&gt;("sounds/footstep.wav");
+
+// Main loop
+while (gameRunning) {
+    resourceManager.UpdateFinalization();
+    
+    // Check if texture is ready
+    if (resourceManager.IsResourceFinalized("textures/grass.png")) {
+        auto texture = resourceManager.GetResource&lt;TextureResource&gt;("textures/grass.png");
+        if (texture) {
+            std::cout << "Grass texture ready: " << texture->GetWidth() 
+                      << "x" << texture->GetHeight() 
+                      << " (GL ID: " << texture->GetTextureId() << ")" << std::endl;
+        }
+    }
+    
+    // Check if audio is ready
+    if (resourceManager.IsResourceFinalized("sounds/footstep.wav")) {
+        auto audio = resourceManager.GetResource&lt;AudioResource&gt;("sounds/footstep.wav");
+        if (audio) {
+            std::cout << "Footstep audio ready: " << audio->GetSampleRate() 
+                      << "Hz (Buffer ID: " << audio->GetBufferId() << ")" << std::endl;
+        }
+    }
+}</div>
+
+        <h2 id="performance">11. ?? Performance Considerations</h2>
+
+        <h3>Loading Performance</h3>
+        <div class="info">
+            <strong>Performance Guidelines:</strong>
+            <ul>
+                <li><strong>File I/O:</strong> Worker thread prevents main thread blocking</li>
+                <li><strong>Memory Usage:</strong> Resources share instances for same paths</li>
+                <li><strong>CPU Usage:</strong> Finalization spreads over multiple frames</li>
+                <li><strong>Threading:</strong> Single worker thread prevents I/O contention</li>
+            </ul>
+        </div>
+
+        <h3>Performance Monitoring</h3>
+        <div class="code-block">// Performance monitoring utility
+class ResourcePerformanceMonitor {
+private:
+    ResourceSystem::ResourceManager& manager_;
+    std::chrono::steady_clock::time_point startTime_;
+    size_t totalRequestedResources_;
+    
+public:
+    ResourcePerformanceMonitor(ResourceSystem::ResourceManager& manager)
+        : manager_(manager), startTime_(std::chrono::steady_clock::now()), totalRequestedResources_(0) {}
+    
+    void OnResourceRequested() {
+        totalRequestedResources_++;
+    }
+    
+    void PrintPerformanceReport() {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(now - startTime_);
+        
+        std::cout << "=== Resource Performance Report ===" << std::endl;
+        std::cout << "Runtime: " << elapsed.count() << "ms" << std::endl;
+        std::cout << "Total Requested: " << totalRequestedResources_ << std::endl;
+        std::cout << "Currently Loaded: " << manager_.GetLoadedResourceCount() << std::endl;
+        std::cout << "Pending Loads: " << manager_.GetPendingLoadCount() << std::endl;
+        std::cout << "Pending Finalization: " << manager_.GetPendingFinalizationCount() << std::endl;
+        
+        if (elapsed.count() > 0) {
+            float requestsPerSecond = (totalRequestedResources_ * 1000.0f) / elapsed.count();
+            std::cout << "Requests/sec: " << requestsPerSecond << std::endl;
+        }
+        
+        std::cout << "==================================" << std::endl;
+    }
+};
+
+// Usage
+ResourcePerformanceMonitor monitor(resourceManager);
+
+// Track requests
+monitor.OnResourceRequested();
+auto texture = resourceManager.RequestResource("texture.png");
+
+// Print reports periodically
+monitor.PrintPerformanceReport();</div>
+
+        <h3>Memory Optimization</h3>
+        <div class="code-block">// Memory-efficient resource loading
+class MemoryEfficientResourceManager {
+private:
+    ResourceSystem::ResourceManager& resourceManager_;
+    size_t maxMemoryUsage_;
+    std::atomic&lt;size_t&gt; currentMemoryUsage_{0};
+    
+public:
+    MemoryEfficientResourceManager(ResourceSystem::ResourceManager& manager, size_t maxMemoryMB)
+        : resourceManager_(manager), maxMemoryUsage_(maxMemoryMB * 1024 * 1024) {}
+    
+    template&lt;typename T&gt;
+    std::shared_ptr&lt;T&gt; RequestResourceIfMemoryAvailable(const std::string& path) {
+        // Estimate resource size (simplified)
+        size_t estimatedSize = EstimateResourceSize(path);
+        
+        if (currentMemoryUsage_ + estimatedSize > maxMemoryUsage_) {
+            std::cout << "Memory limit reached, cannot load: " << path << std::endl;
+            return nullptr;
+        }
+        
+        auto resource = resourceManager_.RequestResource&lt;T&gt;(path);
+        currentMemoryUsage_ += estimatedSize;
+        
+        return resource;
+    }
+    
+    void OnResourceUnloaded(const std::string& path) {
+        size_t estimatedSize = EstimateResourceSize(path);
+        currentMemoryUsage_ -= std::min(currentMemoryUsage_.load(), estimatedSize);
+    }
+    
+    float GetMemoryUsagePercentage() const {
+        return static_cast&lt;float&gt;(currentMemoryUsage_) / maxMemoryUsage_ * 100.0f;
+    }
+    
+private:
+    size_t EstimateResourceSize(const std::string& path) {
+        // Simple size estimation based on file extension
+        std::string ext = path.substr(path.find_last_of('.') + 1);
+        
+        if (ext == "png" || ext == "jpg" || ext == "jpeg") {
+            return 4 * 1024 * 1024; // 4MB for textures
+        } else if (ext == "wav" || ext == "ogg") {
+            return 2 * 1024 * 1024; // 2MB for audio
+        } else if (ext == "obj" || ext == "fbx") {
+            return 1 * 1024 * 1024; // 1MB for models
+        }
+        
+        return 1024; // 1KB default
+    }
+};</div>
+
+        <h2 id="best-practices">12. ? Best Practices</h2>
+
+        <div class="success">
+            <h3>? Recommended Practices</h3>
+            <div class="code-block">// ? Good: Always call UpdateFinalization() in main loop
+while (gameRunning) {
+    resourceManager.UpdateFinalization(); // Required!
+    
+    // Game logic...
+    UpdateGame();
+    RenderFrame();
+}
+
+// ? Good: Check resource state before use
+auto texture = resourceManager.GetResource&lt;TextureResource&gt;("texture.png");
+if (texture && texture->IsFinalized()) {
+    UseTexture(texture);
+}
+
+// ? Good: Use shared_ptr for resource access
+class GameObject {
+    std::shared_ptr&lt;TextureResource&gt; texture_;
+public:
+    void SetTexture(std::shared_ptr&lt;TextureResource&gt; texture) {
+        texture_ = texture; // Safe shared ownership
+    }
+};
+
+// ? Good: Request resources early
+void LoadLevel() {
+    // Request all level resources at start
+    auto terrain = resourceManager.RequestResource&lt;TextureResource&gt;("level1/terrain.png");
+    auto music = resourceManager.RequestResource&lt;AudioResource&gt;("level1/music.ogg");
+    auto model = resourceManager.RequestResource&lt;ModelResource&gt;("level1/building.obj");
+}
+
+// ? Good: Use consistent paths
+const std::string TEXTURE_PATH = "textures/player.png";
+auto texture1 = resourceManager.RequestResource(TEXTURE_PATH);
+auto texture2 = resourceManager.GetResource(TEXTURE_PATH); // Same resource</div>
+        </div>
+
+        <div class="warning">
+            <h3>?? Common Pitfalls</h3>
+            <div class="code-block">// ? Poor: Forgetting to call UpdateFinalization()
+while (gameRunning) {
+    // Missing: resourceManager.UpdateFinalization();
+    
+    auto texture = resourceManager.GetResource("texture.png");
+    // texture will never be finalized!
+}
+
+// ? Poor: Using resources before they're ready
+auto texture = resourceManager.RequestResource("texture.png");
+UseTexture(texture); // texture might not be loaded yet!
+
+// ? Poor: Inconsistent path usage
+auto tex1 = resourceManager.RequestResource("textures/player.png");
+auto tex2 = resourceManager.RequestResource("./textures/player.png"); // Different path!
+// These create separate resources!
+
+// ? Poor: Not checking resource state
+auto texture = resourceManager.GetResource("texture.png");
+texture->GetTextureId(); // Crash if texture is null!
+
+// ? Poor: Blocking the main thread
+auto resource = resourceManager.RequestResource("large_file.dat");
+while (!resource->IsFinalized()) {
+    // This blocks the main thread!
+    std::this_thread::sleep_for(std::chrono::milliseconds(1));
+}</div>
+        </div>
+
+        <h3>Resource Path Guidelines</h3>
+        <div class="highlight">
+            <ul>
+                <li><strong>Use forward slashes:</strong> "textures/player.png" (cross-platform)</li>
+                <li><strong>Relative paths:</strong> Avoid absolute paths for portability</li>
+                <li><strong>Consistent naming:</strong> Use consistent naming conventions</li>
+                <li><strong>Path constants:</strong> Define path constants to avoid typos</li>
+                <li><strong>Case sensitivity:</strong> Be aware of filesystem case sensitivity</li>
+            </ul>
+        </div>
+
+        <h2 id="troubleshooting">13. ?? Troubleshooting</h2>
+
+        <h3>Common Issues and Solutions</h3>
+        <table>
+            <tr>
+                <th>Issue</th>
+                <th>Symptoms</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td>Resources never finalize</td>
+                <td>IsResourceFinalized() always false</td>
+                <td>Ensure UpdateFinalization() is called regularly</td>
+            </tr>
+            <tr>
+                <td>Worker thread not starting</td>
+                <td>Resources never load</td>
+                <td>Check Start() return value, verify FileSystemManager</td>
+            </tr>
+            <tr>
+                <td>Resource not found</td>
+                <td>GetResource() returns nullptr</td>
+                <td>Check file path, FileSystem configuration</td>
+            </tr>
+            <tr>
+                <td>Memory usage growing</td>
+                <td>Increasing RAM consumption</td>
+                <td>Use RemoveResource() for cleanup, check for resource leaks</td>
+            </tr>
+            <tr>
+                <td>Duplicate resources</td>
+                <td>Same resource loading multiple times</td>
+                <td>Ensure consistent path strings, check path normalization</td>
+            </tr>
+        </table>
+
+        <h3>Debugging Utilities</h3>
+        <div class="code-block">// Resource debugging utility
+class ResourceDebugger {
+private:
+    ResourceSystem::ResourceManager& manager_;
+    
+public:
+    ResourceDebugger(ResourceSystem::ResourceManager& manager) : manager_(manager) {}
+    
+    void PrintDetailedStatus() {
+        std::cout << "=== ResourceManager Debug Info ===" << std::endl;
+        std::cout << "Manager Running: " << (manager_.IsRunning() ? "Yes" : "No") << std::endl;
+        std::cout << "Loaded Resources: " << manager_.GetLoadedResourceCount() << std::endl;
+        std::cout << "Pending Loads: " << manager_.GetPendingLoadCount() << std::endl;
+        std::cout << "Pending Finalization: " << manager_.GetPendingFinalizationCount() << std::endl;
+        std::cout << "===============================" << std::endl;
+    }
+    
+    void TestResourceLoad(const std::string& path) {
+        std::cout << "Testing resource load: " << path << std::endl;
+        
+        auto resource = manager_.RequestResource(path);
+        std::cout << "Resource requested successfully" << std::endl;
+        
+        auto startTime = std::chrono::steady_clock::now();
+        while (!manager_.IsResourceFinalized(path)) {
+            manager_.UpdateFinalization();
+            
+            auto elapsed = std::chrono::steady_clock::now() - startTime;
+            if (std::chrono::duration_cast&lt;std::chrono::seconds&gt;(elapsed).count() > 10) {
+                std::cout << "Resource load timeout!" << std::endl;
+                return;
+            }
+            
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+        
+        auto finalResource = manager_.GetResource(path);
+        if (finalResource && finalResource->IsFinalized()) {
+            std::cout << "Resource loaded successfully: " << finalResource->GetData().size() << " bytes" << std::endl;
+        } else {
+            std::cout << "Resource load failed!" << std::endl;
+        }
+    }
+    
+    void MonitorLoadingProgress(const std::vector&lt;std::string&gt;& paths) {
+        std::cout << "Monitoring loading progress for " << paths.size() << " resources..." << std::endl;
+        
+        // Request all resources
+        for (const auto& path : paths) {
+            manager_.RequestResource(path);
+        }
+        
+        while (true) {
+            manager_.UpdateFinalization();
+            
+            size_t finalized = 0;
+            for (const auto& path : paths) {
+                if (manager_.IsResourceFinalized(path)) {
+                    finalized++;
+                }
+            }
+            
+            float progress = static_cast&lt;float&gt;(finalized) / paths.size() * 100.0f;
+            std::cout << "Progress: " << progress << "% (" << finalized << "/" << paths.size() << ")" << std::endl;
+            
+            if (finalized == paths.size()) {
+                std::cout << "All resources loaded!" << std::endl;
+                break;
+            }
+            
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+        }
+    }
+};
+
+// Usage
+ResourceDebugger debugger(resourceManager);
+debugger.PrintDetailedStatus();
+debugger.TestResourceLoad("textures/test.png");
+
+std::vector&lt;std::string&gt; testPaths = {
+    "textures/player.png",
+    "sounds/jump.wav",
+    "models/character.obj"
+};
+debugger.MonitorLoadingProgress(testPaths);</div>
+
+        <h3>Error Logging Integration</h3>
+        <div class="code-block">// Enhanced Resource with error logging
+class LoggingResource : public ResourceSystem::Resource {
+public:
+    LoggingResource(const std::string& path) : Resource(path) {}
+    
+    bool Initialize() override {
+        std::cout << "[ResourceManager] Initializing: " << path_ << std::endl;
+        bool result = Resource::Initialize();
+        if (!result) {
+            std::cerr << "[ResourceManager] Failed to initialize: " << path_ << std::endl;
+        }
+        return result;
+    }
+    
+    bool Update(FileSystem::FileSystemManager& fileSystem) override {
+        std::cout << "[ResourceManager] Loading: " << path_ << std::endl;
+        bool result = Resource::Update(fileSystem);
+        if (result) {
+            std::cout << "[ResourceManager] Loaded: " << path_ << " (" << data_.size() << " bytes)" << std::endl;
+        } else {
+            std::cerr << "[ResourceManager] Failed to load: " << path_ << std::endl;
+        }
+        return result;
+    }
+    
+    void Finalize() override {
+        std::cout << "[ResourceManager] Finalizing: " << path_ << std::endl;
+        Resource::Finalize();
+        std::cout << "[ResourceManager] Finalized: " << path_ << std::endl;
+    }
+};</div>
+
+        <div class="info">
+            <h3>?? Additional Resources</h3>
+            <ul>
+                <li><strong>FileSystem Integration:</strong> See FileSystemManager documentation</li>
+                <li><strong>Threading:</strong> C++20 threading and synchronization best practices</li>
+                <li><strong>Memory Management:</strong> Smart pointer usage and RAII patterns</li>
+                <li><strong>Performance:</strong> Profiling tools and optimization techniques</li>
+            </ul>
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            <p>ResourceManager API Documentation - Generated for C++20 Resource Management Systems</p>
+        </footer>
+    </div>
+</body>
+</html>

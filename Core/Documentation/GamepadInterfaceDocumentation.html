@@ -1,0 +1,1093 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamepadInterface Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+
+        h4 {
+            color: #27ae60;
+            margin-top: 20px;
+        }
+
+        .module-header {
+            background: #e8f4fd;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .method {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .method-signature {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 8px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .enum {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .struct {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .interface {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .parameters {
+            margin: 10px 0;
+        }
+
+        .parameter {
+            margin: 5px 0;
+        }
+
+        .parameter-name {
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-line;
+        }
+
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+            .toc ul {
+                list-style-type: none;
+                padding-left: 0;
+            }
+
+            .toc li {
+                margin: 5px 0;
+            }
+
+            .toc a {
+                text-decoration: none;
+                color: #2980b9;
+            }
+
+                .toc a:hover {
+                    text-decoration: underline;
+                }
+
+        .code-inline {
+            background: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        .gamepad-diagram {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .button-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin: 20px 0;
+        }
+
+        .button-box {
+            background: #ffffff;
+            border: 1px solid #adb5bd;
+            border-radius: 4px;
+            padding: 8px;
+            text-align: center;
+            font-size: 12px;
+        }
+
+        .face-button {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .shoulder-button {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .dpad-button {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .special-button {
+            border-color: #6c757d;
+            background: #e9ecef;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GamepadInterface Documentation</h1>
+
+        <div class="module-header">
+            <h2>Module Overview</h2>
+            <p><strong>Purpose:</strong> The GamepadInterface module provides a comprehensive abstraction layer for gamepad input handling. It supports multiple gamepad types, customizable input mapping, event-driven input processing, and cross-platform compatibility.</p>
+            <p><strong>Namespace:</strong> <code class="code-inline">Input</code></p>
+            <p><strong>Header:</strong> <code class="code-inline">Core/GamepadInterface.h</code></p>
+        </div>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li>
+                    <a href="#enumerations">Enumerations</a>
+                    <ul>
+                        <li><a href="#gamepad-button">GamepadButton</a></li>
+                        <li><a href="#gamepad-axis">GamepadAxis</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#structures">Structures</a>
+                    <ul>
+                        <li><a href="#gamepad-state">GamepadState</a></li>
+                        <li><a href="#gamepad-config">GamepadConfig</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#interfaces">Interfaces</a>
+                    <ul>
+                        <li><a href="#igamepad">IGamepad</a></li>
+                    </ul>
+                </li>
+                <li><a href="#callbacks">Callback Types</a></li>
+                <li><a href="#helper-functions">Helper Functions</a></li>
+                <li><a href="#usage-examples">Usage Examples</a></li>
+                <li><a href="#implementations">Concrete Implementations</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </div>
+
+        <h2 id="enumerations">Enumerations</h2>
+
+        <h3 id="gamepad-button">GamepadButton</h3>
+        <div class="enum">
+            <div class="method-signature">enum class GamepadButton : int</div>
+            <p>Enumeration of all supported gamepad buttons. Uses Xbox controller naming convention with PlayStation equivalents noted.</p>
+
+            <div class="gamepad-diagram">
+                <h4>Button Layout</h4>
+                <div class="button-grid">
+                    <div class="button-box face-button">A<br />(Cross)</div>
+                    <div class="button-box face-button">B<br />(Circle)</div>
+                    <div class="button-box face-button">X<br />(Square)</div>
+                    <div class="button-box face-button">Y<br />(Triangle)</div>
+                    <div class="button-box shoulder-button">L1<br />(LeftBumper)</div>
+                    <div class="button-box shoulder-button">R1<br />(RightBumper)</div>
+                    <div class="button-box special-button">Back<br />(Share)</div>
+                    <div class="button-box special-button">Start<br />(Options)</div>
+                    <div class="button-box special-button">Guide<br />(PS Button)</div>
+                    <div class="button-box special-button">L3<br />(LeftThumb)</div>
+                    <div class="button-box special-button">R3<br />(RightThumb)</div>
+                    <div class="button-box dpad-button">D-Pad Up</div>
+                    <div class="button-box dpad-button">D-Pad Right</div>
+                    <div class="button-box dpad-button">D-Pad Down</div>
+                    <div class="button-box dpad-button">D-Pad Left</div>
+                </div>
+            </div>
+
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">A (0):</span> Primary action button (Cross on PlayStation)</div>
+                <div class="parameter"><span class="parameter-name">B (1):</span> Secondary action button (Circle on PlayStation)</div>
+                <div class="parameter"><span class="parameter-name">X (2):</span> Alternate action button (Square on PlayStation)</div>
+                <div class="parameter"><span class="parameter-name">Y (3):</span> Context action button (Triangle on PlayStation)</div>
+                <div class="parameter"><span class="parameter-name">LeftBumper (4):</span> Left shoulder button (L1)</div>
+                <div class="parameter"><span class="parameter-name">RightBumper (5):</span> Right shoulder button (R1)</div>
+                <div class="parameter"><span class="parameter-name">Back (6):</span> Menu/back button (Share on PlayStation)</div>
+                <div class="parameter"><span class="parameter-name">Start (7):</span> Start/pause button (Options on PlayStation)</div>
+                <div class="parameter"><span class="parameter-name">Guide (8):</span> System button (PS button on PlayStation)</div>
+                <div class="parameter"><span class="parameter-name">LeftThumb (9):</span> Left stick click (L3)</div>
+                <div class="parameter"><span class="parameter-name">RightThumb (10):</span> Right stick click (R3)</div>
+                <div class="parameter"><span class="parameter-name">DPadUp (11):</span> Directional pad up</div>
+                <div class="parameter"><span class="parameter-name">DPadRight (12):</span> Directional pad right</div>
+                <div class="parameter"><span class="parameter-name">DPadDown (13):</span> Directional pad down</div>
+                <div class="parameter"><span class="parameter-name">DPadLeft (14):</span> Directional pad left</div>
+                <div class="parameter"><span class="parameter-name">COUNT (15):</span> Total number of buttons</div>
+            </div>
+        </div>
+
+        <h3 id="gamepad-axis">GamepadAxis</h3>
+        <div class="enum">
+            <div class="method-signature">enum class GamepadAxis : int</div>
+            <p>Enumeration of all supported gamepad analog axes. Values typically range from -1.0 to 1.0 for sticks, 0.0 to 1.0 for triggers.</p>
+
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">LeftX (0):</span> Left stick horizontal axis (-1.0 = left, 1.0 = right)</div>
+                <div class="parameter"><span class="parameter-name">LeftY (1):</span> Left stick vertical axis (-1.0 = down, 1.0 = up)</div>
+                <div class="parameter"><span class="parameter-name">RightX (2):</span> Right stick horizontal axis (-1.0 = left, 1.0 = right)</div>
+                <div class="parameter"><span class="parameter-name">RightY (3):</span> Right stick vertical axis (-1.0 = down, 1.0 = up)</div>
+                <div class="parameter"><span class="parameter-name">LeftTrigger (4):</span> Left trigger (L2) (0.0 = not pressed, 1.0 = fully pressed)</div>
+                <div class="parameter"><span class="parameter-name">RightTrigger (5):</span> Right trigger (R2) (0.0 = not pressed, 1.0 = fully pressed)</div>
+                <div class="parameter"><span class="parameter-name">COUNT (6):</span> Total number of axes</div>
+            </div>
+
+            <div class="example">
+                // Example axis usage
+                if (gamepad->GetAxisValue(GamepadAxis::LeftX) > 0.5f) {
+                // Player is pushing left stick to the right
+                player.moveRight(deltaTime);
+                }
+
+                float triggerValue = gamepad->GetAxisValue(GamepadAxis::RightTrigger);
+                if (triggerValue > 0.1f) {
+                // Player is pressing right trigger
+                weapon.fire(triggerValue);  // Intensity based on trigger pressure
+                }
+            </div>
+        </div>
+
+        <h2 id="structures">Structures</h2>
+
+        <h3 id="gamepad-state">GamepadState</h3>
+        <div class="struct">
+            <div class="method-signature">struct GamepadState</div>
+            <p>Contains the complete state of a gamepad at a specific moment in time. Used for both current and previous state tracking.</p>
+
+            <h4>Member Variables</h4>
+            <div class="method">
+                <div class="method-signature">std::array&lt;bool, static_cast&lt;size_t&gt;(GamepadButton::COUNT)&gt; buttons</div>
+                <p>Array of button states (true = pressed, false = released).</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">std::array&lt;float, static_cast&lt;size_t&gt;(GamepadAxis::COUNT)&gt; axes</div>
+                <p>Array of axis values (typically -1.0 to 1.0 for sticks, 0.0 to 1.0 for triggers).</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">bool connected</div>
+                <p>Whether the gamepad is currently connected.</p>
+            </div>
+
+            <h4>Helper Methods</h4>
+            <div class="method">
+                <div class="method-signature">bool IsButtonPressed(GamepadButton button) const</div>
+                <p>Returns true if the specified button is currently pressed.</p>
+                <div class="example">
+                    GamepadState state = gamepad->GetState();
+                    if (state.IsButtonPressed(GamepadButton::A)) {
+                    // A button is pressed
+                    }
+                </div>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">float GetAxis(GamepadAxis axis) const</div>
+                <p>Returns the current value of the specified axis.</p>
+                <div class="example">float leftStickX = state.GetAxis(GamepadAxis::LeftX);</div>
+            </div>
+
+            <h4>Convenience Methods</h4>
+            <div class="method">
+                <div class="method-signature">bool IsAPressed() const</div>
+                <div class="method-signature">bool IsBPressed() const</div>
+                <div class="method-signature">bool IsXPressed() const</div>
+                <div class="method-signature">bool IsYPressed() const</div>
+                <p>Quick access methods for face buttons.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">float GetLeftStickX() const</div>
+                <div class="method-signature">float GetLeftStickY() const</div>
+                <div class="method-signature">float GetRightStickX() const</div>
+                <div class="method-signature">float GetRightStickY() const</div>
+                <div class="method-signature">float GetLeftTrigger() const</div>
+                <div class="method-signature">float GetRightTrigger() const</div>
+                <p>Quick access methods for analog inputs.</p>
+                <div class="example">
+                    // Movement using convenience methods
+                    Vector2 leftStick(state.GetLeftStickX(), state.GetLeftStickY());
+                    if (leftStick.magnitude() > 0.1f) {
+                    player.move(leftStick * moveSpeed * deltaTime);
+                    }
+                </div>
+            </div>
+        </div>
+
+        <h3 id="gamepad-config">GamepadConfig</h3>
+        <div class="struct">
+            <div class="method-signature">struct GamepadConfig</div>
+            <p>Configuration structure for customizing gamepad behavior including deadzones, sensitivity, and system settings.</p>
+
+            <h4>General Settings</h4>
+            <div class="method">
+                <div class="method-signature">float deadzone = 0.1f</div>
+                <p>Default deadzone for analog sticks (0.0 to 1.0).</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">float triggerDeadzone = 0.05f</div>
+                <p>Default deadzone for triggers (0.0 to 1.0).</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">float sensitivity = 1.0f</div>
+                <p>Default sensitivity multiplier for all axes.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">bool enableVibration = true</div>
+                <p>Whether to enable vibration/rumble if supported.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">bool autoDetectControllers = true</div>
+                <p>Automatically detect and add new controllers.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">int maxControllers = 4</div>
+                <p>Maximum number of controllers to support simultaneously.</p>
+            </div>
+
+            <h4>Per-Axis Configuration</h4>
+            <div class="method">
+                <div class="method-signature">std::array&lt;float, static_cast&lt;size_t&gt;(GamepadAxis::COUNT)&gt; axisDeadzones</div>
+                <p>Individual deadzone settings for each axis.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">std::array&lt;float, static_cast&lt;size_t&gt;(GamepadAxis::COUNT)&gt; axisSensitivities</div>
+                <p>Individual sensitivity settings for each axis.</p>
+            </div>
+
+            <div class="example">
+                // Custom gamepad configuration
+                GamepadConfig config;
+                config.deadzone = 0.15f;                    // Larger deadzone for worn sticks
+                config.triggerDeadzone = 0.02f;             // Smaller trigger deadzone
+                config.sensitivity = 1.2f;                  // Increase overall sensitivity
+                config.enableVibration = false;             // Disable vibration
+                config.maxControllers = 2;                  // Only support 2 controllers
+
+                // Per-axis customization
+                config.axisDeadzones[static_cast<size_t>
+                    (GamepadAxis::RightX)] = 0.05f;  // More sensitive camera
+                    config.axisSensitivities[static_cast<size_t>
+                        (GamepadAxis::LeftY)] = 0.8f;  // Slower forward/back
+
+                        GamepadManager manager(config);
+            </div>
+        </div>
+
+        <h2 id="interfaces">Interfaces</h2>
+
+        <h3 id="igamepad">IGamepad Interface</h3>
+        <div class="interface">
+            <p>Abstract interface defining the contract for all gamepad implementations. Provides comprehensive access to gamepad state, configuration, and functionality.</p>
+
+            <h4>Core Functionality</h4>
+            <div class="method">
+                <div class="method-signature">virtual bool Initialize() = 0</div>
+                <p>Initializes the gamepad. Returns true if successful.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual void Update() = 0</div>
+                <p>Updates the gamepad state. Should be called once per frame.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual void Shutdown() = 0</div>
+                <p>Cleans up gamepad resources and stops input processing.</p>
+            </div>
+
+            <h4>State Queries</h4>
+            <div class="method">
+                <div class="method-signature">virtual bool IsConnected() const = 0</div>
+                <p>Returns true if the gamepad is currently connected and functional.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual const GamepadState& GetState() const = 0</div>
+                <p>Returns the current gamepad state.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual const GamepadState& GetPreviousState() const = 0</div>
+                <p>Returns the gamepad state from the previous frame. Useful for detecting state changes.</p>
+            </div>
+
+            <h4>Gamepad Information</h4>
+            <div class="method">
+                <div class="method-signature">virtual int GetGamepadId() const = 0</div>
+                <p>Returns the unique identifier for this gamepad.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual std::string GetName() const = 0</div>
+                <p>Returns the human-readable name of the gamepad.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual std::string GetGUID() const = 0</div>
+                <p>Returns the globally unique identifier string for this gamepad type.</p>
+            </div>
+
+            <h4>Button State Queries</h4>
+            <div class="method">
+                <div class="method-signature">virtual bool IsButtonPressed(GamepadButton button) const = 0</div>
+                <p>Returns true if the button is currently pressed.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual bool IsButtonReleased(GamepadButton button) const = 0</div>
+                <p>Returns true if the button is currently released (not pressed).</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual bool WasButtonJustPressed(GamepadButton button) const = 0</div>
+                <p>Returns true if the button was pressed this frame (transition from released to pressed).</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual bool WasButtonJustReleased(GamepadButton button) const = 0</div>
+                <p>Returns true if the button was released this frame (transition from pressed to released).</p>
+            </div>
+
+            <div class="example">
+                // Button state examples
+                IGamepad* gamepad = gamepadManager.GetFirstConnectedGamepad();
+
+                // Continuous actions (while held)
+                if (gamepad->IsButtonPressed(GamepadButton::A)) {
+                player.jump();  // Keep jumping while A is held
+                }
+
+                // One-time actions (on press)
+                if (gamepad->WasButtonJustPressed(GamepadButton::Start)) {
+                game.pauseMenu();  // Open pause menu only when Start is first pressed
+                }
+
+                // Release actions
+                if (gamepad->WasButtonJustReleased(GamepadButton::RightBumper)) {
+                weapon.stopFiring();  // Stop firing when trigger is released
+                }
+            </div>
+
+            <h4>Axis State Queries</h4>
+            <div class="method">
+                <div class="method-signature">virtual float GetAxisValue(GamepadAxis axis) const = 0</div>
+                <p>Returns the current value of the specified axis.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual float GetAxisDelta(GamepadAxis axis) const = 0</div>
+                <p>Returns the change in axis value since the previous frame.</p>
+            </div>
+
+            <div class="example">
+                // Axis usage examples
+                float leftStickX = gamepad->GetAxisValue(GamepadAxis::LeftX);
+                float rightTrigger = gamepad->GetAxisValue(GamepadAxis::RightTrigger);
+
+                // Movement with deadzone handling (done automatically by implementation)
+                Vector2 movement(leftStickX, gamepad->GetAxisValue(GamepadAxis::LeftY));
+                player.move(movement * moveSpeed * deltaTime);
+
+                // Camera control using axis delta for smooth rotation
+                float cameraDelta = gamepad->GetAxisDelta(GamepadAxis::RightX);
+                camera.yaw(cameraDelta * cameraSpeed * deltaTime);
+            </div>
+
+            <h4>Convenience Methods</h4>
+            <div class="method">
+                <div class="method-signature">virtual bool IsAnyButtonPressed() const = 0</div>
+                <p>Returns true if any button on the gamepad is currently pressed.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual GamepadButton GetLastPressedButton() const = 0</div>
+                <p>Returns the last button that was pressed.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual float GetLeftStickX() const</div>
+                <div class="method-signature">virtual float GetLeftStickY() const</div>
+                <div class="method-signature">virtual float GetRightStickX() const</div>
+                <div class="method-signature">virtual float GetRightStickY() const</div>
+                <div class="method-signature">virtual float GetLeftTrigger() const</div>
+                <div class="method-signature">virtual float GetRightTrigger() const</div>
+                <p>Convenience methods for common axis access (have default implementations).</p>
+            </div>
+
+            <h4>Vibration/Rumble</h4>
+            <div class="method">
+                <div class="method-signature">virtual bool SupportsVibration() const = 0</div>
+                <p>Returns true if the gamepad supports vibration/rumble effects.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual void SetVibration(float leftMotor, float rightMotor) = 0</div>
+                <p>Sets vibration strength for left and right motors (0.0 to 1.0).</p>
+                <div class="parameters">
+                    <div class="parameter"><span class="parameter-name">leftMotor:</span> Low-frequency rumble strength (0.0 to 1.0)</div>
+                    <div class="parameter"><span class="parameter-name">rightMotor:</span> High-frequency rumble strength (0.0 to 1.0)</div>
+                </div>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual void StopVibration() = 0</div>
+                <p>Stops all vibration immediately.</p>
+            </div>
+
+            <div class="example">
+                // Vibration examples
+                if (gamepad->SupportsVibration()) {
+                // Heavy explosion effect
+                gamepad->SetVibration(1.0f, 0.8f);
+
+                // Light feedback for UI selection
+                gamepad->SetVibration(0.2f, 0.1f);
+
+                // Stop vibration after event
+                gamepad->StopVibration();
+                }
+            </div>
+
+            <h4>Configuration</h4>
+            <div class="method">
+                <div class="method-signature">virtual void SetDeadzone(GamepadAxis axis, float deadzone) = 0</div>
+                <div class="method-signature">virtual float GetDeadzone(GamepadAxis axis) const = 0</div>
+                <p>Configure deadzone for individual axes.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual void SetAxisSensitivity(GamepadAxis axis, float sensitivity) = 0</div>
+                <div class="method-signature">virtual float GetAxisSensitivity(GamepadAxis axis) const = 0</div>
+                <p>Configure sensitivity for individual axes.</p>
+            </div>
+
+            <h4>Event Callbacks</h4>
+            <div class="method">
+                <div class="method-signature">virtual void SetButtonCallback(GamepadButtonCallback callback) = 0</div>
+                <div class="method-signature">virtual void SetAxisCallback(GamepadAxisCallback callback) = 0</div>
+                <p>Set callback functions for button and axis events.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">virtual const GamepadButtonCallback& GetButtonCallback() const = 0</div>
+                <div class="method-signature">virtual const GamepadAxisCallback& GetAxisCallback() const = 0</div>
+                <p>Get currently set callback functions.</p>
+            </div>
+        </div>
+
+        <h2 id="callbacks">Callback Types</h2>
+
+        <div class="struct">
+            <div class="method-signature">using GamepadConnectedCallback = std::function&lt;void(int gamepadId)&gt;</div>
+            <p>Called when a gamepad is connected.</p>
+        </div>
+
+        <div class="struct">
+            <div class="method-signature">using GamepadDisconnectedCallback = std::function&lt;void(int gamepadId)&gt;</div>
+            <p>Called when a gamepad is disconnected.</p>
+        </div>
+
+        <div class="struct">
+            <div class="method-signature">using GamepadButtonCallback = std::function&lt;void(int gamepadId, GamepadButton button, bool pressed)&gt;</div>
+            <p>Called when a button state changes.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">gamepadId:</span> ID of the gamepad that triggered the event</div>
+                <div class="parameter"><span class="parameter-name">button:</span> Which button changed state</div>
+                <div class="parameter"><span class="parameter-name">pressed:</span> New button state (true = pressed, false = released)</div>
+            </div>
+        </div>
+
+        <div class="struct">
+            <div class="method-signature">using GamepadAxisCallback = std::function&lt;void(int gamepadId, GamepadAxis axis, float value)&gt;</div>
+            <p>Called when an axis value changes significantly.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">gamepadId:</span> ID of the gamepad that triggered the event</div>
+                <div class="parameter"><span class="parameter-name">axis:</span> Which axis changed</div>
+                <div class="parameter"><span class="parameter-name">value:</span> New axis value</div>
+            </div>
+        </div>
+
+        <div class="example">
+            // Callback examples
+            gamepad->SetButtonCallback([](int gamepadId, GamepadButton button, bool pressed) {
+            if (button == GamepadButton::Start && pressed) {
+            std::cout << "Player " << gamepadId << " pressed Start!" << std::endl;
+            game.showPauseMenu(gamepadId);
+            }
+            });
+
+            gamepad->SetAxisCallback([](int gamepadId, GamepadAxis axis, float value) {
+            if (axis == GamepadAxis::LeftTrigger && value > 0.5f) {
+            std::cout << "Player " << gamepadId << " pulling left trigger: " << value << std::endl;
+            vehicle.brake(value);
+            }
+            });
+        </div>
+
+        <h2 id="helper-functions">Helper Functions</h2>
+
+        <div class="method">
+            <div class="method-signature">const char* GetButtonName(GamepadButton button)</div>
+            <p>Returns a human-readable name for the given button.</p>
+            <div class="example">std::cout << "Pressed: " << GetButtonName(GamepadButton::A) << std::endl;  // "Pressed: A"</div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">const char* GetAxisName(GamepadAxis axis)</div>
+            <p>Returns a human-readable name for the given axis.</p>
+            <div class="example">std::cout << "Axis: " << GetAxisName(GamepadAxis::LeftX) << std::endl;  // "Axis: Left Stick X"</div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">float ApplyDeadzone(float value, float deadzone)</div>
+            <p>Applies deadzone processing to an axis value. Values within the deadzone are returned as 0.0, while values outside are scaled appropriately.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">value:</span> Raw axis value (-1.0 to 1.0)</div>
+                <div class="parameter"><span class="parameter-name">deadzone:</span> Deadzone threshold (0.0 to 1.0)</div>
+                <div class="parameter"><span class="parameter-name">Returns:</span> Processed value with deadzone applied</div>
+            </div>
+            <div class="example">
+                // Manual deadzone application
+                float rawStickValue = 0.08f;
+                float deadzone = 0.1f;
+                float processed = ApplyDeadzone(rawStickValue, deadzone);  // Returns 0.0f (within deadzone)
+
+                rawStickValue = 0.6f;
+                processed = ApplyDeadzone(rawStickValue, deadzone);  // Returns ~0.556f (scaled beyond deadzone)
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">float ApplySensitivity(float value, float sensitivity)</div>
+            <p>Applies sensitivity scaling to an axis value, clamping the result to valid range.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">value:</span> Input axis value</div>
+                <div class="parameter"><span class="parameter-name">sensitivity:</span> Sensitivity multiplier (typically 0.1 to 3.0)</div>
+                <div class="parameter"><span class="parameter-name">Returns:</span> Scaled value clamped to [-1.0, 1.0]</div>
+            </div>
+        </div>
+
+        <h2 id="usage-examples">Usage Examples</h2>
+
+        <h3>Basic Gamepad Usage</h3>
+        <div class="example">
+            // Simple player movement with gamepad
+            class Player {
+            Vector3 position;
+            float moveSpeed = 5.0f;
+            float jumpHeight = 10.0f;
+
+            public:
+            void update(IGamepad* gamepad, float deltaTime) {
+            if (!gamepad || !gamepad->IsConnected()) return;
+
+            // Movement using left stick
+            float moveX = gamepad->GetLeftStickX();
+            float moveZ = gamepad->GetLeftStickY();
+
+            Vector3 movement(moveX, 0, moveZ);
+            if (movement.magnitude() > 0.1f) {  // Small deadzone check
+            position += movement * moveSpeed * deltaTime;
+            }
+
+            // Jump with A button (one-time action)
+            if (gamepad->WasButtonJustPressed(GamepadButton::A)) {
+            jump(jumpHeight);
+            }
+
+            // Run while holding right bumper
+            float currentSpeed = moveSpeed;
+            if (gamepad->IsButtonPressed(GamepadButton::RightBumper)) {
+            currentSpeed *= 2.0f;  // Double speed while running
+            }
+            }
+            };
+        </div>
+
+        <h3>Camera Control</h3>
+        <div class="example">
+            // FPS camera control with gamepad
+            class FPSCamera {
+            Vector3 position;
+            float yaw = 0.0f;
+            float pitch = 0.0f;
+            float mouseSensitivity = 2.0f;
+
+            public:
+            void update(IGamepad* gamepad, float deltaTime) {
+            if (!gamepad || !gamepad->IsConnected()) return;
+
+            // Camera rotation using right stick
+            float rightStickX = gamepad->GetRightStickX();
+            float rightStickY = gamepad->GetRightStickY();
+
+            // Apply sensitivity and delta time
+            yaw += rightStickX * mouseSensitivity * deltaTime;
+            pitch -= rightStickY * mouseSensitivity * deltaTime;  // Invert Y-axis
+
+            // Clamp pitch to prevent over-rotation
+            pitch = std::clamp(pitch, -89.0f, 89.0f);
+
+            // Optional: Variable sensitivity based on trigger pressure
+            float lookSpeed = mouseSensitivity;
+            if (gamepad->GetRightTrigger() > 0.1f) {
+            // Precision aiming when right trigger is held
+            lookSpeed *= 0.3f;
+            }
+            }
+            };
+        </div>
+
+        <h3>Menu Navigation</h3>
+        <div class="example">
+            // Menu system with gamepad navigation
+            class GameMenu {
+            int selectedIndex = 0;
+            std::vector<MenuItem>
+                menuItems;
+                float navigationCooldown = 0.0f;
+
+                public:
+                void update(IGamepad* gamepad, float deltaTime) {
+                if (!gamepad || !gamepad->IsConnected()) return;
+
+                navigationCooldown -= deltaTime;
+
+                // Navigate with D-Pad or left stick
+                bool moveUp = gamepad->WasButtonJustPressed(GamepadButton::DPadUp) ||
+                (gamepad->GetLeftStickY() > 0.7f && navigationCooldown <= 0.0f);
+                bool moveDown = gamepad->WasButtonJustPressed(GamepadButton::DPadDown) ||
+                (gamepad->GetLeftStickY() < -0.7f && navigationCooldown <= 0.0f);
+
+                if (moveUp) {
+                selectedIndex = (selectedIndex - 1 + menuItems.size()) % menuItems.size();
+                navigationCooldown = 0.2f;  // Prevent rapid navigation
+                playSound("menu_move");
+                } else if (moveDown) {
+                selectedIndex = (selectedIndex + 1) % menuItems.size();
+                navigationCooldown = 0.2f;
+                playSound("menu_move");
+                }
+
+                // Select with A button
+                if (gamepad->WasButtonJustPressed(GamepadButton::A)) {
+                menuItems[selectedIndex].activate();
+                playSound("menu_select");
+                }
+
+                // Back with B button
+                if (gamepad->WasButtonJustPressed(GamepadButton::B)) {
+                goBack();
+                playSound("menu_back");
+                }
+                }
+                };
+        </div>
+
+        <h3>Driving Game</h3>
+        <div class="example">
+            // Racing game vehicle control
+            class Vehicle {
+            float speed = 0.0f;
+            float steering = 0.0f;
+            float maxSpeed = 100.0f;
+            bool isBraking = false;
+
+            public:
+            void update(IGamepad* gamepad, float deltaTime) {
+            if (!gamepad || !gamepad->IsConnected()) return;
+
+            // Steering with left stick
+            float steerInput = gamepad->GetLeftStickX();
+            steering = steerInput;  // -1.0 = full left, 1.0 = full right
+
+            // Acceleration and braking with triggers
+            float accelerate = gamepad->GetRightTrigger();  // 0.0 to 1.0
+            float brake = gamepad->GetLeftTrigger();        // 0.0 to 1.0
+
+            // Apply acceleration
+            if (accelerate > 0.1f) {
+            speed += accelerate * 50.0f * deltaTime;  // Acceleration rate
+            speed = std::min(speed, maxSpeed);
+            }
+
+            // Apply braking
+            if (brake > 0.1f) {
+            isBraking = true;
+            speed -= brake * 80.0f * deltaTime;  // Braking is stronger than acceleration
+            speed = std::max(speed, 0.0f);
+
+            // Vibration feedback for braking
+            if (gamepad->SupportsVibration()) {
+            gamepad->SetVibration(brake * 0.3f, brake * 0.5f);
+            }
+            } else {
+            isBraking = false;
+            // Natural deceleration
+            speed -= 20.0f * deltaTime;
+            speed = std::max(speed, 0.0f);
+
+            gamepad->StopVibration();
+            }
+
+            // Handbrake with A button
+            if (gamepad->IsButtonPressed(GamepadButton::A)) {
+            speed *= 0.95f;  // Rapid deceleration
+            // Stronger vibration for handbrake
+            if (gamepad->SupportsVibration()) {
+            gamepad->SetVibration(0.6f, 0.8f);
+            }
+            }
+            }
+            };
+        </div>
+
+        <h3>Event-Driven Input Handling</h3>
+        <div class="example">
+            // Event-driven input system
+            class InputEventHandler {
+            public:
+            void setupGamepadEvents(IGamepad* gamepad) {
+            // Button event handling
+            gamepad->SetButtonCallback([this](int gamepadId, GamepadButton button, bool pressed) {
+            handleButtonEvent(gamepadId, button, pressed);
+            });
+
+            // Axis event handling
+            gamepad->SetAxisCallback([this](int gamepadId, GamepadAxis axis, float value) {
+            handleAxisEvent(gamepadId, axis, value);
+            });
+            }
+
+            private:
+            void handleButtonEvent(int gamepadId, GamepadButton button, bool pressed) {
+            if (!pressed) return;  // Only handle button presses
+
+            switch (button) {
+            case GamepadButton::Start:
+            game->togglePause();
+            break;
+            case GamepadButton::Back:
+            game->showInventory();
+            break;
+            case GamepadButton::Y:
+            player->useItem();
+            break;
+            case GamepadButton::LeftBumper:
+            player->previousWeapon();
+            break;
+            case GamepadButton::RightBumper:
+            player->nextWeapon();
+            break;
+            }
+            }
+
+            void handleAxisEvent(int gamepadId, GamepadAxis axis, float value) {
+            switch (axis) {
+            case GamepadAxis::LeftTrigger:
+            if (value > 0.8f) {
+            weapon->chargeAttack(value);
+            }
+            break;
+            case GamepadAxis::RightTrigger:
+            if (value > 0.1f) {
+            weapon->fire(value);
+            } else {
+            weapon->stopFiring();
+            }
+            break;
+            }
+            }
+            };
+        </div>
+
+        <h2 id="implementations">Concrete Implementations</h2>
+
+        <h3>GLFWGamepad</h3>
+        <div class="info">
+            <p><strong>GLFWGamepad</strong> - Implementation using GLFW for cross-platform gamepad support. Supports XInput controllers, PlayStation controllers, and other common gamepads through GLFW's gamepad API.</p>
+            <ul>
+                <li><strong>Platform Support:</strong> Windows, macOS, Linux</li>
+                <li><strong>Controller Support:</strong> Xbox 360/One/Series, PlayStation 3/4/5, Nintendo Switch Pro Controller</li>
+                <li><strong>Features:</strong> Automatic button mapping, hotplug support, vibration simulation</li>
+            </ul>
+        </div>
+
+        <h3>MKBGamepad</h3>
+        <div class="info">
+            <p><strong>MKBGamepad</strong> - Mouse and Keyboard implementation that emulates gamepad behavior. Useful for development and providing gamepad-like interface for keyboard players.</p>
+            <ul>
+                <li><strong>Features:</strong> Customizable key mapping, mouse-as-analog-stick, configurable sensitivity</li>
+                <li><strong>Use Cases:</strong> Development testing, accessibility, mixed input scenarios</li>
+                <li><strong>Key Mappings:</strong> WASD for left stick, mouse for right stick, Space for A button, etc.</li>
+            </ul>
+        </div>
+
+        <h3>GamepadManager</h3>
+        <div class="info">
+            <p><strong>GamepadManager</strong> - High-level manager that handles multiple gamepads, automatic detection, and input routing to handlers.</p>
+            <ul>
+                <li><strong>Features:</strong> Multi-gamepad support, hotplug detection, input handler stack, global events</li>
+                <li><strong>Input Handlers:</strong> Priority-based input processing with <code>IGamepadInputHandler</code></li>
+                <li><strong>Management:</strong> Automatic cleanup, connection monitoring, configuration management</li>
+            </ul>
+        </div>
+
+        <h2 id="best-practices">Best Practices</h2>
+
+        <div class="note">
+            <h4>Input Handling</h4>
+            <ul>
+                <li><strong>Frame-based updates:</strong> Always call <code>Update()</code> once per frame before querying state</li>
+                <li><strong>Connection checking:</strong> Always check <code>IsConnected()</code> before using gamepad input</li>
+                <li><strong>Just-pressed vs pressed:</strong> Use <code>WasButtonJustPressed()</code> for one-time actions, <code>IsButtonPressed()</code> for continuous actions</li>
+                <li><strong>Null checking:</strong> Always verify gamepad pointers are not null before use</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>Configuration and Accessibility</h4>
+            <ul>
+                <li><strong>Configurable deadzones:</strong> Allow users to adjust deadzones for accessibility and worn controllers</li>
+                <li><strong>Sensitivity options:</strong> Provide sensitivity settings for different player preferences</li>
+                <li><strong>Button remapping:</strong> Consider allowing users to remap buttons for accessibility</li>
+                <li><strong>Multiple input methods:</strong> Support both gamepad and keyboard/mouse simultaneously</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Performance Considerations</h4>
+            <ul>
+                <li><strong>Event callbacks:</strong> Keep callback functions lightweight to avoid frame rate issues</li>
+                <li><strong>State caching:</strong> Cache frequently accessed values rather than calling methods repeatedly</li>
+                <li><strong>Vibration cleanup:</strong> Always stop vibration when appropriate to avoid draining battery</li>
+                <li><strong>Connection polling:</strong> Use GamepadManager for efficient connection monitoring rather than polling individual gamepads</li>
+            </ul>
+        </div>
+
+        <div class="note">
+            <h4>Cross-Platform Compatibility</h4>
+            <ul>
+                <li><strong>Button conventions:</strong> Be aware of different button naming conventions (Xbox vs PlayStation)</li>
+                <li><strong>Axis directions:</strong> Some platforms may have different axis orientations</li>
+                <li><strong>Vibration support:</strong> Not all platforms/controllers support vibration</li>
+                <li><strong>Device detection:</strong> Controller hotplug behavior varies between platforms</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>User Experience</h4>
+            <ul>
+                <li><strong>Visual feedback:</strong> Show on-screen prompts that match the connected controller type</li>
+                <li><strong>Graceful degradation:</strong> Handle controller disconnection gracefully</li>
+                <li><strong>Input buffering:</strong> Consider buffering critical inputs to handle brief disconnections</li>
+                <li><strong>Mixed input:</strong> Allow seamless switching between gamepad and keyboard/mouse</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

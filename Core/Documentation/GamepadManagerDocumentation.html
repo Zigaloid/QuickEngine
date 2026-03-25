@@ -1,0 +1,1123 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamepadManager Class Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+
+        h4 {
+            color: #27ae60;
+            margin-top: 20px;
+        }
+
+        .class-header {
+            background: #e8f4fd;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .method {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .method-signature {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 8px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .static-method {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .singleton-class {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .parameters {
+            margin: 10px 0;
+        }
+
+        .parameter {
+            margin: 5px 0;
+        }
+
+        .parameter-name {
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-line;
+        }
+
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .architecture {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+            .toc ul {
+                list-style-type: none;
+                padding-left: 0;
+            }
+
+            .toc li {
+                margin: 5px 0;
+            }
+
+            .toc a {
+                text-decoration: none;
+                color: #2980b9;
+            }
+
+                .toc a:hover {
+                    text-decoration: underline;
+                }
+
+        .code-inline {
+            background: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        .handler-diagram {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .handler-box {
+            background: #ffffff;
+            border: 1px solid #adb5bd;
+            border-radius: 4px;
+            padding: 10px;
+            margin: 5px;
+            display: inline-block;
+            width: 150px;
+        }
+
+        .high-priority {
+            border-color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .medium-priority {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+
+        .low-priority {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GamepadManager Class Documentation</h1>
+
+        <div class="class-header">
+            <h2>Class Overview</h2>
+            <div class="method-signature">class GamepadManager</div>
+            <p><strong>Purpose:</strong> A comprehensive manager for handling multiple gamepads with automatic detection, input routing through priority-based handlers, and centralized configuration. Provides hotplug support, event callbacks, and utility functions for multi-gamepad applications.</p>
+            <p><strong>Namespace:</strong> <code class="code-inline">Input</code></p>
+            <p><strong>Header:</strong> <code class="code-inline">Core/GamepadManager.h</code></p>
+            <p><strong>Implementation:</strong> <code class="code-inline">Core/GamepadManager.cpp</code></p>
+        </div>
+
+        <div class="architecture">
+            <h4>Architecture Overview</h4>
+            <p>The GamepadManager implements a layered input processing system with priority-based handlers:</p>
+
+            <div class="handler-diagram">
+                <h4>Input Handler Processing Flow</h4>
+                <div class="handler-box high-priority">UI Handler<br />(Priority: 100)</div>
+                <div class="handler-box medium-priority">Menu Handler<br />(Priority: 50)</div>
+                <div class="handler-box low-priority">Game Handler<br />(Priority: 10)</div>
+                <p><strong>↓</strong> Input flows through handlers in priority order <strong>↓</strong></p>
+                <p>Higher priority handlers can consume input to prevent lower priority handlers from processing it.</p>
+            </div>
+        </div>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li><a href="#constructor">Constructor & Destructor</a></li>
+                <li><a href="#lifecycle">Manager Lifecycle</a></li>
+                <li><a href="#configuration">Configuration Management</a></li>
+                <li><a href="#input-handlers">Input Handler Management</a></li>
+                <li><a href="#gamepad-access">Gamepad Access</a></li>
+                <li><a href="#state-queries">State Queries</a></li>
+                <li><a href="#callbacks">Event Callbacks</a></li>
+                <li><a href="#manual-management">Manual Gamepad Management</a></li>
+                <li><a href="#debugging">Debugging & Information</a></li>
+                <li><a href="#static-utilities">Static Utility Methods</a></li>
+                <li><a href="#singleton">GlobalGamepadManager Singleton</a></li>
+                <li><a href="#usage-examples">Usage Examples</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </div>
+
+        <h2 id="constructor">Constructor & Destructor</h2>
+
+        <div class="method">
+            <div class="method-signature">GamepadManager(const GamepadConfig& defaultConfig = GamepadConfig{})</div>
+            <p>Constructs a GamepadManager with optional default configuration for all managed gamepads.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">defaultConfig:</span> Default configuration applied to all newly detected gamepads</div>
+            </div>
+            <div class="example">
+                // Create manager with default settings
+                GamepadManager manager;
+
+                // Create manager with custom configuration
+                GamepadConfig config;
+                config.deadzone = 0.15f;
+                config.maxControllers = 2;
+                config.enableVibration = false;
+                GamepadManager customManager(config);
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">virtual ~GamepadManager()</div>
+            <p>Destructor automatically calls Shutdown() to ensure proper cleanup of all managed gamepads and resources.</p>
+        </div>
+
+        <h2 id="lifecycle">Manager Lifecycle</h2>
+
+        <div class="method">
+            <div class="method-signature">bool Initialize()</div>
+            <p>Initializes the gamepad manager and detects any initially connected gamepads.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">Returns:</span> true if initialization was successful</div>
+            </div>
+            <div class="example">
+                GamepadManager manager;
+                if (manager.Initialize()) {
+                std::cout << "GamepadManager initialized successfully" << std::endl;
+                } else {
+                std::cout << "Failed to initialize GamepadManager" << std::endl;
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void Update(double deltaTime = 0.0)</div>
+            <p>Updates all managed gamepads, processes input through handlers, and checks for hotplug events. Should be called once per frame.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">deltaTime:</span> Time since last update (seconds), passed to input handlers</div>
+            </div>
+            <div class="example">
+                // In main game loop
+                while (gameRunning) {
+                double deltaTime = timer.getDeltaTime();
+                manager.Update(deltaTime);
+
+                // ... rest of game update logic
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void Shutdown()</div>
+            <p>Shuts down all managed gamepads and cleans up resources. Called automatically by destructor.</p>
+            <div class="example">
+                // Explicit shutdown (usually not needed)
+                manager.Shutdown();
+            </div>
+        </div>
+
+        <h2 id="configuration">Configuration Management</h2>
+
+        <div class="method">
+            <div class="method-signature">void SetDefaultConfig(const GamepadConfig& config)</div>
+            <div class="method-signature">const GamepadConfig& GetDefaultConfig() const</div>
+            <p>Set or get the default configuration applied to newly connected gamepads.</p>
+            <div class="example">
+                GamepadConfig newConfig;
+                newConfig.deadzone = 0.2f;
+                newConfig.sensitivity = 1.5f;
+                manager.SetDefaultConfig(newConfig);
+
+                // Get current default config
+                const GamepadConfig& currentConfig = manager.GetDefaultConfig();
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void SetAutoDetect(bool enabled)</div>
+            <div class="method-signature">bool IsAutoDetectEnabled() const</div>
+            <p>Enable or disable automatic detection of newly connected gamepads.</p>
+            <div class="example">
+                // Disable auto-detection for manual control
+                manager.SetAutoDetect(false);
+
+                // Check if auto-detection is enabled
+                if (manager.IsAutoDetectEnabled()) {
+                std::cout << "Auto-detection is active" << std::endl;
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void SetMaxGamepads(int maxGamepads)</div>
+            <div class="method-signature">int GetMaxGamepads() const</div>
+            <p>Set the maximum number of gamepads to support simultaneously. Excess gamepads will be removed if the limit is lowered.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">maxGamepads:</span> Maximum number of gamepads (minimum 1)</div>
+            </div>
+            <div class="example">
+                // Limit to 2 players for a local co-op game
+                manager.SetMaxGamepads(2);
+
+                // Support up to 8 players
+                manager.SetMaxGamepads(8);
+            </div>
+        </div>
+
+        <h2 id="input-handlers">Input Handler Management</h2>
+
+        <div class="method">
+            <div class="method-signature">void AddInputHandler(std::shared_ptr&lt;IGamepadInputHandler&gt; handler)</div>
+            <p>Adds an input handler to the processing stack. Handlers are sorted by priority (higher values processed first).</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">handler:</span> Shared pointer to input handler implementation</div>
+            </div>
+            <div class="example">
+                // Create and add a menu input handler
+                auto menuHandler = std::make_shared&lt;MenuInputHandler&gt;("MainMenu", 100);
+                manager.AddInputHandler(menuHandler);
+
+                // Add a game input handler with lower priority
+                auto gameHandler = std::make_shared&lt;GameInputHandler&gt;("GamePlay", 10);
+                manager.AddInputHandler(gameHandler);
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void RemoveInputHandler(std::shared_ptr&lt;IGamepadInputHandler&gt; handler)</div>
+            <p>Removes a specific input handler from the processing stack.</p>
+            <div class="example">
+                // Remove menu handler when exiting menu
+                manager.RemoveInputHandler(menuHandler);
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void ClearInputHandlers()</div>
+            <p>Removes all input handlers from the processing stack.</p>
+            <div class="example">
+                // Clear all handlers when changing game states
+                manager.ClearInputHandlers();
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">size_t GetInputHandlerCount() const</div>
+            <p>Returns the number of currently registered input handlers.</p>
+            <div class="example">std::cout << "Active handlers: " << manager.GetInputHandlerCount() << std::endl;</div>
+        </div>
+
+        <h2 id="gamepad-access">Gamepad Access</h2>
+
+        <div class="method">
+            <div class="method-signature">IGamepad* GetGamepad(int gamepadId) const</div>
+            <p>Retrieves a gamepad by its unique ID.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">gamepadId:</span> Unique gamepad identifier</div>
+                <div class="parameter"><span class="parameter-name">Returns:</span> Pointer to gamepad or nullptr if not found</div>
+            </div>
+            <div class="example">
+                IGamepad* player1Controller = manager.GetGamepad(0);
+                if (player1Controller && player1Controller->IsConnected()) {
+                // Use player 1's controller
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">IGamepad* GetGamepadByIndex(size_t index) const</div>
+            <p>Retrieves a gamepad by its slot index in the manager's internal array.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">index:</span> Zero-based slot index</div>
+                <div class="parameter"><span class="parameter-name">Returns:</span> Pointer to gamepad or nullptr if slot is empty or out of range</div>
+            </div>
+            <div class="example">
+                // Iterate through all gamepad slots
+                for (size_t i = 0; i < manager.GetMaxGamepads(); ++i) {
+                IGamepad* gamepad = manager.GetGamepadByIndex(i);
+                if (gamepad && gamepad->IsConnected()) {
+                std::cout << "Slot " << i << ": " << gamepad->GetName() << std::endl;
+                }
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">size_t GetConnectedGamepadCount() const</div>
+            <p>Returns the number of currently connected and functional gamepads.</p>
+            <div class="example">
+                size_t playerCount = manager.GetConnectedGamepadCount();
+                std::cout << "Players ready: " << playerCount << std::endl;
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">std::vector&lt;int&gt; GetConnectedGamepadIds() const</div>
+            <p>Returns a vector of all connected gamepad IDs.</p>
+            <div class="example">
+                auto connectedIds = manager.GetConnectedGamepadIds();
+                for (int id : connectedIds) {
+                std::cout << "Connected gamepad ID: " << id << std::endl;
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">IGamepad* GetFirstConnectedGamepad() const</div>
+            <p>Returns the first connected gamepad found. Useful for single-player games.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">Returns:</span> Pointer to first connected gamepad or nullptr if none are connected</div>
+            </div>
+            <div class="example">
+                // Single-player game input
+                IGamepad* controller = manager.GetFirstConnectedGamepad();
+                if (controller) {
+                if (controller->WasButtonJustPressed(GamepadButton::Start)) {
+                game.showPauseMenu();
+                }
+                }
+            </div>
+        </div>
+
+        <h2 id="state-queries">State Queries</h2>
+
+        <div class="method">
+            <div class="method-signature">bool IsAnyButtonPressed(GamepadButton button) const</div>
+            <p>Returns true if the specified button is pressed on any connected gamepad.</p>
+            <div class="example">
+                // Check if any player pressed the start button
+                if (manager.IsAnyButtonPressed(GamepadButton::Start)) {
+                game.showPauseMenu();
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">bool IsAnyButtonJustPressed(GamepadButton button) const</div>
+            <p>Returns true if the specified button was just pressed this frame on any connected gamepad.</p>
+            <div class="example">
+                // Any player can join the game
+                if (manager.IsAnyButtonJustPressed(GamepadButton::A)) {
+                game.addNewPlayer();
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">IGamepad* GetGamepadWithButtonPressed(GamepadButton button) const</div>
+            <p>Returns the first gamepad found that has the specified button pressed.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">Returns:</span> Pointer to gamepad with button pressed, or nullptr if none found</div>
+            </div>
+            <div class="example">
+                // Find which player pressed the action button
+                IGamepad* activePlayer = manager.GetGamepadWithButtonPressed(GamepadButton::A);
+                if (activePlayer) {
+                int playerId = activePlayer->GetGamepadId();
+                game.performAction(playerId);
+                }
+            </div>
+        </div>
+
+        <h2 id="callbacks">Event Callbacks</h2>
+
+        <div class="method">
+            <div class="method-signature">void SetConnectedCallback(GamepadConnectedCallback callback)</div>
+            <p>Sets a callback function that is called when a gamepad is connected.</p>
+            <div class="example">
+                manager.SetConnectedCallback([](int gamepadId) {
+                std::cout << "Player " << gamepadId << " joined the game!" << std::endl;
+                ui.showPlayerJoinedMessage(gamepadId);
+                });
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void SetDisconnectedCallback(GamepadDisconnectedCallback callback)</div>
+            <p>Sets a callback function that is called when a gamepad is disconnected.</p>
+            <div class="example">
+                manager.SetDisconnectedCallback([](int gamepadId) {
+                std::cout << "Player " << gamepadId << " disconnected!" << std::endl;
+                game.pauseForReconnection(gamepadId);
+                });
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void SetGlobalButtonCallback(GamepadButtonCallback callback)</div>
+            <p>Sets a global callback for all button events across all gamepads.</p>
+            <div class="example">
+                manager.SetGlobalButtonCallback([](int gamepadId, GamepadButton button, bool pressed) {
+                if (pressed) {
+                analytics.logButtonPress(gamepadId, button);
+                }
+                });
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void SetGlobalAxisCallback(GamepadAxisCallback callback)</div>
+            <p>Sets a global callback for all axis events across all gamepads.</p>
+            <div class="example">
+                manager.SetGlobalAxisCallback([](int gamepadId, GamepadAxis axis, float value) {
+                if (axis == GamepadAxis::LeftTrigger && value > 0.8f) {
+                haptics.triggerFeedback(gamepadId);
+                }
+                });
+            </div>
+        </div>
+
+        <h2 id="manual-management">Manual Gamepad Management</h2>
+
+        <div class="method">
+            <div class="method-signature">bool AddGamepad(int gamepadId, const GamepadConfig& config = GamepadConfig{})</div>
+            <p>Manually adds a gamepad with optional custom configuration.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">gamepadId:</span> System gamepad identifier</div>
+                <div class="parameter"><span class="parameter-name">config:</span> Custom configuration for this gamepad</div>
+                <div class="parameter"><span class="parameter-name">Returns:</span> true if gamepad was added successfully</div>
+            </div>
+            <div class="example">
+                // Add a specific gamepad with custom settings
+                GamepadConfig playerConfig;
+                playerConfig.deadzone = 0.05f;  // Very sensitive for this player
+                if (manager.AddGamepad(2, playerConfig)) {
+                std::cout << "Added gamepad 2 with custom config" << std::endl;
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">bool RemoveGamepad(int gamepadId)</div>
+            <p>Manually removes a specific gamepad from management.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">Returns:</span> true if gamepad was found and removed</div>
+            </div>
+            <div class="example">
+                // Remove a problematic gamepad
+                if (manager.RemoveGamepad(1)) {
+                std::cout << "Removed gamepad 1" << std::endl;
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void RemoveAllGamepads()</div>
+            <p>Removes all gamepads from management.</p>
+            <div class="example">
+                // Clear all gamepads when resetting the game
+                manager.RemoveAllGamepads();
+            </div>
+        </div>
+
+        <h2 id="debugging">Debugging & Information</h2>
+
+        <div class="method">
+            <div class="method-signature">void PrintConnectedGamepads() const</div>
+            <p>Prints detailed information about all connected gamepads to the console.</p>
+            <div class="example">
+                // Debug output of current gamepad state
+                manager.PrintConnectedGamepads();
+                // Output:
+                // === Connected Gamepads ===
+                // Total connected: 2
+                //   Gamepad 0 (Slot 0): Xbox One Controller
+                //   Gamepad 3 (Slot 1): PlayStation 4 Controller
+                // ========================
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">void PrintInputHandlers() const</div>
+            <p>Prints information about all registered input handlers to the console.</p>
+            <div class="example">
+                manager.PrintInputHandlers();
+                // Output:
+                // === Input Handlers ===
+                // Total handlers: 3
+                //   1. UI Handler (Priority: 100, Active: Yes)
+                //   2. Menu Handler (Priority: 50, Active: Yes)
+                //   3. Game Handler (Priority: 10, Active: No)
+                // =====================
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">std::string GetGamepadInfo(int gamepadId) const</div>
+            <p>Returns formatted information string about a specific gamepad.</p>
+            <div class="example">
+                std::string info = manager.GetGamepadInfo(0);
+                std::cout << info << std::endl;
+                // Output: "ID: 0, Name: Xbox One Controller, Connected: Yes"
+            </div>
+        </div>
+
+        <h2 id="static-utilities">Static Utility Methods</h2>
+
+        <div class="static-method">
+            <div class="method-signature">static std::vector&lt;int&gt; GetAvailableGamepadIds()</div>
+            <p>Returns a list of all gamepad IDs that are currently available on the system.</p>
+            <div class="example">
+                // Check what gamepads are available before creating manager
+                auto availableIds = GamepadManager::GetAvailableGamepadIds();
+                std::cout << "Available gamepads: " << availableIds.size() << std::endl;
+            </div>
+        </div>
+
+        <div class="static-method">
+            <div class="method-signature">static bool IsGamepadConnected(int gamepadId)</div>
+            <p>Checks if a specific gamepad ID is currently connected to the system.</p>
+            <div class="example">
+                if (GamepadManager::IsGamepadConnected(0)) {
+                std::cout << "Gamepad 0 is available" << std::endl;
+                }
+            </div>
+        </div>
+
+        <div class="static-method">
+            <div class="method-signature">static std::string GetGamepadName(int gamepadId)</div>
+            <p>Returns the name of a specific gamepad without needing a manager instance.</p>
+            <div class="example">
+                std::string name = GamepadManager::GetGamepadName(0);
+                std::cout << "Gamepad 0 name: " << name << std::endl;
+            </div>
+        </div>
+
+        <h2 id="singleton">GlobalGamepadManager Singleton</h2>
+
+        <div class="singleton-class">
+            <div class="method-signature">class GlobalGamepadManager</div>
+            <p>Optional singleton wrapper for GamepadManager that provides global access throughout an application.</p>
+
+            <h4>Static Methods</h4>
+            <div class="method">
+                <div class="method-signature">static GamepadManager* GetInstance()</div>
+                <p>Returns the singleton instance, or nullptr if not created.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">static void CreateInstance(const GamepadConfig& config = GamepadConfig{})</div>
+                <p>Creates the singleton instance with optional configuration.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">static void DestroyInstance()</div>
+                <p>Destroys the singleton instance.</p>
+            </div>
+
+            <div class="method">
+                <div class="method-signature">static bool HasInstance()</div>
+                <p>Returns true if the singleton instance exists.</p>
+            </div>
+
+            <div class="example">
+                // Using the global singleton
+                GlobalGamepadManager::CreateInstance();
+                GamepadManager* globalManager = GlobalGamepadManager::GetInstance();
+
+                if (globalManager) {
+                globalManager->Initialize();
+                }
+
+                // Cleanup
+                GlobalGamepadManager::DestroyInstance();
+            </div>
+        </div>
+
+        <h2 id="usage-examples">Usage Examples</h2>
+
+        <h3>Basic Setup and Usage</h3>
+        <div class="example">
+            // Initialize gamepad system
+            GamepadConfig config;
+            config.deadzone = 0.15f;
+            config.maxControllers = 4;
+
+            GamepadManager manager(config);
+            if (!manager.Initialize()) {
+            std::cerr << "Failed to initialize gamepad manager" << std::endl;
+            return -1;
+            }
+
+            // Main game loop
+            while (gameRunning) {
+            double deltaTime = timer.getDeltaTime();
+            manager.Update(deltaTime);
+
+            // Simple single-player input
+            IGamepad* controller = manager.GetFirstConnectedGamepad();
+            if (controller) {
+            if (controller->WasButtonJustPressed(GamepadButton::Start)) {
+            game.togglePause();
+            }
+
+            Vector2 movement(controller->GetLeftStickX(), controller->GetLeftStickY());
+            player.move(movement * deltaTime);
+            }
+
+            // ... rest of game logic
+            }
+
+            manager.Shutdown();
+        </div>
+
+        <h3>Multi-Player Game with Input Handlers</h3>
+        <div class="example">
+            // Multi-player game with layered input handling
+            class MultiPlayerGame {
+            GamepadManager gamepadManager_;
+            std::shared_ptr<MenuInputHandler>
+                menuHandler_;
+                std::shared_ptr<GameInputHandler>
+                    gameHandler_;
+
+                    public:
+                    void initialize() {
+                    // Setup gamepad manager
+                    GamepadConfig config;
+                    config.maxControllers = 4;
+                    gamepadManager_ = GamepadManager(config);
+                    gamepadManager_.Initialize();
+
+                    // Create input handlers
+                    menuHandler_ = std::make_shared<MenuInputHandler>
+                        ("MenuSystem", 100);
+                        gameHandler_ = std::make_shared<GameInputHandler>
+                            ("GamePlay", 10);
+
+                            // Setup connection callbacks
+                            gamepadManager_.SetConnectedCallback([this](int gamepadId) {
+                            onPlayerJoined(gamepadId);
+                            });
+
+                            gamepadManager_.SetDisconnectedCallback([this](int gamepadId) {
+                            onPlayerLeft(gamepadId);
+                            });
+
+                            // Start with menu input only
+                            gamepadManager_.AddInputHandler(menuHandler_);
+                            }
+
+                            void startGame() {
+                            // Add game input handler when starting gameplay
+                            gamepadManager_.AddInputHandler(gameHandler_);
+                            menuHandler_->SetActive(false);  // Disable menu input
+                            }
+
+                            void showMenu() {
+                            // Re-enable menu input, disable game input
+                            menuHandler_->SetActive(true);
+                            gameHandler_->SetActive(false);
+                            }
+
+                            void update(double deltaTime) {
+                            gamepadManager_.Update(deltaTime);
+
+                            // Check if any player wants to pause
+                            if (gamepadManager_.IsAnyButtonJustPressed(GamepadButton::Start)) {
+                            showMenu();
+                            }
+                            }
+
+                            private:
+                            void onPlayerJoined(int gamepadId) {
+                            std::cout << "Player " << gamepadId << " joined!" << std::endl;
+                            ui_.showPlayerJoinedNotification(gamepadId);
+
+                            // Configure controller for this player
+                            IGamepad* gamepad = gamepadManager_.GetGamepad(gamepadId);
+                            if (gamepad && gamepad->SupportsVibration()) {
+                            gamepad->SetVibration(0.5f, 0.5f);  // Welcome vibration
+                            // Stop vibration after 200ms
+                            scheduler_.scheduleAfter(200ms, [gamepad]() {
+                            gamepad->StopVibration();
+                            });
+                            }
+                            }
+
+                            void onPlayerLeft(int gamepadId) {
+                            std::cout << "Player " << gamepadId << " disconnected!" << std::endl;
+                            game_.pauseForReconnection(gamepadId);
+                            }
+                            };
+        </div>
+
+        <h3>Custom Input Handler Implementation</h3>
+        <div class="example">
+            // Example custom input handler for a racing game
+            class RacingInputHandler : public GamepadInputHandler {
+            RacingGame* game_;
+
+            public:
+            RacingInputHandler(RacingGame* game, int priority = 10)
+            : GamepadInputHandler("RacingInput", priority), game_(game) {}
+
+            bool HandleButtonInput(int gamepadId, GamepadButton button,
+            bool pressed, bool justPressed, bool justReleased) override {
+            if (!IsActive()) return false;
+
+            Player* player = game_->getPlayer(gamepadId);
+            if (!player) return false;
+
+            switch (button) {
+            case GamepadButton::A:
+            if (justPressed) {
+            player->startHandbrake();
+            return true;  // Consume input
+            } else if (justReleased) {
+            player->stopHandbrake();
+            return true;
+            }
+            break;
+
+            case GamepadButton::Start:
+            if (justPressed) {
+            game_->showPauseMenu(gamepadId);
+            return true;  // Prevent other handlers from processing
+            }
+            break;
+
+            case GamepadButton::Back:
+            if (justPressed) {
+            player->lookBehind(!pressed);
+            return true;
+            }
+            break;
+            }
+
+            return false;  // Let other handlers process unhandled input
+            }
+
+            bool HandleAxisInput(int gamepadId, GamepadAxis axis,
+            float value, float delta) override {
+            if (!IsActive()) return false;
+
+            Player* player = game_->getPlayer(gamepadId);
+            if (!player) return false;
+
+            switch (axis) {
+            case GamepadAxis::LeftX:
+            player->setSteering(value);
+            return true;
+
+            case GamepadAxis::RightTrigger:
+            player->setAcceleration(value);
+            return true;
+
+            case GamepadAxis::LeftTrigger:
+            player->setBraking(value);
+            return true;
+
+            case GamepadAxis::RightY:
+            // Camera pitch for looking around
+            if (std::abs(value) > 0.1f) {
+            player->adjustCameraPitch(value * 2.0f);
+            return true;
+            }
+            break;
+            }
+
+            return false;
+            }
+
+            void OnGamepadConnected(int gamepadId) override {
+            std::cout << "Racing controller " << gamepadId << " connected" << std::endl;
+            game_->addPlayer(gamepadId);
+            }
+
+            void OnGamepadDisconnected(int gamepadId) override {
+            std::cout << "Racing controller " << gamepadId << " disconnected" << std::endl;
+            game_->removePlayer(gamepadId);
+            }
+            };
+        </div>
+
+        <h3>Configuration and Hotplug Management</h3>
+        <div class="example">
+            // Advanced configuration and hotplug handling
+            class GamepadSystemManager {
+            GamepadManager manager_;
+            std::map<int, PlayerProfile>
+                playerProfiles_;
+
+                public:
+                void initialize() {
+                // Create custom configurations for different player types
+                GamepadConfig competitiveConfig;
+                competitiveConfig.deadzone = 0.05f;      // Very sensitive
+                competitiveConfig.sensitivity = 1.3f;     // High sensitivity
+                competitiveConfig.enableVibration = false; // No distractions
+
+                GamepadConfig casualConfig;
+                casualConfig.deadzone = 0.2f;           // Larger deadzone
+                casualConfig.sensitivity = 0.8f;        // Lower sensitivity
+                casualConfig.enableVibration = true;    // Full feedback
+
+                // Initialize with default casual config
+                manager_ = GamepadManager(casualConfig);
+                manager_.Initialize();
+
+                // Set up hotplug callbacks
+                setupHotplugHandling();
+
+                // Manual gamepad setup for specific players
+                setupPlayerGamepads();
+                }
+
+                private:
+                void setupHotplugHandling() {
+                manager_.SetConnectedCallback([this](int gamepadId) {
+                handleGamepadConnected(gamepadId);
+                });
+
+                manager_.SetDisconnectedCallback([this](int gamepadId) {
+                handleGamepadDisconnected(gamepadId);
+                });
+                }
+
+                void handleGamepadConnected(int gamepadId) {
+                std::string gamepadName = manager_.GetGamepadName(gamepadId);
+                std::cout << "Gamepad connected: " << gamepadName << " (ID: " << gamepadId << ")" << std::endl;
+
+                // Apply player-specific configuration if available
+                auto profileIt = playerProfiles_.find(gamepadId);
+                if (profileIt != playerProfiles_.end()) {
+                applyPlayerProfile(gamepadId, profileIt->second);
+                } else {
+                // Create new player profile
+                createPlayerProfile(gamepadId, gamepadName);
+                }
+
+                // Show connection notification
+                ui_.showGamepadConnectedNotification(gamepadId, gamepadName);
+                }
+
+                void handleGamepadDisconnected(int gamepadId) {
+                std::cout << "Gamepad disconnected: ID " << gamepadId << std::endl;
+
+                // Save player profile before they disconnect
+                savePlayerProfile(gamepadId);
+
+                // Handle game state
+                if (game_.isInProgress()) {
+                game_.pauseForPlayerReconnection(gamepadId);
+                }
+
+                ui_.showGamepadDisconnectedNotification(gamepadId);
+                }
+
+                void applyPlayerProfile(int gamepadId, const PlayerProfile& profile) {
+                IGamepad* gamepad = manager_.GetGamepad(gamepadId);
+                if (!gamepad) return;
+
+                // Apply custom sensitivity settings
+                gamepad->SetAxisSensitivity(GamepadAxis::LeftX, profile.stickSensitivity);
+                gamepad->SetAxisSensitivity(GamepadAxis::LeftY, profile.stickSensitivity);
+                gamepad->SetAxisSensitivity(GamepadAxis::RightX, profile.cameraSensitivity);
+                gamepad->SetAxisSensitivity(GamepadAxis::RightY, profile.cameraSensitivity);
+
+                // Apply custom deadzones
+                gamepad->SetDeadzone(GamepadAxis::LeftX, profile.deadzone);
+                gamepad->SetDeadzone(GamepadAxis::LeftY, profile.deadzone);
+                gamepad->SetDeadzone(GamepadAxis::RightX, profile.deadzone);
+                gamepad->SetDeadzone(GamepadAxis::RightY, profile.deadzone);
+
+                std::cout << "Applied profile for player " << gamepadId << std::endl;
+                }
+
+                void setupPlayerGamepads() {
+                // Check for specific gamepads and configure them
+                auto availableIds = GamepadManager::GetAvailableGamepadIds();
+
+                for (int id : availableIds) {
+                std::string name = GamepadManager::GetGamepadName(id);
+                std::cout << "Found gamepad: " << name << " (ID: " << id << ")" << std::endl;
+
+                // Apply specific configuration based on gamepad type
+                if (name.find("Pro Controller") != std::string::npos) {
+                // Nintendo Pro Controller - configure for precision
+                GamepadConfig proConfig;
+                proConfig.deadzone = 0.08f;
+                proConfig.sensitivity = 1.1f;
+                manager_.AddGamepad(id, proConfig);
+                } else if (name.find("Xbox") != std::string::npos) {
+                // Xbox controller - default settings work well
+                manager_.AddGamepad(id);
+                } else if (name.find("PlayStation") != std::string::npos) {
+                // PlayStation controller - adjust for different stick feel
+                GamepadConfig psConfig;
+                psConfig.deadzone = 0.12f;
+                proConfig.sensitivity = 0.95f;
+                manager_.AddGamepad(id, psConfig);
+                }
+                }
+                }
+                };
+        </div>
+
+        <h2 id="best-practices">Best Practices</h2>
+
+        <div class="note">
+            <h4>Initialization and Lifecycle</h4>
+            <ul>
+                <li><strong>Initialize early:</strong> Call Initialize() during application startup, before the main loop</li>
+                <li><strong>Update regularly:</strong> Call Update() once per frame in your main loop</li>
+                <li><strong>Handle shutdown:</strong> Explicit Shutdown() call is optional but good practice for clarity</li>
+                <li><strong>Check initialization:</strong> Always check the return value of Initialize()</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>Input Handler Design</h4>
+            <ul>
+                <li><strong>Priority hierarchy:</strong> Use clear priority levels (e.g., UI=100, Menu=50, Game=10)</li>
+                <li><strong>Consume input appropriately:</strong> Return true from handlers only when input should be consumed</li>
+                <li><strong>State management:</strong> Use IsActive() to enable/disable handlers instead of removing them</li>
+                <li><strong>Handler lifetime:</strong> Store handlers as shared_ptr to manage lifetime properly</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Multi-Player Considerations</h4>
+            <ul>
+                <li><strong>Hotplug handling:</strong> Always implement connection/disconnection callbacks for robust multi-player</li>
+                <li><strong>Player assignment:</strong> Maintain mapping between gamepad IDs and player slots</li>
+                <li><strong>Graceful degradation:</strong> Handle mid-game disconnections with pause/reconnect logic</li>
+                <li><strong>Configuration per player:</strong> Allow per-gamepad configuration for accessibility</li>
+            </ul>
+        </div>
+
+        <div name="architecture">
+            <h4>Performance and Architecture</h4>
+            <ul>
+                <li><strong>Handler efficiency:</strong> Keep input handlers lightweight to avoid frame rate impact</li>
+                <li><strong>Auto-detection overhead:</strong> Disable auto-detection if managing gamepads manually</li>
+                <li><strong>Memory management:</strong> The manager uses smart pointers for automatic resource cleanup</li>
+                <li><strong>Thread safety:</strong> The manager is not thread-safe; use from main thread only</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>Integration Patterns</h4>
+            <ul>
+                <li><strong>Singleton usage:</strong> Use GlobalGamepadManager for simple applications, instance-based for complex ones</li>
+                <li><strong>State machines:</strong> Integrate handler activation with game state transitions</li>
+                <li><strong>Event systems:</strong> Use callbacks to integrate with broader event/messaging systems</li>
+                <li><strong>Configuration systems:</strong> Store and load gamepad configurations with player profiles</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

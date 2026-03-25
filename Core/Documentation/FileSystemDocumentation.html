@@ -1,0 +1,1166 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FileSystem API Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #8e44ad;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .success {
+            background-color: #d4edda;
+            padding: 10px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .method-signature {
+            background-color: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 5px 0;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .toc > ul {
+            padding-left: 0;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .architecture-diagram {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .enum-value {
+            background-color: #f8f9fa;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+            font-size: 13px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📁 FileSystem API Documentation</h1>
+        
+        <div class="info">
+            <strong>Version:</strong> 1.0<br>
+            <strong>Compatibility:</strong> C++20<br>
+            <strong>Namespace:</strong> FileSystem<br>
+            <strong>Last Updated:</strong> October 2025
+        </div>
+
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#architecture">2. Architecture</a></li>
+                <li><a href="#core-interfaces">3. Core Interfaces</a></li>
+                <li><a href="#result-type">4. Result&lt;T&gt; Type</a></li>
+                <li><a href="#file-interface">5. IFile Interface</a></li>
+                <li><a href="#directory-interface">6. IDirectory Interface</a></li>
+                <li><a href="#filesystem-interface">7. IFileSystem Interface</a></li>
+                <li><a href="#filesystem-manager">8. FileSystemManager</a></li>
+                <li><a href="#standard-implementation">9. Standard Implementation</a></li>
+                <li><a href="#basic-usage">10. Basic Usage Examples</a></li>
+                <li><a href="#advanced-usage">11. Advanced Usage</a></li>
+                <li><a href="#error-handling">12. Error Handling</a></li>
+                <li><a href="#best-practices">13. Best Practices</a></li>
+                <li><a href="#troubleshooting">14. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">1. 🌟 Overview</h2>
+        <p>The FileSystem API provides a comprehensive, cross-platform file system abstraction layer for C++20 applications. It offers type-safe error handling, flexible filesystem stacking, and consistent behavior across different platforms and storage backends.</p>
+
+        <div class="highlight">
+            <strong>Key Features:</strong>
+            <ul>
+                <li>✅ Cross-platform file system abstraction</li>
+                <li>✅ Type-safe error handling with Result&lt;T&gt;</li>
+                <li>✅ Stackable filesystem implementations</li>
+                <li>✅ RAII-based resource management</li>
+                <li>✅ Comprehensive file and directory operations</li>
+                <li>✅ Path manipulation utilities</li>
+                <li>✅ Support for special directories (temp, user, app)</li>
+                <li>✅ Pattern-based file/directory filtering</li>
+            </ul>
+        </div>
+
+        <h2 id="architecture">2. 🏗️ Architecture</h2>
+
+        <div class="architecture-diagram">
+            <h4>FileSystem Architecture</h4>
+            <pre>
+┌─────────────────────────────────────────────────────────┐
+│                FileSystemManager                        │
+│              (Composite Pattern)                        │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │           FileSystem Stack                         ││
+│  │  ┌─────────────────┐ ┌─────────────────┐ ┌───────┐ ││
+│  │  │ ArchiveFileSystem│ │ NetworkFileSystem│ │  ...  │ ││
+│  │  └─────────────────┘ └─────────────────┘ └───────┘ ││
+│  │  ┌─────────────────────────────────────────────────┐ ││
+│  │  │          StandardFileSystem                     │ ││
+│  │  │         (Default/Fallback)                      │ ││
+│  │  └─────────────────────────────────────────────────┘ ││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│                 IFileSystem                             │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │ IFile           IDirectory      Path Operations     ││
+│  │ • Read/Write    • Enumerate     • Combine/Resolve  ││
+│  │ • Seek/Tell     • Filter        • GetExtension     ││
+│  │ • Flush/Close   • Create        • GetDirectory     ││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+
+        <h2 id="core-interfaces">3. 🏛️ Core Interfaces</h2>
+
+        <table>
+            <tr>
+                <th>Interface</th>
+                <th>Purpose</th>
+                <th>Key Features</th>
+            </tr>
+            <tr>
+                <td><strong>IFile</strong></td>
+                <td>File operations and I/O</td>
+                <td>Read/write, seeking, positioning, properties</td>
+            </tr>
+            <tr>
+                <td><strong>IDirectory</strong></td>
+                <td>Directory enumeration and filtering</td>
+                <td>File/directory listing, pattern matching</td>
+            </tr>
+            <tr>
+                <td><strong>IFileSystem</strong></td>
+                <td>Complete filesystem operations</td>
+                <td>File/directory management, path utilities</td>
+            </tr>
+            <tr>
+                <td><strong>FileSystemManager</strong></td>
+                <td>Stackable filesystem management</td>
+                <td>Multiple backends, fallback handling</td>
+            </tr>
+        </table>
+
+        <h3>Enumerations and Types</h3>
+
+        <h4>FileMode</h4>
+        <div class="code-block">enum class FileMode {
+    Read,        // Open for reading only
+    Write,       // Open for writing (truncates existing)
+    ReadWrite,   // Open for reading and writing
+    Append       // Open for writing at end of file
+};</div>
+
+        <h4>SeekOrigin</h4>
+        <div class="code-block">enum class SeekOrigin {
+    Begin,       // Seek from beginning of file
+    Current,     // Seek from current position
+    End          // Seek from end of file
+};</div>
+
+        <h4>FileAttributes</h4>
+        <div class="code-block">enum class FileAttributes {
+    None = 0,
+    ReadOnly = 1 << 0,     // File is read-only
+    Hidden = 1 << 1,       // File is hidden
+    System = 1 << 2,       // System file
+    Directory = 1 << 3,    // Is a directory
+    Archive = 1 << 4,      // Archive bit set
+    Compressed = 1 << 5,   // File is compressed
+    Encrypted = 1 << 6     // File is encrypted
+};</div>
+
+        <h4>FileInfo Structure</h4>
+        <div class="code-block">struct FileInfo {
+    std::string name;                                    // File/directory name
+    std::string fullPath;                               // Complete path
+    uint64_t size;                                      // Size in bytes
+    FileAttributes attributes;                          // File attributes
+    std::chrono::system_clock::time_point creationTime;     // Creation time
+    std::chrono::system_clock::time_point lastWriteTime;    // Last write time
+    std::chrono::system_clock::time_point lastAccessTime;   // Last access time
+    bool isDirectory;                                   // True if directory
+};</div>
+
+        <h2 id="result-type">4. 🎯 Result&lt;T&gt; Type</h2>
+
+        <p>The FileSystem API uses a Result&lt;T&gt; type for error handling, providing type-safe error management without exceptions.</p>
+
+        <div class="method-signature">template&lt;typename T&gt; class Result</div>
+        <div class="code-block">// Constructor overloads
+Result(T&& value);                    // Success case
+Result(const std::string& error);    // Error case
+
+// Status checking
+bool IsSuccess() const;
+bool HasError() const;
+
+// Value access
+const T& GetValue() const;
+T& GetValue();
+
+// Error access
+const std::string& GetError() const;</div>
+
+        <h3>Result Usage Patterns</h3>
+        <div class="code-block">// Basic usage pattern
+auto result = fileSystem->ReadAllText("config.txt");
+if (result.IsSuccess()) {
+    std::string content = result.GetValue();
+    // Process content
+} else {
+    std::cerr << "Error: " << result.GetError() << std::endl;
+}
+
+// Chaining operations
+auto createResult = fileSystem->CreateFile("output.txt");
+if (createResult.IsSuccess()) {
+    auto file = std::move(createResult.GetValue());
+    auto writeResult = file->WriteAllText("Hello, World!");
+    if (writeResult.HasError()) {
+        std::cerr << "Write failed: " << writeResult.GetError() << std::endl;
+    }
+}</div>
+
+        <h2 id="file-interface">5. 📄 IFile Interface</h2>
+
+        <h3>Core File Operations</h3>
+        <div class="method-signature">class IFile</div>
+        <div class="code-block">// Basic I/O operations
+virtual Result&lt;size_t&gt; Read(void* buffer, size_t bytesToRead) = 0;
+virtual Result&lt;size_t&gt; Write(const void* buffer, size_t bytesToWrite) = 0;
+virtual Result&lt;void&gt; Flush() = 0;
+virtual Result&lt;void&gt; Close() = 0;
+
+// File positioning
+virtual Result&lt;uint64_t&gt; Seek(int64_t offset, SeekOrigin origin) = 0;
+virtual Result&lt;uint64_t&gt; GetPosition() = 0;
+virtual Result&lt;uint64_t&gt; GetSize() = 0;
+
+// File properties
+virtual Result&lt;FileInfo&gt; GetInfo() = 0;
+virtual bool IsOpen() const = 0;
+virtual bool CanRead() const = 0;
+virtual bool CanWrite() const = 0;
+
+// Convenience methods
+virtual Result&lt;std::vector&lt;uint8_t&gt;&gt; ReadAll() = 0;
+virtual Result&lt;std::string&gt; ReadAllText() = 0;
+virtual Result&lt;void&gt; WriteAllText(const std::string& text) = 0;</div>
+
+        <h3>File Usage Examples</h3>
+        <div class="code-block">// Reading a file
+auto fileResult = fileSystem->OpenFile("data.txt", FileMode::Read);
+if (fileResult.IsSuccess()) {
+    auto file = std::move(fileResult.GetValue());
+    
+    // Read entire file as text
+    auto textResult = file->ReadAllText();
+    if (textResult.IsSuccess()) {
+        std::string content = textResult.GetValue();
+        std::cout << "File content: " << content << std::endl;
+    }
+    
+    // Manual buffer reading
+    char buffer[1024];
+    auto readResult = file->Read(buffer, sizeof(buffer));
+    if (readResult.IsSuccess()) {
+        size_t bytesRead = readResult.GetValue();
+        std::cout << "Read " << bytesRead << " bytes" << std::endl;
+    }
+}
+
+// Writing a file
+auto createResult = fileSystem->CreateFile("output.txt");
+if (createResult.IsSuccess()) {
+    auto file = std::move(createResult.GetValue());
+    
+    // Write text directly
+    auto writeResult = file->WriteAllText("Hello, FileSystem!");
+    if (writeResult.IsSuccess()) {
+        std::cout << "File written successfully" << std::endl;
+    }
+    
+    // Manual buffer writing
+    const char* data = "Binary data";
+    auto binaryResult = file->Write(data, strlen(data));
+    if (binaryResult.IsSuccess()) {
+        file->Flush();  // Ensure data is written
+    }
+}</div>
+
+        <h2 id="directory-interface">6. 📂 IDirectory Interface</h2>
+
+        <h3>Directory Operations</h3>
+        <div class="method-signature">class IDirectory</div>
+        <div class="code-block">// Directory enumeration
+virtual Result&lt;std::vector&lt;FileInfo&gt;&gt; GetFiles() = 0;
+virtual Result&lt;std::vector&lt;FileInfo&gt;&gt; GetDirectories() = 0;
+virtual Result&lt;std::vector&lt;FileInfo&gt;&gt; GetEntries() = 0;
+
+// Filtered enumeration
+virtual Result&lt;std::vector&lt;FileInfo&gt;&gt; GetFiles(const std::string& pattern) = 0;
+virtual Result&lt;std::vector&lt;FileInfo&gt;&gt; GetDirectories(const std::string& pattern) = 0;
+
+// Directory properties
+virtual Result&lt;FileInfo&gt; GetInfo() = 0;
+virtual std::string GetPath() const = 0;</div>
+
+        <h3>Directory Usage Examples</h3>
+        <div class="code-block">// Directory enumeration
+auto dirResult = fileSystem->OpenDirectory("/path/to/directory");
+if (dirResult.IsSuccess()) {
+    auto directory = std::move(dirResult.GetValue());
+    
+    // Get all files
+    auto filesResult = directory->GetFiles();
+    if (filesResult.IsSuccess()) {
+        for (const auto& fileInfo : filesResult.GetValue()) {
+            std::cout << "File: " << fileInfo.name 
+                      << " (Size: " << fileInfo.size << " bytes)" << std::endl;
+        }
+    }
+    
+    // Get files matching pattern
+    auto cppFilesResult = directory->GetFiles("*.cpp");
+    if (cppFilesResult.IsSuccess()) {
+        std::cout << "Found " << cppFilesResult.GetValue().size() 
+                  << " C++ files" << std::endl;
+    }
+    
+    // Get all subdirectories
+    auto dirsResult = directory->GetDirectories();
+    if (dirsResult.IsSuccess()) {
+        for (const auto& dirInfo : dirsResult.GetValue()) {
+            std::cout << "Directory: " << dirInfo.name << std::endl;
+        }
+    }
+}</div>
+
+        <h2 id="filesystem-interface">7. 🗄️ IFileSystem Interface</h2>
+
+        <h3>Complete FileSystem Operations</h3>
+        <div class="method-signature">class IFileSystem</div>
+        <div class="code-block">// File operations
+virtual Result&lt;std::unique_ptr&lt;IFile&gt;&gt; OpenFile(const std::string& path, FileMode mode) = 0;
+virtual Result&lt;std::unique_ptr&lt;IFile&gt;&gt; CreateFile(const std::string& path) = 0;
+virtual Result&lt;void&gt; DeleteFile(const std::string& path) = 0;
+virtual Result&lt;void&gt; CopyFile(const std::string& sourcePath, const std::string& destinationPath, bool overwrite = false) = 0;
+virtual Result&lt;void&gt; MoveFile(const std::string& sourcePath, const std::string& destinationPath) = 0;
+
+// Directory operations
+virtual Result&lt;std::unique_ptr&lt;IDirectory&gt;&gt; OpenDirectory(const std::string& path) = 0;
+virtual Result&lt;void&gt; CreateDirectory(const std::string& path) = 0;
+virtual Result&lt;void&gt; DeleteDirectory(const std::string& path, bool recursive = false) = 0;
+virtual Result&lt;void&gt; CopyDirectory(const std::string& sourcePath, const std::string& destinationPath, bool recursive = true) = 0;
+virtual Result&lt;void&gt; MoveDirectory(const std::string& sourcePath, const std::string& destinationPath) = 0;
+
+// Path operations
+virtual bool Exists(const std::string& path) = 0;
+virtual bool IsFile(const std::string& path) = 0;
+virtual bool IsDirectory(const std::string& path) = 0;
+virtual Result&lt;FileInfo&gt; GetInfo(const std::string& path) = 0;
+
+// Path manipulation
+virtual std::string GetFileName(const std::string& path) = 0;
+virtual std::string GetFileNameWithoutExtension(const std::string& path) = 0;
+virtual std::string GetExtension(const std::string& path) = 0;
+virtual std::string GetDirectoryName(const std::string& path) = 0;
+virtual std::string GetFullPath(const std::string& path) = 0;
+virtual std::string CombinePath(const std::string& path1, const std::string& path2) = 0;
+
+// Working directory
+virtual Result&lt;std::string&gt; GetCurrentDirectory() = 0;
+virtual Result&lt;void&gt; SetCurrentDirectory(const std::string& path) = 0;
+
+// Special directories
+virtual Result&lt;std::string&gt; GetTempDirectory() = 0;
+virtual Result&lt;std::string&gt; GetUserDirectory() = 0;
+virtual Result&lt;std::string&gt; GetApplicationDirectory() = 0;
+
+// Utility functions
+virtual Result&lt;std::vector&lt;uint8_t&gt;&gt; ReadAllBytes(const std::string& path) = 0;
+virtual Result&lt;std::string&gt; ReadAllText(const std::string& path) = 0;
+virtual Result&lt;void&gt; WriteAllBytes(const std::string& path, const std::vector&lt;uint8_t&gt;& data) = 0;
+virtual Result&lt;void&gt; WriteAllText(const std::string& path, const std::string& text) = 0;</div>
+
+        <h2 id="filesystem-manager">8. 🔧 FileSystemManager</h2>
+
+        <p>The FileSystemManager implements a composite pattern, allowing multiple filesystem implementations to be stacked with fallback behavior.</p>
+
+        <h3>Manager Operations</h3>
+        <div class="code-block">// Stack management
+void PushFileSystem(std::unique_ptr&lt;IFileSystem&gt; fileSystem);     // Add to front (highest priority)
+void AddFileSystem(std::unique_ptr&lt;IFileSystem&gt; fileSystem);      // Add to back (lowest priority)
+std::unique_ptr&lt;IFileSystem&gt; PopFileSystem();                     // Remove from front
+std::unique_ptr&lt;IFileSystem&gt; RemoveFileSystem();                  // Remove from back
+void ClearFileSystems();                                          // Remove all
+
+// Information
+size_t GetFileSystemCount() const;
+bool IsEmpty() const;</div>
+
+        <h3>Stacking Example</h3>
+        <div class="code-block">// Create filesystem manager
+FileSystemManager manager;
+
+// Add filesystem implementations in priority order
+manager.PushFileSystem(std::make_unique&lt;ArchiveFileSystem&gt;("game.pak"));     // Highest priority
+manager.AddFileSystem(std::make_unique&lt;NetworkFileSystem&gt;("cdn.server.com")); // Medium priority  
+manager.AddFileSystem(std::make_unique&lt;StandardFileSystem&gt;());               // Fallback
+
+// Operations try each filesystem in order
+auto result = manager.ReadAllText("config.txt");
+// 1. Try ArchiveFileSystem first
+// 2. If fails, try NetworkFileSystem  
+// 3. If fails, try StandardFileSystem
+// 4. If all fail, return error</div>
+
+        <h2 id="standard-implementation">9. 🛠️ Standard Implementation</h2>
+
+        <p>The StandardFileSystem provides a concrete implementation using std::filesystem for cross-platform file operations.</p>
+
+        <h3>Creating Standard FileSystem</h3>
+        <div class="code-block">// Factory function
+std::unique_ptr&lt;IFileSystem&gt; CreateStandardFileSystem();
+
+// Usage
+auto fileSystem = FileSystem::CreateStandardFileSystem();
+
+// Or through CoreSystem
+auto* fileSystem = Core::CoreSystem::GetFileSystemManager();</div>
+
+        <h3>Standard Implementation Features</h3>
+        <div class="info">
+            <ul>
+                <li><strong>Cross-platform:</strong> Uses std::filesystem for portability</li>
+                <li><strong>Pattern matching:</strong> Supports glob patterns (*,?) for file filtering</li>
+                <li><strong>Path normalization:</strong> Handles path separators consistently</li>
+                <li><strong>Error handling:</strong> Converts system errors to Result&lt;T&gt;</li>
+                <li><strong>RAII:</strong> Automatic resource cleanup and file closing</li>
+            </ul>
+        </div>
+
+        <h2 id="basic-usage">10. 📝 Basic Usage Examples</h2>
+
+        <h3>Simple File Operations</h3>
+        <div class="code-block">// Get filesystem manager
+auto* fileSystem = Core::CoreSystem::GetFileSystemManager();
+
+// Check if file exists
+if (fileSystem->Exists("config.txt")) {
+    // Read entire file
+    auto textResult = fileSystem->ReadAllText("config.txt");
+    if (textResult.IsSuccess()) {
+        std::string config = textResult.GetValue();
+        std::cout << "Config: " << config << std::endl;
+    }
+}
+
+// Write configuration
+std::string newConfig = "setting1=value1\nsetting2=value2";
+auto writeResult = fileSystem->WriteAllText("config.txt", newConfig);
+if (writeResult.IsSuccess()) {
+    std::cout << "Configuration saved!" << std::endl;
+}
+
+// Copy file
+auto copyResult = fileSystem->CopyFile("config.txt", "config_backup.txt", true);
+if (copyResult.IsSuccess()) {
+    std::cout << "Backup created!" << std::endl;
+}</div>
+
+        <h3>Directory Operations</h3>
+        <div class="code-block">// Create directory structure
+auto createResult = fileSystem->CreateDirectory("logs/2025/october");
+if (createResult.IsSuccess()) {
+    std::cout << "Directory structure created" << std::endl;
+}
+
+// List directory contents
+auto dirResult = fileSystem->OpenDirectory("logs");
+if (dirResult.IsSuccess()) {
+    auto directory = std::move(dirResult.GetValue());
+    
+    // Get all log files
+    auto logFilesResult = directory->GetFiles("*.log");
+    if (logFilesResult.IsSuccess()) {
+        std::cout << "Log files found:" << std::endl;
+        for (const auto& fileInfo : logFilesResult.GetValue()) {
+            std::cout << "  " << fileInfo.name 
+                      << " (Size: " << fileInfo.size << " bytes)" << std::endl;
+        }
+    }
+}</div>
+
+        <h3>Path Manipulation</h3>
+        <div class="code-block">// Path utilities
+std::string fileName = fileSystem->GetFileName("/path/to/file.txt");        // "file.txt"
+std::string baseName = fileSystem->GetFileNameWithoutExtension("/path/to/file.txt"); // "file"
+std::string extension = fileSystem->GetExtension("/path/to/file.txt");      // ".txt"
+std::string directory = fileSystem->GetDirectoryName("/path/to/file.txt");  // "/path/to"
+
+// Combine paths
+std::string fullPath = fileSystem->CombinePath("logs", "app.log");          // "logs/app.log"
+std::string absolutePath = fileSystem->GetFullPath("relative/path.txt");    // Full absolute path
+
+// Working directory
+auto currentDirResult = fileSystem->GetCurrentDirectory();
+if (currentDirResult.IsSuccess()) {
+    std::cout << "Current directory: " << currentDirResult.GetValue() << std::endl;
+}</div>
+
+        <h2 id="advanced-usage">11. 🚀 Advanced Usage</h2>
+
+        <h3>Custom File Processing</h3>
+        <div class="code-block">// Process large files in chunks
+class FileProcessor {
+public:
+    static Result&lt;void&gt; ProcessLargeFile(IFileSystem* fs, const std::string& inputPath, 
+                                        const std::string& outputPath) {
+        auto inputResult = fs->OpenFile(inputPath, FileMode::Read);
+        if (inputResult.HasError()) {
+            return Result&lt;void&gt;("Failed to open input: " + inputResult.GetError());
+        }
+        
+        auto outputResult = fs->CreateFile(outputPath);
+        if (outputResult.HasError()) {
+            return Result&lt;void&gt;("Failed to create output: " + outputResult.GetError());
+        }
+        
+        auto inputFile = std::move(inputResult.GetValue());
+        auto outputFile = std::move(outputResult.GetValue());
+        
+        const size_t bufferSize = 8192;
+        std::vector&lt;uint8_t&gt; buffer(bufferSize);
+        
+        while (true) {
+            auto readResult = inputFile->Read(buffer.data(), bufferSize);
+            if (readResult.HasError()) {
+                return Result&lt;void&gt;("Read error: " + readResult.GetError());
+            }
+            
+            size_t bytesRead = readResult.GetValue();
+            if (bytesRead == 0) break;  // End of file
+            
+            // Process data (example: convert to uppercase)
+            for (size_t i = 0; i < bytesRead; ++i) {
+                if (buffer[i] >= 'a' && buffer[i] <= 'z') {
+                    buffer[i] = buffer[i] - 'a' + 'A';
+                }
+            }
+            
+            auto writeResult = outputFile->Write(buffer.data(), bytesRead);
+            if (writeResult.HasError()) {
+                return Result&lt;void&gt;("Write error: " + writeResult.GetError());
+            }
+        }
+        
+        outputFile->Flush();
+        return Result&lt;void&gt;();
+    }
+};</div>
+
+        <h3>Directory Tree Walking</h3>
+        <div class="code-block">// Recursive directory traversal
+class DirectoryWalker {
+public:
+    static void WalkDirectory(IFileSystem* fs, const std::string& path, 
+                             std::function&lt;void(const FileInfo&)&gt; fileCallback,
+                             std::function&lt;void(const FileInfo&)&gt; dirCallback = nullptr) {
+        
+        auto dirResult = fs->OpenDirectory(path);
+        if (dirResult.HasError()) {
+            std::cerr << "Failed to open directory: " << dirResult.GetError() << std::endl;
+            return;
+        }
+        
+        auto directory = std::move(dirResult.GetValue());
+        
+        // Process all entries
+        auto entriesResult = directory->GetEntries();
+        if (entriesResult.HasError()) {
+            std::cerr << "Failed to get entries: " << entriesResult.GetError() << std::endl;
+            return;
+        }
+        
+        for (const auto& entry : entriesResult.GetValue()) {
+            if (entry.isDirectory) {
+                if (dirCallback) {
+                    dirCallback(entry);
+                }
+                // Recursive call
+                WalkDirectory(fs, entry.fullPath, fileCallback, dirCallback);
+            } else {
+                fileCallback(entry);
+            }
+        }
+    }
+    
+    // Find all files with specific extension
+    static std::vector&lt;std::string&gt; FindFilesByExtension(IFileSystem* fs, 
+                                                         const std::string& rootPath,
+                                                         const std::string& extension) {
+        std::vector&lt;std::string&gt; foundFiles;
+        
+        WalkDirectory(fs, rootPath, [&](const FileInfo& fileInfo) {
+            if (fs->GetExtension(fileInfo.fullPath) == extension) {
+                foundFiles.push_back(fileInfo.fullPath);
+            }
+        });
+        
+        return foundFiles;
+    }
+};
+
+// Usage
+auto* fileSystem = Core::CoreSystem::GetFileSystemManager();
+
+// Find all .cpp files recursively
+auto cppFiles = DirectoryWalker::FindFilesByExtension(fileSystem, "src", ".cpp");
+std::cout << "Found " << cppFiles.size() << " C++ files:" << std::endl;
+for (const auto& file : cppFiles) {
+    std::cout << "  " << file << std::endl;
+}</div>
+
+        <h3>Configuration File Manager</h3>
+        <div class="code-block">// Configuration management system
+class ConfigManager {
+private:
+    IFileSystem* fileSystem_;
+    std::string configPath_;
+    std::map&lt;std::string, std::string&gt; settings_;
+    
+public:
+    ConfigManager(IFileSystem* fs, const std::string& configFile) 
+        : fileSystem_(fs), configPath_(configFile) {
+        LoadSettings();
+    }
+    
+    void LoadSettings() {
+        if (!fileSystem_->Exists(configPath_)) {
+            std::cout << "Config file not found, using defaults" << std::endl;
+            return;
+        }
+        
+        auto textResult = fileSystem_->ReadAllText(configPath_);
+        if (textResult.HasError()) {
+            std::cerr << "Failed to read config: " << textResult.GetError() << std::endl;
+            return;
+        }
+        
+        // Parse simple key=value format
+        std::istringstream stream(textResult.GetValue());
+        std::string line;
+        while (std::getline(stream, line)) {
+            size_t pos = line.find('=');
+            if (pos != std::string::npos) {
+                std::string key = line.substr(0, pos);
+                std::string value = line.substr(pos + 1);
+                settings_[key] = value;
+            }
+        }
+    }
+    
+    void SaveSettings() {
+        std::stringstream content;
+        for (const auto& [key, value] : settings_) {
+            content << key << "=" << value << "\n";
+        }
+        
+        auto writeResult = fileSystem_->WriteAllText(configPath_, content.str());
+        if (writeResult.HasError()) {
+            std::cerr << "Failed to save config: " << writeResult.GetError() << std::endl;
+        }
+    }
+    
+    std::string GetSetting(const std::string& key, const std::string& defaultValue = "") {
+        auto it = settings_.find(key);
+        return (it != settings_.end()) ? it->second : defaultValue;
+    }
+    
+    void SetSetting(const std::string& key, const std::string& value) {
+        settings_[key] = value;
+    }
+    
+    void CreateBackup() {
+        if (fileSystem_->Exists(configPath_)) {
+            std::string backupPath = configPath_ + ".backup";
+            auto result = fileSystem_->CopyFile(configPath_, backupPath, true);
+            if (result.IsSuccess()) {
+                std::cout << "Config backup created: " << backupPath << std::endl;
+            }
+        }
+    }
+};</div>
+
+        <h2 id="error-handling">12. ⚠️ Error Handling</h2>
+
+        <h3>Comprehensive Error Handling</h3>
+        <div class="code-block">// Robust file operation with error handling
+class SafeFileOperations {
+public:
+    static bool SafeCopyWithVerification(IFileSystem* fs, 
+                                        const std::string& source, 
+                                        const std::string& destination) {
+        // Check source exists
+        if (!fs->Exists(source)) {
+            std::cerr << "Source file does not exist: " << source << std::endl;
+            return false;
+        }
+        
+        // Get source file info
+        auto sourceInfoResult = fs->GetInfo(source);
+        if (sourceInfoResult.HasError()) {
+            std::cerr << "Failed to get source info: " << sourceInfoResult.GetError() << std::endl;
+            return false;
+        }
+        
+        uint64_t originalSize = sourceInfoResult.GetValue().size;
+        
+        // Perform copy
+        auto copyResult = fs->CopyFile(source, destination, true);
+        if (copyResult.HasError()) {
+            std::cerr << "Copy failed: " << copyResult.GetError() << std::endl;
+            return false;
+        }
+        
+        // Verify copy
+        auto destInfoResult = fs->GetInfo(destination);
+        if (destInfoResult.HasError()) {
+            std::cerr << "Failed to verify destination: " << destInfoResult.GetError() << std::endl;
+            return false;
+        }
+        
+        uint64_t copiedSize = destInfoResult.GetValue().size;
+        if (originalSize != copiedSize) {
+            std::cerr << "Size mismatch: expected " << originalSize 
+                      << ", got " << copiedSize << std::endl;
+            return false;
+        }
+        
+        std::cout << "File copied successfully: " << source << " -> " << destination << std::endl;
+        return true;
+    }
+    
+    // Safe directory creation with validation
+    static bool CreateDirectoryWithValidation(IFileSystem* fs, const std::string& path) {
+        // Check if already exists
+        if (fs->Exists(path)) {
+            if (fs->IsDirectory(path)) {
+                std::cout << "Directory already exists: " << path << std::endl;
+                return true;
+            } else {
+                std::cerr << "Path exists but is not a directory: " << path << std::endl;
+                return false;
+            }
+        }
+        
+        // Create directory
+        auto createResult = fs->CreateDirectory(path);
+        if (createResult.HasError()) {
+            std::cerr << "Failed to create directory: " << createResult.GetError() << std::endl;
+            return false;
+        }
+        
+        // Verify creation
+        if (!fs->IsDirectory(path)) {
+            std::cerr << "Directory creation verification failed: " << path << std::endl;
+            return false;
+        }
+        
+        std::cout << "Directory created successfully: " << path << std::endl;
+        return true;
+    }
+};</div>
+
+        <h3>Error Categories and Handling</h3>
+        <table>
+            <tr>
+                <th>Error Type</th>
+                <th>Common Causes</th>
+                <th>Handling Strategy</th>
+            </tr>
+            <tr>
+                <td>File Not Found</td>
+                <td>Path doesn't exist, typos</td>
+                <td>Validate paths, provide defaults</td>
+            </tr>
+            <tr>
+                <td>Permission Denied</td>
+                <td>Insufficient rights, file in use</td>
+                <td>Check permissions, retry logic</td>
+            </tr>
+            <tr>
+                <td>Disk Full</td>
+                <td>No space available</td>
+                <td>Check free space, cleanup old files</td>
+            </tr>
+            <tr>
+                <td>Network Error</td>
+                <td>Connection issues</td>
+                <td>Fallback to local filesystem</td>
+            </tr>
+            <tr>
+                <td>Corruption</td>
+                <td>Hardware issues, interrupted operations</td>
+                <td>Verify checksums, use backups</td>
+            </tr>
+        </table>
+
+        <h2 id="best-practices">13. ✅ Best Practices</h2>
+
+        <div class="highlight">
+            <h3>🎯 Performance Guidelines</h3>
+            <ul>
+                <li><strong>Use RAII patterns</strong> - Files automatically close when Result objects are destroyed</li>
+                <li><strong>Batch operations</strong> - Read/write in reasonable chunk sizes (4KB-64KB)</li>
+                <li><strong>Check file existence</strong> - Use Exists() before expensive operations</li>
+                <li><strong>Prefer utility methods</strong> - Use ReadAllText/WriteAllText for simple operations</li>
+                <li><strong>Handle large files carefully</strong> - Stream data instead of loading everything into memory</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <h3>✅ Good Practices</h3>
+            <div class="code-block">// ✅ Good: Always check results
+auto result = fileSystem->ReadAllText("config.txt");
+if (result.IsSuccess()) {
+    ProcessConfiguration(result.GetValue());
+} else {
+    HandleConfigError(result.GetError());
+}
+
+// ✅ Good: Use appropriate access modes
+auto file = fileSystem->OpenFile("data.bin", FileMode::ReadWrite);
+
+// ✅ Good: Validate paths before operations
+if (fileSystem->Exists(inputPath) && fileSystem->IsFile(inputPath)) {
+    // Safe to proceed
+}
+
+// ✅ Good: Use path utilities
+std::string fullPath = fileSystem->CombinePath(baseDir, fileName);
+
+// ✅ Good: Handle special directories properly
+auto tempResult = fileSystem->GetTempDirectory();
+if (tempResult.IsSuccess()) {
+    std::string tempFile = fileSystem->CombinePath(tempResult.GetValue(), "temp.dat");
+}</div>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Common Pitfalls</h3>
+            <div class="code-block">// ❌ Poor: Ignoring error results
+fileSystem->WriteAllText("file.txt", content);  // What if this fails?
+
+// ❌ Poor: Not checking file existence
+auto file = fileSystem->OpenFile("nonexistent.txt", FileMode::Read);
+// This will fail!
+
+// ❌ Poor: Hardcoded path separators
+std::string path = "dir\\file.txt";  // Won't work on Unix systems
+
+// ❌ Poor: Loading large files into memory
+auto content = fileSystem->ReadAllText("huge_file.dat");  // Memory issues!
+
+// ❌ Poor: Not handling special characters in paths
+auto result = fileSystem->CreateFile("file with spaces.txt");</div>
+        </div>
+
+        <h3>Resource Management</h3>
+        <div class="code-block">// ✅ Good: RAII ensures cleanup
+{
+    auto fileResult = fileSystem->OpenFile("data.txt", FileMode::Write);
+    if (fileResult.IsSuccess()) {
+        auto file = std::move(fileResult.GetValue());
+        file->WriteAllText("data");
+        // File automatically closed when 'file' goes out of scope
+    }
+}
+
+// ✅ Good: Explicit resource management
+class FileManager {
+private:
+    std::unique_ptr&lt;IFile&gt; activeFile_;
+    
+public:
+    bool OpenFile(IFileSystem* fs, const std::string& path) {
+        CloseFile();  // Close any existing file
+        
+        auto result = fs->OpenFile(path, FileMode::ReadWrite);
+        if (result.IsSuccess()) {
+            activeFile_ = std::move(result.GetValue());
+            return true;
+        }
+        return false;
+    }
+    
+    void CloseFile() {
+        if (activeFile_) {
+            activeFile_->Close();
+            activeFile_.reset();
+        }
+    }
+    
+    ~FileManager() {
+        CloseFile();
+    }
+};</div>
+
+        <h2 id="troubleshooting">14. 🔧 Troubleshooting</h2>
+
+        <h3>Common Issues and Solutions</h3>
+        <table>
+            <tr>
+                <th>Issue</th>
+                <th>Symptoms</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td>File operations failing</td>
+                <td>All operations return errors</td>
+                <td>Check if FileSystemManager has any registered filesystems</td>
+            </tr>
+            <tr>
+                <td>Path not found errors</td>
+                <td>Exists() returns false for valid paths</td>
+                <td>Verify path separators, use CombinePath() for portability</td>
+            </tr>
+            <tr>
+                <td>Permission denied</td>
+                <td>Cannot read/write files</td>
+                <td>Check file permissions, run with appropriate privileges</td>
+            </tr>
+            <tr>
+                <td>Memory usage high</td>
+                <td>Application using excessive RAM</td>
+                <td>Use streaming I/O for large files, avoid ReadAll() methods</td>
+            </tr>
+            <tr>
+                <td>Files not closing</td>
+                <td>Too many open file handles</td>
+                <td>Ensure Result&lt;IFile&gt; objects go out of scope properly</td>
+            </tr>
+        </table>
+
+        <h3>Debugging File Operations</h3>
+        <div class="code-block">// Debug filesystem operations
+void DebugFileSystem(IFileSystem* fs) {
+    // Test basic functionality
+    std::cout << "=== FileSystem Debug Information ===" << std::endl;
+    
+    // Check current directory
+    auto currentDirResult = fs->GetCurrentDirectory();
+    if (currentDirResult.IsSuccess()) {
+        std::cout << "Current Directory: " << currentDirResult.GetValue() << std::endl;
+    } else {
+        std::cout << "Failed to get current directory: " << currentDirResult.GetError() << std::endl;
+    }
+    
+    // Check special directories
+    auto tempResult = fs->GetTempDirectory();
+    if (tempResult.IsSuccess()) {
+        std::cout << "Temp Directory: " << tempResult.GetValue() << std::endl;
+    }
+    
+    auto userResult = fs->GetUserDirectory();
+    if (userResult.IsSuccess()) {
+        std::cout << "User Directory: " << userResult.GetValue() << std::endl;
+    }
+    
+    // Test path operations
+    std::cout << "Path Operations Test:" << std::endl;
+    std::string testPath = "/path/to/file.txt";
+    std::cout << "  Original: " << testPath << std::endl;
+    std::cout << "  FileName: " << fs->GetFileName(testPath) << std::endl;
+    std::cout << "  Extension: " << fs->GetExtension(testPath) << std::endl;
+    std::cout << "  Directory: " << fs->GetDirectoryName(testPath) << std::endl;
+    
+    // Test file creation/deletion
+    std::string testFile = "filesystem_test.tmp";
+    auto writeResult = fs->WriteAllText(testFile, "Test content");
+    if (writeResult.IsSuccess()) {
+        std::cout << "Test file created successfully" << std::endl;
+        
+        if (fs->Exists(testFile)) {
+            std::cout << "Test file exists - filesystem working correctly" << std::endl;
+            
+            auto deleteResult = fs->DeleteFile(testFile);
+            if (deleteResult.IsSuccess()) {
+                std::cout << "Test file deleted successfully" << std::endl;
+            }
+        }
+    } else {
+        std::cout << "Failed to create test file: " << writeResult.GetError() << std::endl;
+    }
+    
+    std::cout << "=== End Debug Information ===" << std::endl;
+}
+
+// Usage
+auto* fileSystem = Core::CoreSystem::GetFileSystemManager();
+DebugFileSystem(fileSystem);</div>
+
+        <h3>Performance Monitoring</h3>
+        <div class="code-block">// Monitor filesystem performance
+class FileSystemProfiler {
+private:
+    std::chrono::high_resolution_clock::time_point startTime_;
+    std::string operationName_;
+    
+public:
+    FileSystemProfiler(const std::string& operation) : operationName_(operation) {
+        startTime_ = std::chrono::high_resolution_clock::now();
+        std::cout << "[PROFILE] Starting: " << operationName_ << std::endl;
+    }
+    
+    ~FileSystemProfiler() {
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(endTime - startTime_);
+        std::cout << "[PROFILE] Completed: " << operationName_ 
+                  << " (took " << duration.count() << "ms)" << std::endl;
+    }
+};
+
+// Usage
+{
+    FileSystemProfiler profile("Large file copy");
+    fileSystem->CopyFile("large_file.dat", "large_file_copy.dat");
+    // Automatic timing output on destruction
+}</div>
+
+        <div class="info">
+            <h3>📚 Additional Resources</h3>
+            <ul>
+                <li><strong>Unit Tests:</strong> See Tests/StandardFileSystemTest.cpp for comprehensive examples</li>
+                <li><strong>Core Integration:</strong> Check CoreSystem documentation for manager setup</li>
+                <li><strong>Error Handling:</strong> Review Result&lt;T&gt; patterns for robust code</li>
+                <li><strong>Platform Notes:</strong> Different behaviors on Windows vs Unix systems</li>
+            </ul>
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            <p>FileSystem API Documentation - Generated for C++20 Engine Development</p>
+        </footer>
+    </div>
+</body>
+</html>

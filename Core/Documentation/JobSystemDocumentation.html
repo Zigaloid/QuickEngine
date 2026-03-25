@@ -1,0 +1,1147 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JobSystem API Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .success {
+            background-color: #d4edda;
+            padding: 10px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .method-signature {
+            background-color: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 5px 0;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .toc > ul {
+            padding-left: 0;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .architecture-diagram {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .concept-box {
+            background-color: #e8f4f8;
+            border: 2px solid #17a2b8;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .concept-title {
+            font-weight: bold;
+            color: #0c5460;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚡ JobSystem API Documentation</h1>
+        
+        <div class="info">
+            <strong>Version:</strong> 1.0<br>
+            <strong>Compatibility:</strong> C++20<br>
+            <strong>Namespace:</strong> Global<br>
+            <strong>Header:</strong> JobSystem.h<br>
+            <strong>Last Updated:</strong> October 2025
+        </div>
+
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#architecture">2. Architecture</a></li>
+                <li><a href="#cpp20-features">3. C++20 Features</a></li>
+                <li><a href="#core-classes">4. Core Classes</a></li>
+                <li><a href="#jobsystem-class">5. JobSystem Class</a></li>
+                <li><a href="#job-class">6. Job Class</a></li>
+                <li><a href="#threadsafe-queue">7. ThreadSafeQueue</a></li>
+                <li><a href="#basic-usage">8. Basic Usage Examples</a></li>
+                <li><a href="#advanced-usage">9. Advanced Usage</a></li>
+                <li><a href="#performance">10. Performance Considerations</a></li>
+                <li><a href="#error-handling">11. Error Handling</a></li>
+                <li><a href="#best-practices">12. Best Practices</a></li>
+                <li><a href="#troubleshooting">13. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">1. 🌟 Overview</h2>
+        <p>The JobSystem is a modern C++20 thread pool implementation designed for high-performance parallel task execution. It provides a clean, type-safe interface for submitting work to a pool of worker threads with support for both fire-and-forget tasks and tasks that return values via futures.</p>
+
+        <div class="highlight">
+            <strong>Key Features:</strong>
+            <ul>
+                <li>✅ Modern C++20 design with concepts and constraints</li>
+                <li>✅ Thread-safe job queue with efficient synchronization</li>
+                <li>✅ Support for callable objects, lambdas, and function pointers</li>
+                <li>✅ Future-based return value handling</li>
+                <li>✅ Exception safety and error handling</li>
+                <li>✅ Graceful shutdown with job completion tracking</li>
+                <li>✅ Comprehensive debugging and monitoring</li>
+                <li>✅ Lock-free atomic counters for performance</li>
+            </ul>
+        </div>
+
+        <h2 id="architecture">2. 🏗️ Architecture</h2>
+
+        <div class="architecture-diagram">
+            <h4>JobSystem Architecture</h4>
+            <pre>
+┌─────────────────────────────────────────────────────────┐
+│                    JobSystem                            │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │                Job Submission                       ││
+│  │  submitJob()           submitJobWithResult()        ││
+│  │       │                        │                   ││
+│  │       ▼                        ▼                   ││
+│  │  ┌─────────────────────────────────────────────────┐││
+│  │  │            ThreadSafeQueue&lt;Job&gt;                ║││
+│  │  └─────────────────────────────────────────────────┘││
+│  └─────────────────────┬───────────────────────────────┘│
+│                        │                               │
+│  ┌─────────────────────▼───────────────────────────────┐│
+│  │              Worker Thread Pool                     ││
+│  │  ┌──────────┐ ┌──────────┐ ┌──────────┐ ┌────────┐ ││
+│  │  │Thread #0 │ │Thread #1 │ │Thread #2 │ │  ...   │ ││
+│  │  │          │ │          │ │          │ │        │ ││
+│  │  │ Job::    │ │ Job::    │ │ Job::    │ │ Job::  │ ││
+│  │  │execute() │ │execute() │ │execute() │ │execute │ ││
+│  │  └──────────┘ └──────────┘ └──────────┘ └────────┘ ││
+│  └─────────────────────────────────────────────────────┘│
+│                                                         │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │           Synchronization & Monitoring              ││
+│  │  • Atomic job counters                             ││
+│  │  • Condition variables for waiting                 ││
+│  │  • Exception handling and safety                   ││
+│  │  • Graceful shutdown coordination                  ││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+
+        <h2 id="cpp20-features">3. 🚀 C++20 Features</h2>
+        
+        <p>The JobSystem leverages modern C++20 features for better type safety, performance, and code clarity.</p>
+
+        <h3>Concepts</h3>
+        <div class="concept-box">
+            <div class="concept-title">Type Safety with Concepts</div>
+            <div class="code-block">// C++20 Concepts for type safety
+template&lt;typename F&gt;
+concept Callable = std::invocable&lt;F&gt;;
+
+template&lt;typename F, typename... Args&gt;
+concept CallableWithArgs = std::invocable&lt;F, Args...&gt;;</div>
+        </div>
+
+        <h3>Modern Language Features</h3>
+        <table>
+            <tr>
+                <th>Feature</th>
+                <th>Usage</th>
+                <th>Benefit</th>
+            </tr>
+            <tr>
+                <td><strong>Concepts</strong></td>
+                <td>Template constraints</td>
+                <td>Compile-time type checking, better error messages</td>
+            </tr>
+            <tr>
+                <td><strong>requires clauses</strong></td>
+                <td>Function template constraints</td>
+                <td>Precise control over template instantiation</td>
+            </tr>
+            <tr>
+                <td><strong>std::invoke_result_t</strong></td>
+                <td>Automatic return type deduction</td>
+                <td>Type-safe future return types</td>
+            </tr>
+            <tr>
+                <td><strong>[[nodiscard]]</strong></td>
+                <td>Return value annotations</td>
+                <td>Prevents accidental value ignoring</td>
+            </tr>
+            <tr>
+                <td><strong>noexcept</strong></td>
+                <td>Exception specifications</td>
+                <td>Performance optimization hints</td>
+            </tr>
+        </table>
+
+        <h2 id="core-classes">4. 🏛️ Core Classes</h2>
+
+        <table>
+            <tr>
+                <th>Class</th>
+                <th>Purpose</th>
+                <th>Key Features</th>
+            </tr>
+            <tr>
+                <td><strong>JobSystem</strong></td>
+                <td>Main thread pool manager</td>
+                <td>Job submission, worker management, synchronization</td>
+            </tr>
+            <tr>
+                <td><strong>Job</strong></td>
+                <td>Executable task wrapper</td>
+                <td>Type erasure, move semantics, exception safety</td>
+            </tr>
+            <tr>
+                <td><strong>ThreadSafeQueue&lt;T&gt;</strong></td>
+                <td>Thread-safe job queue</td>
+                <td>Lock-based synchronization, condition variables</td>
+            </tr>
+        </table>
+
+        <h2 id="jobsystem-class">5. ⚙️ JobSystem Class</h2>
+
+        <h3>Constructor</h3>
+        <div class="method-signature">explicit JobSystem(size_t numThreads = std::thread::hardware_concurrency())</div>
+        <p>Creates a JobSystem with the specified number of worker threads. Defaults to the number of hardware threads available.</p>
+
+        <h3>Core Methods</h3>
+
+        <h4>Job Submission (Fire-and-Forget)</h4>
+        <div class="method-signature">template&lt;Callable F&gt; void submitJob(F&& func)</div>
+        <div class="code-block">// Submit a job that doesn't return a value
+jobSystem.submitJob([]() {
+    std::cout << "Hello from worker thread!" << std::endl;
+});
+
+// Submit a job with captured variables
+int value = 42;
+jobSystem.submitJob([value]() {
+    processValue(value);
+});</div>
+
+        <h4>Job Submission (With Return Value)</h4>
+        <div class="method-signature">template&lt;typename F, typename... Args&gt; requires CallableWithArgs&lt;F, Args...&gt;<br>auto submitJobWithResult(F&& func, Args&&... args) -> std::future&lt;std::invoke_result_t&lt;F, Args...&gt;&gt;</div>
+        <div class="code-block">// Submit a job that returns a value
+auto future = jobSystem.submitJobWithResult([]() -> int {
+    return computeExpensiveCalculation();
+});
+
+// Get the result
+int result = future.get();
+
+// Submit a job with arguments
+auto future2 = jobSystem.submitJobWithResult([](int a, int b) -> int {
+    return a + b;
+}, 10, 20);</div>
+
+        <h3>Synchronization Methods</h3>
+        <div class="code-block">// Wait for all jobs to complete
+void waitForAll();
+
+// Wait with timeout
+template&lt;typename Rep, typename Period&gt;
+bool waitForAll(const std::chrono::duration&lt;Rep, Period&gt;& timeout);</div>
+
+        <h3>Information Methods</h3>
+        <div class="code-block">// Get system information
+[[nodiscard]] size_t getThreadCount() const noexcept;
+[[nodiscard]] size_t getPendingJobCount() const noexcept;
+[[nodiscard]] size_t getActiveJobCount() const noexcept;
+[[nodiscard]] bool isShuttingDown() const noexcept;</div>
+
+        <h3>Lifecycle Management</h3>
+        <div class="code-block">// Graceful shutdown
+void shutdown();</div>
+
+        <h2 id="job-class">6. 📦 Job Class</h2>
+
+        <p>The Job class provides type erasure for callable objects, allowing different types of functions to be stored in the same queue.</p>
+
+        <h3>Job Interface</h3>
+        <div class="code-block">class Job {
+public:
+    // Constructor from any callable
+    template&lt;Callable F&gt;
+    Job(F&& func);
+    
+    // Default constructor for empty job
+    Job() = default;
+    
+    // Move semantics only
+    Job(Job&&) = default;
+    Job& operator=(Job&&) = default;
+    
+    // Execute the job
+    void execute();
+    
+    // Check if job is valid
+    bool valid() const;
+};</div>
+
+        <h3>Job Creation Examples</h3>
+        <div class="code-block">// Create jobs from different callable types
+Job job1([]() { std::cout << "Lambda job" << std::endl; });
+
+Job job2(std::bind(&MyClass::method, &instance));
+
+Job job3(functionPointer);
+
+// Move-only semantics
+Job job4 = std::move(job1); // OK
+// Job job5 = job1;         // Error - copy disabled</div>
+
+        <h2 id="threadsafe-queue">7. 🔒 ThreadSafeQueue</h2>
+
+        <p>A generic thread-safe queue implementation used internally by the JobSystem.</p>
+
+        <h3>Key Methods</h3>
+        <div class="code-block">template&lt;typename T&gt;
+class ThreadSafeQueue {
+public:
+    // Add item to queue
+    void push(T item);
+    
+    // Try to pop without blocking
+    bool tryPop(T& item);
+    
+    // Wait for item or shutdown signal
+    bool waitAndPop(T& item, const std::atomic&lt;bool&gt;& shouldShutdown);
+    
+    // Queue state
+    bool empty() const;
+    size_t size() const;
+    
+    // Wake all waiting threads
+    void notifyAll();
+};</div>
+
+        <h2 id="basic-usage">8. 📝 Basic Usage Examples</h2>
+
+        <h3>Creating and Using JobSystem</h3>
+        <div class="code-block">// Create JobSystem with default thread count
+JobSystem jobSystem;
+
+// Or specify thread count
+JobSystem jobSystem(8); // 8 worker threads</div>
+
+        <h3>Simple Job Submission</h3>
+        <div class="code-block">// Submit simple tasks
+jobSystem.submitJob([]() {
+    std::cout << "Task 1 executing on thread " 
+              << std::this_thread::get_id() << std::endl;
+});
+
+jobSystem.submitJob([]() {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::cout << "Task 2 completed" << std::endl;
+});
+
+// Wait for all tasks to complete
+jobSystem.waitForAll();
+std::cout << "All tasks completed!" << std::endl;</div>
+
+        <h3>Jobs with Return Values</h3>
+        <div class="code-block">// Submit job that returns a value
+auto future1 = jobSystem.submitJobWithResult([]() -> int {
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    return 42;
+});
+
+auto future2 = jobSystem.submitJobWithResult([]() -> std::string {
+    return "Hello from worker thread!";
+});
+
+// Get results
+int result1 = future1.get();
+std::string result2 = future2.get();
+
+std::cout << "Results: " << result1 << ", " << result2 << std::endl;</div>
+
+        <h3>Working with Data</h3>
+        <div class="code-block">// Process data in parallel
+std::vector&lt;int&gt; data = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+std::vector&lt;std::future&lt;int&gt;&gt; futures;
+
+// Submit jobs to process each element
+for (int value : data) {
+    auto future = jobSystem.submitJobWithResult([](int val) -> int {
+        // Simulate expensive computation
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+        return val * val;
+    }, value);
+    
+    futures.push_back(std::move(future));
+}
+
+// Collect results
+std::vector&lt;int&gt; results;
+for (auto& future : futures) {
+    results.push_back(future.get());
+}
+
+// Print results
+for (size_t i = 0; i < results.size(); ++i) {
+    std::cout << data[i] << "² = " << results[i] << std::endl;
+}</div>
+
+        <h2 id="advanced-usage">9. 🚀 Advanced Usage</h2>
+
+        <h3>Parallel Algorithms</h3>
+        <div class="code-block">// Parallel reduce implementation
+template&lt;typename Iterator, typename T, typename BinaryOp&gt;
+T parallelReduce(JobSystem& jobSystem, Iterator first, Iterator last, 
+                T init, BinaryOp op) {
+    const size_t length = std::distance(first, last);
+    if (length == 0) return init;
+    
+    const size_t numThreads = jobSystem.getThreadCount();
+    const size_t chunkSize = (length + numThreads - 1) / numThreads;
+    
+    std::vector&lt;std::future&lt;T&gt;&gt; futures;
+    
+    for (size_t i = 0; i < numThreads && first != last; ++i) {
+        auto chunkEnd = first;
+        std::advance(chunkEnd, std::min(chunkSize, static_cast&lt;size_t&gt;(std::distance(first, last))));
+        
+        auto future = jobSystem.submitJobWithResult([first, chunkEnd, init, op]() -> T {
+            return std::reduce(first, chunkEnd, init, op);
+        });
+        
+        futures.push_back(std::move(future));
+        first = chunkEnd;
+    }
+    
+    // Combine partial results
+    T result = init;
+    for (auto& future : futures) {
+        result = op(result, future.get());
+    }
+    
+    return result;
+}
+
+// Usage example
+std::vector&lt;int&gt; numbers(1000000);
+std::iota(numbers.begin(), numbers.end(), 1);
+
+JobSystem jobSystem;
+auto sum = parallelReduce(jobSystem, numbers.begin(), numbers.end(), 
+                         0LL, std::plus&lt;long long&gt;{});
+
+std::cout << "Sum: " << sum << std::endl;</div>
+
+        <h3>Producer-Consumer Pattern</h3>
+        <div class="code-block">// Producer-consumer example
+class DataProcessor {
+private:
+    JobSystem& jobSystem_;
+    std::atomic&lt;bool&gt; stopRequested_{false};
+    
+public:
+    DataProcessor(JobSystem& jobSystem) : jobSystem_(jobSystem) {}
+    
+    void startProcessing() {
+        // Producer job
+        jobSystem_.submitJob([this]() {
+            for (int i = 0; i < 100 && !stopRequested_; ++i) {
+                // Simulate data generation
+                auto data = generateData(i);
+                
+                // Submit consumer job
+                jobSystem_.submitJob([this, data = std::move(data)]() {
+                    processData(data);
+                });
+                
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            }
+        });
+    }
+    
+    void stop() {
+        stopRequested_ = true;
+    }
+    
+private:
+    std::string generateData(int id) {
+        return "Data item " + std::to_string(id);
+    }
+    
+    void processData(const std::string& data) {
+        std::cout << "Processing: " << data 
+                  << " on thread " << std::this_thread::get_id() << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(5));
+    }
+};
+
+// Usage
+JobSystem jobSystem(4);
+DataProcessor processor(jobSystem);
+processor.startProcessing();
+
+// Let it run for a while
+std::this_thread::sleep_for(std::chrono::seconds(2));
+processor.stop();
+jobSystem.waitForAll();</div>
+
+        <h3>Task Dependencies</h3>
+        <div class="code-block">// Implementing task dependencies
+class TaskGraph {
+private:
+    JobSystem& jobSystem_;
+    
+public:
+    TaskGraph(JobSystem& jobSystem) : jobSystem_(jobSystem) {}
+    
+    template&lt;typename F&gt;
+    auto addTask(F&& func) {
+        return jobSystem_.submitJobWithResult(std::forward&lt;F&gt;(func));
+    }
+    
+    template&lt;typename F, typename... Futures&gt;
+    auto addDependentTask(F&& func, Futures&... dependencies) {
+        return jobSystem_.submitJobWithResult([func = std::forward&lt;F&gt;(func), 
+                                              ...deps = std::move(dependencies)]() mutable {
+            // Wait for all dependencies
+            (..., deps.get());
+            
+            // Execute the task
+            return func();
+        });
+    }
+};
+
+// Usage example
+JobSystem jobSystem;
+TaskGraph graph(jobSystem);
+
+// Task A and B can run in parallel
+auto taskA = graph.addTask([]() -> int {
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    std::cout << "Task A completed" << std::endl;
+    return 1;
+});
+
+auto taskB = graph.addTask([]() -> int {
+    std::this_thread::sleep_for(std::chrono::milliseconds(50));
+    std::cout << "Task B completed" << std::endl;
+    return 2;
+});
+
+// Task C depends on both A and B
+auto taskC = graph.addDependentTask([](int a, int b) -> int {
+    std::cout << "Task C completed with " << a << " and " << b << std::endl;
+    return a + b;
+}, std::move(taskA), std::move(taskB));
+
+int result = taskC.get();
+std::cout << "Final result: " << result << std::endl;</div>
+
+        <h3>Resource Pool Management</h3>
+        <div class="code-block">// Thread-safe resource pool
+template&lt;typename Resource&gt;
+class ResourcePool {
+private:
+    std::queue&lt;std::unique_ptr&lt;Resource&gt;&gt; pool_;
+    std::mutex mutex_;
+    std::condition_variable condition_;
+    size_t maxSize_;
+    
+public:
+    ResourcePool(size_t maxSize) : maxSize_(maxSize) {}
+    
+    std::unique_ptr&lt;Resource&gt; acquire() {
+        std::unique_lock&lt;std::mutex&gt; lock(mutex_);
+        
+        if (!pool_.empty()) {
+            auto resource = std::move(pool_.front());
+            pool_.pop();
+            return resource;
+        }
+        
+        lock.unlock();
+        return std::make_unique&lt;Resource&gt;();
+    }
+    
+    void release(std::unique_ptr&lt;Resource&gt; resource) {
+        std::lock_guard&lt;std::mutex&gt; lock(mutex_);
+        if (pool_.size() < maxSize_) {
+            pool_.push(std::move(resource));
+        }
+    }
+};
+
+// Usage with JobSystem
+class DatabaseConnection {
+public:
+    void executeQuery(const std::string& query) {
+        std::cout << "Executing: " << query << std::endl;
+        std::this_thread::sleep_for(std::chrono::milliseconds(10));
+    }
+};
+
+ResourcePool&lt;DatabaseConnection&gt; dbPool(5);
+JobSystem jobSystem;
+
+// Submit database tasks
+for (int i = 0; i < 20; ++i) {
+    jobSystem.submitJob([&dbPool, i]() {
+        auto connection = dbPool.acquire();
+        connection->executeQuery("SELECT * FROM table" + std::to_string(i));
+        dbPool.release(std::move(connection));
+    });
+}
+
+jobSystem.waitForAll();</div>
+
+        <h2 id="performance">10. 📊 Performance Considerations</h2>
+
+        <h3>Job Granularity</h3>
+        <div class="info">
+            <strong>Guidelines for Job Size:</strong>
+            <ul>
+                <li><strong>Too Fine:</strong> Overhead dominates useful work (microsecond tasks)</li>
+                <li><strong>Just Right:</strong> Millisecond to second range tasks</li>
+                <li><strong>Too Coarse:</strong> Poor load balancing (very long tasks)</li>
+            </ul>
+        </div>
+
+        <h3>Performance Monitoring</h3>
+        <div class="code-block">// Performance monitoring example
+class JobSystemMonitor {
+private:
+    JobSystem& jobSystem_;
+    std::chrono::steady_clock::time_point startTime_;
+    std::atomic&lt;size_t&gt; completedJobs_{0};
+    
+public:
+    JobSystemMonitor(JobSystem& jobSystem) 
+        : jobSystem_(jobSystem), startTime_(std::chrono::steady_clock::now()) {}
+    
+    void printStats() {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast&lt;std::chrono::milliseconds&gt;(now - startTime_);
+        
+        std::cout << "=== JobSystem Stats ===" << std::endl;
+        std::cout << "Thread Count: " << jobSystem_.getThreadCount() << std::endl;
+        std::cout << "Active Jobs: " << jobSystem_.getActiveJobCount() << std::endl;
+        std::cout << "Pending Jobs: " << jobSystem_.getPendingJobCount() << std::endl;
+        std::cout << "Completed Jobs: " << completedJobs_ << std::endl;
+        std::cout << "Runtime: " << elapsed.count() << "ms" << std::endl;
+        std::cout << "Jobs/sec: " << (completedJobs_ * 1000.0) / elapsed.count() << std::endl;
+    }
+    
+    void submitMonitoredJob(std::function&lt;void()&gt; job) {
+        jobSystem_.submitJob([this, job = std::move(job)]() {
+            job();
+            completedJobs_.fetch_add(1);
+        });
+    }
+};
+
+// Usage
+JobSystem jobSystem;
+JobSystemMonitor monitor(jobSystem);
+
+// Submit some jobs
+for (int i = 0; i < 1000; ++i) {
+    monitor.submitMonitoredJob([i]() {
+        // Simulate work
+        std::this_thread::sleep_for(std::chrono::microseconds(100));
+    });
+}
+
+jobSystem.waitForAll();
+monitor.printStats();</div>
+
+        <h3>Memory Usage Optimization</h3>
+        <div class="code-block">// Efficient job submission for large datasets
+template&lt;typename Iterator, typename Function&gt;
+void submitBatchJobs(JobSystem& jobSystem, Iterator first, Iterator last, 
+                    Function func, size_t batchSize = 1000) {
+    while (first != last) {
+        auto batchEnd = first;
+        std::advance(batchEnd, std::min(batchSize, static_cast&lt;size_t&gt;(std::distance(first, last))));
+        
+        // Create a batch job instead of individual jobs
+        jobSystem.submitJob([first, batchEnd, func]() {
+            std::for_each(first, batchEnd, func);
+        });
+        
+        first = batchEnd;
+    }
+}
+
+// Usage
+std::vector&lt;int&gt; data(1000000);
+std::iota(data.begin(), data.end(), 0);
+
+JobSystem jobSystem;
+submitBatchJobs(jobSystem, data.begin(), data.end(), [](int& value) {
+    value *= 2; // Double each value
+}, 10000); // Process in batches of 10,000
+
+jobSystem.waitForAll();</div>
+
+        <h2 id="error-handling">11. ⚠️ Error Handling</h2>
+
+        <h3>Exception Safety</h3>
+        <div class="info">
+            The JobSystem provides strong exception safety guarantees:
+            <ul>
+                <li><strong>Job Exceptions:</strong> Caught and logged, don't crash worker threads</li>
+                <li><strong>Future Exceptions:</strong> Propagated through std::future mechanism</li>
+                <li><strong>Shutdown Safety:</strong> All jobs complete before destruction</li>
+            </ul>
+        </div>
+
+        <h3>Exception Handling Examples</h3>
+        <div class="code-block">// Exception handling in jobs
+JobSystem jobSystem;
+
+// Job that throws exception (fire-and-forget)
+jobSystem.submitJob([]() {
+    throw std::runtime_error("Something went wrong!");
+    // Exception is caught and logged, doesn't crash the system
+});
+
+// Job that throws exception (with future)
+auto future = jobSystem.submitJobWithResult([]() -> int {
+    throw std::runtime_error("Calculation failed!");
+    return 42;
+});
+
+try {
+    int result = future.get(); // Exception is re-thrown here
+} catch (const std::exception& e) {
+    std::cout << "Caught exception: " << e.what() << std::endl;
+}
+
+// Safe exception handling pattern
+auto safeFuture = jobSystem.submitJobWithResult([]() -> std::optional&lt;int&gt; {
+    try {
+        // Risky operation
+        return performRiskyCalculation();
+    } catch (const std::exception& e) {
+        std::cerr << "Operation failed: " << e.what() << std::endl;
+        return std::nullopt;
+    }
+});
+
+auto result = safeFuture.get();
+if (result.has_value()) {
+    std::cout << "Result: " << result.value() << std::endl;
+} else {
+    std::cout << "Operation failed safely" << std::endl;
+}</div>
+
+        <h3>Timeout Handling</h3>
+        <div class="code-block">// Handling timeouts
+JobSystem jobSystem;
+
+// Submit a long-running job
+auto future = jobSystem.submitJobWithResult([]() -> int {
+    std::this_thread::sleep_for(std::chrono::seconds(5));
+    return 42;
+});
+
+// Wait with timeout
+if (future.wait_for(std::chrono::seconds(1)) == std::future_status::ready) {
+    std::cout << "Result: " << future.get() << std::endl;
+} else {
+    std::cout << "Job is still running..." << std::endl;
+    
+    // Wait for completion or timeout the entire system
+    if (jobSystem.waitForAll(std::chrono::seconds(10))) {
+        std::cout << "All jobs completed within timeout" << std::endl;
+    } else {
+        std::cout << "Timeout reached, some jobs still running" << std::endl;
+    }
+}</div>
+
+        <h2 id="best-practices">12. ✅ Best Practices</h2>
+
+        <div class="success">
+            <h3>✅ Recommended Practices</h3>
+            <div class="code-block">// ✅ Good: Appropriate job granularity
+jobSystem.submitJob([data = heavyDataSet]() {
+    // Process chunks of data, not individual elements
+    processDataChunk(data);
+});
+
+// ✅ Good: Use move semantics for expensive objects
+std::string largeString = generateLargeString();
+jobSystem.submitJob([str = std::move(largeString)]() {
+    processString(str);
+});
+
+// ✅ Good: Handle exceptions appropriately
+auto future = jobSystem.submitJobWithResult([]() -> int {
+    try {
+        return riskyOperation();
+    } catch (const std::exception& e) {
+        // Log error and return safe default
+        std::cerr << "Operation failed: " << e.what() << std::endl;
+        return -1;
+    }
+});
+
+// ✅ Good: Use appropriate waiting patterns
+if (jobSystem.waitForAll(std::chrono::seconds(30))) {
+    std::cout << "All jobs completed successfully" << std::endl;
+} else {
+    std::cout << "Warning: Jobs are taking longer than expected" << std::endl;
+}
+
+// ✅ Good: Monitor system health
+void monitorJobSystem(const JobSystem& jobSystem) {
+    if (jobSystem.getActiveJobCount() > jobSystem.getThreadCount() * 10) {
+        std::cout << "Warning: High job queue depth detected" << std::endl;
+    }
+}</div>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Common Pitfalls</h3>
+            <div class="code-block">// ❌ Poor: Too many tiny jobs
+for (int i = 0; i < 1000000; ++i) {
+    jobSystem.submitJob([i]() {
+        smallOperation(i); // Overhead >> useful work
+    });
+}
+
+// ❌ Poor: Capturing large objects by value unnecessarily
+LargeObject largeObj;
+jobSystem.submitJob([largeObj]() { // Expensive copy!
+    useObject(largeObj);
+});
+
+// ❌ Poor: Not handling future exceptions
+auto future = jobSystem.submitJobWithResult([]() {
+    throw std::runtime_error("Error!");
+    return 42;
+});
+// future.get(); // Will throw, but not handled!
+
+// ❌ Poor: Blocking operations in jobs
+jobSystem.submitJob([]() {
+    std::this_thread::sleep_for(std::chrono::hours(1)); // Ties up worker thread
+});
+
+// ❌ Poor: Not waiting for completion before destruction
+{
+    JobSystem localJobSystem;
+    localJobSystem.submitJob([]() { /* long operation */ });
+    // Destructor called while jobs still running - problematic!
+}</div>
+        </div>
+
+        <h3>Thread Safety Guidelines</h3>
+        <div class="highlight">
+            <ul>
+                <li><strong>JobSystem methods are thread-safe</strong> - Can be called from multiple threads</li>
+                <li><strong>Shared data requires synchronization</strong> - Use mutexes, atomics, or lock-free structures</li>
+                <li><strong>Avoid data races</strong> - Don't modify shared data without proper synchronization</li>
+                <li><strong>Use local copies when possible</strong> - Avoid sharing mutable state between jobs</li>
+            </ul>
+        </div>
+
+        <h2 id="troubleshooting">13. 🔧 Troubleshooting</h2>
+
+        <h3>Common Issues and Solutions</h3>
+        <table>
+            <tr>
+                <th>Issue</th>
+                <th>Symptoms</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td>Deadlock</td>
+                <td>System hangs, jobs don't complete</td>
+                <td>Check for circular dependencies, avoid blocking in jobs</td>
+            </tr>
+            <tr>
+                <td>Poor Performance</td>
+                <td>Slower than single-threaded</td>
+                <td>Increase job granularity, reduce synchronization overhead</td>
+            </tr>
+            <tr>
+                <td>Memory Usage</td>
+                <td>High memory consumption</td>
+                <td>Use move semantics, batch jobs, avoid large captures</td>
+            </tr>
+            <tr>
+                <td>Exceptions</td>
+                <td>Unexpected program termination</td>
+                <td>Handle exceptions in jobs, use try-catch blocks</td>
+            </tr>
+            <tr>
+                <td>Resource Starvation</td>
+                <td>Some jobs never execute</td>
+                <td>Check thread count, avoid long-running jobs</td>
+            </tr>
+        </table>
+
+        <h3>Debugging Utilities</h3>
+        <div class="code-block">// Debug utility class
+class JobSystemDebugger {
+private:
+    JobSystem& jobSystem_;
+    std::chrono::steady_clock::time_point startTime_;
+    
+public:
+    JobSystemDebugger(JobSystem& jobSystem) 
+        : jobSystem_(jobSystem), startTime_(std::chrono::steady_clock::now()) {}
+    
+    void printDetailedStats() {
+        auto now = std::chrono::steady_clock::now();
+        auto uptime = std::chrono::duration_cast&lt;std::chrono::seconds&gt;(now - startTime_);
+        
+        std::cout << "=== JobSystem Debug Info ===" << std::endl;
+        std::cout << "Uptime: " << uptime.count() << " seconds" << std::endl;
+        std::cout << "Thread Count: " << jobSystem_.getThreadCount() << std::endl;
+        std::cout << "Active Jobs: " << jobSystem_.getActiveJobCount() << std::endl;
+        std::cout << "Pending Jobs: " << jobSystem_.getPendingJobCount() << std::endl;
+        std::cout << "Shutting Down: " << (jobSystem_.isShuttingDown() ? "Yes" : "No") << std::endl;
+        
+        // Calculate load factor
+        double loadFactor = static_cast&lt;double&gt;(jobSystem_.getActiveJobCount()) / 
+                           jobSystem_.getThreadCount();
+        std::cout << "Load Factor: " << loadFactor << std::endl;
+        
+        if (loadFactor > 2.0) {
+            std::cout << "⚠️  Warning: High load factor detected!" << std::endl;
+        }
+        
+        std::cout << "=========================" << std::endl;
+    }
+    
+    void waitWithProgress(std::chrono::milliseconds interval = std::chrono::milliseconds(1000)) {
+        while (jobSystem_.getActiveJobCount() > 0) {
+            printDetailedStats();
+            std::this_thread::sleep_for(interval);
+        }
+        std::cout << "✅ All jobs completed!" << std::endl;
+    }
+};
+
+// Usage
+JobSystem jobSystem;
+JobSystemDebugger debugger(jobSystem);
+
+// Submit some jobs
+for (int i = 0; i < 10; ++i) {
+    jobSystem.submitJob([i]() {
+        std::this_thread::sleep_for(std::chrono::seconds(2));
+        std::cout << "Job " << i << " completed" << std::endl;
+    });
+}
+
+// Monitor progress
+debugger.waitWithProgress();</div>
+
+        <h3>Performance Profiling</h3>
+        <div class="code-block">// Simple profiling utility
+class JobProfiler {
+private:
+    std::mutex mutex_;
+    std::unordered_map&lt;std::string, std::chrono::microseconds&gt; timings_;
+    std::unordered_map&lt;std::string, size_t&gt; counts_;
+    
+public:
+    template&lt;typename F&gt;
+    auto profileJob(const std::string& name, F&& func) {
+        auto start = std::chrono::high_resolution_clock::now();
+        
+        if constexpr (std::is_void_v&lt;std::invoke_result_t&lt;F&gt;&gt;) {
+            func();
+            recordTiming(name, start);
+        } else {
+            auto result = func();
+            recordTiming(name, start);
+            return result;
+        }
+    }
+    
+    void printReport() {
+        std::lock_guard&lt;std::mutex&gt; lock(mutex_);
+        
+        std::cout << "=== Job Profiling Report ===" << std::endl;
+        for (const auto& [name, totalTime] : timings_) {
+            auto count = counts_[name];
+            auto avgTime = totalTime.count() / count;
+            
+            std::cout << name << ":" << std::endl;
+            std::cout << "  Count: " << count << std::endl;
+            std::cout << "  Total: " << totalTime.count() << "μs" << std::endl;
+            std::cout << "  Average: " << avgTime << "μs" << std::endl;
+        }
+        std::cout << "=========================" << std::endl;
+    }
+    
+private:
+    void recordTiming(const std::string& name, 
+                     std::chrono::high_resolution_clock::time_point start) {
+        auto end = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(end - start);
+        
+        std::lock_guard&lt;std::mutex&gt; lock(mutex_);
+        timings_[name] += duration;
+        counts_[name]++;
+    }
+};
+
+// Usage
+JobSystem jobSystem;
+JobProfiler profiler;
+
+// Submit profiled jobs
+for (int i = 0; i < 100; ++i) {
+    jobSystem.submitJob([&profiler, i]() {
+        profiler.profileJob("fast_task", []() {
+            std::this_thread::sleep_for(std::chrono::microseconds(100));
+        });
+        
+        if (i % 10 == 0) {
+            profiler.profileJob("slow_task", []() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(10));
+            });
+        }
+    });
+}
+
+jobSystem.waitForAll();
+profiler.printReport();</div>
+
+        <div class="info">
+            <h3>📚 Additional Resources</h3>
+            <ul>
+                <li><strong>Debug Channels:</strong> JobSystemDebug for runtime logging and monitoring</li>
+                <li><strong>C++20 Standards:</strong> std::thread, std::future, concepts documentation</li>
+                <li><strong>Performance Tools:</strong> Thread sanitizer, performance profilers</li>
+                <li><strong>Best Practices:</strong> Concurrency patterns, lock-free programming</li>
+            </ul>
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            <p>JobSystem API Documentation - Generated for C++20 High-Performance Applications</p>
+        </footer>
+    </div>
+</body>
+</html>

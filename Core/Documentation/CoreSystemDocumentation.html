@@ -1,0 +1,1327 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CoreSystem API Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .success {
+            background-color: #d4edda;
+            padding: 10px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .method-signature {
+            background-color: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 5px 0;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .toc > ul {
+            padding-left: 0;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .architecture-diagram {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .system-status {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .status-active { color: #4caf50; }
+        .status-inactive { color: #f44336; }
+        .status-warning { color: #ff9800; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>⚙️ CoreSystem API Documentation</h1>
+        
+        <div class="info">
+            <strong>Version:</strong> 1.0<br>
+            <strong>Compatibility:</strong> C++20<br>
+            <strong>Namespace:</strong> Core<br>
+            <strong>Last Updated:</strong> October 2025
+        </div>
+
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#architecture">2. Architecture</a></li>
+                <li><a href="#core-systems">3. Core Systems</a></li>
+                <li><a href="#api-reference">4. API Reference</a></li>
+                <li><a href="#lifecycle">5. System Lifecycle</a></li>
+                <li><a href="#initialization">6. Initialization Process</a></li>
+                <li><a href="#shutdown">7. Shutdown Process</a></li>
+                <li><a href="#system-access">8. System Access</a></li>
+                <li><a href="#monitoring">9. System Monitoring</a></li>
+                <li><a href="#integration">10. Integration Examples</a></li>
+                <li><a href="#best-practices">11. Best Practices</a></li>
+                <li><a href="#troubleshooting">12. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">1. 🌟 Overview</h2>
+        <p>The CoreSystem is the central orchestrator for all engine systems in the C++20 game engine. It implements a singleton pattern that manages the initialization, coordination, and shutdown of core subsystems including file management, resource loading, component management, job scheduling, and system coordination.</p>
+
+        <div class="highlight">
+            <strong>Key Features:</strong>
+            <ul>
+                <li>✅ Centralized system management and initialization</li>
+                <li>✅ Singleton pattern for global access</li>
+                <li>✅ Dependency management between systems</li>
+                <li>✅ Exception-safe initialization and cleanup</li>
+                <li>✅ Comprehensive system status monitoring</li>
+                <li>✅ Integrated debug logging with CoreDebug channel</li>
+                <li>✅ Thread-safe system access</li>
+                <li>✅ Graceful error handling and recovery</li>
+            </ul>
+        </div>
+
+        <h2 id="architecture">2. 🏗️ Architecture</h2>
+
+        <div class="architecture-diagram">
+            <h4>CoreSystem Architecture</h4>
+            <pre>
+┌─────────────────────────────────────────────────────────┐
+│                    CoreSystem                           │
+│                   (Singleton)                           │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │              Managed Systems                        ││
+│  │                                                     ││
+│  │  ┌─────────────────┐  ┌─────────────────────────┐  ││
+│  │  │ FileSystemManager│  │    ResourceManager     │  ││
+│  │  │  • StandardFS   │  │  • AsyncLoading        │  ││
+│  │  │  • ArchiveFS    │  │  • ResourceCaching     │  ││
+│  │  │  • NetworkFS    │  │  • TypeSafeAccess      │  ││
+│  │  └─────────────────┘  └─────────────────────────┘  ││
+│  │                                                     ││
+│  │  ┌─────────────────┐  ┌─────────────────────────┐  ││
+│  │  │  ComponentManager│  │      JobSystem         │  ││
+│  │  │  • Pools        │  │  • ThreadPool          │  ││
+│  │  │  • Lifecycle    │  │  • TaskScheduling      │  ││
+│  │  │  • Hierarchy    │  │  • FutureResults       │  ││
+│  │  └─────────────────┘  └─────────────────────────┘  ││
+│  │                                                     ││
+│  │  ┌─────────────────────────────────────────────────┐││
+│  │  │         ComponentSystemScheduler               ││
+│  │  │  • AsyncUpdates • Dependencies • Batching     ││
+│  │  └─────────────────────────────────────────────────┘││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────┬───────────────────────────────────┘
+                      │
+               ┌──────▼──────┐
+               │ Application │
+               │   Access    │
+               └─────────────┘
+            </pre>
+        </div>
+
+        <h2 id="core-systems">3. 🧩 Core Systems</h2>
+
+        <table>
+            <tr>
+                <th>System</th>
+                <th>Purpose</th>
+                <th>Key Features</th>
+                <th>Dependencies</th>
+            </tr>
+            <tr>
+                <td><strong>FileSystemManager</strong></td>
+                <td>File and directory operations</td>
+                <td>Cross-platform, stackable filesystems, async I/O</td>
+                <td>None (base system)</td>
+            </tr>
+            <tr>
+                <td><strong>ResourceManager</strong></td>
+                <td>Asset loading and caching</td>
+                <td>Async loading, type safety, memory management</td>
+                <td>FileSystemManager</td>
+            </tr>
+            <tr>
+                <td><strong>JobSystem</strong></td>
+                <td>Task scheduling and threading</td>
+                <td>Thread pool, future results, work stealing</td>
+                <td>None (base system)</td>
+            </tr>
+            <tr>
+                <td><strong>ComponentManager</strong></td>
+                <td>Entity-component management</td>
+                <td>Object pooling, hierarchy, reflection</td>
+                <td>None (base system)</td>
+            </tr>
+            <tr>
+                <td><strong>ComponentSystemScheduler</strong></td>
+                <td>Async component updates</td>
+                <td>Parallel execution, dependency resolution</td>
+                <td>ComponentManager, JobSystem</td>
+            </tr>
+        </table>
+
+        <h2 id="api-reference">4. 📖 API Reference</h2>
+
+        <h3>Core Class Interface</h3>
+        <div class="method-signature">namespace Core { class CoreSystem }</div>
+        <div class="code-block">// Static class - no instantiation
+CoreSystem() = delete;
+~CoreSystem() = delete;
+
+// System lifecycle
+static bool Initialize();
+static void Shutdown();
+static bool IsInitialized();
+
+// System accessors
+static FileSystem::FileSystemManager* GetFileSystemManager();
+static ResourceSystem::ResourceManager* GetResourceManager();
+static ComponentSystem::ComponentManager* GetComponentManager();
+static JobSystem* GetJobSystem();
+static ComponentSystem::ComponentSystemScheduler* GetJobSystemScheduler();
+
+// Utility methods
+static void PrintSystemStatus();</div>
+
+        <h3>System Accessors</h3>
+        <table>
+            <tr>
+                <th>Method</th>
+                <th>Return Type</th>
+                <th>Purpose</th>
+                <th>Availability</th>
+            </tr>
+            <tr>
+                <td><code>GetFileSystemManager()</code></td>
+                <td><code>FileSystem::FileSystemManager*</code></td>
+                <td>Access file system operations</td>
+                <td>After Initialize()</td>
+            </tr>
+            <tr>
+                <td><code>GetResourceManager()</code></td>
+                <td><code>ResourceSystem::ResourceManager*</code></td>
+                <td>Access resource loading</td>
+                <td>After Initialize()</td>
+            </tr>
+            <tr>
+                <td><code>GetComponentManager()</code></td>
+                <td><code>ComponentSystem::ComponentManager*</code></td>
+                <td>Access component management</td>
+                <td>After Initialize()</td>
+            </tr>
+            <tr>
+                <td><code>GetJobSystem()</code></td>
+                <td><code>JobSystem*</code></td>
+                <td>Access task scheduling</td>
+                <td>After Initialize()</td>
+            </tr>
+            <tr>
+                <td><code>GetJobSystemScheduler()</code></td>
+                <td><code>ComponentSystem::ComponentSystemScheduler*</code></td>
+                <td>Access async component updates</td>
+                <td>After Initialize()</td>
+            </tr>
+        </table>
+
+        <h2 id="lifecycle">5. 🔄 System Lifecycle</h2>
+
+        <h3>Initialization Sequence</h3>
+        <div class="code-block">// Initialization order (dependencies matter!)
+1. FileSystemManager     → Base file operations
+2. ResourceManager       → Asset loading (needs FileSystem)
+3. JobSystem             → Task scheduling
+4. ComponentManager      → Component pools and lifecycle
+5. ComponentSystemScheduler → Async updates (needs Components + Jobs)</div>
+
+        <h3>Shutdown Sequence</h3>
+        <div class="code-block">// Shutdown order (reverse of initialization)
+1. ComponentSystemScheduler → Stop async updates first
+2. ComponentManager         → Clean up components
+3. JobSystem               → Finish running tasks
+4. ResourceManager         → Unload resources
+5. FileSystemManager       → Close file handles</div>
+
+        <h2 id="initialization">6. 🚀 Initialization Process</h2>
+
+        <h3>Basic Initialization</h3>
+        <div class="code-block">// Simple initialization
+#include "CoreSystem/CoreSystem.h"
+
+int main() {
+    // Initialize all core systems
+    if (!Core::CoreSystem::Initialize()) {
+        std::cerr << "Failed to initialize CoreSystem!" << std::endl;
+        return -1;
+    }
+    
+    // Core systems are now available for use
+    auto* fileSystem = Core::CoreSystem::GetFileSystemManager();
+    auto* jobSystem = Core::CoreSystem::GetJobSystem();
+    auto* componentManager = Core::CoreSystem::GetComponentManager();
+    
+    // Your application code here...
+    
+    // Shutdown when done
+    Core::CoreSystem::Shutdown();
+    return 0;
+}</div>
+
+        <h3>Advanced Initialization with Error Handling</h3>
+        <div class="code-block">// Robust initialization with logging
+class EngineApplication {
+private:
+    bool m_initialized = false;
+    
+public:
+    bool Initialize() {
+        CoreDebug.printf("Starting engine initialization...\n");
+        
+        try {
+            // Initialize core systems
+            if (!Core::CoreSystem::Initialize()) {
+                CoreDebug.warning("CoreSystem initialization failed\n");
+                return false;
+            }
+            
+            // Verify all systems are available
+            if (!VerifySystemsAvailable()) {
+                CoreDebug.warning("System verification failed\n");
+                Core::CoreSystem::Shutdown();
+                return false;
+            }
+            
+            // Configure systems for your application
+            ConfigureFileSystems();
+            ConfigureJobSystem();
+            RegisterComponents();
+            
+            m_initialized = true;
+            CoreDebug.printf("Engine initialization completed successfully\n");
+            return true;
+            
+        } catch (const std::exception& e) {
+            CoreDebug.warning("Exception during initialization: %s\n", e.what());
+            Core::CoreSystem::Shutdown();
+            return false;
+        }
+    }
+    
+    bool VerifySystemsAvailable() {
+        return Core::CoreSystem::GetFileSystemManager() != nullptr &&
+               Core::CoreSystem::GetResourceManager() != nullptr &&
+               Core::CoreSystem::GetComponentManager() != nullptr &&
+               Core::CoreSystem::GetJobSystem() != nullptr &&
+               Core::CoreSystem::GetJobSystemScheduler() != nullptr;
+    }
+    
+    void ConfigureFileSystems() {
+        auto* fileSystemManager = Core::CoreSystem::GetFileSystemManager();
+        
+        // Add custom filesystem implementations
+        // fileSystemManager->PushFileSystem(std::make_unique<CustomArchiveSystem>("game.pak"));
+        
+        CoreDebug.printf("FileSystem configured with %zu systems\n", 
+                        fileSystemManager->GetFileSystemCount());
+    }
+    
+    void ConfigureJobSystem() {
+        auto* jobSystem = Core::CoreSystem::GetJobSystem();
+        CoreDebug.printf("JobSystem configured with %zu worker threads\n", 
+                        jobSystem->getThreadCount());
+    }
+    
+    void RegisterComponents() {
+        auto* componentManager = Core::CoreSystem::GetComponentManager();
+        auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
+        
+        // Register your component types
+        // componentManager->RegisterComponentType<YourComponentType>();
+        // scheduler->RegisterComponentType<YourComponentType>();
+        
+        CoreDebug.printf("Component types registered\n");
+    }
+    
+    void Shutdown() {
+        if (!m_initialized) return;
+        
+        CoreDebug.printf("Shutting down engine...\n");
+        Core::CoreSystem::Shutdown();
+        m_initialized = false;
+        CoreDebug.printf("Engine shutdown complete\n");
+    }
+    
+    ~EngineApplication() {
+        Shutdown();
+    }
+};</div>
+
+        <h2 id="shutdown">7. 🛑 Shutdown Process</h2>
+
+        <h3>Safe Shutdown Patterns</h3>
+        <div class="code-block">// Graceful shutdown with cleanup verification
+void SafeShutdown() {
+    if (!Core::CoreSystem::IsInitialized()) {
+        CoreDebug.printf("CoreSystem not initialized, nothing to shutdown\n");
+        return;
+    }
+    
+    CoreDebug.printf("Beginning safe shutdown sequence...\n");
+    
+    // Wait for pending jobs to complete
+    auto* jobSystem = Core::CoreSystem::GetJobSystem();
+    if (jobSystem) {
+        CoreDebug.printf("Waiting for jobs to complete...\n");
+        jobSystem->waitForAll();
+    }
+    
+    // Stop async component updates
+    auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
+    if (scheduler) {
+        CoreDebug.printf("Stopping component scheduler...\n");
+        scheduler->WaitForCompletion();
+    }
+    
+    // Print final system status
+    Core::CoreSystem::PrintSystemStatus();
+    
+    // Perform shutdown
+    Core::CoreSystem::Shutdown();
+    
+    CoreDebug.printf("Safe shutdown completed\n");
+}
+
+// RAII wrapper for automatic CoreSystem management
+class CoreSystemManager {
+public:
+    CoreSystemManager() {
+        if (!Core::CoreSystem::Initialize()) {
+            throw std::runtime_error("Failed to initialize CoreSystem");
+        }
+    }
+    
+    ~CoreSystemManager() {
+        Core::CoreSystem::Shutdown();
+    }
+    
+    // Disable copy/move
+    CoreSystemManager(const CoreSystemManager&) = delete;
+    CoreSystemManager& operator=(const CoreSystemManager&) = delete;
+    CoreSystemManager(CoreSystemManager&&) = delete;
+    CoreSystemManager& operator=(CoreSystemManager&&) = delete;
+};
+
+// Usage with RAII
+int main() {
+    try {
+        CoreSystemManager coreManager; // Automatic init/shutdown
+        
+        // Your application code here...
+        RunApplication();
+        
+        return 0; // Automatic shutdown in destructor
+    } catch (const std::exception& e) {
+        std::cerr << "Application error: " << e.what() << std::endl;
+        return -1;
+    }
+}</div>
+
+        <h2 id="system-access">8. 🔗 System Access</h2>
+
+        <h3>Common Access Patterns</h3>
+        <div class="code-block">// File operations
+void DoFileOperations() {
+    auto* fs = Core::CoreSystem::GetFileSystemManager();
+    if (!fs) {
+        CoreDebug.warning("FileSystemManager not available\n");
+        return;
+    }
+    
+    // Use filesystem
+    auto result = fs->ReadAllText("config.json");
+    if (result.IsSuccess()) {
+        ProcessConfig(result.GetValue());
+    } else {
+        CoreDebug.warning("Failed to read config: %s\n", result.GetError().c_str());
+    }
+}
+
+// Resource loading
+template<typename T>
+std::shared_ptr<T> LoadResource(const std::string& path) {
+    auto* resourceManager = Core::CoreSystem::GetResourceManager();
+    if (!resourceManager) {
+        CoreDebug.warning("ResourceManager not available\n");
+        return nullptr;
+    }
+    
+    return resourceManager->RequestResource<T>(path);
+}
+
+// Job submission
+void SubmitBackgroundTask() {
+    auto* jobSystem = Core::CoreSystem::GetJobSystem();
+    if (!jobSystem) {
+        CoreDebug.warning("JobSystem not available\n");
+        return;
+    }
+    
+    // Submit asynchronous task
+    auto future = jobSystem->submitJobWithResult([]() {
+        // Background work
+        return ProcessData();
+    });
+    
+    // Handle result later
+    HandleFutureResult(std::move(future));
+}
+
+// Component management
+template<typename T>
+T* CreateComponent() {
+    auto* componentManager = Core::CoreSystem::GetComponentManager();
+    if (!componentManager) {
+        CoreDebug.warning("ComponentManager not available\n");
+        return nullptr;
+    }
+    
+    auto* component = componentManager->CreateComponent<T>();
+    if (component && !component->Initialize()) {
+        componentManager->ReleaseComponent(component);
+        return nullptr;
+    }
+    
+    return component;
+}</div>
+
+        <h3>System Integration Helper</h3>
+        <div class="code-block">// Helper class for safe system access
+class SystemAccessor {
+public:
+    static bool IsFullyInitialized() {
+        return Core::CoreSystem::IsInitialized() &&
+               Core::CoreSystem::GetFileSystemManager() &&
+               Core::CoreSystem::GetResourceManager() &&
+               Core::CoreSystem::GetComponentManager() &&
+               Core::CoreSystem::GetJobSystem() &&
+               Core::CoreSystem::GetJobSystemScheduler();
+    }
+    
+    template<typename Func>
+    static auto SafeAccess(Func&& func) -> decltype(func()) {
+        if (!IsFullyInitialized()) {
+            throw std::runtime_error("CoreSystem not fully initialized");
+        }
+        return func();
+    }
+    
+    // Type-safe system getters with validation
+    static FileSystem::FileSystemManager& GetFileSystem() {
+        auto* fs = Core::CoreSystem::GetFileSystemManager();
+        if (!fs) throw std::runtime_error("FileSystemManager not available");
+        return *fs;
+    }
+    
+    static ResourceSystem::ResourceManager& GetResourceManager() {
+        auto* rm = Core::CoreSystem::GetResourceManager();
+        if (!rm) throw std::runtime_error("ResourceManager not available");
+        return *rm;
+    }
+    
+    static ComponentSystem::ComponentManager& GetComponentManager() {
+        auto* cm = Core::CoreSystem::GetComponentManager();
+        if (!cm) throw std::runtime_error("ComponentManager not available");
+        return *cm;
+    }
+    
+    static JobSystem& GetJobSystem() {
+        auto* js = Core::CoreSystem::GetJobSystem();
+        if (!js) throw std::runtime_error("JobSystem not available");
+        return *js;
+    }
+    
+    static ComponentSystem::ComponentSystemScheduler& GetScheduler() {
+        auto* sched = Core::CoreSystem::GetJobSystemScheduler();
+        if (!sched) throw std::runtime_error("ComponentSystemScheduler not available");
+        return *sched;
+    }
+};
+
+// Usage
+void SafeSystemUsage() {
+    try {
+        SystemAccessor::SafeAccess([]() {
+            auto& fs = SystemAccessor::GetFileSystem();
+            auto& jobs = SystemAccessor::GetJobSystem();
+            
+            // Safe to use systems here
+        });
+    } catch (const std::exception& e) {
+        CoreDebug.warning("System access error: %s\n", e.what());
+    }
+}</div>
+
+        <h2 id="monitoring">9. 📊 System Monitoring</h2>
+
+        <h3>System Status Output</h3>
+        <p>The <code>PrintSystemStatus()</code> method provides comprehensive system information:</p>
+
+        <div class="system-status">
+<span class="status-active">=== Core System Status ===</span>
+<span class="status-active">Initialized: Yes</span>
+<span class="status-active">FileSystemManager: Active</span>
+<span class="status-active">  File Systems: 2</span>
+<span class="status-active">ResourceManager: Active</span>
+<span class="status-active">  Running: Yes</span>
+<span class="status-active">  Loaded Resources: 45</span>
+<span class="status-warning">  Pending Loads: 3</span>
+<span class="status-active">  Pending Finalizations: 0</span>
+<span class="status-active">JobSystem: Active</span>
+<span class="status-active">  Worker Threads: 8</span>
+<span class="status-warning">  Active Jobs: 2</span>
+<span class="status-active">  Pending Jobs: 0</span>
+<span class="status-active">  Shutting Down: No</span>
+<span class="status-active">ComponentManager: Active</span>
+<span class="status-active">  Active Components: 156</span>
+<span class="status-active">  Total Components: 200</span>
+<span class="status-active">JobSystemScheduler: Active</span>
+<span class="status-active">  Registered Phases: 5</span>
+<span class="status-active">  Active Jobs: 0</span>
+<span class="status-active">  Pending Jobs: 0</span>
+<span class="status-active">  Execution Policy: Sequential</span>
+<span class="status-active">=========================</span>
+        </div>
+
+        <h3>Real-time Monitoring</h3>
+        <div class="code-block">// Periodic system monitoring
+class SystemMonitor {
+private:
+    std::chrono::steady_clock::time_point m_lastUpdate;
+    std::chrono::seconds m_updateInterval{5}; // Update every 5 seconds
+    
+public:
+    void Update() {
+        auto now = std::chrono::steady_clock::now();
+        if (now - m_lastUpdate >= m_updateInterval) {
+            LogSystemMetrics();
+            m_lastUpdate = now;
+        }
+    }
+    
+    void LogSystemMetrics() {
+        if (!Core::CoreSystem::IsInitialized()) return;
+        
+        // Log key metrics
+        CoreDebug.printf("=== System Metrics ===\n");
+        
+        auto* jobSystem = Core::CoreSystem::GetJobSystem();
+        if (jobSystem) {
+            CoreDebug.printf("Jobs - Active: %zu, Pending: %zu\n",
+                           jobSystem->getActiveJobCount(),
+                           jobSystem->getPendingJobCount());
+        }
+        
+        auto* resourceManager = Core::CoreSystem::GetResourceManager();
+        if (resourceManager) {
+            CoreDebug.printf("Resources - Loaded: %zu, Pending: %zu\n",
+                           resourceManager->GetLoadedResourceCount(),
+                           resourceManager->GetPendingLoadCount());
+        }
+        
+        auto* componentManager = Core::CoreSystem::GetComponentManager();
+        if (componentManager) {
+            CoreDebug.printf("Components - Active: %zu, Total: %zu\n",
+                           componentManager->GetActiveComponentCount<ComponentSystem::Component>(),
+                           componentManager->GetTotalComponentCount<ComponentSystem::Component>());
+        }
+        
+        CoreDebug.printf("==================\n");
+    }
+    
+    // Performance profiling
+    void ProfileSystemPerformance() {
+        CoreDebug.printf("=== Performance Profile ===\n");
+        
+        auto start = std::chrono::high_resolution_clock::now();
+        
+        // Measure file system performance
+        auto* fs = Core::CoreSystem::GetFileSystemManager();
+        if (fs) {
+            auto fsStart = std::chrono::high_resolution_clock::now();
+            fs->WriteAllText("perf_test.tmp", "Performance test data");
+            fs->ReadAllText("perf_test.tmp");
+            fs->DeleteFile("perf_test.tmp");
+            auto fsEnd = std::chrono::high_resolution_clock::now();
+            
+            auto fsDuration = std::chrono::duration_cast<std::chrono::microseconds>(fsEnd - fsStart);
+            CoreDebug.printf("FileSystem I/O: %ld μs\n", fsDuration.count());
+        }
+        
+        // Measure job system performance
+        auto* jobSystem = Core::CoreSystem::GetJobSystem();
+        if (jobSystem) {
+            auto jobStart = std::chrono::high_resolution_clock::now();
+            auto future = jobSystem->submitJobWithResult([]() {
+                return 42; // Simple task
+            });
+            future.wait();
+            auto jobEnd = std::chrono::high_resolution_clock::now();
+            
+            auto jobDuration = std::chrono::duration_cast<std::chrono::microseconds>(jobEnd - jobStart);
+            CoreDebug.printf("Job Submission: %ld μs\n", jobDuration.count());
+        }
+        
+        auto end = std::chrono::high_resolution_clock::now();
+        auto totalDuration = std::chrono::duration_cast<std::chrono::microseconds>(end - start);
+        CoreDebug.printf("Total Profile Time: %ld μs\n", totalDuration.count());
+        CoreDebug.printf("========================\n");
+    }
+};</div>
+
+        <h2 id="integration">10. 🔧 Integration Examples</h2>
+
+        <h3>Game Loop Integration</h3>
+        <div class="code-block">// Complete game loop with CoreSystem
+class GameEngine {
+private:
+    bool m_running = false;
+    SystemMonitor m_monitor;
+    
+public:
+    bool Initialize() {
+        // Initialize core systems
+        if (!Core::CoreSystem::Initialize()) {
+            return false;
+        }
+        
+        // Setup game-specific systems
+        SetupGameSystems();
+        
+        m_running = true;
+        return true;
+    }
+    
+    void Run() {
+        CoreDebug.printf("Starting game loop...\n");
+        
+        auto lastFrameTime = std::chrono::high_resolution_clock::now();
+        
+        while (m_running) {
+            auto currentTime = std::chrono::high_resolution_clock::now();
+            auto deltaTime = std::chrono::duration<double>(currentTime - lastFrameTime).count();
+            lastFrameTime = currentTime;
+            
+            // Update systems
+            Update(deltaTime);
+            
+            // Render
+            Render();
+            
+            // Monitor systems
+            m_monitor.Update();
+            
+            // Check for exit
+            if (ShouldExit()) {
+                m_running = false;
+            }
+        }
+        
+        CoreDebug.printf("Game loop ended\n");
+    }
+    
+    void Update(double deltaTime) {
+        // Update components asynchronously
+        auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
+        if (scheduler) {
+            scheduler->UpdateAllAsync(deltaTime);
+            scheduler->WaitForCompletion();
+        }
+        
+        // Update other game systems
+        UpdateGameLogic(deltaTime);
+    }
+    
+    void Render() {
+        // Rendering code here
+        // Can access resource manager for textures, models, etc.
+        auto* resourceManager = Core::CoreSystem::GetResourceManager();
+        // Use resources for rendering
+    }
+    
+    void SetupGameSystems() {
+        // Register custom component types
+        auto* componentManager = Core::CoreSystem::GetComponentManager();
+        auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
+        
+        // componentManager->RegisterComponentType<PlayerComponent>();
+        // scheduler->RegisterComponentType<PlayerComponent>(0, "Player");
+        
+        CoreDebug.printf("Game systems configured\n");
+    }
+    
+    void Shutdown() {
+        CoreDebug.printf("Shutting down game engine...\n");
+        
+        // Cleanup game-specific resources first
+        CleanupGameSystems();
+        
+        // Shutdown core systems
+        Core::CoreSystem::Shutdown();
+        
+        CoreDebug.printf("Game engine shutdown complete\n");
+    }
+    
+    void CleanupGameSystems() {
+        // Game-specific cleanup
+    }
+    
+    bool ShouldExit() {
+        // Check for exit conditions
+        return false; // Implement exit logic
+    }
+    
+    void UpdateGameLogic(double deltaTime) {
+        // Game-specific update logic
+    }
+};</div>
+
+        <h3>Async Task Management</h3>
+        <div class="code-block">// Advanced async task coordination
+class AsyncTaskManager {
+private:
+    std::vector<std::future<void>> m_pendingTasks;
+    
+public:
+    void SubmitAsyncWork() {
+        auto* jobSystem = Core::CoreSystem::GetJobSystem();
+        auto* resourceManager = Core::CoreSystem::GetResourceManager();
+        auto* fileSystem = Core::CoreSystem::GetFileSystemManager();
+        
+        if (!jobSystem || !resourceManager || !fileSystem) {
+            CoreDebug.warning("Required systems not available for async work\n");
+            return;
+        }
+        
+        // Submit multiple background tasks
+        auto task1 = jobSystem->submitJobWithResult([=]() {
+            return LoadAndProcessAssets(resourceManager);
+        });
+        
+        auto task2 = jobSystem->submitJobWithResult([=]() {
+            return ProcessFileOperations(fileSystem);
+        });
+        
+        auto task3 = jobSystem->submitJobWithResult([=]() {
+            return UpdateComponents();
+        });
+        
+        // Store futures for later synchronization
+        m_pendingTasks.push_back(std::move(task1));
+        m_pendingTasks.push_back(std::move(task2));
+        m_pendingTasks.push_back(std::move(task3));
+    }
+    
+    void WaitForCompletion() {
+        CoreDebug.printf("Waiting for %zu async tasks to complete...\n", m_pendingTasks.size());
+        
+        for (auto& task : m_pendingTasks) {
+            if (task.valid()) {
+                task.wait();
+            }
+        }
+        
+        m_pendingTasks.clear();
+        CoreDebug.printf("All async tasks completed\n");
+    }
+    
+private:
+    int LoadAndProcessAssets(ResourceSystem::ResourceManager* rm) {
+        // Asset loading work
+        return 0;
+    }
+    
+    int ProcessFileOperations(FileSystem::FileSystemManager* fs) {
+        // File processing work
+        return 0;
+    }
+    
+    int UpdateComponents() {
+        // Component update work
+        auto* componentManager = Core::CoreSystem::GetComponentManager();
+        if (componentManager) {
+            // Perform component operations
+        }
+        return 0;
+    }
+};</div>
+
+        <h2 id="best-practices">11. ✅ Best Practices</h2>
+
+        <div class="highlight">
+            <h3>🎯 Initialization Guidelines</h3>
+            <ul>
+                <li><strong>Initialize early</strong> - Call CoreSystem::Initialize() before using any subsystems</li>
+                <li><strong>Check return values</strong> - Always verify initialization success</li>
+                <li><strong>Use RAII patterns</strong> - Automatic cleanup prevents resource leaks</li>
+                <li><strong>Handle exceptions</strong> - Wrap initialization in try-catch blocks</li>
+                <li><strong>Verify systems</strong> - Check system availability before use</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <h3>✅ Good Practices</h3>
+            <div class="code-block">// ✅ Good: Safe initialization with verification
+bool InitializeEngine() {
+    if (!Core::CoreSystem::Initialize()) {
+        return false;
+    }
+    
+    // Verify critical systems
+    if (!Core::CoreSystem::GetFileSystemManager() ||
+        !Core::CoreSystem::GetJobSystem()) {
+        Core::CoreSystem::Shutdown();
+        return false;
+    }
+    
+    return true;
+}
+
+// ✅ Good: Safe system access
+void SafeFileOperation() {
+    auto* fs = Core::CoreSystem::GetFileSystemManager();
+    if (!fs) {
+        CoreDebug.warning("FileSystem not available\n");
+        return;
+    }
+    
+    auto result = fs->ReadAllText("config.json");
+    if (result.IsSuccess()) {
+        ProcessConfig(result.GetValue());
+    }
+}
+
+// ✅ Good: Proper shutdown sequence
+void CleanShutdown() {
+    // Wait for pending work
+    auto* jobSystem = Core::CoreSystem::GetJobSystem();
+    if (jobSystem) {
+        jobSystem->waitForAll();
+    }
+    
+    // Print final status
+    Core::CoreSystem::PrintSystemStatus();
+    
+    // Shutdown
+    Core::CoreSystem::Shutdown();
+}
+
+// ✅ Good: RAII management
+class EngineManager {
+    bool m_initialized = false;
+public:
+    EngineManager() {
+        m_initialized = Core::CoreSystem::Initialize();
+        if (!m_initialized) {
+            throw std::runtime_error("Failed to initialize");
+        }
+    }
+    
+    ~EngineManager() {
+        if (m_initialized) {
+            Core::CoreSystem::Shutdown();
+        }
+    }
+};</div>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Common Pitfalls</h3>
+            <div class="code-block">// ❌ Poor: Not checking initialization
+Core::CoreSystem::Initialize(); // What if this fails?
+auto* fs = Core::CoreSystem::GetFileSystemManager(); // Could be null!
+
+// ❌ Poor: Using systems before initialization
+auto* jobSystem = Core::CoreSystem::GetJobSystem(); // Null pointer!
+jobSystem->submitJob([](){}); // Crash!
+
+// ❌ Poor: Forgetting to shutdown
+int main() {
+    Core::CoreSystem::Initialize();
+    RunApplication();
+    // Missing Core::CoreSystem::Shutdown() - resource leak!
+    return 0;
+}
+
+// ❌ Poor: Not handling exceptions
+Core::CoreSystem::Initialize(); // Could throw
+// No exception handling
+
+// ❌ Poor: Ignoring system status
+void Update() {
+    auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
+    scheduler->UpdateAllAsync(0.016); // What if scheduler is null?
+}</div>
+        </div>
+
+        <h3>Performance Considerations</h3>
+        <div class="code-block">// ✅ Good: Cache system pointers for frequent access
+class PerformantGameSystem {
+private:
+    FileSystem::FileSystemManager* m_fileSystem;
+    JobSystem* m_jobSystem;
+    ComponentSystem::ComponentManager* m_componentManager;
+    
+public:
+    bool Initialize() {
+        // Cache pointers after CoreSystem initialization
+        m_fileSystem = Core::CoreSystem::GetFileSystemManager();
+        m_jobSystem = Core::CoreSystem::GetJobSystem();
+        m_componentManager = Core::CoreSystem::GetComponentManager();
+        
+        return m_fileSystem && m_jobSystem && m_componentManager;
+    }
+    
+    void Update(double deltaTime) {
+        // Use cached pointers - no repeated lookups
+        if (m_jobSystem) {
+            // Submit work efficiently
+        }
+    }
+};
+
+// ✅ Good: Batch operations
+void BatchFileOperations() {
+    auto* fs = Core::CoreSystem::GetFileSystemManager();
+    if (!fs) return;
+    
+    // Process multiple files in one batch
+    std::vector<std::string> filesToProcess = GetFileList();
+    
+    for (const auto& file : filesToProcess) {
+        auto result = fs->ReadAllText(file);
+        if (result.IsSuccess()) {
+            ProcessFileData(result.GetValue());
+        }
+    }
+}</div>
+
+        <h2 id="troubleshooting">12. 🔧 Troubleshooting</h2>
+
+        <h3>Common Issues and Solutions</h3>
+        <table>
+            <tr>
+                <th>Issue</th>
+                <th>Symptoms</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td>Initialization fails</td>
+                <td>Initialize() returns false</td>
+                <td>Check CoreDebug output for specific failure reasons</td>
+            </tr>
+            <tr>
+                <td>Null pointer access</td>
+                <td>Crash when calling Get*() methods</td>
+                <td>Verify CoreSystem::IsInitialized() before system access</td>
+            </tr>
+            <tr>
+                <td>System not available</td>
+                <td>Get*() methods return nullptr</td>
+                <td>Ensure initialization completed successfully</td>
+            </tr>
+            <tr>
+                <td>Memory leaks</td>
+                <td>Increasing memory usage</td>
+                <td>Call Shutdown() before application exit</td>
+            </tr>
+            <tr>
+                <td>Shutdown hangs</td>
+                <td>Application doesn't exit</td>
+                <td>Wait for pending jobs before shutdown</td>
+            </tr>
+        </table>
+
+        <h3>Debugging System State</h3>
+        <div class="code-block">// Comprehensive system debugging
+void DiagnoseCoreSystem() {
+    CoreDebug.printf("=== CoreSystem Diagnostics ===\n");
+    
+    // Check initialization status
+    CoreDebug.printf("Initialized: %s\n", 
+                     Core::CoreSystem::IsInitialized() ? "Yes" : "No");
+    
+    if (!Core::CoreSystem::IsInitialized()) {
+        CoreDebug.printf("CoreSystem not initialized - run Initialize() first\n");
+        return;
+    }
+    
+    // Test each system
+    CoreDebug.printf("Testing system availability...\n");
+    
+    auto* fs = Core::CoreSystem::GetFileSystemManager();
+    CoreDebug.printf("FileSystemManager: %s\n", fs ? "Available" : "NULL");
+    
+    auto* rm = Core::CoreSystem::GetResourceManager();
+    CoreDebug.printf("ResourceManager: %s\n", rm ? "Available" : "NULL");
+    
+    auto* cm = Core::CoreSystem::GetComponentManager();
+    CoreDebug.printf("ComponentManager: %s\n", cm ? "Available" : "NULL");
+    
+    auto* js = Core::CoreSystem::GetJobSystem();
+    CoreDebug.printf("JobSystem: %s\n", js ? "Available" : "NULL");
+    
+    auto* sched = Core::CoreSystem::GetJobSystemScheduler();
+    CoreDebug.printf("Scheduler: %s\n", sched ? "Available" : "NULL");
+    
+    // Print detailed status
+    Core::CoreSystem::PrintSystemStatus();
+    
+    CoreDebug.printf("=== End Diagnostics ===\n");
+}
+
+// Test system functionality
+void TestSystemFunctionality() {
+    CoreDebug.printf("=== System Functionality Test ===\n");
+    
+    try {
+        // Test FileSystem
+        auto* fs = Core::CoreSystem::GetFileSystemManager();
+        if (fs) {
+            auto writeResult = fs->WriteAllText("test.tmp", "Test data");
+            auto readResult = fs->ReadAllText("test.tmp");
+            fs->DeleteFile("test.tmp");
+            
+            CoreDebug.printf("FileSystem test: %s\n", 
+                           (writeResult.IsSuccess() && readResult.IsSuccess()) ? "PASS" : "FAIL");
+        }
+        
+        // Test JobSystem
+        auto* js = Core::CoreSystem::GetJobSystem();
+        if (js) {
+            auto future = js->submitJobWithResult([]() { return 42; });
+            int result = future.get();
+            
+            CoreDebug.printf("JobSystem test: %s\n", 
+                           (result == 42) ? "PASS" : "FAIL");
+        }
+        
+        // Test ComponentManager
+        auto* cm = Core::CoreSystem::GetComponentManager();
+        if (cm) {
+            size_t activeCount = cm->GetActiveComponentCount<ComponentSystem::Component>();
+            CoreDebug.printf("ComponentManager test: PASS (Active: %zu)\n", activeCount);
+        }
+        
+    } catch (const std::exception& e) {
+        CoreDebug.warning("System test exception: %s\n", e.what());
+    }
+    
+    CoreDebug.printf("=== End Functionality Test ===\n");
+}</div>
+
+        <h3>Performance Debugging</h3>
+        <div class="code-block">// Profile CoreSystem initialization time
+void ProfileInitialization() {
+    CoreDebug.printf("Profiling CoreSystem initialization...\n");
+    
+    auto start = std::chrono::high_resolution_clock::now();
+    
+    bool success = Core::CoreSystem::Initialize();
+    
+    auto end = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
+    
+    CoreDebug.printf("Initialization %s in %ld ms\n", 
+                     success ? "succeeded" : "failed", 
+                     duration.count());
+    
+    if (success) {
+        Core::CoreSystem::PrintSystemStatus();
+    }
+}
+
+// Monitor system health
+class SystemHealthMonitor {
+private:
+    std::chrono::steady_clock::time_point m_lastCheck;
+    
+public:
+    void CheckSystemHealth() {
+        auto now = std::chrono::steady_clock::now();
+        auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - m_lastCheck);
+        
+        if (elapsed.count() >= 10) { // Check every 10 seconds
+            m_lastCheck = now;
+            
+            CoreDebug.printf("=== System Health Check ===\n");
+            
+            if (!Core::CoreSystem::IsInitialized()) {
+                CoreDebug.warning("CoreSystem not initialized!\n");
+                return;
+            }
+            
+            // Check job system health
+            auto* js = Core::CoreSystem::GetJobSystem();
+            if (js) {
+                size_t activeJobs = js->getActiveJobCount();
+                size_t pendingJobs = js->getPendingJobCount();
+                
+                if (activeJobs > 100) {
+                    CoreDebug.warning("High active job count: %zu\n", activeJobs);
+                }
+                if (pendingJobs > 1000) {
+                    CoreDebug.warning("High pending job count: %zu\n", pendingJobs);
+                }
+            }
+            
+            // Check resource manager health
+            auto* rm = Core::CoreSystem::GetResourceManager();
+            if (rm) {
+                size_t pendingLoads = rm->GetPendingLoadCount();
+                if (pendingLoads > 50) {
+                    CoreDebug.warning("High pending load count: %zu\n", pendingLoads);
+                }
+            }
+            
+            CoreDebug.printf("System health check complete\n");
+        }
+    }
+};</div>
+
+        <div class="info">
+            <h3>📚 Additional Resources</h3>
+            <ul>
+                <li><strong>FileSystem Documentation:</strong> See FileSystemDocumentation.html for file operations</li>
+                <li><strong>ComponentSystem Documentation:</strong> See ComponentSystemDocumentation.html for ECS patterns</li>
+                <li><strong>DebugChannel Documentation:</strong> See DebugChannelDocumentation.html for logging</li>
+                <li><strong>Integration Examples:</strong> Check Tests/ folder for usage examples</li>
+                <li><strong>CoreDebugChannels.h:</strong> Contains predefined debug channels for all systems</li>
+            </ul>
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            <p>CoreSystem API Documentation - Generated for C++20 Engine Development</p>
+        </footer>
+    </div>
+</body>
+</html>

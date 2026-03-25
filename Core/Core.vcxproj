@@ -1,0 +1,242 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</ProjectGuid>
+    <IgnoreWarnCompileDuplicatedFilename>true</IgnoreWarnCompileDuplicatedFilename>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Core</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <CharacterSet>Unicode</CharacterSet>
+    <PlatformToolset>v143</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <OutDir>bin\Debug\</OutDir>
+    <IntDir>obj\Debug\</IntDir>
+    <TargetName>Core</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <OutDir>bin\Release\</OutDir>
+    <IntDir>obj\Release\</IntDir>
+    <TargetName>Core</TargetName>
+    <TargetExt>.lib</TargetExt>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <Optimization>Disabled</Optimization>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <Optimization>Full</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <StringPooling>true</StringPooling>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <ExternalWarningLevel>Level3</ExternalWarningLevel>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="Analysis\HeatMapContainer.h" />
+    <ClInclude Include="App\AppInterface.h" />
+    <ClInclude Include="App\ApplicationComponent.h" />
+    <ClInclude Include="ClassFactory\ClassFactory.h" />
+    <ClInclude Include="ComponentSystem\ComponentSystem.h" />
+    <ClInclude Include="ComponentSystem\ComponentSystemScheduler.h" />
+    <ClInclude Include="CoreSystem\CoreDebugChannels.h" />
+    <ClInclude Include="CoreSystem\CoreSystem.h" />
+    <ClInclude Include="CoreSystem\FunctionCallManager.h" />
+    <ClInclude Include="CoreSystem\FunctionQueue.h" />
+    <ClInclude Include="DebugChannel\DebugChannel.h" />
+    <ClInclude Include="External\rapidjson\include\allocators.h" />
+    <ClInclude Include="External\rapidjson\include\cursorstreamwrapper.h" />
+    <ClInclude Include="External\rapidjson\include\document.h" />
+    <ClInclude Include="External\rapidjson\include\encodedstream.h" />
+    <ClInclude Include="External\rapidjson\include\encodings.h" />
+    <ClInclude Include="External\rapidjson\include\error\en.h" />
+    <ClInclude Include="External\rapidjson\include\error\error.h" />
+    <ClInclude Include="External\rapidjson\include\filereadstream.h" />
+    <ClInclude Include="External\rapidjson\include\filewritestream.h" />
+    <ClInclude Include="External\rapidjson\include\fwd.h" />
+    <ClInclude Include="External\rapidjson\include\internal\biginteger.h" />
+    <ClInclude Include="External\rapidjson\include\internal\clzll.h" />
+    <ClInclude Include="External\rapidjson\include\internal\diyfp.h" />
+    <ClInclude Include="External\rapidjson\include\internal\dtoa.h" />
+    <ClInclude Include="External\rapidjson\include\internal\ieee754.h" />
+    <ClInclude Include="External\rapidjson\include\internal\itoa.h" />
+    <ClInclude Include="External\rapidjson\include\internal\meta.h" />
+    <ClInclude Include="External\rapidjson\include\internal\pow10.h" />
+    <ClInclude Include="External\rapidjson\include\internal\regex.h" />
+    <ClInclude Include="External\rapidjson\include\internal\stack.h" />
+    <ClInclude Include="External\rapidjson\include\internal\strfunc.h" />
+    <ClInclude Include="External\rapidjson\include\internal\strtod.h" />
+    <ClInclude Include="External\rapidjson\include\internal\swap.h" />
+    <ClInclude Include="External\rapidjson\include\istreamwrapper.h" />
+    <ClInclude Include="External\rapidjson\include\memorybuffer.h" />
+    <ClInclude Include="External\rapidjson\include\memorystream.h" />
+    <ClInclude Include="External\rapidjson\include\msinttypes\inttypes.h" />
+    <ClInclude Include="External\rapidjson\include\msinttypes\stdint.h" />
+    <ClInclude Include="External\rapidjson\include\ostreamwrapper.h" />
+    <ClInclude Include="External\rapidjson\include\pointer.h" />
+    <ClInclude Include="External\rapidjson\include\prettywriter.h" />
+    <ClInclude Include="External\rapidjson\include\rapidjson.h" />
+    <ClInclude Include="External\rapidjson\include\reader.h" />
+    <ClInclude Include="External\rapidjson\include\schema.h" />
+    <ClInclude Include="External\rapidjson\include\stream.h" />
+    <ClInclude Include="External\rapidjson\include\stringbuffer.h" />
+    <ClInclude Include="External\rapidjson\include\uri.h" />
+    <ClInclude Include="External\rapidjson\include\writer.h" />
+    <ClInclude Include="FileSystem\FileSystemInterface.h" />
+    <ClInclude Include="FileSystem\FileSystemManager.h" />
+    <ClInclude Include="FileSystem\StandardFileSystem.h" />
+    <ClInclude Include="Input\GamepadInputHandler.h" />
+    <ClInclude Include="Input\GamepadInterface.h" />
+    <ClInclude Include="Input\GamepadManager.h" />
+    <ClInclude Include="Input\MouseInputHandler.h" />
+    <ClInclude Include="Input\MouseInterface.h" />
+    <ClInclude Include="Input\MouseManager.h" />
+    <ClInclude Include="Input\WindowsGamepad.h" />
+    <ClInclude Include="Input\WindowsMouse.h" />
+    <ClInclude Include="JobSystem\JobSystem.h" />
+    <ClInclude Include="Log\ThreadSafeLog.h" />
+    <ClInclude Include="Math\ConvexHull.h" />
+    <ClInclude Include="Math\Matrix4f.h" />
+    <ClInclude Include="Math\Quaternion.h" />
+    <ClInclude Include="Math\Vector3f.h" />
+    <ClInclude Include="Math\Vector4f.h" />
+    <ClInclude Include="Net\BerkeleySocket.h" />
+    <ClInclude Include="Net\IBerkeleySocket.h" />
+    <ClInclude Include="Net\NexusClient.h" />
+    <ClInclude Include="Net\NexusProtocol.h" />
+    <ClInclude Include="Net\NexusServer.h" />
+    <ClInclude Include="Net\WinBerkeleySocket.h" />
+    <ClInclude Include="Profiler\Profiler.h" />
+    <ClInclude Include="Profiler\ProfilerAnalyzer.h" />
+    <ClInclude Include="Reflection\BinaryParser\BinaryBufferParser.h" />
+    <ClInclude Include="Reflection\BinaryParser\BinaryParser.h" />
+    <ClInclude Include="Reflection\JSONParser\JSONBufferParser.h" />
+    <ClInclude Include="Reflection\JSONParser\JSONParser.h" />
+    <ClInclude Include="Reflection\RFL_Pareser.h" />
+    <ClInclude Include="Reflection\Reflection.h" />
+    <ClInclude Include="Reflection\ReflectionBase.h" />
+    <ClInclude Include="Reflection\ReflectionError.h" />
+    <ClInclude Include="Reflection\ReflectionMap.h" />
+    <ClInclude Include="Reflection\Types\Mat4.h" />
+    <ClInclude Include="Reflection\Types\primitivevector.h" />
+    <ClInclude Include="Reflection\Types\stringboolmap.h" />
+    <ClInclude Include="Reflection\Types\Vec3.h" />
+    <ClInclude Include="Reflection\Types\bool.h" />
+    <ClInclude Include="Reflection\Types\component.h" />
+    <ClInclude Include="Reflection\Types\float.h" />
+    <ClInclude Include="Reflection\Types\int.h" />
+    <ClInclude Include="Reflection\Types\object.h" />
+    <ClInclude Include="Reflection\Types\string.h" />
+    <ClInclude Include="Reflection\Types\vec4.h" />
+    <ClInclude Include="ResourceManager\ResourceManager.h" />
+    <ClInclude Include="stdafx.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Analysis\HeatMapContainer.cpp" />
+    <ClCompile Include="App\ApplicationComponent.cpp" />
+    <ClCompile Include="ClassFactory\ClassFactory.cpp" />
+    <ClCompile Include="ComponentSystem\ComponentSystem.cpp" />
+    <ClCompile Include="ComponentSystem\ComponentSystemScheduler.cpp" />
+    <ClCompile Include="CoreSystem\CoreDebugChannels.cpp" />
+    <ClCompile Include="CoreSystem\CoreSystem.cpp" />
+    <ClCompile Include="CoreSystem\FunctionCallManager.cpp" />
+    <ClCompile Include="CoreSystem\FunctionQueue.cpp" />
+    <ClCompile Include="DebugChannel\DebugChannel.cpp" />
+    <ClCompile Include="FileSystem\StandardFileSystem.cpp" />
+    <ClCompile Include="Input\GamepadInterface.cpp" />
+    <ClCompile Include="Input\GamepadManager.cpp" />
+    <ClCompile Include="Input\MouseManager.cpp" />
+    <ClCompile Include="Input\WindowsGamepad.cpp" />
+    <ClCompile Include="Input\WindowsMouse.cpp" />
+    <ClCompile Include="Log\ThreadSafeLog.cpp" />
+    <ClCompile Include="Math\ConvexHull.cpp" />
+    <ClCompile Include="Math\Matrix4f.cpp" />
+    <ClCompile Include="Math\Quaternion.cpp" />
+    <ClCompile Include="Math\Vector3f.cpp" />
+    <ClCompile Include="Math\Vector4f.cpp" />
+    <ClCompile Include="Net\BerkeleySocket.cpp" />
+    <ClCompile Include="Net\NexusClient.cpp" />
+    <ClCompile Include="Net\NexusServer.cpp" />
+    <ClCompile Include="Net\WinBerkeleySocket.cpp" />
+    <ClCompile Include="Profiler\Profiler.cpp" />
+    <ClCompile Include="Profiler\ProfilerAnalyzer.cpp" />
+    <ClCompile Include="Reflection\ReflectionBase.cpp" />
+    <ClCompile Include="Reflection\ReflectionError.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Documentation\ComponentSystemDocumentation.html" />
+    <None Include="Documentation\CoreSystemDocumentation.html" />
+    <None Include="Documentation\DebugChannelDocumentation.html" />
+    <None Include="Documentation\FileSystemDocumentation.html" />
+    <None Include="Documentation\GamepadInputHandlerDocumentation.html" />
+    <None Include="Documentation\GamepadInterfaceDocumentation.html" />
+    <None Include="Documentation\GamepadManagerDocumentation.html" />
+    <None Include="Documentation\JobSystemDocumentation.html" />
+    <None Include="Documentation\Matrix4fDocumentation.html" />
+    <None Include="Documentation\QuaternionDocumentation.html" />
+    <None Include="Documentation\RefectionDocumentation.html" />
+    <None Include="Documentation\ResourceManagerDocumentation.html" />
+    <None Include="Documentation\Vector3fDocumentation.html" />
+    <None Include="Documentation\index.html" />
+    <None Include="External\rapidjson\doc\misc\footer.html" />
+    <None Include="External\rapidjson\doc\misc\header.html" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

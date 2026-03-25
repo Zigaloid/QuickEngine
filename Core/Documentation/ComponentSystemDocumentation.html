@@ -1,0 +1,869 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ComponentSystem API Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #e74c3c;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .method-signature {
+            background-color: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 5px 0;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .toc > ul {
+            padding-left: 0;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .architecture-diagram {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧩 ComponentSystem API Documentation</h1>
+        
+        <div class="info">
+            <strong>Version:</strong> 1.0<br>
+            <strong>Compatibility:</strong> C++20<br>
+            <strong>Namespace:</strong> ComponentSystem<br>
+            <strong>Last Updated:</strong> October 2025
+        </div>
+
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#architecture">2. Architecture</a></li>
+                <li><a href="#core-classes">3. Core Classes</a></li>
+                <li><a href="#component-class">4. Component Class</a></li>
+                <li><a href="#component-manager">5. ComponentManager</a></li>
+                <li><a href="#component-pool">6. ComponentPool</a></li>
+                <li><a href="#scheduler">7. ComponentSystemScheduler</a></li>
+                <li><a href="#basic-usage">8. Basic Usage Examples</a></li>
+                <li><a href="#advanced-usage">9. Advanced Usage</a></li>
+                <li><a href="#async-updates">10. Asynchronous Updates</a></li>
+                <li><a href="#best-practices">11. Best Practices</a></li>
+                <li><a href="#troubleshooting">12. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">1. 🌟 Overview</h2>
+        <p>The ComponentSystem provides a robust, high-performance entity-component architecture for game engines. It features object pooling, asynchronous updates, reflection-based serialization, and efficient memory management.</p>
+
+        <div class="highlight">
+            <strong>Key Features:</strong>
+            <ul>
+                <li>✅ Entity-Component architecture with hierarchical relationships</li>
+                <li>✅ Object pooling for optimal memory management</li>
+                <li>✅ Asynchronous component updates with JobSystem integration</li>
+                <li>✅ Reflection-based serialization support</li>
+                <li>✅ Flexible activation/deactivation system</li>
+                <li>✅ Type-safe component creation and management</li>
+                <li>✅ Dependency-based update scheduling</li>
+            </ul>
+        </div>
+
+        <h2 id="architecture">2. 🏗️ Architecture</h2>
+
+        <div class="architecture-diagram">
+            <h4>ComponentSystem Architecture</h4>
+            <pre>
+┌─────────────────────────────────────────────────────────┐
+│                   CoreSystem                            │
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│              ComponentManager                           │
+│  ┌─────────────────┐ ┌─────────────────┐ ┌─────────────┐│
+│  │  ComponentPool  │ │  ComponentPool  │ │      ...    ││
+│  │   <TypeA>       │ │   <TypeB>       │ │             ││
+│  └─────────────────┘ └─────────────────┘ └─────────────┘│
+└─────────────────────┬───────────────────────────────────┘
+                      │
+┌─────────────────────▼───────────────────────────────────┐
+│          ComponentSystemScheduler                       │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │              JobSystem Integration                  ││
+│  │  • Parallel Updates  • Dependencies  • Batching   ││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────────────────────────────────────────┘
+            </pre>
+        </div>
+
+        <h2 id="core-classes">3. 🏛️ Core Classes</h2>
+
+        <table>
+            <tr>
+                <th>Class</th>
+                <th>Purpose</th>
+                <th>Key Features</th>
+            </tr>
+            <tr>
+                <td><strong>Component</strong></td>
+                <td>Base class for all components</td>
+                <td>Lifecycle management, hierarchy, reflection</td>
+            </tr>
+            <tr>
+                <td><strong>ComponentManager</strong></td>
+                <td>Central component management</td>
+                <td>Type registration, creation, pooling</td>
+            </tr>
+            <tr>
+                <td><strong>ComponentPool</strong></td>
+                <td>Memory pool for component types</td>
+                <td>Object reuse, memory optimization</td>
+            </tr>
+            <tr>
+                <td><strong>ComponentSystemScheduler</strong></td>
+                <td>Asynchronous update scheduling</td>
+                <td>Parallel updates, dependencies, batching</td>
+            </tr>
+            <tr>
+                <td><strong>ComponentFactory</strong></td>
+                <td>Type-safe component creation</td>
+                <td>Template-based factory pattern</td>
+            </tr>
+        </table>
+
+        <h2 id="component-class">4. 🧱 Component Class</h2>
+
+        <h3>Base Component Interface</h3>
+        <div class="method-signature">class Component : public CReflectedBase</div>
+        
+        <div class="code-block">// Core lifecycle methods
+bool Initialize();
+void Update(double deltaTime);
+void Shutdown();
+
+// Activation/deactivation
+void SetActive(bool active);
+bool IsActive() const;
+bool IsActiveInHierarchy() const;
+void Activate();
+void Deactivate();
+void ToggleActive();
+
+// Hierarchy management
+void AddChild(Component* child);
+template&lt;typename T&gt; T* CreateChild();
+void RemoveChild(ComponentId childId);
+Component* GetParent() const;
+const std::vector&lt;Component*&gt;& GetChildren() const;
+
+// Component queries
+template&lt;typename T&gt; T* FindChild() const;
+template&lt;typename T&gt; std::vector&lt;T*&gt; FindChildren() const;
+template&lt;typename T&gt; T* FindActiveChild() const;
+template&lt;typename T&gt; std::vector&lt;T*&gt; FindActiveChildren() const;
+
+// Properties
+ComponentId GetId() const;
+bool IsInitialized() const;</div>
+
+        <h3>Virtual Lifecycle Hooks</h3>
+        <div class="code-block">// Override these in derived classes
+virtual bool OnInitialize();        // Called during initialization
+virtual void OnUpdate(double deltaTime);  // Called during update
+virtual void OnShutdown();          // Called during shutdown
+virtual void OnActivate();          // Called when activated
+virtual void OnDeactivate();        // Called when deactivated</div>
+
+        <h3>Creating Custom Components</h3>
+        <div class="code-block">// Header file: HealthComponent.h
+class HealthComponent : public ComponentSystem::Component
+{
+public:
+    REFL_DECLARE_OBJECT(HealthComponent, ComponentSystem::Component);
+    
+private:
+    int m_maxHealth;
+    int m_currentHealth;
+    float m_regenRate;
+    
+protected:
+    bool OnInitialize() override;
+    void OnUpdate(double deltaTime) override;
+    void OnShutdown() override;
+    
+public:
+    HealthComponent(int maxHealth = 100);
+    
+    // Health management
+    void TakeDamage(int damage);
+    void Heal(int amount);
+    bool IsDead() const;
+    float GetHealthPercentage() const;
+    
+    // Getters/Setters
+    int GetCurrentHealth() const { return m_currentHealth; }
+    int GetMaxHealth() const { return m_maxHealth; }
+    void SetRegenRate(float rate) { m_regenRate = rate; }
+};
+
+// Implementation file: HealthComponent.cpp
+REFL_DEFINE_OBJECT(HealthComponent)
+    REFL_DEFINE_INT_MEMBER(HealthComponent, m_maxHealth),
+    REFL_DEFINE_INT_MEMBER(HealthComponent, m_currentHealth),
+    REFL_DEFINE_FLOAT_MEMBER(HealthComponent, m_regenRate),
+REFL_DEFINE_END
+
+bool HealthComponent::OnInitialize()
+{
+    m_currentHealth = m_maxHealth;
+    return true;
+}
+
+void HealthComponent::OnUpdate(double deltaTime)
+{
+    // Health regeneration
+    if (m_currentHealth < m_maxHealth && m_regenRate > 0.0f) {
+        float regenAmount = m_regenRate * static_cast&lt;float&gt;(deltaTime);
+        m_currentHealth = std::min(m_maxHealth, 
+                                  m_currentHealth + static_cast&lt;int&gt;(regenAmount));
+    }
+}</div>
+
+        <h2 id="component-manager">5. 🎛️ ComponentManager</h2>
+
+        <h3>Core Methods</h3>
+        <div class="method-signature">class ComponentManager</div>
+        <div class="code-block">// Component type registration
+template&lt;typename T&gt;
+void RegisterComponentType(size_t initialPoolSize = 10, size_t maxPoolSize = 1000);
+
+template&lt;typename T&gt;
+void RegisterComponentType(const std::string& className, 
+                          size_t initialPoolSize = 10, 
+                          size_t maxPoolSize = 1000);
+
+// Component creation
+template&lt;typename T&gt; T* CreateComponent();
+Component* CreateComponentByName(const std::string& className);
+
+// Component management
+void ReleaseComponent(Component* component);
+void UpdateAllComponents(double deltaTime);
+void UpdateAllComponentsInHierarchy(double deltaTime);
+
+template&lt;typename T&gt;
+void UpdateComponentsOfType(double deltaTime);
+
+// Lifecycle
+bool Initialize();
+void Shutdown();
+
+// Statistics and queries
+template&lt;typename T&gt; size_t GetActiveComponentCount() const;
+template&lt;typename T&gt; size_t GetTotalComponentCount() const;
+template&lt;typename T&gt; std::vector&lt;T*&gt; GetComponentsOfType() const;
+template&lt;typename T&gt; std::vector&lt;T*&gt; GetActiveComponentsOfType() const;</div>
+
+        <h3>Registration and Setup</h3>
+        <div class="code-block">// Get ComponentManager from CoreSystem
+auto* componentManager = Core::CoreSystem::GetComponentManager();
+
+// Register component types
+componentManager->RegisterComponentType&lt;HealthComponent&gt;();
+componentManager->RegisterComponentType&lt;TransformComponent&gt;(20, 500); // Custom pool sizes
+componentManager->RegisterComponentType&lt;RenderComponent&gt;("RenderComponent"); // With string name
+
+// Initialize the manager
+componentManager->Initialize();</div>
+
+        <h2 id="component-pool">6. 🏊 ComponentPool</h2>
+
+        <h3>Pool Management</h3>
+        <div class="code-block">// ComponentPool manages memory for specific component types
+class ComponentPool
+{
+public:
+    // Object lifecycle
+    Component* Acquire();           // Get component from pool
+    void Release(Component* component);  // Return component to pool
+    
+    // Batch operations
+    void UpdateAll(double deltaTime);
+    void UpdateAllInHierarchy(double deltaTime);
+    void InitializeAll();
+    void ShutdownAll();
+    
+    // Statistics
+    size_t GetActiveCount() const;
+    size_t GetInactiveCount() const;
+    size_t GetTotalCount() const;
+    size_t GetActiveInHierarchyCount() const;
+    
+    // Access
+    const std::vector&lt;Component*&gt;& GetActiveComponents() const;
+    std::type_index GetComponentType() const;
+};</div>
+
+        <div class="info">
+            <strong>Pool Benefits:</strong>
+            <ul>
+                <li><strong>Memory Efficiency:</strong> Reduces allocation/deallocation overhead</li>
+                <li><strong>Cache Performance:</strong> Components of same type stored contiguously</li>
+                <li><strong>Predictable Performance:</strong> No unexpected allocations during gameplay</li>
+                <li><strong>Automatic Management:</strong> Handles object reuse transparently</li>
+            </ul>
+        </div>
+
+        <h2 id="scheduler">7. ⚡ ComponentSystemScheduler</h2>
+
+        <h3>Execution Policies</h3>
+        <table>
+            <tr>
+                <th>Policy</th>
+                <th>Description</th>
+                <th>Use Case</th>
+            </tr>
+            <tr>
+                <td><strong>Sequential</strong></td>
+                <td>Execute component types one after another</td>
+                <td>Simple systems, debugging</td>
+            </tr>
+            <tr>
+                <td><strong>Parallel</strong></td>
+                <td>Execute all component types simultaneously</td>
+                <td>Independent components, maximum performance</td>
+            </tr>
+            <tr>
+                <td><strong>Custom</strong></td>
+                <td>Use dependency graph for execution order</td>
+                <td>Complex systems with interdependencies</td>
+            </tr>
+        </table>
+
+        <h3>Scheduler API</h3>
+        <div class="code-block">// Registration and setup
+template&lt;typename T&gt;
+void RegisterComponentType(int priority = 0, const std::string& name = "");
+
+template&lt;typename T, typename Dependency&gt;
+void AddDependency();
+
+void SetExecutionPolicy(ExecutionPolicy policy);
+
+// Execution
+void UpdateAllAsync(double deltaTime);
+void WaitForCompletion();
+
+template&lt;typename Rep, typename Period&gt;
+bool WaitForCompletion(const std::chrono::duration&lt;Rep, Period&gt;& timeout);
+
+// Statistics
+size_t GetRegisteredPhaseCount() const;
+size_t GetPendingJobCount() const;
+size_t GetActiveJobCount() const;
+const std::vector&lt;ComponentPhase&gt;& GetPhases() const;</div>
+
+        <h2 id="basic-usage">8. 📝 Basic Usage Examples</h2>
+
+        <h3>Simple Component Creation and Management</h3>
+        <div class="code-block">// Initialize the ComponentSystem
+auto* componentManager = Core::CoreSystem::GetComponentManager();
+componentManager->RegisterComponentType&lt;HealthComponent&gt;();
+componentManager->Initialize();
+
+// Create components
+auto* health1 = componentManager->CreateComponent&lt;HealthComponent&gt;();
+auto* health2 = componentManager->CreateComponent&lt;HealthComponent&gt;();
+
+// Initialize components
+health1->Initialize();
+health2->Initialize();
+
+// Update components
+double deltaTime = 0.016; // 60 FPS
+health1->Update(deltaTime);
+health2->Update(deltaTime);
+
+// Or update all components of a type
+componentManager->UpdateComponentsOfType&lt;HealthComponent&gt;(deltaTime);
+
+// Clean up
+componentManager->ReleaseComponent(health1);
+componentManager->ReleaseComponent(health2);</div>
+
+        <h3>Component Hierarchy</h3>
+        <div class="code-block">// Create parent component
+auto* player = componentManager->CreateComponent&lt;HealthComponent&gt;();
+player->Initialize();
+
+// Create child components
+auto* weapon = player->CreateChild&lt;WeaponComponent&gt;();
+auto* armor = player->CreateChild&lt;ArmorComponent&gt;();
+
+// Child components are automatically initialized
+// Updates cascade through hierarchy
+player->Update(deltaTime);  // Updates player, weapon, and armor
+
+// Deactivating parent affects children
+player->SetActive(false);   // Deactivates entire hierarchy
+player->SetActive(true);    // Reactivates entire hierarchy
+
+// Find child components
+auto* foundWeapon = player->FindChild&lt;WeaponComponent&gt;();
+auto allWeapons = player->FindChildren&lt;WeaponComponent&gt;();</div>
+
+        <h3>Component Queries and Statistics</h3>
+        <div class="code-block">// Get all components of a type
+auto healthComponents = componentManager->GetComponentsOfType&lt;HealthComponent&gt;();
+auto activeHealthComponents = componentManager->GetActiveComponentsOfType&lt;HealthComponent&gt;();
+
+// Statistics
+size_t totalHealth = componentManager->GetTotalComponentCount&lt;HealthComponent&gt;();
+size_t activeHealth = componentManager->GetActiveComponentCount&lt;HealthComponent&gt;();
+
+std::cout << "Health Components: " << activeHealth << "/" << totalHealth << std::endl;
+
+// Process all components
+for (auto* health : activeHealthComponents) {
+    if (health->IsDead()) {
+        health->SetActive(false);
+    }
+}</div>
+
+        <h2 id="advanced-usage">9. 🚀 Advanced Usage</h2>
+
+        <h3>Complex Component System Example</h3>
+        <div class="code-block">// Define multiple component types
+class TransformComponent : public ComponentSystem::Component {
+public:
+    REFL_DECLARE_OBJECT(TransformComponent, ComponentSystem::Component);
+    
+private:
+    Vector3f m_position;
+    Vector3f m_rotation;
+    Vector3f m_scale;
+    
+public:
+    TransformComponent() : m_scale(1.0f, 1.0f, 1.0f) {}
+    
+    // Position
+    void SetPosition(const Vector3f& pos) { m_position = pos; }
+    const Vector3f& GetPosition() const { return m_position; }
+    
+    // Rotation 
+    void SetRotation(const Vector3f& rot) { m_rotation = rot; }
+    const Vector3f& GetRotation() const { return m_rotation; }
+    
+    // Scale
+    void SetScale(const Vector3f& scale) { m_scale = scale; }
+    const Vector3f& GetScale() const { return m_scale; }
+};
+
+class RenderComponent : public ComponentSystem::Component {
+public:
+    REFL_DECLARE_OBJECT(RenderComponent, ComponentSystem::Component);
+    
+private:
+    std::string m_meshName;
+    std::string m_materialName;
+    bool m_visible;
+    
+protected:
+    void OnUpdate(double deltaTime) override {
+        if (m_visible && IsActiveInHierarchy()) {
+            // Update rendering
+            auto* transform = GetParent()->FindChild&lt;TransformComponent&gt;();
+            if (transform) {
+                // Render with transform data
+                RenderMesh(m_meshName, transform->GetPosition());
+            }
+        }
+    }
+    
+public:
+    RenderComponent() : m_visible(true) {}
+    
+    void SetMesh(const std::string& meshName) { m_meshName = meshName; }
+    void SetMaterial(const std::string& materialName) { m_materialName = materialName; }
+    void SetVisible(bool visible) { m_visible = visible; }
+    
+private:
+    void RenderMesh(const std::string& mesh, const Vector3f& position) {
+        // Rendering implementation
+    }
+};
+
+// Register component types with reflection
+REFL_DEFINE_OBJECT(TransformComponent)
+    REFL_DEFINE_VECTOR3_MEMBER(TransformComponent, m_position),
+    REFL_DEFINE_VECTOR3_MEMBER(TransformComponent, m_rotation),
+    REFL_DEFINE_VECTOR3_MEMBER(TransformComponent, m_scale),
+REFL_DEFINE_END
+
+REFL_DEFINE_OBJECT(RenderComponent)
+    REFL_DEFINE_STRING_MEMBER(RenderComponent, m_meshName),
+    REFL_DEFINE_STRING_MEMBER(RenderComponent, m_materialName),
+    REFL_DEFINE_BOOL_MEMBER(RenderComponent, m_visible),
+REFL_DEFINE_END
+
+// Usage
+auto* componentManager = Core::CoreSystem::GetComponentManager();
+componentManager->RegisterComponentType&lt;TransformComponent&gt;();
+componentManager->RegisterComponentType&lt;RenderComponent&gt;();
+componentManager->RegisterComponentType&lt;HealthComponent&gt;();
+
+// Create entity with multiple components
+auto* entity = componentManager->CreateComponent&lt;HealthComponent&gt;(); // Root component
+entity->Initialize();
+
+auto* transform = entity->CreateChild&lt;TransformComponent&gt;();
+auto* render = entity->CreateChild&lt;RenderComponent&gt;();
+
+// Configure components
+transform->SetPosition(Vector3f(10.0f, 0.0f, 5.0f));
+render->SetMesh("player_mesh");
+render->SetMaterial("player_material");
+
+// Save entity to file
+entity->Write("player_entity.json");
+
+// Load entity from file
+auto* loadedEntity = componentManager->CreateComponent&lt;HealthComponent&gt;();
+loadedEntity->Read("player_entity.json");</div>
+
+        <h2 id="async-updates">10. ⚡ Asynchronous Updates</h2>
+
+        <h3>Setting up Async Scheduler</h3>
+        <div class="code-block">// Get scheduler from CoreSystem
+auto* scheduler = Core::CoreSystem::GetComponentSystemScheduler();
+
+// Register component types with priorities
+scheduler->RegisterComponentType&lt;TransformComponent&gt;(0, "Transform");  // Highest priority
+scheduler->RegisterComponentType&lt;HealthComponent&gt;(1, "Health");
+scheduler->RegisterComponentType&lt;RenderComponent&gt;(2, "Render");       // Lowest priority
+
+// Set dependencies (RenderComponent depends on TransformComponent)
+scheduler->AddDependency&lt;RenderComponent, TransformComponent&gt;();
+
+// Configure execution policy
+scheduler->SetExecutionPolicy(ComponentSystem::ExecutionPolicy::Custom);
+
+// In main game loop
+double deltaTime = 0.016;
+scheduler->UpdateAllAsync(deltaTime);
+
+// Option 1: Wait for completion
+scheduler->WaitForCompletion();
+
+// Option 2: Wait with timeout
+bool completed = scheduler->WaitForCompletion(std::chrono::milliseconds(16));
+if (!completed) {
+    std::cout << "Frame took longer than expected!" << std::endl;
+}
+
+// Option 3: Check statistics
+std::cout << "Active Jobs: " << scheduler->GetActiveJobCount() << std::endl;
+std::cout << "Pending Jobs: " << scheduler->GetPendingJobCount() << std::endl;</div>
+
+        <h3>Execution Policy Examples</h3>
+        <div class="code-block">// Sequential execution - components update one type at a time
+scheduler->SetExecutionPolicy(ComponentSystem::ExecutionPolicy::Sequential);
+
+// Parallel execution - all component types update simultaneously
+scheduler->SetExecutionPolicy(ComponentSystem::ExecutionPolicy::Parallel);
+
+// Custom execution - respects dependencies and priorities
+scheduler->SetExecutionPolicy(ComponentSystem::ExecutionPolicy::Custom);
+
+// Performance monitoring
+const auto& phases = scheduler->GetPhases();
+for (const auto& phase : phases) {
+    std::cout << "Phase: " << phase.name 
+              << ", Priority: " << phase.priority 
+              << ", Dependencies: " << phase.dependencies.size() << std::endl;
+}</div>
+
+        <h2 id="best-practices">11. ✅ Best Practices</h2>
+
+        <div class="highlight">
+            <h3>🎯 Performance Guidelines</h3>
+            <ul>
+                <li><strong>Register component types early</strong> - Preferably during initialization</li>
+                <li><strong>Use appropriate pool sizes</strong> - Balance memory usage vs. allocation overhead</li>
+                <li><strong>Leverage async updates</strong> - Use ComponentSystemScheduler for multi-threading</li>
+                <li><strong>Set up dependencies correctly</strong> - Ensure proper update order</li>
+                <li><strong>Cache component references</strong> - Avoid repeated lookups in tight loops</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Common Pitfalls</h3>
+            <ul>
+                <li><strong>Forgetting to Initialize</strong> - Components must be initialized before use</li>
+                <li><strong>Memory leaks</strong> - Always release components or use RAII patterns</li>
+                <li><strong>Circular dependencies</strong> - Avoid dependency cycles in scheduler</li>
+                <li><strong>Thread safety</strong> - Be careful with shared data in async updates</li>
+                <li><strong>Over-pooling</strong> - Don't allocate excessive pool sizes for rare components</li>
+            </ul>
+        </div>
+
+        <h3>Memory Management</h3>
+        <div class="code-block">// ✅ Good: Use ComponentManager for creation and cleanup
+auto* health = componentManager->CreateComponent&lt;HealthComponent&gt;();
+// ... use component
+componentManager->ReleaseComponent(health);
+
+// ✅ Good: Use RAII wrapper
+class ComponentWrapper {
+    ComponentManager* manager_;
+    Component* component_;
+public:
+    ComponentWrapper(ComponentManager* mgr, Component* comp) 
+        : manager_(mgr), component_(comp) {}
+    ~ComponentWrapper() { 
+        if (manager_ && component_) {
+            manager_->ReleaseComponent(component_);
+        }
+    }
+};
+
+// ❌ Avoid: Manual new/delete
+HealthComponent* health = new HealthComponent(); // Memory leak risk!
+delete health;</div>
+
+        <h3>Component Design Patterns</h3>
+        <div class="code-block">// ✅ Good: Single responsibility components
+class HealthComponent : public Component {
+    // Only handles health-related functionality
+};
+
+class MovementComponent : public Component {
+    // Only handles movement logic
+};
+
+// ✅ Good: Composition over inheritance
+class Player {
+    HealthComponent* health_;
+    MovementComponent* movement_;
+    WeaponComponent* weapon_;
+};
+
+// ❌ Avoid: Monolithic components
+class PlayerComponent : public Component {
+    // Handles health, movement, weapons, inventory, etc.
+    // Too many responsibilities!
+};</div>
+
+        <h2 id="troubleshooting">12. 🔧 Troubleshooting</h2>
+
+        <h3>Common Issues and Solutions</h3>
+        <table>
+            <tr>
+                <th>Issue</th>
+                <th>Symptoms</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td>Components not updating</td>
+                <td>OnUpdate not called</td>
+                <td>Check if component is initialized and active</td>
+            </tr>
+            <tr>
+                <td>Memory usage growing</td>
+                <td>Increasing memory consumption</td>
+                <td>Ensure components are released back to pools</td>
+            </tr>
+            <tr>
+                <td>Async updates hanging</td>
+                <td>WaitForCompletion never returns</td>
+                <td>Check for deadlocks in component dependencies</td>
+            </tr>
+            <tr>
+                <td>Component not found</td>
+                <td>FindChild returns nullptr</td>
+                <td>Verify component hierarchy and types</td>
+            </tr>
+            <tr>
+                <td>Reflection errors</td>
+                <td>Serialization fails</td>
+                <td>Ensure REFL_DEFINE_OBJECT is properly implemented</td>
+            </tr>
+        </table>
+
+        <h3>Debugging Tips</h3>
+        <div class="code-block">// Enable debug output
+Core::CoreSystem::PrintDebugInfo();
+
+// Check component statistics
+auto* manager = Core::CoreSystem::GetComponentManager();
+std::cout << "Registered types: " << manager->GetRegisteredTypeCount() << std::endl;
+
+// Verify component hierarchy
+void PrintComponentHierarchy(Component* component, int depth = 0) {
+    std::string indent(depth * 2, ' ');
+    std::cout << indent << "Component ID: " << component->GetId() 
+              << ", Active: " << component->IsActive() 
+              << ", Initialized: " << component->IsInitialized() << std::endl;
+              
+    for (auto* child : component->GetChildren()) {
+        PrintComponentHierarchy(child, depth + 1);
+    }
+}
+
+// Monitor scheduler performance
+auto* scheduler = Core::CoreSystem::GetComponentSystemScheduler();
+auto start = std::chrono::high_resolution_clock::now();
+scheduler->UpdateAllAsync(deltaTime);
+scheduler->WaitForCompletion();
+auto end = std::chrono::high_resolution_clock::now();
+
+auto duration = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(end - start);
+std::cout << "Update cycle took: " << duration.count() << " microseconds" << std::endl;</div>
+
+        <h3>Performance Profiling</h3>
+        <div class="code-block">// Profile individual component types
+template&lt;typename T&gt;
+void ProfileComponentType(ComponentManager* manager, double deltaTime) {
+    auto start = std::chrono::high_resolution_clock::now();
+    manager->UpdateComponentsOfType&lt;T&gt;(deltaTime);
+    auto end = std::chrono::high_resolution_clock::now();
+    
+    auto duration = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(end - start);
+    size_t count = manager->GetActiveComponentCount&lt;T&gt;();
+    
+    std::cout << typeid(T).name() << ": " 
+              << duration.count() << "μs for " 
+              << count << " components" << std::endl;
+}
+
+// Usage
+ProfileComponentType&lt;HealthComponent&gt;(manager, deltaTime);
+ProfileComponentType&lt;TransformComponent&gt;(manager, deltaTime);
+ProfileComponentType&lt;RenderComponent&gt;(manager, deltaTime);</div>
+
+        <div class="info">
+            <h3>📚 Additional Resources</h3>
+            <ul>
+                <li><strong>Unit Tests:</strong> See Tests/ComponentSystemTest.cpp for comprehensive examples</li>
+                <li><strong>Reflection Integration:</strong> Check Reflection System documentation</li>
+                <li><strong>JobSystem:</strong> Refer to JobSystem documentation for async programming</li>
+                <li><strong>CoreSystem:</strong> See CoreSystem documentation for initialization patterns</li>
+            </ul>
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            <p>ComponentSystem API Documentation - Generated for C++20 Game Engine</p>
+        </footer>
+    </div>
+</body>
+</html>

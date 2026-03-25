@@ -1,0 +1,875 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DebugChannel API Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f8f9fa;
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #27ae60;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #2c3e50;
+            margin-top: 30px;
+        }
+
+        .code-block {
+            background-color: #f4f4f4;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 15px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', Consolas, monospace;
+            font-size: 14px;
+            white-space: pre-wrap;
+        }
+
+        .highlight {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background-color: #f8d7da;
+            padding: 10px;
+            border-left: 4px solid #dc3545;
+            margin: 15px 0;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            padding: 10px;
+            border-left: 4px solid #17a2b8;
+            margin: 15px 0;
+        }
+
+        .success {
+            background-color: #d4edda;
+            padding: 10px;
+            border-left: 4px solid #28a745;
+            margin: 15px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .method-signature {
+            background-color: #e9ecef;
+            padding: 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 5px 0;
+        }
+
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+
+        .toc ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+
+        .toc > ul {
+            padding-left: 0;
+        }
+
+        .toc a {
+            text-decoration: none;
+            color: #007bff;
+        }
+
+        .toc a:hover {
+            text-decoration: underline;
+        }
+
+        .architecture-diagram {
+            background-color: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+            font-family: monospace;
+        }
+
+        .output-example {
+            background-color: #1e1e1e;
+            color: #d4d4d4;
+            padding: 15px;
+            border-radius: 4px;
+            margin: 15px 0;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .log-level {
+            font-weight: bold;
+        }
+
+        .log-info { color: #87ceeb; }
+        .log-warning { color: #ffa500; }
+        .log-error { color: #ff6b6b; }
+        .log-assert { color: #ff4757; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🐛 DebugChannel API Documentation</h1>
+        
+        <div class="info">
+            <strong>Version:</strong> 1.0<br>
+            <strong>Compatibility:</strong> C++20<br>
+            <strong>Namespace:</strong> DebugChannels<br>
+            <strong>Last Updated:</strong> October 2025
+        </div>
+
+        <div class="toc">
+            <h3>📋 Table of Contents</h3>
+            <ul>
+                <li><a href="#overview">1. Overview</a></li>
+                <li><a href="#architecture">2. Architecture</a></li>
+                <li><a href="#core-classes">3. Core Classes</a></li>
+                <li><a href="#debug-channel">4. CDebugChannel Class</a></li>
+                <li><a href="#channel-manager">5. CDebugChannelManager</a></li>
+                <li><a href="#output-flags">6. Output Flags</a></li>
+                <li><a href="#predefined-channels">7. Predefined Debug Channels</a></li>
+                <li><a href="#basic-usage">8. Basic Usage Examples</a></li>
+                <li><a href="#advanced-usage">9. Advanced Usage</a></li>
+                <li><a href="#logging-patterns">10. Logging Patterns</a></li>
+                <li><a href="#integration">11. System Integration</a></li>
+                <li><a href="#best-practices">12. Best Practices</a></li>
+                <li><a href="#troubleshooting">13. Troubleshooting</a></li>
+            </ul>
+        </div>
+
+        <h2 id="overview">1. 🌟 Overview</h2>
+        <p>The DebugChannel system provides a flexible, categorized logging framework for C++ applications. It allows developers to create named debug channels that can output to both console and log files simultaneously, with configurable output destinations and formatting.</p>
+
+        <div class="highlight">
+            <strong>Key Features:</strong>
+            <ul>
+                <li>✅ Named debug channels for categorized logging</li>
+                <li>✅ Dual output support (console and file logging)</li>
+                <li>✅ Configurable output flags and destinations</li>
+                <li>✅ Printf-style formatted output</li>
+                <li>✅ Warning and assertion support</li>
+                <li>✅ Automatic log file management</li>
+                <li>✅ Centralized channel management</li>
+                <li>✅ Thread-safe singleton pattern</li>
+            </ul>
+        </div>
+
+        <h2 id="architecture">2. 🏗️ Architecture</h2>
+
+        <div class="architecture-diagram">
+            <h4>DebugChannel System Architecture</h4>
+            <pre>
+┌─────────────────────────────────────────────────────────┐
+│              CDebugChannelManager                       │
+│                   (Singleton)                           │
+│  ┌─────────────────────────────────────────────────────┐│
+│  │              Channel Registry                       ││
+│  │   "Reflection" → CDebugChannel                     ││
+│  │   "Core"       → CDebugChannel                     ││
+│  │   "JobSystem"  → CDebugChannel                     ││
+│  │   "FileSystem" → CDebugChannel                     ││
+│  │   "Custom"     → CDebugChannel                     ││
+│  └─────────────────────────────────────────────────────┘│
+└─────────────────────┬───────────────────────────────────┘
+                      │
+        ┌─────────────▼─────────────┐
+        │      CDebugChannel        │
+        │                           │
+        │  ┌─────────┐ ┌──────────┐ │
+        │  │ Console │ │ Log File │ │
+        │  │ Output  │ │  Output  │ │
+        │  └─────────┘ └──────────┘ │
+        └───────────────────────────┘
+            </pre>
+        </div>
+
+        <h2 id="core-classes">3. 🏛️ Core Classes</h2>
+
+        <table>
+            <tr>
+                <th>Class</th>
+                <th>Purpose</th>
+                <th>Key Features</th>
+            </tr>
+            <tr>
+                <td><strong>CDebugChannel</strong></td>
+                <td>Individual debug channel for logging</td>
+                <td>Formatted output, file logging, warnings, assertions</td>
+            </tr>
+            <tr>
+                <td><strong>CDebugChannelManager</strong></td>
+                <td>Centralized channel management</td>
+                <td>Singleton pattern, channel registry, lifecycle management</td>
+            </tr>
+        </table>
+
+        <h2 id="debug-channel">4. 🔧 CDebugChannel Class</h2>
+
+        <h3>Class Interface</h3>
+        <div class="method-signature">class CDebugChannel</div>
+        <div class="code-block">// Constructor and Destructor
+CDebugChannel(const std::string& name);
+~CDebugChannel();
+
+// Core Output Methods
+void print(const std::string message);
+void printf(const char* format, ...);
+void warning(const char* format, ...);
+
+// Assertion Support
+bool Assert(bool condition, const char* message, ...);
+
+// File Management
+void OpenLog();
+void CloseLog();
+
+// Configuration
+void SetOutputFlags(int flags);
+const std::string& GetName() const;
+
+// Private Helper
+std::string FormatString(const char* fmt, va_list vl);</div>
+
+        <h3>Output Methods</h3>
+        <table>
+            <tr>
+                <th>Method</th>
+                <th>Purpose</th>
+                <th>Format</th>
+                <th>Example</th>
+            </tr>
+            <tr>
+                <td><code>print()</code></td>
+                <td>Direct string output</td>
+                <td>Raw string</td>
+                <td><code>channel.print("Hello World\n");</code></td>
+            </tr>
+            <tr>
+                <td><code>printf()</code></td>
+                <td>Formatted output</td>
+                <td>Printf-style</td>
+                <td><code>channel.printf("Value: %d\n", 42);</code></td>
+            </tr>
+            <tr>
+                <td><code>warning()</code></td>
+                <td>Warning messages</td>
+                <td>[WARNING] prefix</td>
+                <td><code>channel.warning("Low memory: %d%%\n", usage);</code></td>
+            </tr>
+            <tr>
+                <td><code>Assert()</code></td>
+                <td>Conditional assertions</td>
+                <td>Assert on failure</td>
+                <td><code>channel.Assert(ptr != nullptr, "Null pointer!");</code></td>
+            </tr>
+        </table>
+
+        <h2 id="channel-manager">5. 🗂️ CDebugChannelManager</h2>
+
+        <h3>Manager Interface</h3>
+        <div class="method-signature">class CDebugChannelManager</div>
+        <div class="code-block">// Singleton Access
+static CDebugChannelManager& GetInstance();
+
+// Channel Management
+void AddChannel(CDebugChannel* channel);
+void RemoveChannel(CDebugChannel* channel);
+
+// Private Storage
+std::map&lt;const std::string, CDebugChannel*&gt; m_channels;</div>
+
+        <div class="info">
+            <strong>Automatic Management:</strong> Debug channels automatically register and unregister themselves with the manager during construction and destruction.
+        </div>
+
+        <h2 id="output-flags">6. 🎚️ Output Flags</h2>
+
+        <h3>Available Output Flags</h3>
+        <table>
+            <tr>
+                <th>Flag</th>
+                <th>Value</th>
+                <th>Description</th>
+                <th>Usage</th>
+            </tr>
+            <tr>
+                <td><code>OF_Null</code></td>
+                <td>0x0000</td>
+                <td>Disable all output</td>
+                <td>Silent mode for performance</td>
+            </tr>
+            <tr>
+                <td><code>OF_StdOut</code></td>
+                <td>0x0001</td>
+                <td>Output to console</td>
+                <td>Real-time debugging</td>
+            </tr>
+            <tr>
+                <td><code>OF_Log</code></td>
+                <td>0x0001</td>
+                <td>Output to log file</td>
+                <td>Persistent logging</td>
+            </tr>
+        </table>
+
+        <div class="code-block">// Default configuration (both console and file)
+int m_outputflags = OF_StdOut | OF_Log;
+
+// Configuration examples
+channel.SetOutputFlags(OF_StdOut);              // Console only
+channel.SetOutputFlags(OF_Log);                 // File only
+channel.SetOutputFlags(OF_StdOut | OF_Log);     // Both (default)
+channel.SetOutputFlags(OF_Null);                // Silent mode</div>
+
+        <h2 id="predefined-channels">7. 🏷️ Predefined Debug Channels</h2>
+
+        <p>The system includes several predefined debug channels for core engine systems:</p>
+
+        <div class="code-block">// Predefined global debug channels
+extern DebugChannels::CDebugChannel ReflectionDebug;  // "Reflection"
+extern DebugChannels::CDebugChannel CoreDebug;        // "Core" 
+extern DebugChannels::CDebugChannel JobSystemDebug;   // "JobSystem"
+extern DebugChannels::CDebugChannel FileSystemDebug;  // "FileSystem"</div>
+
+        <h3>Channel Usage by System</h3>
+        <table>
+            <tr>
+                <th>Channel</th>
+                <th>System</th>
+                <th>Typical Usage</th>
+                <th>Log File</th>
+            </tr>
+            <tr>
+                <td><strong>ReflectionDebug</strong></td>
+                <td>Reflection System</td>
+                <td>Serialization, property access, type validation</td>
+                <td>Reflection.log</td>
+            </tr>
+            <tr>
+                <td><strong>CoreDebug</strong></td>
+                <td>Core System</td>
+                <td>Initialization, shutdown, system status</td>
+                <td>Core.log</td>
+            </tr>
+            <tr>
+                <td><strong>JobSystemDebug</strong></td>
+                <td>Job System</td>
+                <td>Task scheduling, thread management, performance</td>
+                <td>JobSystem.log</td>
+            </tr>
+            <tr>
+                <td><strong>FileSystemDebug</strong></td>
+                <td>File System</td>
+                <td>File operations, I/O errors, path validation</td>
+                <td>FileSystem.log</td>
+            </tr>
+        </table>
+
+        <h2 id="basic-usage">8. 📝 Basic Usage Examples</h2>
+
+        <h3>Using Predefined Channels</h3>
+        <div class="code-block">// Include the predefined channels
+#include "CoreDebugChannels.h"
+
+// Basic logging
+CoreDebug.print("System initializing...\n");
+CoreDebug.printf("Loading %d modules\n", moduleCount);
+
+// Warning messages
+ReflectionDebug.warning("Property '%s' not found in class '%s'\n", 
+                       propertyName.c_str(), className.c_str());
+
+// Assertions
+bool isValid = (ptr != nullptr);
+CoreDebug.Assert(isValid, "Critical pointer is null!\n");</div>
+
+        <h3>Creating Custom Debug Channels</h3>
+        <div class="code-block">// Create custom debug channels for your systems
+DebugChannels::CDebugChannel GameplayDebug("Gameplay");
+DebugChannels::CDebugChannel NetworkDebug("Network");
+DebugChannels::CDebugChannel AudioDebug("Audio");
+
+// Use them just like predefined channels
+GameplayDebug.printf("Player health: %d/%d\n", currentHealth, maxHealth);
+NetworkDebug.warning("Connection timeout: %f seconds\n", timeout);
+AudioDebug.print("Audio system initialized successfully\n");</div>
+
+        <h3>Output Configuration</h3>
+        <div class="code-block">// Configure output destinations
+GameplayDebug.SetOutputFlags(DebugChannels::OF_StdOut);     // Console only
+NetworkDebug.SetOutputFlags(DebugChannels::OF_Log);         // File only  
+AudioDebug.SetOutputFlags(DebugChannels::OF_Null);          // Silent
+
+// Default is both console and file
+DebugChannels::CDebugChannel DefaultDebug("Default");       // Both enabled</div>
+
+        <h2 id="advanced-usage">9. 🚀 Advanced Usage</h2>
+
+        <h3>Conditional Logging</h3>
+        <div class="code-block">// Conditional logging patterns
+class GameSystem {
+private:
+    DebugChannels::CDebugChannel m_debug;
+    bool m_verboseLogging;
+    
+public:
+    GameSystem(const std::string& name, bool verbose = false) 
+        : m_debug(name), m_verboseLogging(verbose) {
+        
+        if (!verbose) {
+            m_debug.SetOutputFlags(DebugChannels::OF_Log); // File only for non-verbose
+        }
+    }
+    
+    void LogInfo(const char* format, ...) {
+        if (m_verboseLogging) {
+            va_list args;
+            va_start(args, format);
+            // Manual formatting for custom handling
+            char buffer[1024];
+            vsnprintf(buffer, sizeof(buffer), format, args);
+            m_debug.print(std::string(buffer));
+            va_end(args);
+        }
+    }
+    
+    void LogError(const char* format, ...) {
+        // Always log errors regardless of verbose setting
+        va_list args;
+        va_start(args, format);
+        char buffer[1024];
+        vsnprintf(buffer, sizeof(buffer), format, args);
+        m_debug.warning("ERROR: %s", buffer);  // Use warning for emphasis
+        va_end(args);
+    }
+};</div>
+
+        <h3>Performance-Critical Logging</h3>
+        <div class="code-block">// Macro-based conditional compilation for performance
+#ifdef DEBUG_BUILD
+    #define PERF_LOG(channel, ...) channel.printf(__VA_ARGS__)
+    #define PERF_ASSERT(channel, condition, ...) channel.Assert(condition, __VA_ARGS__)
+#else
+    #define PERF_LOG(channel, ...) ((void)0)
+    #define PERF_ASSERT(channel, condition, ...) ((void)0)
+#endif
+
+// Usage in performance-critical code
+class RenderSystem {
+    DebugChannels::CDebugChannel m_debug{"Rendering"};
+    
+public:
+    void RenderFrame() {
+        PERF_LOG(m_debug, "Starting frame render\n");
+        
+        // Performance critical rendering code
+        for (auto& object : renderObjects) {
+            PERF_ASSERT(m_debug, object.IsValid(), 
+                       "Invalid render object at index %d\n", i);
+            RenderObject(object);
+        }
+        
+        PERF_LOG(m_debug, "Frame render completed\n");
+    }
+};</div>
+
+        <h3>Channel Scoping and RAII</h3>
+        <div class="code-block">// RAII wrapper for automatic scope logging
+class ScopedDebugLog {
+private:
+    DebugChannels::CDebugChannel& m_channel;
+    std::string m_scopeName;
+    std::chrono::high_resolution_clock::time_point m_startTime;
+    
+public:
+    ScopedDebugLog(DebugChannels::CDebugChannel& channel, const std::string& scopeName)
+        : m_channel(channel), m_scopeName(scopeName) {
+        
+        m_startTime = std::chrono::high_resolution_clock::now();
+        m_channel.printf("ENTER: %s\n", m_scopeName.c_str());
+    }
+    
+    ~ScopedDebugLog() {
+        auto endTime = std::chrono::high_resolution_clock::now();
+        auto duration = std::chrono::duration_cast&lt;std::chrono::microseconds&gt;(
+            endTime - m_startTime);
+            
+        m_channel.printf("EXIT:  %s (took %ld μs)\n", 
+                        m_scopeName.c_str(), duration.count());
+    }
+};
+
+// Usage
+void ComplexFunction() {
+    ScopedDebugLog scope(CoreDebug, "ComplexFunction");
+    
+    // Function implementation
+    // Automatic entry/exit logging with timing
+}</div>
+
+        <h2 id="logging-patterns">10. 📊 Logging Patterns</h2>
+
+        <h3>Structured Logging</h3>
+        <div class="code-block">// Structured logging with consistent formatting
+class StructuredLogger {
+private:
+    DebugChannels::CDebugChannel& m_channel;
+    
+public:
+    StructuredLogger(DebugChannels::CDebugChannel& channel) : m_channel(channel) {}
+    
+    void LogEvent(const std::string& category, const std::string& event, 
+                  const std::string& details = "") {
+        auto now = std::chrono::system_clock::now();
+        auto time_t = std::chrono::system_clock::to_time_t(now);
+        
+        m_channel.printf("[%s][%s] %s", 
+                        std::ctime(&time_t),
+                        category.c_str(), 
+                        event.c_str());
+                        
+        if (!details.empty()) {
+            m_channel.printf(" - %s", details.c_str());
+        }
+        m_channel.print("\n");
+    }
+    
+    void LogMetric(const std::string& name, double value, const std::string& unit = "") {
+        m_channel.printf("[METRIC] %s: %.3f %s\n", 
+                        name.c_str(), value, unit.c_str());
+    }
+    
+    void LogError(const std::string& error, const std::string& context = "") {
+        m_channel.printf("[ERROR] %s", error.c_str());
+        if (!context.empty()) {
+            m_channel.printf(" (Context: %s)", context.c_str());
+        }
+        m_channel.print("\n");
+    }
+};
+
+// Usage
+StructuredLogger logger(GameplayDebug);
+logger.LogEvent("PLAYER", "Level Up", "Level 5 reached");
+logger.LogMetric("FPS", 60.0, "frames/sec");
+logger.LogError("Save failed", "Disk full");</div>
+
+        <h3>Error Severity Levels</h3>
+        <div class="code-block">// Custom severity levels using different methods
+class SeverityLogger {
+private:
+    DebugChannels::CDebugChannel& m_channel;
+    
+public:
+    SeverityLogger(DebugChannels::CDebugChannel& channel) : m_channel(channel) {}
+    
+    void Info(const char* format, ...) {
+        va_list args;
+        va_start(args, format);
+        char buffer[1024];
+        vsnprintf(buffer, sizeof(buffer), format, args);
+        m_channel.printf("[INFO] %s\n", buffer);
+        va_end(args);
+    }
+    
+    void Warning(const char* format, ...) {
+        va_list args;
+        va_start(args, format);
+        char buffer[1024];
+        vsnprintf(buffer, sizeof(buffer), format, args);
+        m_channel.warning("%s\n", buffer);  // Uses built-in warning format
+        va_end(args);
+    }
+    
+    void Error(const char* format, ...) {
+        va_list args;
+        va_start(args, format);
+        char buffer[1024];
+        vsnprintf(buffer, sizeof(buffer), format, args);
+        m_channel.printf("[ERROR] %s\n", buffer);
+        va_end(args);
+    }
+    
+    void Critical(const char* format, ...) {
+        va_list args;
+        va_start(args, format);
+        char buffer[1024];
+        vsnprintf(buffer, sizeof(buffer), format, args);
+        
+        // Critical errors always assert false for immediate attention
+        m_channel.Assert(false, "[CRITICAL] %s\n", buffer);
+        va_end(args);
+    }
+};</div>
+
+        <h2 id="integration">11. 🔗 System Integration</h2>
+
+        <h3>Integration with Reflection System</h3>
+        <div class="code-block">// Example from ReflectionError.cpp
+void DefaultErrorHandler::HandleError(const ErrorInfo& error) {
+    // Log to debug channel
+    ReflectionDebug.print(error.ToString());
+    
+    // Store error for later retrieval
+    m_errors.push_back(error);
+    
+    // Throw if configured to do so
+    if (ShouldThrow(error.severity)) {
+        throw ReflectionException(error);
+    }
+}</div>
+
+        <h3>Integration with Core Systems</h3>
+        <div class="code-block">// Example system integration
+void CoreSystem::PrintDebugInfo() {
+    CoreDebug.printf("=========================\n");
+    CoreDebug.printf("Core System Debug Info\n");
+    CoreDebug.printf("=========================\n");
+    
+    CoreDebug.printf("FileSystemManager: %s\n", 
+                     (s_fileSystemManager ? "Active" : "Null"));
+    CoreDebug.printf("ComponentManager: %s\n", 
+                     (s_componentManager ? "Active" : "Null"));
+    
+    if (s_componentManager) {
+        CoreDebug.printf("  Active Components: %zu\n", 
+                        s_componentManager->GetActiveComponentCount&lt;Component&gt;());
+    }
+    
+    CoreDebug.printf("=========================\n\n");
+}</div>
+
+        <h2 id="best-practices">12. ✅ Best Practices</h2>
+
+        <div class="highlight">
+            <h3>🎯 Logging Guidelines</h3>
+            <ul>
+                <li><strong>Use descriptive channel names</strong> - Make channels easily identifiable</li>
+                <li><strong>Include context in messages</strong> - Add relevant parameters and state</li>
+                <li><strong>Use appropriate severity levels</strong> - Reserve assertions for critical failures</li>
+                <li><strong>Format consistently</strong> - Establish logging patterns across systems</li>
+                <li><strong>Consider performance impact</strong> - Use conditional compilation for heavy logging</li>
+            </ul>
+        </div>
+
+        <div class="success">
+            <h3>✅ Good Practices</h3>
+            <div class="code-block">// ✅ Good: Descriptive messages with context
+GameplayDebug.printf("Player %d took %d damage from %s (health: %d/%d)\n", 
+                     playerId, damage, source.c_str(), currentHealth, maxHealth);
+
+// ✅ Good: Meaningful channel names
+DebugChannels::CDebugChannel NetworkProtocol("NetworkProtocol");
+DebugChannels::CDebugChannel AssetLoader("AssetLoader");
+
+// ✅ Good: Conditional verbose logging
+#ifdef VERBOSE_LOGGING
+    RenderDebug.printf("Rendering object %d at (%.2f, %.2f, %.2f)\n", 
+                       objId, pos.x, pos.y, pos.z);
+#endif
+
+// ✅ Good: Appropriate use of assertions
+bool success = InitializeSystem();
+SystemDebug.Assert(success, "Failed to initialize critical system!\n");</div>
+        </div>
+
+        <div class="warning">
+            <h3>⚠️ Common Pitfalls</h3>
+            <div class="code-block">// ❌ Poor: Vague messages without context
+GameplayDebug.print("Error occurred\n");
+
+// ❌ Poor: Generic channel names
+DebugChannels::CDebugChannel Debug1("Debug");
+DebugChannels::CDebugChannel Debug2("System");
+
+// ❌ Poor: Excessive logging in tight loops
+for (int i = 0; i < 10000; ++i) {
+    ProcessDebug.printf("Processing item %d\n", i);  // Performance killer!
+}
+
+// ❌ Poor: Using assertions for non-critical conditions
+NetworkDebug.Assert(connectionEstablished, "Connection not ready\n");  // Too harsh</div>
+        </div>
+
+        <h3>Performance Considerations</h3>
+        <div class="code-block">// Performance-conscious logging patterns
+class PerformanceLogger {
+    DebugChannels::CDebugChannel& m_channel;
+    bool m_enabled;
+    
+public:
+    PerformanceLogger(DebugChannels::CDebugChannel& channel) 
+        : m_channel(channel), m_enabled(true) {}
+        
+    void SetEnabled(bool enabled) { m_enabled = enabled; }
+    
+    template&lt;typename... Args&gt;
+    void Log(const char* format, Args&&... args) {
+        if (m_enabled) {
+            m_channel.printf(format, std::forward&lt;Args&gt;(args)...);
+        }
+    }
+    
+    // Batch logging for high-frequency events
+    void LogBatch(const std::vector&lt;std::string&gt;& messages) {
+        if (m_enabled && !messages.empty()) {
+            std::string batch;
+            for (const auto& msg : messages) {
+                batch += msg + "\n";
+            }
+            m_channel.print(batch);
+        }
+    }
+};</div>
+
+        <h2 id="troubleshooting">13. 🔧 Troubleshooting</h2>
+
+        <h3>Common Issues and Solutions</h3>
+        <table>
+            <tr>
+                <th>Issue</th>
+                <th>Symptoms</th>
+                <th>Solution</th>
+            </tr>
+            <tr>
+                <td>No console output</td>
+                <td>Messages only in log files</td>
+                <td>Check if OF_StdOut flag is set</td>
+            </tr>
+            <tr>
+                <td>No log files created</td>
+                <td>Messages only on console</td>
+                <td>Verify OF_Log flag and file permissions</td>
+            </tr>
+            <tr>
+                <td>Log files empty</td>
+                <td>Files created but no content</td>
+                <td>Ensure proper log flushing and file closure</td>
+            </tr>
+            <tr>
+                <td>Assertions not working</td>
+                <td>No assertion dialogs</td>
+                <td>Check if running in debug mode</td>
+            </tr>
+            <tr>
+                <td>Performance issues</td>
+                <td>Slow execution with logging</td>
+                <td>Use conditional compilation for heavy logging</td>
+            </tr>
+        </table>
+
+        <h3>Debugging Debug Channels</h3>
+        <div class="code-block">// Debug the debug system itself
+void DiagnoseDebugChannels() {
+    auto& manager = DebugChannels::CDebugChannelManager::GetInstance();
+    
+    // Create a diagnostic channel
+    DebugChannels::CDebugChannel diagnostic("Diagnostic");
+    
+    diagnostic.print("=== Debug Channel Diagnostics ===\n");
+    
+    // Test different output methods
+    diagnostic.printf("Printf test: %d, %s, %.2f\n", 42, "hello", 3.14);
+    diagnostic.warning("Warning test message\n");
+    
+    // Test assertions (this will assert in debug builds)
+    bool testCondition = true;
+    diagnostic.Assert(testCondition, "Assertion test passed\n");
+    
+    // Test output flag changes
+    diagnostic.print("Testing output flag changes...\n");
+    diagnostic.SetOutputFlags(DebugChannels::OF_Log);
+    diagnostic.print("This should only go to log file\n");
+    
+    diagnostic.SetOutputFlags(DebugChannels::OF_StdOut);
+    diagnostic.print("This should only go to console\n");
+    
+    diagnostic.SetOutputFlags(DebugChannels::OF_StdOut | DebugChannels::OF_Log);
+    diagnostic.print("This should go to both\n");
+    
+    diagnostic.print("=== Diagnostics Complete ===\n");
+}</div>
+
+        <h3>Output Examples</h3>
+        <p>Here's what typical debug output looks like:</p>
+
+        <div class="output-example">
+<span class="log-info">[INFO] System initialization starting...</span>
+<span class="log-info">Loading configuration from: config.json</span>
+<span class="log-warning">[WARNING] Configuration file not found, using defaults</span>
+<span class="log-info">ComponentManager: Active</span>
+<span class="log-info">  Active Components: 42</span>
+<span class="log-info">  Total Components: 100</span>
+<span class="log-error">[ERROR] Failed to load asset: missing_texture.png</span>
+<span class="log-info">System initialization completed successfully</span>
+        </div>
+
+        <div class="info">
+            <h3>📚 Additional Resources</h3>
+            <ul>
+                <li><strong>Core Integration:</strong> See CoreDebugChannels.h for predefined channels</li>
+                <li><strong>Reflection Integration:</strong> Check ReflectionError.cpp for usage examples</li>
+                <li><strong>Performance Tips:</strong> Use conditional compilation for production builds</li>
+                <li><strong>File Management:</strong> Log files are automatically created in the working directory</li>
+            </ul>
+        </div>
+
+        <footer style="margin-top: 50px; padding-top: 20px; border-top: 1px solid #eee; text-align: center; color: #666;">
+            <p>DebugChannel API Documentation - Generated for C++20 Engine Development</p>
+        </footer>
+    </div>
+</body>
+</html>

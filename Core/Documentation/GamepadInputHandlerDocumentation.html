@@ -1,0 +1,1002 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GamepadInputHandler Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            color: #2c3e50;
+            border-bottom: 3px solid #3498db;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #34495e;
+            margin-top: 40px;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+        }
+
+        h3 {
+            color: #2980b9;
+            margin-top: 30px;
+        }
+
+        h4 {
+            color: #27ae60;
+            margin-top: 20px;
+        }
+
+        .class-header {
+            background: #e8f4fd;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .interface-header {
+            background: #e8f5e8;
+            border: 2px solid #28a745;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .method {
+            background: #ffffff;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .pure-virtual {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .virtual-method {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .method-signature {
+            font-family: 'Courier New', monospace;
+            background: #e9ecef;
+            padding: 8px;
+            border-radius: 3px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #495057;
+        }
+
+        .pure-virtual .method-signature {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .virtual-method .method-signature {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .parameters {
+            margin: 10px 0;
+        }
+
+        .parameter {
+            margin: 5px 0;
+        }
+
+        .parameter-name {
+            font-weight: bold;
+            color: #2980b9;
+        }
+
+        .example {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            margin: 15px 0;
+            overflow-x: auto;
+            white-space: pre-line;
+        }
+
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .warning {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .info {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .architecture {
+            background: #e8f5e8;
+            border: 1px solid #28a745;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+            .toc ul {
+                list-style-type: none;
+                padding-left: 0;
+            }
+
+            .toc li {
+                margin: 5px 0;
+            }
+
+            .toc a {
+                text-decoration: none;
+                color: #2980b9;
+            }
+
+                .toc a:hover {
+                    text-decoration: underline;
+                }
+
+        .code-inline {
+            background: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #e83e8c;
+        }
+
+        .handler-flow {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .flow-box {
+            background: #ffffff;
+            border: 1px solid #adb5bd;
+            border-radius: 4px;
+            padding: 15px;
+            margin: 10px;
+            display: inline-block;
+            width: 200px;
+            vertical-align: top;
+        }
+
+        .input-flow {
+            border-color: #3498db;
+            background: #e8f4fd;
+        }
+
+        .handler-flow-box {
+            border-color: #28a745;
+            background: #e8f5e8;
+        }
+
+        .output-flow {
+            border-color: #ffc107;
+            background: #fff3cd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>GamepadInputHandler Documentation</h1>
+
+        <div class="class-header">
+            <h2>Module Overview</h2>
+            <p><strong>Purpose:</strong> The GamepadInputHandler module provides a priority-based input processing system for gamepad events. It enables layered input handling where different game systems (UI, menus, gameplay) can process input in a controlled order with the ability to consume input to prevent lower-priority handlers from processing it.</p>
+            <p><strong>Namespace:</strong> <code class="code-inline">Input</code></p>
+            <p><strong>Header:</strong> <code class="code-inline">Core/GamepadInputHandler.h</code></p>
+        </div>
+
+        <div class="architecture">
+            <h4>Input Processing Architecture</h4>
+            <p>The system uses a chain-of-responsibility pattern where input events flow through handlers in priority order:</p>
+
+            <div class="handler-flow">
+                <h4>Input Event Flow</h4>
+                <div class="flow-box input-flow">Gamepad Input<br />(Button/Axis Events)</div>
+                <div style="font-size: 20px; margin: 10px;">→</div>
+                <div class="flow-box handler-flow-box">High Priority Handler<br />(e.g., UI: Priority 100)</div>
+                <div style="font-size: 20px; margin: 10px;">→</div>
+                <div class="flow-box handler-flow-box">Medium Priority Handler<br />(e.g., Menu: Priority 50)</div>
+                <div style="font-size: 20px; margin: 10px;">→</div>
+                <div class="flow-box handler-flow-box">Low Priority Handler<br />(e.g., Game: Priority 10)</div>
+                <div style="font-size: 20px; margin: 10px;">→</div>
+                <div class="flow-box output-flow">Consumed or<br />Passed Through</div>
+                <p><strong>↑</strong> Handlers can return true to consume input and stop the chain <strong>↑</strong></p>
+            </div>
+        </div>
+
+        <div class="toc">
+            <h3>Table of Contents</h3>
+            <ul>
+                <li>
+                    <a href="#interface">IGamepadInputHandler Interface</a>
+                    <ul>
+                        <li><a href="#pure-virtual">Pure Virtual Methods</a></li>
+                        <li><a href="#virtual-methods">Virtual Methods (Optional Override)</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#base-class">GamepadInputHandler Base Class</a>
+                    <ul>
+                        <li><a href="#constructor">Constructor</a></li>
+                        <li><a href="#implementation">Default Implementation</a></li>
+                        <li><a href="#accessors">Accessor Methods</a></li>
+                    </ul>
+                </li>
+                <li><a href="#usage-patterns">Usage Patterns</a></li>
+                <li><a href="#implementation-examples">Implementation Examples</a></li>
+                <li><a href="#integration">Integration with GamepadManager</a></li>
+                <li><a href="#best-practices">Best Practices</a></li>
+            </ul>
+        </div>
+
+        <h2 id="interface">IGamepadInputHandler Interface</h2>
+
+        <div class="interface-header">
+            <div class="method-signature">class IGamepadInputHandler</div>
+            <p><strong>Purpose:</strong> Abstract interface defining the contract for gamepad input processing handlers. Handlers are organized in a priority-based stack where higher priority handlers process input first and can consume it to prevent lower priority handlers from receiving it.</p>
+        </div>
+
+        <h3 id="pure-virtual">Pure Virtual Methods (Must Override)</h3>
+
+        <div class="pure-virtual">
+            <div class="method-signature">virtual bool HandleButtonInput(int gamepadId, GamepadButton button, bool pressed, bool justPressed, bool justReleased) = 0</div>
+            <p>Processes button input events from gamepads. This is the core method for handling button-based interactions.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">gamepadId:</span> Unique identifier of the gamepad that generated the event</div>
+                <div class="parameter"><span class="parameter-name">button:</span> Which button triggered the event (see GamepadButton enum)</div>
+                <div class="parameter"><span class="parameter-name">pressed:</span> Current state of the button (true = pressed, false = released)</div>
+                <div class="parameter"><span class="parameter-name">justPressed:</span> True if the button was just pressed this frame (transition from released to pressed)</div>
+                <div class="parameter"><span class="parameter-name">justReleased:</span> True if the button was just released this frame (transition from pressed to released)</div>
+                <div class="parameter"><span class="parameter-name">Returns:</span> true if the input was handled and should not be passed to lower priority handlers, false to continue processing</div>
+            </div>
+            <div class="example">
+                // Example button handling for a menu system
+                bool MenuInputHandler::HandleButtonInput(int gamepadId, GamepadButton button,
+                bool pressed, bool justPressed, bool justReleased) {
+                if (!IsActive()) return false;
+
+                // Only process button presses for menu navigation
+                if (justPressed) {
+                switch (button) {
+                case GamepadButton::A:
+                menu->selectCurrentItem();
+                return true;  // Consume input - don't let game handler process it
+
+                case GamepadButton::B:
+                menu->goBack();
+                return true;  // Consume input
+
+                case GamepadButton::DPadUp:
+                menu->navigateUp();
+                return true;  // Consume input
+
+                case GamepadButton::DPadDown:
+                menu->navigateDown();
+                return true;  // Consume input
+
+                case GamepadButton::Start:
+                // Don't consume Start - let game handler pause/unpause
+                return false;
+                }
+                }
+
+                return false;  // Let other handlers process unhandled input
+                }
+            </div>
+        </div>
+
+        <div class="pure-virtual">
+            <div class="method-signature">virtual bool HandleAxisInput(int gamepadId, GamepadAxis axis, float value, float delta) = 0</div>
+            <p>Processes analog axis input events from gamepads. Handles stick movements, trigger presses, and other analog inputs.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">gamepadId:</span> Unique identifier of the gamepad that generated the event</div>
+                <div class="parameter"><span class="parameter-name">axis:</span> Which axis changed (see GamepadAxis enum)</div>
+                <div class="parameter"><span class="parameter-name">value:</span> Current value of the axis (typically -1.0 to 1.0 for sticks, 0.0 to 1.0 for triggers)</div>
+                <div class="parameter"><span class="parameter-name">delta:</span> Change in axis value since the previous frame</div>
+                <div class="parameter"><span class="parameter-name">Returns:</span> true if the input was handled and should not be passed to lower priority handlers, false to continue processing</div>
+            </div>
+            <div class="example">
+                // Example axis handling for camera control
+                bool CameraInputHandler::HandleAxisInput(int gamepadId, GamepadAxis axis,
+                float value, float delta) {
+                if (!IsActive()) return false;
+
+                switch (axis) {
+                case GamepadAxis::RightX:
+                // Horizontal camera rotation (yaw)
+                if (std::abs(value) > 0.1f) {  // Simple deadzone check
+                camera->adjustYaw(value * mouseSensitivity * deltaTime);
+                return true;  // Consume input
+                }
+                break;
+
+                case GamepadAxis::RightY:
+                // Vertical camera rotation (pitch)
+                if (std::abs(value) > 0.1f) {
+                camera->adjustPitch(-value * mouseSensitivity * deltaTime);  // Invert Y
+                return true;  // Consume input
+                }
+                break;
+
+                case GamepadAxis::LeftTrigger:
+                // Zoom in while holding left trigger
+                if (value > 0.1f) {
+                camera->setZoom(1.0f - (value * 0.5f));  // Reduce FOV for zoom
+                return true;  // Consume input
+                }
+                break;
+                }
+
+                return false;  // Let other handlers process unhandled axes
+                }
+            </div>
+        </div>
+
+        <h3 id="virtual-methods">Virtual Methods (Optional Override)</h3>
+
+        <div class="virtual-method">
+            <div class="method-signature">virtual void OnUpdate(double deltaTime) {}</div>
+            <p>Called at the beginning of each frame update cycle. Use this for time-based processing, state updates, or cleanup operations.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">deltaTime:</span> Time elapsed since the previous frame (in seconds)</div>
+            </div>
+            <div class="example">
+                // Example update implementation for animation
+                void UIInputHandler::OnUpdate(double deltaTime) {
+                // Update button highlight animations
+                if (highlightTimer > 0.0f) {
+                highlightTimer -= deltaTime;
+                if (highlightTimer <= 0.0f) {
+                ui->clearButtonHighlight();
+                }
+                }
+
+                // Update controller vibration duration
+                if (vibrationDuration > 0.0f) {
+                vibrationDuration -= deltaTime;
+                if (vibrationDuration <= 0.0f) {
+                gamepad->StopVibration();
+                }
+                }
+                }
+            </div>
+        </div>
+
+        <div class="virtual-method">
+            <div class="method-signature">virtual void OnGamepadConnected(int gamepadId) {}</div>
+            <p>Called when a gamepad is connected to the system. Use this to initialize gamepad-specific state or notify the user.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">gamepadId:</span> Unique identifier of the newly connected gamepad</div>
+            </div>
+            <div class="example">
+                // Example connection handling
+                void PlayerInputHandler::OnGamepadConnected(int gamepadId) {
+                std::cout << "Player controller " << gamepadId << " connected!" << std::endl;
+
+                // Assign to a player slot
+                int playerSlot = findAvailablePlayerSlot();
+                if (playerSlot != -1) {
+                assignGamepadToPlayer(gamepadId, playerSlot);
+                ui->showPlayerJoinedMessage(playerSlot);
+
+                // Welcome vibration feedback
+                auto* gamepad = gamepadManager->GetGamepad(gamepadId);
+                if (gamepad && gamepad->SupportsVibration()) {
+                gamepad->SetVibration(0.5f, 0.5f);
+                vibrationDuration = 0.2f;  // Stop after 200ms
+                }
+                }
+                }
+            </div>
+        </div>
+
+        <div class="virtual-method">
+            <div class="method-signature">virtual void OnGamepadDisconnected(int gamepadId) {}</div>
+            <p>Called when a gamepad is disconnected from the system. Use this to handle player dropouts or pause the game.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">gamepadId:</span> Unique identifier of the disconnected gamepad</div>
+            </div>
+            <div class="example">
+                // Example disconnection handling
+                void PlayerInputHandler::OnGamepadDisconnected(int gamepadId) {
+                std::cout << "Player controller " << gamepadId << " disconnected!" << std::endl;
+
+                // Find which player lost their controller
+                int playerSlot = findPlayerByGamepadId(gamepadId);
+                if (playerSlot != -1) {
+                // Pause the game and show reconnection prompt
+                game->pauseForReconnection(playerSlot);
+                ui->showControllerDisconnectedMessage(playerSlot);
+
+                // Mark player as awaiting reconnection
+                players[playerSlot].awaitingReconnection = true;
+                players[playerSlot].gamepadId = -1;
+                }
+                }
+            </div>
+        </div>
+
+        <div class="virtual-method">
+            <div class="method-signature">virtual int GetPriority() const { return 0; }</div>
+            <p>Returns the priority value for this handler. Higher values have higher priority and are processed first.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">Returns:</span> Priority value (typically 0-100, but can be any integer)</div>
+            </div>
+            <div class="note">
+                <strong>Common Priority Conventions:</strong>
+                <ul>
+                    <li><strong>100-200:</strong> Critical UI elements (modal dialogs, system menus)</li>
+                    <li><strong>50-99:</strong> Normal UI elements (HUD, game menus)</li>
+                    <li><strong>10-49:</strong> Gameplay systems (player input, camera control)</li>
+                    <li><strong>0-9:</strong> Background systems (analytics, debugging)</li>
+                </ul>
+            </div>
+            <div class="example">
+                // Priority examples
+                class CriticalUIHandler : public IGamepadInputHandler {
+                public:
+                int GetPriority() const override { return 150; }  // Highest priority
+                };
+
+                class GameMenuHandler : public IGamepadInputHandler {
+                public:
+                int GetPriority() const override { return 75; }   // High priority
+                };
+
+                class PlayerInputHandler : public IGamepadInputHandler {
+                public:
+                int GetPriority() const override { return 25; }   // Medium priority
+                };
+
+                class AnalyticsHandler : public IGamepadInputHandler {
+                public:
+                int GetPriority() const override { return 5; }    // Low priority
+                };
+            </div>
+        </div>
+
+        <div class="virtual-method">
+            <div class="method-signature">virtual bool IsActive() const { return true; }</div>
+            <p>Returns whether this handler is currently active and should process input. Inactive handlers are skipped entirely.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">Returns:</span> true if the handler should process input, false to skip it</div>
+            </div>
+            <div class="example">
+                // Example active state management
+                class MenuInputHandler : public IGamepadInputHandler {
+                bool menuVisible = false;
+
+                public:
+                bool IsActive() const override {
+                return menuVisible && !game->isPaused();
+                }
+
+                void showMenu() { menuVisible = true; }
+                void hideMenu() { menuVisible = false; }
+                };
+            </div>
+        </div>
+
+        <div class="virtual-method">
+            <div class="method-signature">virtual const char* GetName() const { return "Unknown Handler"; }</div>
+            <p>Returns a human-readable name for this handler. Used for debugging and logging purposes.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">Returns:</span> Null-terminated string containing the handler name</div>
+            </div>
+            <div class="example">
+                // Example name implementation
+                class PlayerMovementHandler : public IGamepadInputHandler {
+                public:
+                const char* GetName() const override {
+                return "Player Movement Handler";
+                }
+                };
+            </div>
+        </div>
+
+        <h2 id="base-class">GamepadInputHandler Base Class</h2>
+
+        <div class="class-header">
+            <div class="method-signature">class GamepadInputHandler : public IGamepadInputHandler</div>
+            <p><strong>Purpose:</strong> Concrete base implementation that provides common functionality and default implementations for the IGamepadInputHandler interface. Most custom handlers should inherit from this class rather than implementing IGamepadInputHandler directly.</p>
+        </div>
+
+        <h3 id="constructor">Constructor</h3>
+
+        <div class="method">
+            <div class="method-signature">GamepadInputHandler(const std::string& name = "BaseHandler", int priority = 0, bool active = true)</div>
+            <p>Constructs a GamepadInputHandler with the specified configuration.</p>
+            <div class="parameters">
+                <div class="parameter"><span class="parameter-name">name:</span> Human-readable name for debugging (default: "BaseHandler")</div>
+                <div class="parameter"><span class="parameter-name">priority:</span> Processing priority (default: 0)</div>
+                <div class="parameter"><span class="parameter-name">active:</span> Whether the handler starts in active state (default: true)</div>
+            </div>
+            <div class="example">
+                // Constructor examples
+                auto menuHandler = std::make_shared<MenuInputHandler>
+                    ("MainMenu", 75, true);
+                    auto gameHandler = std::make_shared<GameInputHandler>
+                        ("PlayerControl", 25, false);  // Start inactive
+                        auto debugHandler = std::make_shared<DebugInputHandler>("Debug Console", 5);
+            </div>
+        </div>
+
+        <h3 id="implementation">Default Implementation</h3>
+
+        <div class="method">
+            <div class="method-signature">bool HandleButtonInput(...) override { return false; }</div>
+            <div class="method-signature">bool HandleAxisInput(...) override { return false; }</div>
+            <p>Base implementations that do nothing and allow all input to pass through. Override these in derived classes to provide actual functionality.</p>
+            <div class="warning">
+                <strong>Important:</strong> The base class implementations return false (don't consume input). Always call the base implementation or return false for inputs you don't handle to maintain the input chain.
+            </div>
+        </div>
+
+        <h3 id="accessors">Accessor Methods</h3>
+
+        <div class="method">
+            <div class="method-signature">bool IsActive() const override</div>
+            <div class="method-signature">void SetActive(bool active)</div>
+            <p>Get or set the active state of the handler. Inactive handlers are completely skipped during input processing.</p>
+            <div class="example">
+                // Dynamic activation control
+                menuHandler->SetActive(false);         // Disable menu input
+                gameHandler->SetActive(true);          // Enable game input
+
+                if (pauseMenuOpen) {
+                menuHandler->SetActive(true);       // Re-enable menu input
+                gameHandler->SetActive(false);     // Disable game input
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">int GetPriority() const override</div>
+            <div class="method-signature">void SetPriority(int priority)</div>
+            <p>Get or set the priority of the handler. Changes take effect on the next frame when the handler stack is resorted.</p>
+            <div class="example">
+                // Dynamic priority adjustment
+                if (criticalDialogOpen) {
+                dialogHandler->SetPriority(200);   // Boost to highest priority
+                } else {
+                dialogHandler->SetPriority(50);    // Normal UI priority
+                }
+            </div>
+        </div>
+
+        <div class="method">
+            <div class="method-signature">const char* GetName() const override</div>
+            <div class="method-signature">void SetName(const std::string& name)</div>
+            <p>Get or set the human-readable name of the handler.</p>
+            <div class="example">
+                // Dynamic naming for debugging
+                handler->SetName("Player" + std::to_string(playerId) + "Input");
+            </div>
+        </div>
+
+        <h2 id="usage-patterns">Usage Patterns</h2>
+
+        <h3>Simple Handler Implementation</h3>
+        <div class="example">
+            // Basic handler that inherits from GamepadInputHandler
+            class SimplePlayerHandler : public GamepadInputHandler {
+            public:
+            SimplePlayerHandler() : GamepadInputHandler("SimplePlayer", 20) {}
+
+            bool HandleButtonInput(int gamepadId, GamepadButton button,
+            bool pressed, bool justPressed, bool justReleased) override {
+            if (!IsActive()) return false;
+
+            if (justPressed) {
+            switch (button) {
+            case GamepadButton::A:
+            player->jump();
+            return true;  // Consume jump input
+
+            case GamepadButton::B:
+            player->attack();
+            return true;  // Consume attack input
+            }
+            }
+
+            return false;  // Let other handlers process unhandled buttons
+            }
+
+            bool HandleAxisInput(int gamepadId, GamepadAxis axis,
+            float value, float delta) override {
+            if (!IsActive()) return false;
+
+            switch (axis) {
+            case GamepadAxis::LeftX:
+            case GamepadAxis::LeftY:
+            // Movement input - always consume if active
+            player->setMovementInput(
+            gamepad->GetLeftStickX(),
+            gamepad->GetLeftStickY()
+            );
+            return true;
+            }
+
+            return false;  // Let other handlers process unhandled axes
+            }
+            };
+        </div>
+
+        <h3>State-Aware Handler</h3>
+        <div class="example">
+            // Handler that changes behavior based on game state
+            class AdaptiveUIHandler : public GamepadInputHandler {
+            GameState currentState = GameState::Menu;
+
+            public:
+            AdaptiveUIHandler() : GamepadInputHandler("AdaptiveUI", 80) {}
+
+            void setGameState(GameState state) {
+            currentState = state;
+            // Adjust priority based on state
+            switch (state) {
+            case GameState::Menu:
+            SetPriority(100);  // High priority in menus
+            break;
+            case GameState::InGame:
+            SetPriority(60);   // Lower priority during gameplay
+            break;
+            case GameState::Paused:
+            SetPriority(90);   // High priority when paused
+            break;
+            }
+            }
+
+            bool HandleButtonInput(int gamepadId, GamepadButton button,
+            bool pressed, bool justPressed, bool justReleased) override {
+            if (!IsActive() || !justPressed) return false;
+
+            switch (currentState) {
+            case GameState::Menu:
+            return handleMenuInput(button);
+
+            case GameState::InGame:
+            return handleGameUIInput(button);
+
+            case GameState::Paused:
+            return handlePauseInput(button);
+            }
+
+            return false;
+            }
+
+            private:
+            bool handleMenuInput(GamepadButton button) {
+            switch (button) {
+            case GamepadButton::A:
+            menu->selectItem();
+            return true;
+            case GamepadButton::B:
+            menu->goBack();
+            return true;
+            case GamepadButton::DPadUp:
+            menu->navigateUp();
+            return true;
+            case GamepadButton::DPadDown:
+            menu->navigateDown();
+            return true;
+            }
+            return false;
+            }
+
+            bool handleGameUIInput(GamepadButton button) {
+            switch (button) {
+            case GamepadButton::Start:
+            game->showPauseMenu();
+            setGameState(GameState::Paused);
+            return true;
+            case GamepadButton::Back:
+            hud->toggleInventory();
+            return true;
+            }
+            return false;
+            }
+
+            bool handlePauseInput(GamepadButton button) {
+            switch (button) {
+            case GamepadButton::Start:
+            game->resumeGame();
+            setGameState(GameState::InGame);
+            return true;
+            case GamepadButton::A:
+            pauseMenu->selectItem();
+            return true;
+            }
+            return false;
+            }
+            };
+        </div>
+
+        <h3>Multi-Player Handler</h3>
+        <div class="example">
+            // Handler that manages multiple players
+            class MultiPlayerHandler : public GamepadInputHandler {
+            std::map<int, int>
+                gamepadToPlayer;  // gamepadId -> playerId
+                std::vector<Player>
+                    players;
+
+                    public:
+                    MultiPlayerHandler() : GamepadInputHandler("MultiPlayer", 30) {}
+
+                    void OnGamepadConnected(int gamepadId) override {
+                    // Assign to first available player slot
+                    for (int i = 0; i < players.size(); ++i) {
+                    if (!players[i].isActive) {
+                    gamepadToPlayer[gamepadId] = i;
+                    players[i].isActive = true;
+                    players[i].gamepadId = gamepadId;
+                    ui->showPlayerJoinedMessage(i);
+                    break;
+                    }
+                    }
+                    }
+
+                    void OnGamepadDisconnected(int gamepadId) override {
+                    auto it = gamepadToPlayer.find(gamepadId);
+                    if (it != gamepadToPlayer.end()) {
+                    int playerId = it->second;
+                    players[playerId].isActive = false;
+                    players[playerId].gamepadId = -1;
+                    gamepadToPlayer.erase(it);
+                    ui->showPlayerLeftMessage(playerId);
+                    }
+                    }
+
+                    bool HandleButtonInput(int gamepadId, GamepadButton button,
+                    bool pressed, bool justPressed, bool justReleased) override {
+                    if (!IsActive()) return false;
+
+                    auto it = gamepadToPlayer.find(gamepadId);
+                    if (it == gamepadToPlayer.end()) return false;
+
+                    int playerId = it->second;
+                    Player& player = players[playerId];
+
+                    if (justPressed) {
+                    switch (button) {
+                    case GamepadButton::A:
+                    player.jump();
+                    return true;
+
+                    case GamepadButton::X:
+                    player.attack();
+                    return true;
+
+                    case GamepadButton::Y:
+                    player.useSpecialAbility();
+                    return true;
+                    }
+                    }
+
+                    return false;
+                    }
+
+                    bool HandleAxisInput(int gamepadId, GamepadAxis axis,
+                    float value, float delta) override {
+                    if (!IsActive()) return false;
+
+                    auto it = gamepadToPlayer.find(gamepadId);
+                    if (it == gamepadToPlayer.end()) return false;
+
+                    int playerId = it->second;
+                    Player& player = players[playerId];
+
+                    switch (axis) {
+                    case GamepadAxis::LeftX:
+                    case GamepadAxis::LeftY:
+                    player.setMovementInput(
+                    gamepadManager->GetGamepad(gamepadId)->GetLeftStickX(),
+                    gamepadManager->GetGamepad(gamepadId)->GetLeftStickY()
+                    );
+                    return true;
+
+                    case GamepadAxis::RightX:
+                    case GamepadAxis::RightY:
+                    player.setCameraInput(
+                    gamepadManager->GetGamepad(gamepadId)->GetRightStickX(),
+                    gamepadManager->GetGamepad(gamepadId)->GetRightStickY()
+                    );
+                    return true;
+                    }
+
+                    return false;
+                    }
+                    };
+        </div>
+
+        <h2 id="integration">Integration with GamepadManager</h2>
+
+        <div class="example">
+            // Complete integration example
+            class Game {
+            GamepadManager gamepadManager_;
+            std::shared_ptr<UIInputHandler>
+                uiHandler_;
+                std::shared_ptr<PlayerInputHandler>
+                    playerHandler_;
+                    std::shared_ptr<DebugInputHandler>
+                        debugHandler_;
+
+                        public:
+                        void initialize() {
+                        // Initialize gamepad manager
+                        gamepadManager_.Initialize();
+
+                        // Create input handlers
+                        uiHandler_ = std::make_shared<UIInputHandler>
+                            ("GameUI", 75);
+                            playerHandler_ = std::make_shared<PlayerInputHandler>
+                                ("PlayerControl", 25);
+                                debugHandler_ = std::make_shared<DebugInputHandler>
+                                    ("Debug", 5);
+
+                                    // Add handlers to manager (they will be sorted by priority)
+                                    gamepadManager_.AddInputHandler(uiHandler_);
+                                    gamepadManager_.AddInputHandler(playerHandler_);
+                                    gamepadManager_.AddInputHandler(debugHandler_);
+
+                                    // Set up global callbacks for system-level events
+                                    gamepadManager_.SetConnectedCallback([this](int gamepadId) {
+                                    std::cout << "System: Gamepad " << gamepadId << " connected" << std::endl;
+                                    });
+
+                                    gamepadManager_.SetDisconnectedCallback([this](int gamepadId) {
+                                    std::cout << "System: Gamepad " << gamepadId << " disconnected" << std::endl;
+                                    });
+                                    }
+
+                                    void update(double deltaTime) {
+                                    // Update gamepad manager - this will:
+                                    // 1. Update all connected gamepads
+                                    // 2. Process input through all active handlers in priority order
+                                    // 3. Call OnUpdate on all active handlers
+                                    gamepadManager_.Update(deltaTime);
+                                    }
+
+                                    void showMenu() {
+                                    uiHandler_->SetActive(true);       // Enable UI input
+                                    playerHandler_->SetActive(false);  // Disable player input
+                                    }
+
+                                    void startGame() {
+                                    uiHandler_->SetActive(false);     // Disable UI input
+                                    playerHandler_->SetActive(true);  // Enable player input
+                                    }
+
+                                    void showDebugConsole() {
+                                    debugHandler_->SetPriority(150);  // Boost debug priority to highest
+                                    }
+
+                                    void hideDebugConsole() {
+                                    debugHandler_->SetPriority(5);    // Reset debug priority to lowest
+                                    }
+                                    };
+        </div>
+
+        <h2 id="best-practices">Best Practices</h2>
+
+        <div class="note">
+            <h4>Input Consumption Strategy</h4>
+            <ul>
+                <li><strong>Be selective:</strong> Only consume input that your handler actually processes</li>
+                <li><strong>Common inputs:</strong> Consider not consuming common inputs like Start/Pause that should be available system-wide</li>
+                <li><strong>Context awareness:</strong> Consume more aggressively when your system has focus (e.g., modal dialogs)</li>
+                <li><strong>Debugging:</strong> Log input consumption decisions during development to debug input flow issues</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>Priority Management</h4>
+            <ul>
+                <li><strong>Use ranges:</strong> Group related handlers in priority ranges (UI: 50-100, Game: 10-49, etc.)</li>
+                <li><strong>Leave gaps:</strong> Use priorities like 10, 20, 30 to leave room for future handlers</li>
+                <li><strong>Dynamic adjustment:</strong> Change priorities based on game state when needed</li>
+                <li><strong>Document priorities:</strong> Maintain a list of priority conventions for your project</li>
+            </ul>
+        </div>
+
+        <div class="warning">
+            <h4>Performance Considerations</h4>
+            <ul>
+                <li><strong>Early returns:</strong> Return early in HandleButtonInput/HandleAxisInput when IsActive() is false</li>
+                <li><strong>Minimize work:</strong> Keep input processing lightweight - defer heavy operations to Update()</li>
+                <li><strong>Avoid allocations:</strong> Don't allocate memory in input handling methods</li>
+                <li><strong>Cache lookups:</strong> Cache expensive lookups rather than repeating them every frame</li>
+            </ul>
+        </div>
+
+        <div class="architecture">
+            <h4>Architecture Guidelines</h4>
+            <ul>
+                <li><strong>Single responsibility:</strong> Each handler should have a clear, focused purpose</li>
+                <li><strong>State management:</strong> Use IsActive() to enable/disable handlers rather than removing them</li>
+                <li><strong>Lifecycle:</strong> Store handlers as shared_ptr to manage lifetime properly</li>
+                <li><strong>Testing:</strong> Design handlers to be testable by injecting dependencies rather than accessing globals</li>
+            </ul>
+        </div>
+
+        <div class="info">
+            <h4>Common Patterns</h4>
+            <ul>
+                <li><strong>UI Overlay:</strong> High priority handler for modal dialogs that consumes all input</li>
+                <li><strong>Menu System:</strong> Medium priority handler that consumes navigation but passes through system inputs</li>
+                <li><strong>Player Control:</strong> Lower priority handler that processes gameplay input</li>
+                <li><strong>Debug/Analytics:</strong> Lowest priority handler that logs input without consuming it</li>
+            </ul>
+        </div>
+
+        <div class="note">
+            <h4>Integration Tips</h4>
+            <ul>
+                <li><strong>Handler lifetime:</strong> Create handlers during initialization and keep them alive throughout the game</li>
+                <li><strong>State synchronization:</strong> Update handler active states when game states change</li>
+                <li><strong>Error handling:</strong> Wrap input processing in try-catch blocks for robustness</li>
+                <li><strong>Debugging:</strong> Use GetName() and GetPriority() for debug output and logging</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

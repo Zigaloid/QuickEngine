@@ -1,0 +1,588 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++20 Game Engine Documentation</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            font-weight: 300;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .overview {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border-left: 5px solid #3498db;
+        }
+
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .doc-card {
+            background: #fff;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 25px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+            .doc-card:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+                border-color: #3498db;
+            }
+
+            .doc-card h3 {
+                color: #2c3e50;
+                margin-bottom: 15px;
+                font-size: 1.3em;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .doc-card .icon {
+                font-size: 1.5em;
+                width: 40px;
+                height: 40px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 8px;
+                color: white;
+            }
+
+            .doc-card .description {
+                color: #666;
+                margin-bottom: 20px;
+                line-height: 1.5;
+            }
+
+            .doc-card .features {
+                list-style: none;
+                padding: 0;
+                margin: 15px 0;
+            }
+
+                .doc-card .features li {
+                    color: #555;
+                    margin: 8px 0;
+                    padding-left: 20px;
+                    position: relative;
+                }
+
+                    .doc-card .features li:before {
+                        content: "✓";
+                        color: #27ae60;
+                        font-weight: bold;
+                        position: absolute;
+                        left: 0;
+                    }
+
+        .doc-link {
+            display: inline-block;
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: background-color 0.3s ease;
+        }
+
+            .doc-link:hover {
+                background: #2980b9;
+                text-decoration: none;
+            }
+
+        .core-icon {
+            background: #3498db;
+        }
+
+        .component-icon {
+            background: #e74c3c;
+        }
+
+        .filesystem-icon {
+            background: #8e44ad;
+        }
+
+        .resource-icon {
+            background: #9b59b6;
+        }
+
+        .job-icon {
+            background: #f39c12;
+        }
+
+        .debug-icon {
+            background: #27ae60;
+        }
+
+        .reflection-icon {
+            background: #3498db;
+        }
+
+        .gamepad-icon {
+            background: #9b59b6;
+        }
+
+        .math-icon {
+            background: #e67e22;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            text-align: center;
+            border: 1px solid #e9ecef;
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #3498db;
+            display: block;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 5px;
+        }
+
+        .tech-stack {
+            background: #2c3e50;
+            color: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+            .tech-stack h3 {
+                color: white;
+                margin-bottom: 15px;
+            }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .tech-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            font-weight: 500;
+        }
+
+        .footer {
+            text-align: center;
+            color: #7f8c8d;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ecf0f1;
+            font-size: 0.9em;
+        }
+
+        .quick-nav {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 30px 0;
+        }
+
+            .quick-nav h3 {
+                color: #2c3e50;
+                margin-bottom: 15px;
+            }
+
+        .nav-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav-link {
+            background: #3498db;
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 0.9em;
+            transition: background-color 0.3s ease;
+        }
+
+            .nav-link:hover {
+                background: #2980b9;
+                text-decoration: none;
+            }
+
+        @media (max-width: 768px) {
+            .doc-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .tech-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 C++20 Game Engine Documentation</h1>
+        <p class="subtitle">Comprehensive API Documentation for Modern Game Development</p>
+
+        <div class="overview">
+            <h3>📖 Documentation Overview</h3>
+            <p>Welcome to the complete documentation for our modern C++20 game engine. This documentation covers all core systems, from low-level file operations to high-level component management. Each system is designed with performance, scalability, and maintainability in mind.</p>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number">15</span>
+                    <div class="stat-label">Documentation Pages</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">9</span>
+                    <div class="stat-label">Core Systems</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">C++20</span>
+                    <div class="stat-label">Modern Standard</div>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number">100%</span>
+                    <div class="stat-label">Cross-Platform</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="quick-nav">
+            <h3>🔗 Quick Navigation</h3>
+            <div class="nav-links">
+                <a href="#core-systems" class="nav-link">Core Systems</a>
+                <a href="#component-system" class="nav-link">ECS Framework</a>
+                <a href="#input-system" class="nav-link">Input Handling</a>
+                <a href="#utilities" class="nav-link">Utilities</a>
+                <a href="#math" class="nav-link">Mathematics</a>
+            </div>
+        </div>
+
+        <h2 id="core-systems">🏗️ Core Engine Systems</h2>
+        <div class="doc-grid">
+            <div class="doc-card">
+                <h3>
+                    <div class="icon core-icon">⚙️</div>
+                    CoreSystem
+                </h3>
+                <div class="description">
+                    Central orchestrator for all engine systems. Manages initialization, coordination, and shutdown of core subsystems with automatic dependency management.
+                </div>
+                <ul class="features">
+                    <li>Centralized system management</li>
+                    <li>Dependency resolution</li>
+                    <li>Exception-safe initialization</li>
+                    <li>System monitoring & status</li>
+                </ul>
+                <a href="CoreSystemDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon filesystem-icon">📁</div>
+                    FileSystem
+                </h3>
+                <div class="description">
+                    Cross-platform file system abstraction with type-safe error handling, stackable filesystems, and comprehensive I/O operations.
+                </div>
+                <ul class="features">
+                    <li>Cross-platform abstraction</li>
+                    <li>Type-safe Result&lt;T&gt; error handling</li>
+                    <li>Stackable filesystem implementations</li>
+                    <li>RAII resource management</li>
+                </ul>
+                <a href="FileSystemDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon resource-icon">📦</div>
+                    ResourceManager
+                </h3>
+                <div class="description">
+                    Asynchronous, thread-safe resource loading and management system with automatic deduplication, custom resource types, and complete lifecycle management.
+                </div>
+                <ul class="features">
+                    <li>Asynchronous loading</li>
+                    <li>Thread-safe operations</li>
+                    <li>Resource deduplication</li>
+                    <li>Custom resource types</li>
+                </ul>
+                <a href="ResourceManagerDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon job-icon">⚡</div>
+                    JobSystem
+                </h3>
+                <div class="description">
+                    Modern C++20 thread pool implementation for high-performance parallel task execution with futures and type-safe interfaces.
+                </div>
+                <ul class="features">
+                    <li>C++20 concepts & constraints</li>
+                    <li>Thread-safe job queue</li>
+                    <li>Future-based return values</li>
+                    <li>Exception safety</li>
+                </ul>
+                <a href="JobSystemDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon debug-icon">🐛</div>
+                    DebugChannel
+                </h3>
+                <div class="description">
+                    Flexible categorized logging framework with named debug channels, dual output support, and configurable destinations.
+                </div>
+                <ul class="features">
+                    <li>Named debug channels</li>
+                    <li>Console & file output</li>
+                    <li>Printf-style formatting</li>
+                    <li>Assertion support</li>
+                </ul>
+                <a href="DebugChannelDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+        </div>
+
+        <h2 id="component-system">🧩 Entity-Component System</h2>
+        <div class="doc-grid">
+            <div class="doc-card">
+                <h3>
+                    <div class="icon component-icon">🧩</div>
+                    ComponentSystem
+                </h3>
+                <div class="description">
+                    Robust entity-component architecture with object pooling, asynchronous updates, and reflection-based serialization for high-performance game development.
+                </div>
+                <ul class="features">
+                    <li>Object pooling optimization</li>
+                    <li>Asynchronous updates</li>
+                    <li>Reflection serialization</li>
+                    <li>Hierarchical relationships</li>
+                </ul>
+                <a href="ComponentSystemDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon reflection-icon">🔍</div>
+                    Reflection System
+                </h3>
+                <div class="description">
+                    Automatic serialization and deserialization system with multiple file format support and type-safe error handling.
+                </div>
+                <ul class="features">
+                    <li>Automatic serialization</li>
+                    <li>JSON & Binary formats</li>
+                    <li>Type-safe error handling</li>
+                    <li>Component integration</li>
+                </ul>
+                <a href="RefectionDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+        </div>
+
+        <h2 id="input-system">🎮 Input Management</h2>
+        <div class="doc-grid">
+            <div class="doc-card">
+                <h3>
+                    <div class="icon gamepad-icon">🎮</div>
+                    GamepadInterface
+                </h3>
+                <div class="description">
+                    Comprehensive gamepad input abstraction with support for multiple controller types, customizable mapping, and cross-platform compatibility.
+                </div>
+                <ul class="features">
+                    <li>Multiple gamepad support</li>
+                    <li>Customizable input mapping</li>
+                    <li>Event-driven processing</li>
+                    <li>Cross-platform compatibility</li>
+                </ul>
+                <a href="GamepadInterfaceDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon gamepad-icon">🎯</div>
+                    GamepadInputHandler
+                </h3>
+                <div class="description">
+                    Priority-based input processing system enabling layered input handling where different systems can process input in controlled order.
+                </div>
+                <ul class="features">
+                    <li>Priority-based processing</li>
+                    <li>Input consumption control</li>
+                    <li>Chain-of-responsibility pattern</li>
+                    <li>Multi-system coordination</li>
+                </ul>
+                <a href="GamepadInputHandlerDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon gamepad-icon">🎛️</div>
+                    GamepadManager
+                </h3>
+                <div class="description">
+                    High-level manager for multiple gamepads with automatic detection, input routing, and centralized configuration management.
+                </div>
+                <ul class="features">
+                    <li>Multi-gamepad management</li>
+                    <li>Hotplug support</li>
+                    <li>Input handler integration</li>
+                    <li>Configuration management</li>
+                </ul>
+                <a href="GamepadManagerDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+        </div>
+
+        <h2 id="math">📐 Mathematics & Utilities</h2>
+        <div class="doc-grid">
+            <div class="doc-card">
+                <h3>
+                    <div class="icon math-icon">📐</div>
+                    Matrix4f
+                </h3>
+                <div class="description">
+                    4x4 matrix class optimized for 3D graphics transformations with OpenGL-compatible column-major storage and comprehensive transformation operations.
+                </div>
+                <ul class="features">
+                    <li>OpenGL-compatible column-major storage</li>
+                    <li>3D transformations (translate, rotate, scale)</li>
+                    <li>Camera and projection matrices</li>
+                    <li>Matrix decomposition and vector transforms</li>
+                </ul>
+                <a href="Matrix4fDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon math-icon">📍</div>
+                    Vector3f
+                </h3>
+                <div class="description">
+                    3D vector class for mathematical operations in 3D space with comprehensive geometric functionality and exception-safe operations.
+                </div>
+                <ul class="features">
+                    <li>Comprehensive mathematical operations</li>
+                    <li>Geometric calculations (dot, cross, distance)</li>
+                    <li>Projection and reflection operations</li>
+                    <li>Exception-safe division and normalization</li>
+                </ul>
+                <a href="Vector3fDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+
+            <div class="doc-card">
+                <h3>
+                    <div class="icon math-icon">🔄</div>
+                    Quaternion
+                </h3>
+                <div class="description">
+                    Mathematical representation of 3D rotations with gimbal-lock-free operations, smooth interpolation, and efficient composition.
+                </div>
+                <ul class="features">
+                    <li>Gimbal-lock-free rotations</li>
+                    <li>Smooth interpolation (SLERP/NLERP)</li>
+                    <li>Efficient composition</li>
+                    <li>Multiple conversion formats</li>
+                </ul>
+                <a href="QuaternionDocumentation.html" class="doc-link">View Documentation</a>
+            </div>
+        </div>
+
+        <div class="tech-stack">
+            <h3>🛠️ Technology Stack</h3>
+            <div class="tech-grid">
+                <div class="tech-item">C++20</div>
+                <div class="tech-item">Concepts</div>
+                <div class="tech-item">Modules</div>
+                <div class="tech-item">Coroutines</div>
+                <div class="tech-item">std::filesystem</div>
+                <div class="tech-item">Threading</div>
+                <div class="tech-item">RAII</div>
+                <div class="tech-item">Smart Pointers</div>
+            </div>
+        </div>
+
+        <div class="overview">
+            <h3>🎯 Getting Started</h3>
+            <p><strong>New to the engine?</strong> Start with the <strong>CoreSystem Documentation</strong> to understand the overall architecture and initialization process.</p>
+            <p><strong>Building a game?</strong> Check out the <strong>ComponentSystem Documentation</strong> for entity-component patterns and the <strong>GamepadManager</strong> for input handling.</p>
+            <p><strong>Working with assets?</strong> The <strong>FileSystem</strong>, <strong>ResourceManager</strong>, and <strong>Reflection System</strong> documentation cover file operations, asset loading, and serialization.</p>
+            <p><strong>Performance optimization?</strong> Review the <strong>JobSystem Documentation</strong> for parallel task execution and threading patterns.</p>
+            <p><strong>Working with 3D mathematics?</strong> The <strong>Matrix4f</strong>, <strong>Vector3f</strong>, and <strong>Quaternion</strong> documentation cover essential 3D math operations for graphics and game development.</p>
+        </div>
+
+        <div class="footer">
+            <p>Documentation generated for C++20 Game Engine • Last updated: October 2025</p>
+            <p>📧 Questions? Issues? Check the documentation or contact the development team.</p>
+        </div>
+    </div>
+</body>
+</html>

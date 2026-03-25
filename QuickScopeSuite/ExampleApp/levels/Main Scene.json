@@ -1,0 +1,141 @@
+{
+    "RootObject": {
+        "m_levelName": {
+            "Value": "Main Scene",
+            "Type": 3,
+            "Size": 40
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "LevelComponent",
+            "Elements": [
+                {
+                    "Value": "RenderComponent",
+                    "m_position": {
+                        "Value": [
+                            0.0,
+                            3.0,
+                            0.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_rotation": {
+                        "Value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_scale": {
+                        "Value": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_color": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_visible": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_wireframe": {
+                        "Value": false,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "RenderComponent",
+                        "Elements": [],
+                        "Type": 11,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "RenderComponent",
+                    "m_position": {
+                        "Value": [
+                            0.0,
+                            3.0,
+                            8.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_rotation": {
+                        "Value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_scale": {
+                        "Value": [
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_color": {
+                        "Value": [
+                            0.0,
+                            1.0,
+                            0.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_visible": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_wireframe": {
+                        "Value": false,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "RenderComponent",
+                        "Elements": [],
+                        "Type": 11,
+                        "Size": 32
+                    }
+                }
+            ],
+            "Type": 11,
+            "Size": 32
+        }
+    }
+}
