@@ -5,6 +5,7 @@ External/*
 ### C++ ###
 # Prerequisites
 *.d
+*.log
 
 # Compiled Object files
 *.slo
