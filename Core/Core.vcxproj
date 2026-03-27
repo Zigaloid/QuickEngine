@@ -98,6 +98,7 @@
     <ClInclude Include="CoreSystem\CoreSystem.h" />
     <ClInclude Include="CoreSystem\FunctionCallManager.h" />
     <ClInclude Include="CoreSystem\FunctionQueue.h" />
+    <ClInclude Include="CoreSystem\Timer.h" />
     <ClInclude Include="DebugChannel\DebugChannel.h" />
     <ClInclude Include="FileSystem\FileSystemInterface.h" />
     <ClInclude Include="FileSystem\FileSystemManager.h" />

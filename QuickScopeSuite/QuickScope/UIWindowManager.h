@@ -49,6 +49,11 @@ public:
     // HeatMap setup (call after Initialize)
     void SetupHeatMap(HeatMapContainer* container, const std::string& backgroundTexturePath = "");
 
+    // Initialize the default owned heatmap container and subscribe to Nexus for live data.
+    // Call after Nexus is connected. Uses default grid dimensions if no external container
+    // has been provided via SetupHeatMap().
+    void InitializeHeatMapNetworking();
+
     // Main rendering methods
     void RenderAllWindows();
     void RenderHeatMap();
@@ -77,6 +82,9 @@ public:
 
     // Access the heat map visualizer for additional configuration
     ImGuiVisualizers::ImGuiHeatMapVisualizer& GetHeatMapVisualizer() { return m_heatmapVis; }
+
+    // Access the owned default heatmap container (may be nullptr if not initialized)
+    HeatMapContainer* GetDefaultHeatMapContainer() { return m_defaultHeatMap.get(); }
 
     // Access the action manager for external registration
     UI::UnifiedActionManager& GetActionManager() { return m_actionManager; }
@@ -135,10 +143,17 @@ private:
     void handleProfilerPacket(const std::string& messageBody);
     void handleProfilerBinaryPacket(const std::vector<uint8_t>& messageBody);
 
+    // Heatmap network packet handler — parses "pos=x,y,z value=v" string messages.
+    // messageType is the series name, body contains the coordinate/value payload.
+    void handleHeatMapPacket(const std::string& messageType, const std::string& body);
+
     // Component references (not owned)
     FPSTracker* m_fpsTracker = nullptr;
     CommandConsole* m_console = nullptr;
     NexusLogVisualizer* m_nexusLog = nullptr;
+
+    // Owned default heatmap container for live Nexus data
+    std::unique_ptr<HeatMapContainer> m_defaultHeatMap;
 
     // Owned heat map visualizer
     ImGuiVisualizers::ImGuiHeatMapVisualizer m_heatmapVis;
@@ -165,6 +180,7 @@ private:
     int m_liveSessionIndex = -1;     // Index of the live capture session (-1 = none)
     int m_nextSessionId = 1;         // Monotonically increasing ID for ImGui tab uniqueness
     bool m_networkInitialized = false;
+    bool m_heatmapNetworkInitialized = false;
 
     // Queue of sessions to close (processed after rendering to avoid mid-loop invalidation)
     std::vector<int> m_pendingCloseIndices;

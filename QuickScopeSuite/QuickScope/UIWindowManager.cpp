@@ -11,10 +11,13 @@
 #include "CoreSystem/FunctionCallManager.h"
 #include "Net/NexusClient.h"
 #include "DebugChannel/DebugChannel.h"
+#include "..\SharedNexusDefines.h"
 
 #include <random>
 #include <string>
 #include <algorithm>
+#include <cstring>
+#include <charconv>
 
 // ImGui includes
 #include "imgui.h"
@@ -26,9 +29,7 @@ using namespace Core;
 
 extern DebugChannels::CDebugChannel AppDebug;
 
-static const std::string PROFILER_PIPE = "Profiler";
-static const std::string PROFILER_PACKET_PIPE = "ProfilerPacket";
-
+ 
 UIWindowManager::UIWindowManager()
 {
 }
@@ -99,6 +100,102 @@ void UIWindowManager::InitializeProfilerNetworking()
 
 	m_networkInitialized = true;
 	AppDebug.printf("Profiler networking initialized\n");
+}
+
+void UIWindowManager::InitializeHeatMapNetworking()
+{
+	if (m_heatmapNetworkInitialized) return;
+
+	// Create the default heatmap container if none has been set externally.
+	// Default: 100x100 meter area, 1 meter cells, origin at (0,0).
+	if (!m_defaultHeatMap) {
+		m_defaultHeatMap = std::make_unique<HeatMapContainer>(
+			100.0f,  // widthMeters
+			100.0f,  // heightMeters
+			1.0f,    // cellSizeMeters
+			0.0f,    // originX
+			0.0f     // originY
+		);
+		m_heatmapVis.SetContainer(m_defaultHeatMap.get());
+		m_heatmapVis.GetConfig().title = "Live Heat Map";
+		AppDebug.printf("Default heatmap container created (100x100m, 1m cells)\n");
+	}
+
+	// Subscribe to the HeatMap text pipe for live data.
+	// We subscribe directly so we can receive both messageType (series name) and body.
+	CoreSystem::GetNexusClient()->Subscribe(TELEMETRY_PIPE, "ANY",
+		[this](const SNexusMessage& msg) {
+			handleHeatMapPacket(msg.messageType, msg.body);
+		});
+
+	m_heatmapNetworkInitialized = true;
+	m_showHeatMap = true;
+	AppDebug.printf("HeatMap networking initialized — listening on pipe '%s'\n", TELEMETRY_PIPE.c_str());
+}
+
+// ---------------------------------------------------------------------------
+// Text heatmap packet format:
+//
+//   messageType  = series name  (e.g. "Temperature")
+//   body         = "pos=x,y,z value=v"
+//
+// The x,z coordinates are in meters and used to look up the grid cell.
+// The y coordinate is accepted but unused by the 2D heatmap (vertical axis).
+// Example body: "pos=12.5,7.3,4.0 value=23.4"
+// ---------------------------------------------------------------------------
+void UIWindowManager::handleHeatMapPacket(const std::string& messageType, const std::string& body)
+{
+	if (!m_defaultHeatMap) return;
+	if (messageType.empty() || body.empty()) return;
+
+	// Locate "pos=" and "value=" tokens
+	const auto posIdx = body.find("pos=");
+	const auto valIdx = body.find("value=");
+	if (posIdx == std::string::npos || valIdx == std::string::npos) {
+		AppDebug.printf("HeatMap packet: malformed body (missing pos= or value=): %s\n", body.c_str());
+		return;
+	}
+
+	// ---- Parse pos=x,y,z ----
+	const char* posStart = body.c_str() + posIdx + 4; // skip "pos="
+	const char* bodyEnd = body.c_str() + body.size();
+
+	float x = 0.0f, y = 0.0f, z = 0.0f;
+	// Parse x
+	auto [ptrX, ecX] = std::from_chars(posStart, bodyEnd, x);
+	if (ecX != std::errc{} || *ptrX != ',') {
+		AppDebug.printf("HeatMap packet: failed to parse pos x: %s\n", body.c_str());
+		return;
+	}
+	// Parse y (accepted but unused — vertical axis)
+	auto [ptrY, ecY] = std::from_chars(ptrX + 1, bodyEnd, y);
+	if (ecY != std::errc{}) {
+		AppDebug.printf("HeatMap packet: failed to parse pos y: %s\n", body.c_str());
+		return;
+	}
+	// Parse z (used as the second heatmap axis)
+	if (*ptrY == ',') {
+		auto [ptrZ, ecZ] = std::from_chars(ptrY + 1, bodyEnd, z);
+		if (ecZ != std::errc{}) {
+			AppDebug.printf("HeatMap packet: failed to parse pos z: %s\n", body.c_str());
+			return;
+		}
+	}
+
+	// ---- Parse value=v ----
+	const char* valStart = body.c_str() + valIdx + 6; // skip "value="
+	double value = 0.0;
+	auto [ptrV, ecV] = std::from_chars(valStart, bodyEnd, value);
+	if (ecV != std::errc{}) {
+		AppDebug.printf("HeatMap packet: failed to parse value: %s\n", body.c_str());
+		return;
+	}
+
+	if (value > 200) value = 200;
+	// Add the value using world-space x,z coordinates; the container resolves the cell
+	if (m_defaultHeatMap->AddValue(x, z, messageType, value)) {
+		m_heatmapVis.RefreshSeriesList();
+	}
 }
 
 void UIWindowManager::ShutdownProfiler()

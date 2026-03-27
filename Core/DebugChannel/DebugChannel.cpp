@@ -58,7 +58,7 @@ void CDebugChannel::print(const string message)
 		m_outFile << message;
 
 	if (m_outputflags & OF_Nexus && Core::CoreSystem::GetNexusClient() && Core::CoreSystem::GetNexusClient()->IsConnected())
-        Core::CoreSystem::GetNexusClient()->SendPipeMessage(m_name, message);
+        Core::CoreSystem::GetNexusClient()->SendPipeMessage(m_name, "Debug", message);
 }
 
 void CDebugChannel::printf(const char *format,...)

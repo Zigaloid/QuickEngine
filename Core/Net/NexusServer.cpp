@@ -1,4 +1,4 @@
-#include "Net/NexusServer.h"
+ï»¿#include "Net/NexusServer.h"
 #include "Net/IBerkeleySocket.h"
 #include "DebugChannel/DebugChannel.h"
 #include <algorithm>
@@ -93,7 +93,7 @@ std::vector<SNexusClientSnapshot> CNexusServer::GetClientSnapshots() const {
 }
 
 // ---------------------------------------------------------------------------
-// Accept loop — runs on its own thread
+// Accept loop ï¿½ runs on its own thread
 // ---------------------------------------------------------------------------
 
 void CNexusServer::AcceptLoop() {
@@ -209,9 +209,10 @@ void CNexusServer::HandlePacket(SNexusClientEntry* client,
     }
     case ENexusMessageType::PipeMessage: {
         SNexusMessage msg;
-        msg.senderApp = DeserializeString(cursor, remaining);
-        msg.pipeName  = DeserializeString(cursor, remaining);
-        msg.body      = DeserializeString(cursor, remaining);
+        msg.senderApp   = DeserializeString(cursor, remaining);
+        msg.pipeName    = DeserializeString(cursor, remaining);
+        msg.messageType = DeserializeString(cursor, remaining);
+        msg.body        = DeserializeString(cursor, remaining);
 
         NexusDebug.print(msg.pipeName);
         // Validate required fields
@@ -265,7 +266,7 @@ bool CNexusServer::MatchesSubscription(const SNexusSubscription& sub,
 }
 
 void CNexusServer::ForwardMessage(const SNexusClientEntry* sender, const SNexusMessage& msg) {
-    std::string packet = BuildPipeMessagePacket(msg.senderApp, msg.pipeName, msg.body);
+    std::string packet = BuildPipeMessagePacket(msg.senderApp, msg.pipeName, msg.messageType, msg.body);
 
 
     // Snapshot matching targets as shared_ptrs under the lock.
@@ -290,7 +291,7 @@ void CNexusServer::ForwardMessage(const SNexusClientEntry* sender, const SNexusM
         }
     }
 
-    // Send outside m_clientsMutex — each client's sendMutex still serialises writes.
+    // Send outside m_clientsMutex ï¿½ each client's sendMutex still serialises writes.
     for (auto& target : targets) {
         std::lock_guard<std::mutex> sendLock(target->sendMutex);
         if (target->socket && target->socket->IsOpen()) {

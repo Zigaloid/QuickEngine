@@ -4,7 +4,7 @@
 #include <sstream>
 #include <iomanip>
 
-static const float MAX_FPS = 120.0f;
+static const float MAX_FPS = 200.0f;
 
 FPSTracker::FPSTracker(size_t maxSamples)
     : VisualizableMetricHeuristic(maxSamples, true)

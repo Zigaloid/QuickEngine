@@ -2,6 +2,7 @@
 #include "CoreSystem/CoreSystem.h"
 #include "Net/NexusClient.h"
 #include "CoreSystem/FunctionCallManager.h"
+#include "..\SharedNexusDefines.h"
 
 #include "DebugChannel/DebugChannel.h"
 #include "imgui.h"
@@ -35,7 +36,6 @@ void ProfilerController::HandleProfilerMessage(const std::string& messageBody)
         AppDebug.printf("Unknown profiler command received: %s\n", command.c_str());
     }
 }
-static const std::string PROFILER_PIPE = "Profiler";
 
 void ProfilerController::Initialize()
 {
@@ -93,7 +93,7 @@ void ProfilerController::StartProfiling()
         AppDebug.printf("Profiler started\n");
     }
 }
-static const std::string PROFILER_PACKET_PIPE = "ProfilerPacket";
+
 void ProfilerController::StopProfiling(bool sendAsBinary)
 {
     DECLARE_FUNC_LOW();
@@ -111,7 +111,7 @@ void ProfilerController::StopProfiling(bool sendAsBinary)
         } else {
             // Send events as a JSON text message
             std::string profilerEvents = profiler.SerializeRecentEvents();
-            NEXUS_SEND_MESSAGE(PROFILER_PACKET_PIPE, profilerEvents);
+            NEXUS_SEND_MESSAGE(PROFILER_PACKET_PIPE,MSG_TYPE_PROFILER_DATA, profilerEvents);
         }
     }
 }

@@ -291,6 +291,7 @@ void ProfilerApp::OnInit()
 
 	// Initialize profiler networking and create the default live capture session
 	m_uiWindowManager.InitializeProfilerNetworking();
+	m_uiWindowManager.InitializeHeatMapNetworking();
 	m_uiWindowManager.GetOrCreateLiveSession();
 }
 

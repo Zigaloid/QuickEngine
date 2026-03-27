@@ -44,6 +44,7 @@ struct SNexusSubscription {
 struct SNexusMessage {
     std::string senderApp;
     std::string pipeName;
+    std::string messageType;
     std::string body;
 };
 
@@ -131,8 +132,8 @@ inline std::string BuildSubscriptionPacket(const std::string& pipeName, const st
     return packet;
 }
 
-inline std::string BuildPipeMessagePacket(const std::string& senderApp, const std::string& pipeName, const std::string& body) {
-    std::string payload = SerializeString(senderApp) + SerializeString(pipeName) + SerializeString(body);
+inline std::string BuildPipeMessagePacket(const std::string& senderApp, const std::string& pipeName, const std::string& messageType, const std::string& body) {
+    std::string payload = SerializeString(senderApp) + SerializeString(pipeName) + SerializeString(messageType) + SerializeString(body);
     SNexusHeader hdr{ENexusMessageType::PipeMessage, static_cast<uint32_t>(payload.size())};
     std::string packet(reinterpret_cast<const char*>(&hdr), sizeof(hdr));
     packet.append(payload);

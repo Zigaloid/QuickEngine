@@ -53,7 +53,7 @@ public:
     bool Subscribe(const std::string& pipeName, const std::string& appName, MessageCallback callback);
     bool SubscribeBinary(const std::string& pipeName, const std::string& appName, BinaryMessageCallback callback);
     // Send a text message on a named pipe through the server.
-    bool SendPipeMessage(const std::string& pipeName, const std::string& body);
+    bool SendPipeMessage(const std::string& pipeName, const std::string& messageType, const std::string& body);
 
     // Send a binary payload on a named pipe through the server.
     bool SendBinaryMessage(const std::string& pipeName, const void* data, size_t dataSize);

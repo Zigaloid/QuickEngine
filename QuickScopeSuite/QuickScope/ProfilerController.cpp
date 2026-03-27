@@ -5,6 +5,8 @@
 #include "Net/NexusClient.h"
 #include "DebugChannel/DebugChannel.h"
 #include "FileSystem/StandardFileSystem.h"
+#include "..\SharedNexusDefines.h"
+
 #include "imgui.h"
 #include <algorithm>
 #include <sstream>
@@ -13,8 +15,6 @@ using namespace Core;
 
 extern DebugChannels::CDebugChannel AppDebug;
 
-static const std::string PROFILER_PIPE = "Profiler";
-static const std::string PROFILER_PACKET_PIPE = "ProfilerPacket";
 
 ProfilerController::ProfilerController()
     : m_showFlameGraph(true)
@@ -280,14 +280,14 @@ void ProfilerController::Shutdown()
 void ProfilerController::StartProfiling()
 {
     DECLARE_FUNC_LOW();
-    NEXUS_SEND_MESSAGE(PROFILER_PIPE, "Start");
+    NEXUS_SEND_MESSAGE(PROFILER_PIPE, MSG_TYPE_PROFILE_CONTROL, "Start");
     m_enabled = true;
 }
 
 void ProfilerController::StopProfiling()
 {
     DECLARE_FUNC_LOW();
-    NEXUS_SEND_MESSAGE(PROFILER_PIPE, "Stop");
+    NEXUS_SEND_MESSAGE(PROFILER_PIPE, MSG_TYPE_PROFILE_CONTROL, "Stop");
     m_enabled = false;
 }
 

@@ -10,6 +10,9 @@
     <Filter Include="External\imgui-docking\backends">
       <UniqueIdentifier>{C8EEB13D-34D2-C07D-3DD5-EEB9A93787CE}</UniqueIdentifier>
     </Filter>
+    <Filter Include="External\stb-master">
+      <UniqueIdentifier>{39E14DCD-A542-2BDB-2EB0-718D9A10629A}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ImGuiApp">
       <UniqueIdentifier>{210B234F-0DD8-7D5A-36F1-6B02221DB3E8}</UniqueIdentifier>
     </Filter>
@@ -24,7 +27,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GlfwMouse.h" />
     <ClInclude Include="ImGuiApp\App.h">
       <Filter>ImGuiApp</Filter>
     </ClInclude>
@@ -32,42 +34,25 @@
     <ClInclude Include="ImGuiVisualizers\CommandConsole.h">
       <Filter>ImGuiVisualizers</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiVisualizers\FPSTracker.h">
+    <ClInclude Include="ImGuiVisualizers\NexusFlowGraph.h">
       <Filter>ImGuiVisualizers</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiVisualizers\ImGuiBarGraph.h">
+    <ClInclude Include="ImGuiVisualizers\NexusLogFilterState.h">
       <Filter>ImGuiVisualizers</Filter>
     </ClInclude>
-    <ClInclude Include="ImGuiVisualizers\ImGuiHeatMapVisualizer.h">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiVisualizers\ImGuiLineGraph.h">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiVisualizers\MetricBucketHeuristic.h">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiVisualizers\ProfilerVisualizer.h">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiVisualizers\PropertyInspector.h">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClInclude>
-    <ClInclude Include="ImGuiVisualizers\VisualizableMetricHeuristic.h">
+    <ClInclude Include="ImGuiVisualizers\NexusLogVisualizer.h">
       <Filter>ImGuiVisualizers</Filter>
     </ClInclude>
     <ClInclude Include="Input\KeyboardShortcutManager.h">
       <Filter>Input</Filter>
     </ClInclude>
-    <ClInclude Include="LevelManager.h" />
-    <ClInclude Include="ProfilerApp.h" />
-    <ClInclude Include="ProfilerController.h" />
+    <ClInclude Include="NexusServerApp.h" />
     <ClInclude Include="Registration.h" />
     <ClInclude Include="Tests\ComponentSchedulerLoadTest.h">
       <Filter>Tests</Filter>
     </ClInclude>
+    <ClInclude Include="TextureResource.h" />
     <ClInclude Include="UIWindowManager.h" />
-    <ClInclude Include="ViewportLayoutManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\External\imgui-docking\backends\imgui_impl_glfw.cpp">
@@ -88,7 +73,9 @@
     <ClCompile Include="..\..\External\imgui-docking\imgui_tables.cpp">
       <Filter>External\imgui-docking</Filter>
     </ClCompile>
-    <ClCompile Include="GlfwMouse.cpp" />
+    <ClCompile Include="..\..\External\stb-master\stb_image.cpp">
+      <Filter>External\stb-master</Filter>
+    </ClCompile>
     <ClCompile Include="ImGuiApp\App.cpp">
       <Filter>ImGuiApp</Filter>
     </ClCompile>
@@ -96,42 +83,24 @@
     <ClCompile Include="ImGuiVisualizers\CommandConsole.cpp">
       <Filter>ImGuiVisualizers</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiVisualizers\FPSTracker.cpp">
+    <ClCompile Include="ImGuiVisualizers\NexusFlowGraph.cpp">
       <Filter>ImGuiVisualizers</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiVisualizers\ImGuiBarGraph.cpp">
+    <ClCompile Include="ImGuiVisualizers\NexusLogFilterState.cpp">
       <Filter>ImGuiVisualizers</Filter>
     </ClCompile>
-    <ClCompile Include="ImGuiVisualizers\ImGuiHeatMapVisualizer.cpp">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGuiVisualizers\ImGuiLineGraph.cpp">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGuiVisualizers\MetricBucketHeuristic.cpp">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGuiVisualizers\ProfilerVisualizer.cpp">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGuiVisualizers\PropertyInspector.cpp">
-      <Filter>ImGuiVisualizers</Filter>
-    </ClCompile>
-    <ClCompile Include="ImGuiVisualizers\VisualizableMetricHeuristic.cpp">
+    <ClCompile Include="ImGuiVisualizers\NexusLogVisualizer.cpp">
       <Filter>ImGuiVisualizers</Filter>
     </ClCompile>
     <ClCompile Include="Input\KeyboardShortcutManager.cpp">
       <Filter>Input</Filter>
     </ClCompile>
-    <ClCompile Include="LevelManager.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="ProfilerApp.cpp" />
-    <ClCompile Include="ProfilerController.cpp" />
+    <ClCompile Include="NexusServerApp.cpp" />
     <ClCompile Include="Registration.cpp" />
     <ClCompile Include="Tests\ComponentSchedulerLoadTest.cpp">
       <Filter>Tests</Filter>
     </ClCompile>
     <ClCompile Include="UIWindowManager.cpp" />
-    <ClCompile Include="ViewportLayoutManager.cpp" />
   </ItemGroup>
 </Project>

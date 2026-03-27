@@ -92,10 +92,10 @@ public:
     void LoadHeatmapDialog();
     void SaveHeatmapAs();
     void SaveHeatmapCurrent();
-
-private:
     // Helpers
     void RefreshSeriesList();
+private:
+    // Helpers    
     std::optional<double> GetCellAverage(std::size_t col, std::size_t row, const std::string& seriesName) const;
     void ComputeDataRangeForSeries(double& outMin, double& outMax) const;
     ImU32 ValueToColor(double v, double vmin, double vmax) const;

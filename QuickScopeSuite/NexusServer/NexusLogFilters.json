@@ -2,8 +2,8 @@
     "RootObject": {
         "m_appVisibility": {
             "Value": {
-                "ExampleApp": true,
-                "QuickScope": true
+                "QuickScope": true,
+                "ExampleApp": true
             },
             "Type": 18,
             "Size": 80
@@ -17,15 +17,16 @@
                 "Profiler": true,
                 "ProfilerPacket": true,
                 "AppDebug": true,
-                "ViewportDebug": true
+                "ViewportDebug": true,
+                "Telemetry": true
             },
             "Type": 18,
             "Size": 80
         },
         "m_appCollectionEnabled": {
             "Value": {
-                "ExampleApp": true,
-                "QuickScope": true
+                "QuickScope": true,
+                "ExampleApp": true
             },
             "Type": 18,
             "Size": 80
@@ -39,7 +40,8 @@
                 "Profiler": true,
                 "ProfilerPacket": false,
                 "AppDebug": true,
-                "ViewportDebug": true
+                "ViewportDebug": true,
+                "Telemetry": false
             },
             "Type": 18,
             "Size": 80

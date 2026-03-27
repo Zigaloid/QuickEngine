@@ -235,6 +235,7 @@
       <Filter>ResourceManager</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="CoreSystem\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp">

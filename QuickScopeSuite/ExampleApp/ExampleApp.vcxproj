@@ -109,6 +109,7 @@
     <ClInclude Include="ProfilerApp.h" />
     <ClInclude Include="ProfilerController.h" />
     <ClInclude Include="Registration.h" />
+    <ClInclude Include="Tests\ComponentSchedulerLoadTest.h" />
     <ClInclude Include="UIWindowManager.h" />
     <ClInclude Include="ViewportLayoutManager.h" />
   </ItemGroup>
@@ -137,6 +138,7 @@
     <ClCompile Include="ProfilerApp.cpp" />
     <ClCompile Include="ProfilerController.cpp" />
     <ClCompile Include="Registration.cpp" />
+    <ClCompile Include="Tests\ComponentSchedulerLoadTest.cpp" />
     <ClCompile Include="UIWindowManager.cpp" />
     <ClCompile Include="ViewportLayoutManager.cpp" />
   </ItemGroup>
