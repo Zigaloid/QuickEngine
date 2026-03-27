@@ -53,6 +53,24 @@ void ProfilerController::HandleProfilerBinaryPacket(const std::vector<uint8_t>& 
 
         m_dirty = true;
 
+        // ---- New code to update thread IDs ----
+        std::set<std::string> threadSet;
+        for (const auto* event : events.m_events)
+        {
+            if (event) 
+            {
+                if (event->GetTheadName() != "")
+                    threadSet.insert(event->GetTheadName());
+                else
+                    threadSet.insert(event->GetThreadIdStr());
+            }
+        }
+        m_threadNames.assign(threadSet.begin(), threadSet.end());
+        if (m_threadNames.size() != 0) 
+        {
+            m_selectedThreadId = m_threadNames.front();
+        }
+        // -----------------------------------------
         for (const auto* event : events.m_events)
             delete event; // Clean up dynamically allocated ProfileEvent objects
     }
@@ -90,7 +108,7 @@ void ProfilerController::HandleProfilerPacket(const std::string& messageBody)
     }    
 }
 
-bool ProfilerController::SaveSession(const std::string& filePath)
+bool ProfilerController::SaveSession(const std::string& filePath) 
 {
     DECLARE_FUNC_LOW();
 
@@ -429,6 +447,8 @@ void ProfilerController::RenderSessionContent()
         m_visualizer.SetOutlierThresholdPct(pct);
     }
 
+    RenderThreadFilter();
+
     // ---- Dispatch to the active view ----
     switch (m_viewMode)
     {
@@ -453,6 +473,55 @@ void ProfilerController::RenderSessionContent()
             m_visualizer.GetTimelineData(),
             m_visualizer.GetSelectedFrames(),
             &m_showFrameComparison);
+    }
+}
+
+void ProfilerController::RenderThreadFilter()
+{
+    ImGui::Text("Thread:");
+    ImGui::SameLine();
+
+    // Display selected threads as comma-separated, or "All"
+    std::string selectedLabel;
+    if (m_selectedThreadIds.empty())
+        selectedLabel = "All";
+    else
+        for (size_t i = 0; i < m_selectedThreadIds.size(); ++i) {
+            selectedLabel += m_selectedThreadIds[i];
+            if (i + 1 < m_selectedThreadIds.size())
+                selectedLabel += ", ";
+        }
+
+    if (ImGui::BeginCombo("##ThreadFilter", selectedLabel.c_str())) {
+        // Text filter box
+        ImGui::SetNextItemWidth(-FLT_MIN);
+        if (ImGui::InputTextWithHint("##ThreadFilterText", "Filter...", &m_threadFilterText)) {
+            // Optionally: trim or sanitize input
+        }
+
+        // "All" option
+        bool allSelected = m_selectedThreadIds.empty();
+        if (ImGui::Selectable("All", allSelected)) {
+            m_selectedThreadIds.clear();
+        }
+
+        // Filter and show thread names
+        for (const std::string& tid : m_threadNames) {
+            if (!m_threadFilterText.empty() &&
+                tid.find(m_threadFilterText) == std::string::npos)
+                continue;
+
+            bool isSelected = std::find(m_selectedThreadIds.begin(), m_selectedThreadIds.end(), tid) != m_selectedThreadIds.end();
+            if (ImGui::Checkbox(tid.c_str(), &isSelected)) {
+                if (isSelected) {
+                    m_selectedThreadIds.push_back(tid);
+                }
+                else {
+                    m_selectedThreadIds.erase(std::remove(m_selectedThreadIds.begin(), m_selectedThreadIds.end(), tid), m_selectedThreadIds.end());
+                }
+            }
+        }
+        ImGui::EndCombo();
     }
 }
 

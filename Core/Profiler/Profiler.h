@@ -87,9 +87,17 @@ namespace Profiler {
 			return std::thread::id{};
 		}
 
+        const std::string &GetThreadIdStr() const {
+            // Note: std::thread::id cannot be reconstructed from string;
+            // use threadIdStr for serialized comparisons
+			return threadIdStr;
+        }
+
+
 		EventType GetEventType() const { return static_cast<EventType>(type); }
 		void SetEventType(EventType et) { type = static_cast<int>(et); }
 		const char* GetName() const { return name.c_str(); }
+		const char* GetTheadName() const { return threadNameStr.c_str(); }
 
 		// Approximate memory footprint of this event (object + heap allocations)
 		size_t EstimateMemoryUsage() const {

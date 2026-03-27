@@ -39,7 +39,10 @@ public:
     // Render only the per-session content (no ImGui window frame or shared menu bar).
     // Must be called between ImGui::Begin / ImGui::End.
     void RenderSessionContent();
-    
+
+    void RenderThreadFilter();
+
+
     // State management
     void SetShowFlameGraph(bool show) { m_showFlameGraph = show; }
     bool ShouldShowFlameGraph() const { return m_showFlameGraph; }
@@ -109,4 +112,9 @@ private:
 
     // Display name for multi-document tabs
     std::string m_displayName = "Untitled";
+
+    std::vector<std::string> m_threadNames;
+    std::string m_selectedThreadId; // empty string means "All"
+    std::vector<std::string> m_selectedThreadIds;
+    std::string m_threadFilterText;
 };
