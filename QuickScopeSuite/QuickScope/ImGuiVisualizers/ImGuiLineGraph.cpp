@@ -190,12 +190,14 @@ bool ImGuiLineGraph::Render(const char* id)
 		// Advance cursor
 		ImVec2 finalPos(canvasMin.x - yLabelWidth - yAxisMarkerSpace - axisLabelSpace, canvasMax.y + xLabelHeight + axisLabelSpace);
 		ImGui::SetCursorScreenPos(finalPos);
+		ImGui::Dummy(ImVec2(0, 0));
 		return true;
 	}
 
 	// Advance cursor
 	ImVec2 finalPos(canvasMin.x - yLabelWidth - yAxisMarkerSpace - axisLabelSpace, canvasMax.y + xLabelHeight + axisLabelSpace);
 	ImGui::SetCursorScreenPos(finalPos);
+	ImGui::Dummy(ImVec2(0, 0));
 	return false;
 }
 

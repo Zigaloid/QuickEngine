@@ -108,6 +108,8 @@ namespace Profiler {
             ImGui::TableHeadersRow();
 
             for (size_t i = 0; i < m_ThreadRoots.size(); ++i) {
+                if (!IsThreadInFilter(m_ThreadRoots[i]->name))
+                    continue;
                 if (SubtreePassesFilter(*m_ThreadRoots[i])) {
                     RenderThreadTree(*m_ThreadRoots[i], i);
                 }
@@ -369,6 +371,14 @@ namespace Profiler {
                 return true;
         }
         return false;
+    }
+
+    bool ProfilerTreeView::IsThreadInFilter(const std::string& threadName) const
+    {
+        if (m_ThreadFilter.empty())
+            return true; // No filter = show all
+
+        return std::find(m_ThreadFilter.begin(), m_ThreadFilter.end(), threadName) != m_ThreadFilter.end();
     }
 
 } // namespace Profiler

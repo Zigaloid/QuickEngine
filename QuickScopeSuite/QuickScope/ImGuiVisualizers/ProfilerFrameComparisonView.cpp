@@ -91,9 +91,9 @@ namespace Profiler {
 
         ImGui::Separator();
 
-        // Accumulate per-frame costs using shared utility
-        auto leftCosts = ViewUtils::AccumulateFrameCosts(data, leftFrame);
-        auto rightCosts = ViewUtils::AccumulateFrameCosts(data, rightFrame);
+        // Accumulate per-frame costs using shared utility, respecting thread filter
+        auto leftCosts = ViewUtils::AccumulateFrameCosts(data, leftFrame, m_ThreadFilter);
+        auto rightCosts = ViewUtils::AccumulateFrameCosts(data, rightFrame, m_ThreadFilter);
 
         const bool useExclusive = (m_CostMode == CostMode::Exclusive);
 

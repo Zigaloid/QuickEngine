@@ -38,7 +38,7 @@ void ImGuiHeatMapVisualizer::ClearBackgroundTexture()
 {
     m_BackgroundTextureResource.reset();
     m_BackgroundTexturePath.clear();
-    m_BackgroundTexId = nullptr;
+    m_BackgroundTexId = ImTextureID_Invalid;
     m_BackgroundTexSize = ImVec2(0, 0);
     m_Config.showBackgroundImage = false;
 }
@@ -56,7 +56,7 @@ void ImGuiHeatMapVisualizer::TryAdoptBackgroundTextureFromResource()
     const int h = m_BackgroundTextureResource->GetHeight();
 
     // ImGui OpenGL backends use ImTextureID as a GL id cast to void*
-    ImTextureID texId = reinterpret_cast<ImTextureID>(static_cast<intptr_t>(glId));
+    ImTextureID texId = static_cast<ImTextureID>(static_cast<intptr_t>(glId));
     // If already set to same id and size, skip
     if (m_BackgroundTexId == texId && static_cast<int>(m_BackgroundTexSize.x) == w && static_cast<int>(m_BackgroundTexSize.y) == h)
         return;
@@ -299,7 +299,7 @@ bool ImGuiHeatMapVisualizer::Render(const char* id)
     const float originY = canvasMin.y + m_Config.pan.y;
 
     // Optional background image (aligned to the heatmap area, panned and zoomed)
-    if (m_Config.showBackgroundImage && m_BackgroundTexId != nullptr) {
+    if (m_Config.showBackgroundImage && m_BackgroundTexId != ImTextureID_Invalid) {
         const ImVec2 heatmapMin(originX, originY);
         const ImVec2 heatmapMax(originX + static_cast<float>(cols) * cellW,
                                 originY + static_cast<float>(rows) * cellH);

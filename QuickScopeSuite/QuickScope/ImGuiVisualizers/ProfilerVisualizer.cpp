@@ -50,6 +50,14 @@ namespace Profiler {
     // Utility helpers
     // -------------------------------------------------------------------------
 
+    bool ProfilerVisualizer::IsThreadInFilter(const TimelineThreadData* thread) const
+    {
+        if (m_ThreadFilter.empty())
+            return true; // No filter = show all
+
+        return std::find(m_ThreadFilter.begin(), m_ThreadFilter.end(), thread->threadName) != m_ThreadFilter.end();
+    }
+
     ProfilerVisualizer::VisibleTimeRange ProfilerVisualizer::GetVisibleTimeRange() const
     {
         VisibleTimeRange vtr;
@@ -341,6 +349,9 @@ namespace Profiler {
             auto* thread = m_TimelineFlameGraphData->GetThread(i);
             if (!thread) continue;
 
+            // Skip threads not in the filter
+            if (!IsThreadInFilter(thread)) continue;
+
             if (m_ThreadVisibility[i]) {
                 int actualMaxDepth = CalculateActualMaxDepth(thread);
                 threadHeights[i] = (actualMaxDepth + 1) * (nodeHeight + 1.0f) + threadPadding;
@@ -379,6 +390,9 @@ namespace Profiler {
                 auto* thread = m_TimelineFlameGraphData->GetThread(i);
                 if (!thread) continue;
 
+                // Skip threads not in the filter
+                if (!IsThreadInFilter(thread)) continue;
+
                 ImVec2 headerPos(canvasPos.x, currentY);
                 ImVec2 headerSize(canvasSize.x, 20.0f);
                 RenderThreadHeader(i, thread, headerPos, headerSize, drawList);
@@ -401,7 +415,7 @@ namespace Profiler {
             ImGui::SetCursorScreenPos(canvasPos);
             ImVec2 actualCanvasSize = ImVec2(canvasSize.x, m_actualRenderedHeight);
             ImGui::InvisibleButton("FlameGraphCanvas", actualCanvasSize);
-            ImGui::SetItemAllowOverlap();
+            ImGui::SetNextItemAllowOverlap();
 
             if (ImGui::IsItemHovered()) {
                 HandleMouseWheelZoom(canvasPos, actualCanvasSize);
@@ -568,7 +582,7 @@ namespace Profiler {
     void ProfilerVisualizer::HandleMouseInteraction(ImVec2 canvasPos, ImVec2 canvasSize)
     {
         ImGui::InvisibleButton("FlameGraphCanvas", canvasSize);
-        ImGui::SetItemAllowOverlap();
+        ImGui::SetNextItemAllowOverlap();
         if (ImGui::IsItemHovered()) {
             HandleMouseWheelZoom(canvasPos, canvasSize);
             HandleMouseDrag(canvasSize);
@@ -578,12 +592,23 @@ namespace Profiler {
 
     void ProfilerVisualizer::HandleKeyboardZoom(ImVec2 canvasPos, ImVec2 canvasSize)
     {
+        // Only handle keyboard input when the flame graph window is focused
         if (!ImGui::IsWindowFocused()) {
             return;
         }
 
-        bool zoomIn = ImGui::IsKeyPressed('=');
-        bool zoomOut = !zoomIn && ImGui::IsKeyPressed('-');
+        const ImGuiIO& io = ImGui::GetIO();
+        bool zoomIn = false;
+        bool zoomOut = false;
+
+        // Check for +
+        if (ImGui::IsKeyPressed(ImGuiKey_Equal)) { // = key (usually with Shift for +)
+            zoomIn = true;
+        }
+        // Check for -
+        else if (ImGui::IsKeyPressed(ImGuiKey_Minus)) { // Regular -
+            zoomOut = true;
+        }
 
         if (zoomIn || zoomOut) {
             auto vtr = GetVisibleTimeRange();

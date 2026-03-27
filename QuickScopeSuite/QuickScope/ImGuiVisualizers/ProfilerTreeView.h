@@ -46,6 +46,11 @@ namespace Profiler {
         // Must be called between ImGui::Begin / ImGui::End.
         void RenderContent(TimelineFlameGraphData* data);
 
+        // Thread filter: when non-empty, only threads whose name is in this list are shown.
+        // An empty list means "show all threads".
+        void SetThreadFilter(const std::vector<std::string>& threadNames) { m_ThreadFilter = threadNames; }
+        void ClearThreadFilter() { m_ThreadFilter.clear(); }
+
     private:
         // Rebuild the call tree from the raw timeline data
         void RebuildTree(TimelineFlameGraphData* data);
@@ -58,6 +63,7 @@ namespace Profiler {
         // Filtering
         bool PassesFilter(const CallTreeNode& node) const;
         bool SubtreePassesFilter(const CallTreeNode& node) const;
+        bool IsThreadInFilter(const std::string& threadName) const;
 
         // Internal content rendering (shared by Render and RenderContent)
         void RenderTreeContent(TimelineFlameGraphData* data);
@@ -74,6 +80,9 @@ namespace Profiler {
         bool m_SortByExclusive = false;
         bool m_ShowCallCounts = true;
         double m_CPUFrequency = 3.0e9;
+
+        // Thread name filter (empty = show all)
+        std::vector<std::string> m_ThreadFilter;
     };
 
 } // namespace Profiler

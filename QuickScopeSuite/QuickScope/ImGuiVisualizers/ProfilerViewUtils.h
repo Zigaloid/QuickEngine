@@ -74,6 +74,13 @@ namespace Profiler {
         std::vector<FrameFunctionCost> AccumulateFrameCosts(
             TimelineFlameGraphData* data, uint64_t frameNumber);
 
+        /// Accumulate per-function inclusive/exclusive costs for a single
+        /// frame, considering only threads whose names are in the filter.
+        /// An empty filter means "all threads".
+        std::vector<FrameFunctionCost> AccumulateFrameCosts(
+            TimelineFlameGraphData* data, uint64_t frameNumber,
+            const std::vector<std::string>& threadFilter);
+
         // -----------------------------------------------------------------
         // File dialogs (Win32 common dialogs)
         // -----------------------------------------------------------------

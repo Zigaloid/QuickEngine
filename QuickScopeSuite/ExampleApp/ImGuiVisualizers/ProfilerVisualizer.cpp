@@ -310,8 +310,8 @@ void ProfilerVisualizer::RenderFlameGraph()
         // Set up an invisible button for the entire rendered canvas to handle mouse interaction
         ImGui::SetCursorScreenPos(canvasPos);
         ImVec2 actualCanvasSize = ImVec2(canvasSize.x, m_actualRenderedHeight);
+        ImGui::SetNextItemAllowOverlap();
         ImGui::InvisibleButton("FlameGraphCanvas", actualCanvasSize);
-        ImGui::SetItemAllowOverlap();
         
         // Handle mouse interaction using global timeline
         if (ImGui::IsItemHovered()) {
@@ -347,8 +347,8 @@ void ProfilerVisualizer::RenderNavigationControls()
 
 void ProfilerVisualizer::HandleMouseInteraction(ImVec2 canvasPos, ImVec2 canvasSize)
 {
+    ImGui::SetNextItemAllowOverlap();
     ImGui::InvisibleButton("FlameGraphCanvas", canvasSize);
-    ImGui::SetItemAllowOverlap();
     if (ImGui::IsItemHovered()) {
         HandleMouseWheelZoom(canvasPos, canvasSize);
         HandleMouseDrag(canvasSize);
@@ -368,11 +368,11 @@ void ProfilerVisualizer::HandleKeyboardZoom(ImVec2 canvasPos, ImVec2 canvasSize)
     bool zoomOut = false;
 
     // Check for +
-    if (ImGui::IsKeyPressed('=')) { // = key (usually with Shift for +)
+    if (ImGui::IsKeyPressed(ImGuiKey_Equal)) { // = key (usually with Shift for +)
         zoomIn = true;
     }
     // Check for -
-    else if (ImGui::IsKeyPressed('-')) { // Regular -
+    else if (ImGui::IsKeyPressed(ImGuiKey_Minus)) { // Regular -
         zoomOut = true;
     }
 

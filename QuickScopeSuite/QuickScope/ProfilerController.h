@@ -86,6 +86,9 @@ public:
     // Profiling state (shared across sessions, but Start/Stop lives on the live session)
     bool IsProfilingEnabled() const { return m_enabled; }
 
+    // Access the timeline data for cross-session comparison
+    Profiler::TimelineFlameGraphData* GetTimelineData() { return m_visualizer.GetTimelineData(); }
+
 private:
     void registerProfilerActions();
     void registerFileActions();

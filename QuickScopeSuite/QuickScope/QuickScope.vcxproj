@@ -103,6 +103,7 @@
     <ClInclude Include="ImGuiVisualizers\MetricBucketHeuristic.h" />
     <ClInclude Include="ImGuiVisualizers\ProfilerFrameComparisonView.h" />
     <ClInclude Include="ImGuiVisualizers\ProfilerOutlierView.h" />
+    <ClInclude Include="ImGuiVisualizers\ProfilerSessionComparisonView.h" />
     <ClInclude Include="ImGuiVisualizers\ProfilerTreeView.h" />
     <ClInclude Include="ImGuiVisualizers\ProfilerViewUtils.h" />
     <ClInclude Include="ImGuiVisualizers\ProfilerVisualizer.h" />
@@ -135,6 +136,7 @@
     <ClCompile Include="ImGuiVisualizers\MetricBucketHeuristic.cpp" />
     <ClCompile Include="ImGuiVisualizers\ProfilerFrameComparisonView.cpp" />
     <ClCompile Include="ImGuiVisualizers\ProfilerOutlierView.cpp" />
+    <ClCompile Include="ImGuiVisualizers\ProfilerSessionComparisonView.cpp" />
     <ClCompile Include="ImGuiVisualizers\ProfilerTreeView.cpp" />
     <ClCompile Include="ImGuiVisualizers\ProfilerViewUtils.cpp" />
     <ClCompile Include="ImGuiVisualizers\ProfilerVisualizer.cpp" />

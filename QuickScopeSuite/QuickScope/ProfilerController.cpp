@@ -449,6 +449,20 @@ void ProfilerController::RenderSessionContent()
 
     RenderThreadFilter();
 
+    // Push thread filter to all views before rendering
+    if (m_selectedThreadIds.empty()) {
+        m_visualizer.ClearThreadFilter();
+        m_treeView.ClearThreadFilter();
+        m_frameComparisonView.ClearThreadFilter();
+        m_outlierView.ClearThreadFilter();
+    }
+    else {
+        m_visualizer.SetThreadFilter(m_selectedThreadIds);
+        m_treeView.SetThreadFilter(m_selectedThreadIds);
+        m_frameComparisonView.SetThreadFilter(m_selectedThreadIds);
+        m_outlierView.SetThreadFilter(m_selectedThreadIds);
+    }
+
     // ---- Dispatch to the active view ----
     switch (m_viewMode)
     {
@@ -492,25 +506,55 @@ void ProfilerController::RenderThreadFilter()
                 selectedLabel += ", ";
         }
 
-    if (ImGui::BeginCombo("##ThreadFilter", selectedLabel.c_str())) {
+    ImGui::PushID("ThreadFilter");
+    if (ImGui::BeginCombo("##Combo", selectedLabel.c_str())) {
         // Text filter box
+        char filterBuf[256] = {};
+        strncpy_s(filterBuf, sizeof(filterBuf), m_threadFilterText.c_str(), _TRUNCATE);
         ImGui::SetNextItemWidth(-FLT_MIN);
-        if (ImGui::InputTextWithHint("##ThreadFilterText", "Filter...", &m_threadFilterText)) {
-            // Optionally: trim or sanitize input
+        if (ImGui::InputTextWithHint("##FilterText", "Filter...", filterBuf, sizeof(filterBuf))) {
+            m_threadFilterText = filterBuf;
         }
 
-        // "All" option
+        // Build list of visible (filtered, non-empty) thread names
+        std::vector<std::string> visibleThreads;
+        for (const std::string& tid : m_threadNames) {
+            if (tid.empty())
+                continue;
+            if (!m_threadFilterText.empty() &&
+                tid.find(m_threadFilterText) == std::string::npos)
+                continue;
+            visibleThreads.push_back(tid);
+        }
+
+        // Select All / Clear All buttons
+        if (ImGui::Button("Select All")) {
+            for (const std::string& tid : visibleThreads) {
+                if (std::find(m_selectedThreadIds.begin(), m_selectedThreadIds.end(), tid) == m_selectedThreadIds.end()) {
+                    m_selectedThreadIds.push_back(tid);
+                }
+            }
+        }
+        ImGui::SameLine();
+        if (ImGui::Button("Clear All")) {
+            for (const std::string& tid : visibleThreads) {
+                m_selectedThreadIds.erase(
+                    std::remove(m_selectedThreadIds.begin(), m_selectedThreadIds.end(), tid),
+                    m_selectedThreadIds.end());
+            }
+        }
+
+        ImGui::Separator();
+
+        // "All" option (resets to no filter)
         bool allSelected = m_selectedThreadIds.empty();
         if (ImGui::Selectable("All", allSelected)) {
             m_selectedThreadIds.clear();
         }
 
         // Filter and show thread names
-        for (const std::string& tid : m_threadNames) {
-            if (!m_threadFilterText.empty() &&
-                tid.find(m_threadFilterText) == std::string::npos)
-                continue;
-
+        for (const std::string& tid : visibleThreads)
+        {
             bool isSelected = std::find(m_selectedThreadIds.begin(), m_selectedThreadIds.end(), tid) != m_selectedThreadIds.end();
             if (ImGui::Checkbox(tid.c_str(), &isSelected)) {
                 if (isSelected) {
@@ -523,6 +567,7 @@ void ProfilerController::RenderThreadFilter()
         }
         ImGui::EndCombo();
     }
+    ImGui::PopID();
 }
 
 void ProfilerController::RenderFlameGraphWindow(const std::string& windowTitle, bool* showWindow)

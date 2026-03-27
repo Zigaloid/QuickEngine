@@ -129,7 +129,7 @@ private:
     double m_LastMax = 1.0;
 
     // Background texture (ImGui)
-    ImTextureID m_BackgroundTexId = nullptr;
+    ImTextureID m_BackgroundTexId = 0;
     ImVec2      m_BackgroundTexSize = ImVec2(0, 0);
 
     // Pending/owned background resource (keeps GPU texture alive)

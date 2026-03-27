@@ -217,6 +217,103 @@ namespace Profiler::ViewUtils {
         return result;
     }
 
+    std::vector<FrameFunctionCost> AccumulateFrameCosts(
+        TimelineFlameGraphData* data, uint64_t frameNumber,
+        const std::vector<std::string>& threadFilter)
+    {
+        // Delegate to the unfiltered version when no filter is active
+        if (threadFilter.empty()) {
+            return AccumulateFrameCosts(data, frameNumber);
+        }
+
+        auto globalFrameMarkers = GatherSortedGlobalFrameMarkers(data);
+        if (globalFrameMarkers.empty()) {
+            return {};
+        }
+
+        uint64_t frameStart = 0;
+        uint64_t frameEnd = 0;
+        bool found = false;
+
+        for (size_t i = 0; i < globalFrameMarkers.size(); ++i) {
+            if (globalFrameMarkers[i].frameNumber == frameNumber) {
+                frameStart = globalFrameMarkers[i].clockCycles;
+                frameEnd = (i + 1 < globalFrameMarkers.size())
+                    ? globalFrameMarkers[i + 1].clockCycles
+                    : data->globalEndTime;
+                found = true;
+                break;
+            }
+        }
+
+        if (!found) {
+            return {};
+        }
+
+        std::map<std::string, FrameFunctionCost> costMap;
+
+        for (size_t t = 0; t < data->GetThreadCount(); ++t) {
+            auto* thread = data->GetThread(t);
+            if (!thread) continue;
+
+            // Skip threads not in the filter
+            if (std::find(threadFilter.begin(), threadFilter.end(), thread->threadName) == threadFilter.end())
+                continue;
+
+            std::vector<TimelineFlameNode*> frameEvents;
+            for (const auto& event : thread->events) {
+                if (event->duration == 0) continue;
+                if (event->startTime >= frameStart && event->startTime < frameEnd) {
+                    frameEvents.push_back(event.get());
+                }
+            }
+
+            std::sort(frameEvents.begin(), frameEvents.end(),
+                [](const TimelineFlameNode* a, const TimelineFlameNode* b) {
+                    if (a->startTime != b->startTime)
+                        return a->startTime < b->startTime;
+                    return a->depth < b->depth;
+                });
+
+            for (size_t i = 0; i < frameEvents.size(); ++i) {
+                auto* event = frameEvents[i];
+                uint64_t inclusive = event->duration;
+                uint64_t childTime = 0;
+
+                for (size_t j = i + 1; j < frameEvents.size(); ++j) {
+                    auto* candidate = frameEvents[j];
+                    if (candidate->startTime >= event->endTime)
+                        break;
+                    if (candidate->depth == event->depth + 1 &&
+                        candidate->startTime >= event->startTime &&
+                        candidate->endTime <= event->endTime) {
+                        childTime += candidate->duration;
+                    }
+                }
+
+                uint64_t exclusive = (childTime <= inclusive) ? (inclusive - childTime) : 0;
+
+                auto& cost = costMap[event->name];
+                cost.name = event->name;
+                cost.inclusiveCycles += inclusive;
+                cost.exclusiveCycles += exclusive;
+                cost.callCount++;
+            }
+        }
+
+        std::vector<FrameFunctionCost> result;
+        result.reserve(costMap.size());
+        for (auto& [name, cost] : costMap) {
+            result.push_back(std::move(cost));
+        }
+        std::sort(result.begin(), result.end(),
+            [](const FrameFunctionCost& a, const FrameFunctionCost& b) {
+                return a.inclusiveCycles > b.inclusiveCycles;
+            });
+
+        return result;
+    }
+
     // -----------------------------------------------------------------
     // File dialogs (Win32)
     // -----------------------------------------------------------------

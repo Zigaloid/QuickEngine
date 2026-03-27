@@ -6,6 +6,7 @@
 #include <memory>
 #include "ImGuiVisualizers/UnifiedActionManager.h"
 #include "ImGuiVisualizers/ImGuiHeatMapVisualizer.h"
+#include "ImGuiVisualizers/ProfilerSessionComparisonView.h"
 #include "Analysis/HeatMapContainer.h"
 
 // Forward declarations
@@ -59,17 +60,20 @@ public:
     void SetShowConsole(bool show) { m_showConsole = show; }
     void SetShowHeatMap(bool show) { m_showHeatMap = show; }
     void SetShowProfiler(bool show) { m_showProfiler = show; }
+    void SetShowSessionComparison(bool show) { m_showSessionComparison = show; }
 
     bool GetShowFrameTimeAnalysis() const { return m_showFrameTimeAnalysis; }
     bool GetShowConsole() const { return m_showConsole; }
     bool GetShowHeatMap() const { return m_showHeatMap; }
     bool GetShowProfiler() const { return m_showProfiler; }
+    bool GetShowSessionComparison() const { return m_showSessionComparison; }
 
     // Toggle methods
     void ToggleFrameTimeAnalysis() { m_showFrameTimeAnalysis = !m_showFrameTimeAnalysis; }
     void ToggleConsole() { m_showConsole = !m_showConsole; }
     void ToggleHeatMap() { m_showHeatMap = !m_showHeatMap; }
     void ToggleProfiler() { m_showProfiler = !m_showProfiler; }
+    void ToggleSessionComparison() { m_showSessionComparison = !m_showSessionComparison; }
 
     // Access the heat map visualizer for additional configuration
     ImGuiVisualizers::ImGuiHeatMapVisualizer& GetHeatMapVisualizer() { return m_heatmapVis; }
@@ -121,6 +125,7 @@ private:
     void renderFrameTimeAnalysisWindow();
     void renderConsoleWindow();
     void renderHeatMapWindow();
+    void renderSessionComparisonWindow();
 
     // Action registration
     void registerWindowActions();
@@ -138,11 +143,15 @@ private:
     // Owned heat map visualizer
     ImGuiVisualizers::ImGuiHeatMapVisualizer m_heatmapVis;
 
+    // Session comparison view
+    Profiler::ProfilerSessionComparisonView m_sessionComparisonView;
+
     // Window visibility states
     bool m_showFrameTimeAnalysis = true;
     bool m_showConsole = false;
     bool m_showHeatMap = false;
     bool m_showProfiler = true;
+    bool m_showSessionComparison = false;
 
     // App-level action manager (Windows menu only)
     UI::UnifiedActionManager m_actionManager;

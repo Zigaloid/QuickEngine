@@ -321,9 +321,9 @@ namespace Profiler {
 
         ImGui::Separator();
 
-        // Accumulate per-frame costs using shared utility
-        auto outlierCosts = ViewUtils::AccumulateFrameCosts(data, outlierFrame);
-        auto refCosts = ViewUtils::AccumulateFrameCosts(data, refFrame);
+        // Accumulate per-frame costs using shared utility, respecting thread filter
+        auto outlierCosts = ViewUtils::AccumulateFrameCosts(data, outlierFrame, m_ThreadFilter);
+        auto refCosts = ViewUtils::AccumulateFrameCosts(data, refFrame, m_ThreadFilter);
 
         const bool useExclusive = (m_CostMode == CostMode::Exclusive);
 

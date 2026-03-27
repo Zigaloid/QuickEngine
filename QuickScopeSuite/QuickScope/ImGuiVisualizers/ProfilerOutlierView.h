@@ -38,6 +38,11 @@ namespace Profiler {
         // Must be called between ImGui::Begin / ImGui::End.
         void RenderContent(TimelineFlameGraphData* data, float outlierThresholdPct);
 
+        // Thread filter: when non-empty, only threads whose name is in this list
+        // contribute to the butterfly cost comparison. An empty list means "all threads".
+        void SetThreadFilter(const std::vector<std::string>& threadNames) { m_ThreadFilter = threadNames; }
+        void ClearThreadFilter() { m_ThreadFilter.clear(); }
+
     private:
         // Internal content rendering (shared by Render and RenderContent)
         void RenderOutlierContent(TimelineFlameGraphData* data, float outlierThresholdPct);
@@ -76,6 +81,9 @@ namespace Profiler {
 
         // Cost display mode (inclusive vs exclusive)
         CostMode m_CostMode = CostMode::Inclusive;
+
+        // Thread name filter (empty = all threads)
+        std::vector<std::string> m_ThreadFilter;
     };
 
 } // namespace Profiler

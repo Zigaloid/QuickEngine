@@ -167,11 +167,13 @@ bool ImGuiBarGraph::Render(const char* id)
         
         // Advance cursor to account for our custom drawing
         ImGui::SetCursorScreenPos(ImVec2(canvasMin.x - yAxisLabelWidth, canvasMax.y + labelHeight));
+        ImGui::Dummy(ImVec2(0, 0));
         return true;
     }
     
     // Advance cursor to account for our custom drawing
     ImGui::SetCursorScreenPos(ImVec2(canvasMin.x, canvasMax.y + labelHeight));
+    ImGui::Dummy(ImVec2(0, 0));
     return false;
 }
 
