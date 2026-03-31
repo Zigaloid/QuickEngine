@@ -20,8 +20,10 @@ project "Core"
 	
    filter "configurations:Debug"
       defines { "DEBUG" }
+	  staticruntime "on" -- Use /MTd
       symbols "On"
 	
    filter "configurations:Release"
       defines { "NDEBUG" }
+	  staticruntime "on" -- Use /MTd
       optimize "On"

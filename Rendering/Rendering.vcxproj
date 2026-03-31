@@ -59,6 +59,7 @@
       <AdditionalIncludeDirectories>.;..\core;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -81,6 +82,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <MinimalRebuild>false</MinimalRebuild>
       <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
@@ -94,7 +96,6 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\External\stb-master\stb_image.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CameraComponent.h" />
     <ClInclude Include="CameraController.h" />
@@ -114,13 +115,12 @@
     <ClInclude Include="Window.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\External\stb-master\stb_image.cpp" />
     <ClCompile Include="CameraComponent.cpp" />
     <ClCompile Include="CameraController.cpp" />
-    <ClCompile Include="GenerateRenderPrimitives.cpp" />
     <ClCompile Include="GLTFRenderComponent.cpp" />
     <ClCompile Include="GLTFRenderer.cpp" />
     <ClCompile Include="GLTFResource.cpp" />
+    <ClCompile Include="GenerateRenderPrimitives.cpp" />
     <ClCompile Include="LevelComponent.cpp" />
     <ClCompile Include="ManipulatorComponent.cpp" />
     <ClCompile Include="Manipulators.cpp" />

@@ -90,6 +90,9 @@
     <ClInclude Include="CoreSystem\FunctionQueue.h">
       <Filter>CoreSystem</Filter>
     </ClInclude>
+    <ClInclude Include="CoreSystem\Timer.h">
+      <Filter>CoreSystem</Filter>
+    </ClInclude>
     <ClInclude Include="DebugChannel\DebugChannel.h">
       <Filter>DebugChannel</Filter>
     </ClInclude>
@@ -235,7 +238,6 @@
       <Filter>ResourceManager</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="CoreSystem\Timer.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp">

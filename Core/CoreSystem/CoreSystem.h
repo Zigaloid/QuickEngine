@@ -17,10 +17,10 @@ namespace FileSystem {
 class CNexusClient;
 
 // Helper macros for simplified Nexus client usage in application code
-#define NEXUS_SUBSCRIBE(pipe, app) CoreSystem::GetNexusClient()->Subscribe(pipe, app);
-#define NEXUS_SUBSCRIBE_CALLBACK(pipe, app, callback) CoreSystem::GetNexusClient()->Subscribe(pipe, app, [this](const SNexusMessage& msg) { callback(msg.body); });
-#define NEXUS_SUBSCRIBE_BINARY_CALLBACK(pipe, app, callback) CoreSystem::GetNexusClient()->SubscribeBinary(pipe, app, [this](const SNexusBinaryMessage& msg) { callback(msg.data); });
-#define NEXUS_CONNECT_AND_REGISTER(ipa,port,app,user)  CoreSystem::GetNexusClient()->Connect(ipa, port); CoreSystem::GetNexusClient()->Register(app, user);
+#define NEXUS_SUBSCRIBE(pipe, app) Core::CoreSystem::GetNexusClient()->Subscribe(pipe, app);
+#define NEXUS_SUBSCRIBE_CALLBACK(pipe, app, callback) Core::CoreSystem::GetNexusClient()->Subscribe(pipe, app, [this](const SNexusMessage& msg) { callback(msg.body); });
+#define NEXUS_SUBSCRIBE_BINARY_CALLBACK(pipe, app, callback) Core::CoreSystem::GetNexusClient()->SubscribeBinary(pipe, app, [this](const SNexusBinaryMessage& msg) { callback(msg.data); });
+#define NEXUS_CONNECT_AND_REGISTER(ipa,port,app,user)  Core::CoreSystem::GetNexusClient()->Connect(ipa, port); Core::CoreSystem::GetNexusClient()->Register(app, user);
 #define NEXUS_SEND_MESSAGE(pipe, type, value) Core::CoreSystem::GetNexusClient()->SendPipeMessage(pipe,type,value)
 #define NEXUS_SEND_BINARY_MESSAGE(pipe, value, size) Core::CoreSystem::GetNexusClient()->SendBinaryMessage(pipe, value, size)
 

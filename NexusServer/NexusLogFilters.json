@@ -1,0 +1,36 @@
+{
+    "RootObject": {
+        "m_appVisibility": {
+            "Value": {
+                "GameApp": true,
+                "QuickScope": true
+            },
+            "Type": 18,
+            "Size": 64
+        },
+        "m_pipeVisibility": {
+            "Value": {
+                "Fps": true,
+                "Profiler": true
+            },
+            "Type": 18,
+            "Size": 64
+        },
+        "m_appCollectionEnabled": {
+            "Value": {
+                "GameApp": true,
+                "QuickScope": true
+            },
+            "Type": 18,
+            "Size": 64
+        },
+        "m_pipeCollectionEnabled": {
+            "Value": {
+                "Fps": false,
+                "Profiler": true
+            },
+            "Type": 18,
+            "Size": 64
+        }
+    }
+}

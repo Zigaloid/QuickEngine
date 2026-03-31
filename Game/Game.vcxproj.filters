@@ -1,0 +1,383 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="External">
+      <UniqueIdentifier>{089DB854-F469-1360-1D83-010809AF48EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\bgfx">
+      <UniqueIdentifier>{9E02D657-0AC3-518E-D3FD-9A0B3F7D966A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\bgfx\3rdparty">
+      <UniqueIdentifier>{C6C608C9-B2C0-311B-9B2D-C82B87C69787}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\bgfx\3rdparty\meshoptimizer">
+      <UniqueIdentifier>{256D63C5-1154-25BD-BAA4-8BDAA66A9E23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\bgfx\3rdparty\meshoptimizer\src">
+      <UniqueIdentifier>{BC350B76-A8B2-FEB8-D12F-FFCCBD0B9B4C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\imgui-docking">
+      <UniqueIdentifier>{DE5A4D51-CA54-76A3-B3C1-0CB49F5ADC0F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\imgui-docking\backends">
+      <UniqueIdentifier>{C8EEB13D-34D2-C07D-3DD5-EEB9A93787CE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common">
+      <UniqueIdentifier>{AEFEE3F6-9AA0-0ECD-835B-22216F9C951D}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\debugdraw">
+      <UniqueIdentifier>{92ED39D4-7EE6-5826-A718-3EAB93703832}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\entry">
+      <UniqueIdentifier>{EF378464-DB9A-1309-8420-4CBF7062DF8B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\font">
+      <UniqueIdentifier>{94B080D4-0066-F9C9-895A-F3A0F50EF0CD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\imgui">
+      <UniqueIdentifier>{98D6CB64-8439-5B09-2DBF-93BF1901278C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\nanovg">
+      <UniqueIdentifier>{E60D1B09-52CE-963F-1B09-E0BC8788DB1B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="common\ps">
+      <UniqueIdentifier>{C07EAB3B-2CE9-5FB2-7527-1158E1D03D07}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClInclude>
+    <ClInclude Include="common\args.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\aviwriter.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\bgfx_utils.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\camera.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\common.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\cube_atlas.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\debugdraw.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\fs_debugdraw_fill.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\fs_debugdraw_fill_lit.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\fs_debugdraw_fill_texture.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\fs_debugdraw_lines.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\fs_debugdraw_lines_stipple.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\vs_debugdraw_fill.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\vs_debugdraw_fill_lit.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\vs_debugdraw_fill_lit_mesh.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\vs_debugdraw_fill_mesh.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\vs_debugdraw_fill_texture.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\vs_debugdraw_lines.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\debugdraw\vs_debugdraw_lines_stipple.bin.h">
+      <Filter>common\debugdraw</Filter>
+    </ClInclude>
+    <ClInclude Include="common\entry\cmd.h">
+      <Filter>common\entry</Filter>
+    </ClInclude>
+    <ClInclude Include="common\entry\dbg.h">
+      <Filter>common\entry</Filter>
+    </ClInclude>
+    <ClInclude Include="common\entry\dialog.h">
+      <Filter>common\entry</Filter>
+    </ClInclude>
+    <ClInclude Include="common\entry\entry.h">
+      <Filter>common\entry</Filter>
+    </ClInclude>
+    <ClInclude Include="common\entry\entry_p.h">
+      <Filter>common\entry</Filter>
+    </ClInclude>
+    <ClInclude Include="common\entry\input.h">
+      <Filter>common\entry</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\font_manager.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\fs_font_basic.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\fs_font_distance_field.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\fs_font_distance_field_drop_shadow.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\fs_font_distance_field_drop_shadow_image.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\fs_font_distance_field_outline.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\fs_font_distance_field_outline_drop_shadow_image.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\fs_font_distance_field_outline_image.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\fs_font_distance_field_subpixel.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\text_buffer_manager.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\text_metrics.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\utf8.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\vs_font_basic.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\vs_font_distance_field.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\vs_font_distance_field_drop_shadow.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\vs_font_distance_field_drop_shadow_image.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\vs_font_distance_field_outline.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\vs_font_distance_field_outline_drop_shadow_image.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\vs_font_distance_field_outline_image.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\font\vs_font_distance_field_subpixel.bin.h">
+      <Filter>common\font</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\droidsans.ttf.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\fs_imgui_image.bin.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\fs_ocornut_imgui.bin.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\icons_font_awesome.ttf.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\icons_kenney.ttf.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\imgui.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\roboto_regular.ttf.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\robotomono_regular.ttf.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\vs_imgui_image.bin.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\imgui\vs_ocornut_imgui.bin.h">
+      <Filter>common\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="common\nanovg\fontstash.h">
+      <Filter>common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="common\nanovg\fs_nanovg_fill.bin.h">
+      <Filter>common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="common\nanovg\nanovg.h">
+      <Filter>common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="common\nanovg\nanovg_bgfx.h">
+      <Filter>common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="common\nanovg\vs_nanovg_fill.bin.h">
+      <Filter>common\nanovg</Filter>
+    </ClInclude>
+    <ClInclude Include="common\packrect.h">
+      <Filter>common</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ps\fs_particle.bin.h">
+      <Filter>common\ps</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ps\particle_system.h">
+      <Filter>common\ps</Filter>
+    </ClInclude>
+    <ClInclude Include="common\ps\vs_particle.bin.h">
+      <Filter>common\ps</Filter>
+    </ClInclude>
+    <ClInclude Include="logo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\clusterizer.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\indexanalyzer.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\indexcodec.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\indexgenerator.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\overdrawoptimizer.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\partition.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\quantization.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\rasterizer.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\simplifier.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\spatialorder.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\stripifier.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vcacheoptimizer.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vertexcodec.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vertexfilter.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vfetchoptimizer.cpp">
+      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_opengl3.cpp">
+      <Filter>External\imgui-docking\backends</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui-docking\imgui.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui-docking\imgui_Widgets.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp">
+      <Filter>External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="common\bgfx_utils.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\camera.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\cube_atlas.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\debugdraw\debugdraw.cpp">
+      <Filter>common\debugdraw</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\cmd.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\dialog.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\entry.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\entry_android.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\entry_glfw.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\entry_html5.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\entry_noop.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\entry_sdl.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\entry_windows.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\entry_x11.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\entry\input.cpp">
+      <Filter>common\entry</Filter>
+    </ClCompile>
+    <ClCompile Include="common\example-glue.cpp">
+      <Filter>common</Filter>
+    </ClCompile>
+    <ClCompile Include="common\font\font_manager.cpp">
+      <Filter>common\font</Filter>
+    </ClCompile>
+    <ClCompile Include="common\font\text_buffer_manager.cpp">
+      <Filter>common\font</Filter>
+    </ClCompile>
+    <ClCompile Include="common\font\text_metrics.cpp">
+      <Filter>common\font</Filter>
+    </ClCompile>
+    <ClCompile Include="common\font\utf8.cpp">
+      <Filter>common\font</Filter>
+    </ClCompile>
+    <ClCompile Include="common\imgui\imgui.cpp">
+      <Filter>common\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="common\nanovg\nanovg.cpp">
+      <Filter>common\nanovg</Filter>
+    </ClCompile>
+    <ClCompile Include="common\nanovg\nanovg_bgfx.cpp">
+      <Filter>common\nanovg</Filter>
+    </ClCompile>
+    <ClCompile Include="common\ps\particle_system.cpp">
+      <Filter>common\ps</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
