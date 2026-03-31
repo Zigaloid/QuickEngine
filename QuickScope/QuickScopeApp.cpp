@@ -12,13 +12,13 @@
 bool QuickScopeApp::Initialize()
 {
 	// Initialize application-specific resources here
-	NEXUS_CONNECT_AND_REGISTER("127.0.0.1", 9500, "QuickScope", "nhill");
+	NEXUS_CONNECT_AND_REGISTER("127.0.0.1", 9500, "QuickScope", "nhill");	
 	NEXUS_SUBSCRIBE_CALLBACK(FPS_PIPE, "ANY", HandleFPSMessage);
 	m_visualizerManager.Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), true);
 	m_visualizerManager.Register("FPS Analytics", std::make_unique<FPSTracker>(), true);
 	m_visualizerManager.Register("Profiler Sessions", std::make_unique<ProfilerSessionManager>(), true);	
-
+	Core::CoreSystem::GetNexusClient()->EnableAutoReconnect();
 
 	return true;
 }

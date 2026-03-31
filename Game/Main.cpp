@@ -31,6 +31,7 @@ namespace
 			m_profilerController.Init();
 			InitializeBgfxView(Args(_argc, _argv), _width, _height);
 			imguiCreate();
+			Core::CoreSystem::GetNexusClient()->EnableAutoReconnect();
 		}
 
 		virtual int shutdown() override
