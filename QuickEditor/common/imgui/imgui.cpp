@@ -282,8 +282,7 @@ struct OcornutImguiContext
 		ImGuiIO& io = ImGui::GetIO();
 
 		io.DisplaySize = ImVec2(1280.0f, 720.0f);
-		io.DeltaTime   = 1.0f / 60.0f;
-		io.IniFilename = NULL;
+		io.DeltaTime   = 1.0f / 60.0f;		
 
 		setupStyle(true);
 
@@ -546,6 +545,12 @@ struct OcornutImguiContext
 			io.AddKeyEvent(m_keyMap[ii], inputGetKeyState(entry::Key::Enum(ii) ) );
 			io.SetKeyEventNativeData(m_keyMap[ii], 0, 0, ii);
 		}
+
+		for (const uint8_t* data = inputGetChar(); NULL != data; data = inputGetChar() )
+		{
+			io.AddInputCharactersUTF8( (const char*)data);
+		}
+		inputCharFlush();
 #endif // USE_ENTRY
 
 		ImGui::NewFrame();

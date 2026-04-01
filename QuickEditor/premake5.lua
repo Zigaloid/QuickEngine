@@ -32,7 +32,8 @@ project "QuickEdit"
    
     defines {         
         "BX_CONFIG_DEBUG",  
-		"ENTRY_CONFIG_IMPLEMENT_MAIN=1"
+		"ENTRY_CONFIG_IMPLEMENT_MAIN=1",
+		"USE_ENTRY=1"
     }
    
     filter "action:vs*"
@@ -48,12 +49,17 @@ project "QuickEdit"
 	includedirs { "../External/bx/include/" }   
 	includedirs { "../External/bgfx/"}
 	includedirs { "../External"}
+	includedirs { "../Shared/ImguiVizualizers" }  
+	includedirs { "../AssetClasses" }
 
 	includedirs { "./common/" }   
 
 	includedirs { "../External/imgui-docking" }   	
 	includedirs { "../External/bx/include/compat/msvc" }   
 	includedirs { "../External/OpenGL/Include" }  
+	
+	files { "../AssetClasses/**.cpp" }
+	files { "../AssetClasses/**.h" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.cpp" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.h" }
 	files { "../External/imgui-docking/imgui.cpp" }
@@ -61,6 +67,14 @@ project "QuickEdit"
 	files { "../External/imgui-docking/imgui_tables.cpp" }
 	files { "../External/imgui-docking/imgui_Widgets.cpp" }
 	files { "../External/imgui-docking/imgui_draw.cpp" }
+
+	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.cpp" }
+	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.h" }
+	files { "../Shared/ImguiVizualizers/IImGuiVisualizer.h" }	
+	files { "../Shared/ImguiVizualizers/CommandConsole.cpp" }
+	files { "../Shared/ImguiVizualizers/CommandConsole.h" }
+	files { "../Shared/ImguiVizualizers/PropertyInspector.cpp" }
+	files { "../Shared/ImguiVizualizers/PropertyInspector.h" }
 
 	files { "./**.cpp", "./**.h" }      
 

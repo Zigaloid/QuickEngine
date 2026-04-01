@@ -1,269 +1,141 @@
-/*
- * Copyright 2011-2026 Branimir Karadzic. All rights reserved.
- * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
- */
+﻿#include "QuickEdit.h"
+#include "CommandConsole.h"
+#include "AssetBrowser.h"
+#include "ObjJsonEditor.h"
 
-#include <bx/uint32_t.h>
-#include "common.h"
-#include "bgfx_utils.h"
-#include "logo.h"
-#include "imgui/imgui.h"
-#include "CoreSystem/CoreSystem.h"
-#include "CoreSystem/Timer.h"
-#include "net/NexusClient.h"
-#include "..\shared\sharednexusdefines.h"
-#include "..\shared\ProfilerController.h"
+#include "EntityDefinition.h"
+#include "StaticMeshDefinition.h"
 
-namespace
+bool QuickEditApp::Initialize()
 {
-	class TheApp : public entry::AppI
-	{
-	public:
-		TheApp(const char* _name, const char* _description, const char* _url)
-			: entry::AppI(_name, _description, _url), m_frameTimer(100)
-		{
-		}
+	// Initialize application-specific resources here
+	m_visualizerManager.Initialize();
+	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), true);
 
-		void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
-		{
-			DECLARE_FUNC_VLOW();
-			InitializeCoreEngine();
-			m_profilerController.Init();
-			InitializeBgfxView(Args(_argc, _argv), _width, _height);
-			imguiCreate();
-			Core::CoreSystem::GetNexusClient()->EnableAutoReconnect();
-		}
+	// Register the generic object editor
+	auto objEditor = std::make_unique<ImGuiVisualizers::ObjJsonEditor>();
+	auto* objEditorPtr = objEditor.get();
+	m_visualizerManager.Register("Object Editor", std::move(objEditor), false);
 
-		virtual int shutdown() override
-		{
-			DECLARE_FUNC_VLOW();
-			ShutdownCoreEngine();
-			imguiDestroy();
-			bgfx::shutdown();
-			return 0;
-		}
+	// Asset Browser with example asset type registrations
+	auto assetBrowser = std::make_unique<ImGuiVisualizers::AssetBrowser>();
+	auto& registry = assetBrowser->GetRegistry();
 
-		bool update() override
-		{
-			PROFILE_FRAME();
-			DECLARE_FUNC_LOW();
-			if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState))
-			{
+	// Register asset types by multi-part extension
+	registry.Register(".def.obj.json", "Definition Object", IM_COL32(100, 200, 255, 255), "O");
+	registry.Register(".png", "Texture", IM_COL32(200, 150, 255, 255), "T");
+	registry.Register(".bmp", "Texture", IM_COL32(200, 150, 255, 255), "T");
+	registry.Register(".dds", "Texture", IM_COL32(200, 150, 255, 255), "T");
 
-				// Get timer at start of frame to get accurate delta time for job system scheduling and other time-based operations							
-				ImguiUpdate();
-				BgfxUpdateView();
+	// ── Configure launch options per asset type ─────────────────────────
 
-				Core::CoreSystem::GetResourceManager()->UpdateFinalization();
-				auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
-				scheduler->UpdateAllAsync(m_deltaTime);
-				scheduler->WaitForCompletion();
-
-
-				UpdateDeltaTime();
-				NEXUS_SEND_MESSAGE(FPS_PIPE, MSG_TYPE_FRAME_TIME, std::to_string(m_deltaTime).c_str());
-				
-				return true;
-			}
-
-			return false;
-		}
-	private:
-
-		double UpdateDeltaTime()
-		{
-			double deltaTime = m_frameTimer.GetElapsed();
-			m_frameTimer.Reset();
-			if( deltaTime > 1.0/10.0) // Clamp delta time to avoid huge jumps (e.g. when debugging or if the app was paused)
-			{
-				deltaTime = 1.0 / 10.0;
-			}
-			m_deltaTime = deltaTime;
-			return m_deltaTime;
-		}
-		double	m_deltaTime = 1 / 10;
-
-		bool InitializeCoreEngine()
-		{
-			DECLARE_FUNC_VLOW();
-			// Example: in your job system worker threads, game thread, render thread, etc.
-			Profiler::ProfileLogger::GetInstance().RegisterThread("Main Thread");
-			// Core system initialization
-			if (!Core::CoreSystem::Initialize())
-				return false;
-
-			NEXUS_CONNECT_AND_REGISTER("127.0.0.1", 9500, "GameApp", "nhill");			
-
-			return true;
-		}
-		void ShutdownCoreEngine()
-		{
-			DECLARE_FUNC_VLOW();			
-			// Example: in your job system worker threads, game thread, render thread, etc.			
-			Core::CoreSystem::Shutdown();
-		}
-		void BgfxUpdateView()
-		{
-			DECLARE_FUNC_LOW();
-			// Set view 0 default viewport.
-			bgfx::setViewRect(0, 0, 0, uint16_t(m_width), uint16_t(m_height));
-
-			// This dummy draw call is here to make sure that view 0 is cleared
-			// if no other draw calls are submitted to view 0.
-			bgfx::touch(0);
-
-			// Use debug font to print information about this example.
-			bgfx::dbgTextClear();
-
-			const bgfx::Stats* stats = bgfx::getStats();
-
-			bgfx::dbgTextImage(
-				bx::max<uint16_t>(uint16_t(stats->textWidth / 2), 20) - 20
-				, bx::max<uint16_t>(uint16_t(stats->textHeight / 2), 6) - 6
-				, 40
-				, 12
-				, s_logo
-				, 160
-			);
-
-			bgfx::dbgTextPrintf(0, 1, 0x0f, "Color can be changed with ANSI \x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b[14;me\x1b[0m code too.");
-
-			bgfx::dbgTextPrintf(80, 1, 0x0f, "\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; 5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
-			bgfx::dbgTextPrintf(80, 2, 0x0f, "\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    \x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
-
-			bgfx::dbgTextPrintf(0, 2, 0x0f, "Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters."
-				, stats->width
-				, stats->height
-				, stats->textWidth
-				, stats->textHeight
-			);
-
-			// Advance to next frame. Rendering thread will be kicked to
-			// process submitted rendering primitives.
-			bgfx::frame();
-		}
-		void SetupDockspace()
-		{
-			DECLARE_FUNC_VLOW();
-			ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(viewport->WorkPos);
-			ImGui::SetNextWindowSize(viewport->WorkSize);
-			ImGui::SetNextWindowViewport(viewport->ID);
-
-			ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
-			window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-			window_flags |= ImGuiWindowFlags_NoBackground;
-
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-			ImGui::Begin("DockSpace", nullptr, window_flags);
-			ImGui::PopStyleVar(3);
-
-			ImGuiID dockspace_id = ImGui::GetID("GameAppDockSpace");
-			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
-
-			// Menu bar within the dockspace window
-			if (ImGui::BeginMenuBar())
-			{
-				if (ImGui::BeginMenu("View"))
-				{
-					ImGui::MenuItem("Example Dialog", nullptr, &m_showExampleDialog);
-					ImGui::MenuItem("Stats", nullptr, &m_showStats);
-					ImGui::EndMenu();
+	// .obj.json files: use the generic ObjJsonEditor
+	if (auto* objType = registry.FindMutable(".def.obj.json")) {
+		// The reflected class name is embedded in the filename:
+		// e.g. "CEntityDefinition.obj.json" -> className = "CEntityDefinition"
+		// Alternatively, set a fixed class name per registered sub-extension.
+		objType->primaryLaunch = {
+			"Object Editor",
+			ImGuiVisualizers::AssetLaunchMode::Internal,
+			[this, objEditorPtr](const std::string& path) {
+				// Derive the class name from the filename.
+				// Convention: <ClassName>.obj.json
+				std::string fileName = path;
+				// Strip directory part
+				auto lastSlash = fileName.find_last_of("/\\");
+				if (lastSlash != std::string::npos) {
+					fileName = fileName.substr(lastSlash + 1);
 				}
-				ImGui::EndMenuBar();
+				// Strip ".obj.json" to get the class name
+				const std::string suffix = ".def.obj.json";
+				std::string className = "CEntityDefinition";
+
+				if (!className.empty()) {
+					objEditorPtr->Open(path, className);
+					m_visualizerManager.SetVisible("Object Editor", true);
+				}
 			}
+		};
+		objType->secondaryLaunches.push_back({
+			"Open as JSON (External)",
+			ImGuiVisualizers::AssetLaunchMode::External,
+			nullptr,
+			""  // empty = OS default for .json
+			});
+	}
 
-			ImGui::End();
-		}
-		void ImguiUpdate()
-		{
-			DECLARE_FUNC_LOW();
-			imguiBeginFrame(m_mouseState.m_mx
-				, m_mouseState.m_my
-				, (m_mouseState.m_buttons[entry::MouseButton::Left] ? IMGUI_MBUT_LEFT : 0)
-				| (m_mouseState.m_buttons[entry::MouseButton::Right] ? IMGUI_MBUT_RIGHT : 0)
-				| (m_mouseState.m_buttons[entry::MouseButton::Middle] ? IMGUI_MBUT_MIDDLE : 0)
-				, m_mouseState.m_mz
-				, uint16_t(m_width)
-				, uint16_t(m_height)
-			);
-
-			// Setup the full-window dockspace
-			SetupDockspace();
-
-			// Render dockable windows
-			if (m_showExampleDialog)
-			{
-				showExampleDialog(this);
+	// Material files: internal material editor
+	if (auto* mat = registry.FindMutable(".mat.json")) {
+		mat->primaryLaunch = {
+			"Material Editor",
+			ImGuiVisualizers::AssetLaunchMode::Internal,
+			[](const std::string& path) {
+				// TODO: open the internal material editor
 			}
+		};
+		mat->secondaryLaunches.push_back({
+			"Open as JSON (External)",
+			ImGuiVisualizers::AssetLaunchMode::External,
+			nullptr,
+			""
+			});
+	}
 
-			if (m_showStats)
-			{
-				ImGui::Begin("Stats", &m_showStats);
-				const bgfx::Stats* stats = bgfx::getStats();
-				ImGui::Text("Backbuffer: %dW x %dH", stats->width, stats->height);
-				ImGui::Text("Debug Text: %dW x %dH", stats->textWidth, stats->textHeight);
-				ImGui::Text("Draw Calls: %d", stats->numDraw);
-				ImGui::Text("Compute Calls: %d", stats->numCompute);
-				ImGui::End();
-			}
-
-			imguiEndFrame();
+	// Textures: internal preview as primary, external editor as secondary
+	for (const char* ext : { ".png", ".bmp", ".jpg", ".dds" }) {
+		if (auto* tex = registry.FindMutable(ext)) {
+			tex->primaryLaunch = {
+				"Texture Preview",
+				ImGuiVisualizers::AssetLaunchMode::Internal,
+				[](const std::string& path) {
+					// TODO: open the internal texture previewer
+				}
+			};
+			tex->secondaryLaunches.push_back({
+				"Open in External Editor",
+				ImGuiVisualizers::AssetLaunchMode::External,
+				nullptr,
+				""
+				});
 		}
-		void InitializeBgfxView(const Args& args, uint32_t _width, uint32_t _height)
-		{
-			m_width = _width;
-			m_height = _height;
-			m_debug = BGFX_DEBUG_TEXT;
-			m_reset = BGFX_RESET_VSYNC;
+	}
 
-			bgfx::Init init;
-			init.type = args.m_type;
-			init.vendorId = args.m_pciId;
-			init.platformData.nwh = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
-			init.platformData.ndt = entry::getNativeDisplayHandle();
-			init.platformData.type = entry::getNativeWindowHandleType();
-			init.resolution.width = m_width;
-			init.resolution.height = m_height;
-			init.resolution.reset = m_reset;
-			bgfx::init(init);
+	// Lua scripts: open externally by default
+	if (auto* lua = registry.FindMutable(".lua")) {
+		lua->primaryLaunch = {
+			"Open in External Editor",
+			ImGuiVisualizers::AssetLaunchMode::External,
+			nullptr,
+			""
+		};
+	}
 
-			// Enable debug text.
-			bgfx::setDebug(m_debug);
+	m_visualizerManager.Register("Asset Browser", std::move(assetBrowser), true);
 
-			// Set view 0 clear state.
-			bgfx::setViewClear(0
-				, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH
-				, 0x303030ff
-				, 1.0f
-				, 0
-			);
-		}
+	return true;
+}
 
-		entry::MouseState m_mouseState;
+void QuickEditApp::Update(double deltaTime)
+{
+	m_visualizerManager.Update(static_cast<float>(deltaTime));
+}
 
-		uint32_t m_width;
-		uint32_t m_height;
-		uint32_t m_debug;
-		uint32_t m_reset;
+void QuickEditApp::Render(double deltaTime)
+{
 
-		// Frame timing
-        Core::Timer m_frameTimer;
-		ProfilerController m_profilerController;
-		// Dockable window visibility states
-		bool m_showExampleDialog = true;
-		bool m_showStats = false;
-	};
+}
 
-} // namespace
+void QuickEditApp::ImguiUpdate()
+{
+	m_visualizerManager.RenderAll();
+}
 
-ENTRY_IMPLEMENT_MAIN(
-	TheApp
-	, "Application Main"
-	, "Initialization of application."
-	, "https://github.com/Zigaloid/QuickScope"
-);
+void QuickEditApp::ImguiMainMenu()
+{
+	m_visualizerManager.RenderMenuBar();
+}
+
+bool QuickEditApp::Shutdown()
+{
+	return true;
+}

@@ -11,15 +11,19 @@
 #include "CoreSystem/CoreSystem.h"
 #include "CoreSystem/Timer.h"
 #include "net/NexusClient.h"
+#include "QuickEdit.h"
+
 #include "..\shared\sharednexusdefines.h"
 #include "..\shared\ProfilerController.h"
 
+QuickEditApp theApp;
+
 namespace
 {
-	class TheApp : public entry::AppI
+	class BGFXApp : public entry::AppI
 	{
 	public:
-		TheApp(const char* _name, const char* _description, const char* _url)
+		BGFXApp(const char* _name, const char* _description, const char* _url)
 			: entry::AppI(_name, _description, _url), m_frameTimer(100)
 		{
 		}
@@ -31,7 +35,10 @@ namespace
 			m_profilerController.Init();
 			InitializeBgfxView(Args(_argc, _argv), _width, _height);
 			imguiCreate();
+			
 			Core::CoreSystem::GetNexusClient()->EnableAutoReconnect();
+
+			theApp.Initialize();
 		}
 
 		virtual int shutdown() override
@@ -40,6 +47,7 @@ namespace
 			ShutdownCoreEngine();
 			imguiDestroy();
 			bgfx::shutdown();
+			theApp.Shutdown();
 			return 0;
 		}
 
@@ -59,7 +67,7 @@ namespace
 				scheduler->UpdateAllAsync(m_deltaTime);
 				scheduler->WaitForCompletion();
 
-
+				theApp.Update(m_deltaTime);
 				UpdateDeltaTime();
 				NEXUS_SEND_MESSAGE(FPS_PIPE, MSG_TYPE_FRAME_TIME, std::to_string(m_deltaTime).c_str());
 				
@@ -115,28 +123,7 @@ namespace
 			// Use debug font to print information about this example.
 			bgfx::dbgTextClear();
 
-			const bgfx::Stats* stats = bgfx::getStats();
-
-			bgfx::dbgTextImage(
-				bx::max<uint16_t>(uint16_t(stats->textWidth / 2), 20) - 20
-				, bx::max<uint16_t>(uint16_t(stats->textHeight / 2), 6) - 6
-				, 40
-				, 12
-				, s_logo
-				, 160
-			);
-
-			bgfx::dbgTextPrintf(0, 1, 0x0f, "Color can be changed with ANSI \x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b[14;me\x1b[0m code too.");
-
-			bgfx::dbgTextPrintf(80, 1, 0x0f, "\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; 5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
-			bgfx::dbgTextPrintf(80, 2, 0x0f, "\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    \x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
-
-			bgfx::dbgTextPrintf(0, 2, 0x0f, "Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters."
-				, stats->width
-				, stats->height
-				, stats->textWidth
-				, stats->textHeight
-			);
+			theApp.Render(m_deltaTime);
 
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
@@ -168,12 +155,7 @@ namespace
 			// Menu bar within the dockspace window
 			if (ImGui::BeginMenuBar())
 			{
-				if (ImGui::BeginMenu("View"))
-				{
-					ImGui::MenuItem("Example Dialog", nullptr, &m_showExampleDialog);
-					ImGui::MenuItem("Stats", nullptr, &m_showStats);
-					ImGui::EndMenu();
-				}
+				theApp.ImguiMainMenu();
 				ImGui::EndMenuBar();
 			}
 
@@ -191,27 +173,9 @@ namespace
 				, uint16_t(m_width)
 				, uint16_t(m_height)
 			);
-
 			// Setup the full-window dockspace
-			SetupDockspace();
-
-			// Render dockable windows
-			if (m_showExampleDialog)
-			{
-				showExampleDialog(this);
-			}
-
-			if (m_showStats)
-			{
-				ImGui::Begin("Stats", &m_showStats);
-				const bgfx::Stats* stats = bgfx::getStats();
-				ImGui::Text("Backbuffer: %dW x %dH", stats->width, stats->height);
-				ImGui::Text("Debug Text: %dW x %dH", stats->textWidth, stats->textHeight);
-				ImGui::Text("Draw Calls: %d", stats->numDraw);
-				ImGui::Text("Compute Calls: %d", stats->numCompute);
-				ImGui::End();
-			}
-
+			SetupDockspace();			
+			theApp.ImguiUpdate();
 			imguiEndFrame();
 		}
 		void InitializeBgfxView(const Args& args, uint32_t _width, uint32_t _height)
@@ -262,7 +226,7 @@ namespace
 } // namespace
 
 ENTRY_IMPLEMENT_MAIN(
-	TheApp
+	BGFXApp
 	, "Application Main"
 	, "Initialization of application."
 	, "https://github.com/Zigaloid/QuickScope"

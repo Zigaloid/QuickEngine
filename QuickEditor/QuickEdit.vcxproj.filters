@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="External">
-      <UniqueIdentifier>{089DB854-F469-1360-1D83-010809AF48EE}</UniqueIdentifier>
+    <Filter Include="..">
+      <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\bgfx">
-      <UniqueIdentifier>{9E02D657-0AC3-518E-D3FD-9A0B3F7D966A}</UniqueIdentifier>
+    <Filter Include="..\AssetClasses">
+      <UniqueIdentifier>{3EBD9B7A-AA48-093F-B359-8C331F64653F}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\bgfx\3rdparty">
-      <UniqueIdentifier>{C6C608C9-B2C0-311B-9B2D-C82B87C69787}</UniqueIdentifier>
+    <Filter Include="..\External">
+      <UniqueIdentifier>{B37FD6D7-1F35-4FCD-A829-49A414DE45D1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\bgfx\3rdparty\meshoptimizer">
-      <UniqueIdentifier>{256D63C5-1154-25BD-BAA4-8BDAA66A9E23}</UniqueIdentifier>
+    <Filter Include="..\External\bgfx">
+      <UniqueIdentifier>{2948D311-1541-F263-3E73-D7E82ACBD16F}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\bgfx\3rdparty\meshoptimizer\src">
-      <UniqueIdentifier>{BC350B76-A8B2-FEB8-D12F-FFCCBD0B9B4C}</UniqueIdentifier>
+    <Filter Include="..\External\bgfx\3rdparty">
+      <UniqueIdentifier>{B178801A-1D3B-B4A4-66EB-4231D2EC8C82}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\imgui-docking">
-      <UniqueIdentifier>{DE5A4D51-CA54-76A3-B3C1-0CB49F5ADC0F}</UniqueIdentifier>
+    <Filter Include="..\External\bgfx\3rdparty\meshoptimizer">
+      <UniqueIdentifier>{509E8E20-BC2D-500B-C529-312331388B17}</UniqueIdentifier>
     </Filter>
-    <Filter Include="External\imgui-docking\backends">
-      <UniqueIdentifier>{C8EEB13D-34D2-C07D-3DD5-EEB9A93787CE}</UniqueIdentifier>
+    <Filter Include="..\External\bgfx\3rdparty\meshoptimizer\src">
+      <UniqueIdentifier>{670471E8-D369-046F-5C42-A647C8A6F9DD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\External\imgui-docking">
+      <UniqueIdentifier>{C90CC5A2-35CF-F82C-7E7F-87B9EA80D10A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\External\imgui-docking\backends">
+      <UniqueIdentifier>{13F91329-FF34-1793-6847-2F8A54A2BFAD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Shared">
+      <UniqueIdentifier>{67846B3F-D3EE-1FB6-1C2D-D15B88D6FD0A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Shared\ImguiVizualizers">
+      <UniqueIdentifier>{F90243E0-E512-EFB0-4ECC-53CF3AFBDD49}</UniqueIdentifier>
     </Filter>
     <Filter Include="common">
       <UniqueIdentifier>{AEFEE3F6-9AA0-0ECD-835B-22216F9C951D}</UniqueIdentifier>
@@ -45,9 +57,30 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    <ClInclude Include="..\AssetClasses\EntityDefinition.h">
+      <Filter>..\AssetClasses</Filter>
     </ClInclude>
+    <ClInclude Include="..\AssetClasses\StaticMeshDefinition.h">
+      <Filter>..\AssetClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\PropertyInspector.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetBrowser.h" />
+    <ClInclude Include="ObjJsonEditor.h" />
+    <ClInclude Include="QuickEdit.h" />
     <ClInclude Include="common\args.h">
       <Filter>common</Filter>
     </ClInclude>
@@ -243,70 +276,87 @@
     <ClInclude Include="logo.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
+      <Filter>..\AssetClasses</Filter>
+    </ClCompile>
+    <ClCompile Include="..\AssetClasses\StaticMeshDefinition.cpp">
+      <Filter>..\AssetClasses</Filter>
+    </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\clusterizer.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\indexanalyzer.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\indexcodec.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\indexgenerator.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\overdrawoptimizer.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\partition.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\quantization.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\rasterizer.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\simplifier.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\spatialorder.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\stripifier.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vcacheoptimizer.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vertexcodec.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vertexfilter.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vfetchoptimizer.cpp">
-      <Filter>External\bgfx\3rdparty\meshoptimizer\src</Filter>
+      <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
     <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_opengl3.cpp">
-      <Filter>External\imgui-docking\backends</Filter>
+      <Filter>..\External\imgui-docking\backends</Filter>
     </ClCompile>
     <ClCompile Include="..\External\imgui-docking\imgui.cpp">
-      <Filter>External\imgui-docking</Filter>
+      <Filter>..\External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\imgui-docking\imgui_Widgets.cpp">
-      <Filter>External\imgui-docking</Filter>
+      <Filter>..\External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp">
-      <Filter>External\imgui-docking</Filter>
+      <Filter>..\External\imgui-docking</Filter>
     </ClCompile>
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp">
-      <Filter>External\imgui-docking</Filter>
+      <Filter>..\External\imgui-docking</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="QuickEdit.cpp" />
     <ClCompile Include="common\bgfx_utils.cpp">
       <Filter>common</Filter>
     </ClCompile>
