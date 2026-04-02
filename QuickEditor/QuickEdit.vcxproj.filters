@@ -274,6 +274,7 @@
       <Filter>common\ps</Filter>
     </ClInclude>
     <ClInclude Include="logo.h" />
+    <ClInclude Include="DocumentManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
@@ -429,5 +430,6 @@
     <ClCompile Include="common\ps\particle_system.cpp">
       <Filter>common\ps</Filter>
     </ClCompile>
+    <ClCompile Include="DocumentManager.cpp" />
   </ItemGroup>
 </Project>
