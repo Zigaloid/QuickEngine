@@ -3,6 +3,7 @@
 #include "imgui.h"
 #include "Reflection/ReflectionBase.h"
 #include "Reflection/ReflectionMap.h"
+#include "ComponentSystem/ComponentRegistry.h"
 
 #include <string>
 #include <unordered_set>
@@ -69,6 +70,15 @@ namespace ImGuiVisualizers {
 		void RenderComponentPtrProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object);
 
+		// Context menu for component arrays
+		void RenderComponentArrayContextMenu(const CPropertyBase& property, CReflectedBase* object);
+		void RenderComponentItemContextMenu(const CPropertyBase& property, CReflectedBase* object, size_t index);
+
+		// Component management
+		bool AddComponentToArray(const CPropertyBase& property, CReflectedBase* object, const std::string& componentClassName);
+		bool RemoveComponentFromArray(const CPropertyBase& property, CReflectedBase* object, size_t index);
+		void ProcessPendingDeletions();
+
 		// Helper methods
 		std::string GenerateTreeNodeId(const std::string& name, const void* address);
 		bool ShouldExpandNode(const std::string& nodeId);
@@ -102,6 +112,14 @@ namespace ImGuiVisualizers {
 			bool isBeingEdited;
 		};
 		std::unordered_map<void*, StringEditBuffer> m_StringBuffers;
+
+		// Deferred deletion for components (to avoid modifying vector during iteration)
+		struct PendingComponentDeletion {
+			const CPropertyBase* property;
+			CReflectedBase* object;
+			size_t index;
+		};
+		std::vector<PendingComponentDeletion> m_PendingDeletions;
 
 		// Input buffers for editable properties
 		float m_FloatBuffer;

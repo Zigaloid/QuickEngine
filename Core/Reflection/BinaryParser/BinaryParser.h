@@ -428,6 +428,67 @@ public:
 		}
 	}
 
+	void ReadComponentRawPtrArray(const CPropertyBase& property, CReflectedBase* obj)
+	{
+		if (ValidateProperties(property))
+		{
+			int arraySize;
+			ReadInt(arraySize);
+			std::vector<ComponentSystem::Component*>* componentVector =
+				reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(obj));
+
+			componentVector->clear();
+
+			ComponentSystem::Component* parentComponent = dynamic_cast<ComponentSystem::Component*>(obj);
+
+			for (int i = 0; i < arraySize; i++)
+			{
+				std::string className;
+				ReadString(className);
+
+				// Create component through ClassFactory
+				CReflectedBase* newObject = ClassFactory::createObject(className.c_str());
+				if (newObject) {
+					// Ensure it's actually a Component
+					ComponentSystem::Component* childComponent = dynamic_cast<ComponentSystem::Component*>(newObject);
+					if (childComponent) {
+						childComponent->ReadMembers(*this);
+
+						if (parentComponent) {
+							parentComponent->AddChild(childComponent);
+						}
+						else {
+							componentVector->push_back(childComponent);
+						}
+					}
+					else {
+						delete newObject;
+					}
+				}
+			}
+		}
+	}
+
+	void WriteComponentRawPtrArray(const CPropertyBase& property, CReflectedBase* obj)
+	{
+		WriteProperties(property);
+		std::vector<ComponentSystem::Component*>* componentVector =
+			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(obj));
+
+		WriteInt(static_cast<int>(componentVector->size()));
+		for (const auto& element : *componentVector)
+		{
+			if (element) {
+				std::string className = element->GetRflClassName();
+				WriteString(className);
+				element->WriteMembers(*this);
+			}
+			else {
+				WriteString(std::string(""));
+			}
+		}
+	}
+
 	void ReadBool(const CPropertyBase& property, CReflectedBase* obj)
 	{
 		if (ValidateProperties(property))

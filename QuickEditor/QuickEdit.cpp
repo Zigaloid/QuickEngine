@@ -1,11 +1,29 @@
 ﻿#include "QuickEdit.h"
 #include "CommandConsole.h"
 
-#include "EntityDefinition.h"
+#include "EntityInstance.h"
 #include "StaticMeshDefinition.h"
+#include <iostream>
 
 bool QuickEditApp::Initialize()
 {
+
+	CEntityInstance instance;
+	instance.Read("./Assets/Entities/Test2.entity.obj.json");
+
+	// Debug: Check if children were loaded
+	const auto& children = instance.GetChildren();
+	if (children.empty()) {
+		std::cout << "ERROR: No children loaded!\n";
+	} else {
+		std::cout << "SUCCESS: Loaded " << children.size() << " child component(s)\n";
+		for (size_t i = 0; i < children.size(); i++) {
+			if (children[i]) {
+				std::cout << "  Child " << i << ": " << children[i]->GetRflClassName() << "\n";
+			}
+		}
+	}
+
 	// Initialize application-specific resources here
 	m_visualizerManager.Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), true);

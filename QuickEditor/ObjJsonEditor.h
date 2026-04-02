@@ -68,9 +68,7 @@ namespace ImGuiVisualizers {
 			}
 
 			static char* buffer = new char[200];
-			buffer[0] = '\0';
-
-			ImGui::InputText("TextTest", buffer, 200);
+			buffer[0] = '\0';			
 			
 			// Toolbar
 			if (ImGui::Button("Save")) {

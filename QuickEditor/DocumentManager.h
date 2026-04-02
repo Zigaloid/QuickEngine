@@ -4,8 +4,13 @@
 #include "AssetBrowser.h"
 
 #include <unordered_set>
+#include <unordered_map>
 #include <string>
 #include <vector>
+#include <memory>
+
+// Forward declarations
+class IAssetLauncher;
 
 /**
  * @brief Manages document registration (asset types and launch options)
@@ -16,6 +21,9 @@
  */
 class DocumentManager
 {
+    // Allow launchers to access private members
+    friend class ObjJsonLauncher;
+
 public:
     explicit DocumentManager(ImGuiVisualizers::ImGuiVisualizerManager& visualizerManager);
 
@@ -35,6 +43,30 @@ private:
                        const std::string& filePath,
                        const std::string& className);
 
+    // ── Asset Launcher Registry ─────────────────────────────────────────
+
+    /// Initialize all asset launchers
+    void InitializeLaunchers();
+
+    /// Get a launcher by name
+    IAssetLauncher* GetLauncher(const char* name);
+
+    // ── Asset type configuration table ──────────────────────────────────
+
+    /// Configuration for a single asset type
+    struct AssetTypeConfig {
+        const char* extension;
+        const char* displayName;
+        ImU32 color;
+        const char* icon;
+        const char* primaryLauncherName;
+        bool hasExternalJsonFallback;
+        bool hasExternalEditorFallback;
+    };
+
+    /// Get the configuration table for all asset types
+    std::vector<AssetTypeConfig> GetAssetTypeConfigs();
+
     ImGuiVisualizers::ImGuiVisualizerManager& m_visualizerManager;
 
     /// Manager keys of dynamically-created ObjJsonEditor instances.
@@ -47,4 +79,48 @@ private:
         std::string className;
     };
     std::vector<PendingEditor> m_pendingEditors;
+
+    /// Registry of asset launchers by name
+    std::unordered_map<std::string, std::unique_ptr<IAssetLauncher>> m_launchers;
+};
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Asset Launcher Interface and Implementations
+// ─────────────────────────────────────────────────────────────────────────────
+
+/**
+ * @brief Base interface for asset launchers
+ */
+class IAssetLauncher
+{
+public:
+    virtual ~IAssetLauncher() = default;
+    virtual void Launch(const std::string& assetPath) = 0;
+};
+
+/**
+ * @brief Launcher for ObjJson editors
+ */
+class ObjJsonLauncher : public IAssetLauncher
+{
+public:
+    ObjJsonLauncher(DocumentManager& manager, 
+                    const std::string& suffix, 
+                    const std::string& className);
+
+    void Launch(const std::string& assetPath) override;
+
+private:
+    DocumentManager& m_manager;
+    std::string m_suffix;
+    std::string m_className;
+};
+
+/**
+ * @brief No-op launcher for TODO/unimplemented features
+ */
+class NoOpLauncher : public IAssetLauncher
+{
+public:
+    void Launch(const std::string& assetPath) override;
 };

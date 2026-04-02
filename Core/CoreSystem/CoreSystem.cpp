@@ -2,6 +2,8 @@
 //#include "GLTFComponent.h"
 #include "ComponentSystem/ComponentSystem.h"
 #include "ComponentSystem/ComponentSystemScheduler.h"
+#include "ComponentSystem/ComponentRegistry.h"
+
 #include "FunctionCallManager.h"  // Add this include
 #include "FileSystem/StandardFileSystem.h"
 #include "Net/NexusClient.h"
@@ -18,7 +20,7 @@ namespace Core {
 	std::unique_ptr<ComponentSystem::ComponentSystemScheduler> CoreSystem::s_componentSystemScheduler = nullptr;
 	std::unique_ptr<CThreadSafeLog> CoreSystem::s_log = nullptr;
 	std::unique_ptr<CNexusClient> CoreSystem::s_nexusClient = nullptr;
-	
+
 	bool CoreSystem::s_initialized = false;
 	InitFlag CoreSystem::s_initFlags = InitFlag::None;
 

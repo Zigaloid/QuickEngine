@@ -62,6 +62,7 @@
 #define REFL_DEFINE_VECTOR3_MEMBER(_O_,_M_)				CReflectionMapEntry(new CVector3Property( RT_Vector3, sizeof(Vector3f),offsetof(_O_, _M_), #_M_) )
 #define REFL_DEFINE_MATRIX4_MEMBER(_O_,_M_)				CReflectionMapEntry(new CMatrix4Property( RT_Matrix4, sizeof(Matrix4f),offsetof(_O_, _M_), #_M_) )
 #define REFL_DEFINE_COMPONENT_PTR_VECTOR_MEMBER(_O_,_M_) CReflectionMapEntry(new CComponentPtrVectorProperty( RT_ComponentPtrVec, sizeof(std::vector<std::unique_ptr<Component>>), offsetof(_O_, _M_), #_M_ ))
+#define REFL_DEFINE_COMPONENT_RAW_PTR_VECTOR_MEMBER(_O_,_M_) CReflectionMapEntry(new CComponentRawPtrVectorProperty( RT_ComponentRawPtrVec, sizeof(std::vector<Component*>), offsetof(_O_, _M_), #_M_ ))
 #define REFL_DEFINE_BOOL_MEMBER(_O_,_M_) CReflectionMapEntry(new CBoolProperty(RT_Bool, sizeof(bool), offsetof(_O_, _M_), #_M_))
 #define REFL_DEFINE_INT_VECTOR_MEMBER(_O_,_M_)			CReflectionMapEntry(new CIntVectorProperty( RT_IntVec, sizeof(std::vector<int>), offsetof(_O_, _M_), #_M_) )
 #define REFL_DEFINE_FLOAT_VECTOR_MEMBER(_O_,_M_)		CReflectionMapEntry(new CFloatVectorProperty( RT_FloatVec, sizeof(std::vector<float>), offsetof(_O_, _M_), #_M_) )

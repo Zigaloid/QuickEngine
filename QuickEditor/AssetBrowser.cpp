@@ -207,6 +207,13 @@ bool AssetBrowser::Render(bool* isOpen)
     ImGui::EndChild();
 
     ImGui::End();
+
+    // Render create asset dialog if active
+    RenderCreateAssetDialog();
+
+    // Render rename asset dialog if active
+    RenderRenameAssetDialog();
+
     return true;
 }
 
@@ -381,6 +388,9 @@ void AssetBrowser::RenderFolderNode(FolderNode& node)
 
     bool opened = ImGui::TreeNodeEx(node.name.c_str(), flags);
 
+    // Track if we manually toggled the state via double-click
+    bool manualToggle = false;
+
     // Selection handling — select on click, even if the node was toggled open/closed
     if (ImGui::IsItemClicked(ImGuiMouseButton_Left)) {
         if (m_selectedFolder != node.fullPath) {
@@ -389,15 +399,41 @@ void AssetBrowser::RenderFolderNode(FolderNode& node)
         }
     }
 
+    // Double-click to toggle folder expansion
+    if (ImGui::IsItemHovered() && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
+        if (!node.children.empty()) {
+            node.expanded = !node.expanded;
+            manualToggle = true;
+        }
+    }
+
+    // Right-click context menu
+    RenderFolderContextMenu(node);
+
+    // Drop target for moving assets
+    if (ImGui::BeginDragDropTarget()) {
+        if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ASSET_MOVE")) {
+            const char* assetPath = static_cast<const char*>(payload->Data);
+            MoveAsset(assetPath, node.fullPath);
+        }
+        ImGui::EndDragDropTarget();
+    }
+
     if (opened && !node.children.empty()) {
-        node.expanded = true;
+        // Only sync state if not manually toggled
+        if (!manualToggle) {
+            node.expanded = true;
+        }
         for (auto& child : node.children) {
             RenderFolderNode(child);
         }
         ImGui::TreePop();
     }
     else if (!opened) {
-        node.expanded = false;
+        // Only sync state if not manually toggled
+        if (!manualToggle) {
+            node.expanded = false;
+        }
     }
 }
 
@@ -482,12 +518,17 @@ void AssetBrowser::RenderAssetList()
 
                 // Double-click: launch primary action
                 if (selected && ImGui::IsMouseDoubleClicked(ImGuiMouseButton_Left)) {
-                    if (asset.typeInfo && asset.typeInfo->primaryLaunch.internalHandler) {
-                        LaunchAsset(asset, asset.typeInfo->primaryLaunch);
+                    if (const auto* launchOption = GetEffectiveLaunchOption(asset)) {
+                        LaunchAsset(asset, *launchOption);
                     }
-                    else if (asset.typeInfo && asset.typeInfo->primaryLaunch.mode == AssetLaunchMode::External) {
-                        LaunchAsset(asset, asset.typeInfo->primaryLaunch);
-                    }
+                }
+
+                // Drag source for moving assets
+                if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
+                    // Set payload to carry the asset full path
+                    ImGui::SetDragDropPayload("ASSET_MOVE", asset.fullPath.c_str(), asset.fullPath.size() + 1);
+                    ImGui::Text("Move: %s", asset.fileName.c_str());
+                    ImGui::EndDragDropSource();
                 }
 
                 // Right-click: context menu
@@ -518,19 +559,26 @@ void AssetBrowser::RenderAssetContextMenu(const AssetEntry& asset)
     ImGui::PushID(asset.fullPath.c_str());
 
     if (ImGui::BeginPopupContextItem("##AssetCtx")) {
-        // Primary action at the top (if configured)
-        if (asset.typeInfo && !asset.typeInfo->primaryLaunch.label.empty()) {
-            std::string primaryLabel = asset.typeInfo->primaryLaunch.label + " (Default)";
+        // Get the effective launch option (primary or first secondary)
+        const AssetLaunchOption* effectiveLaunch = GetEffectiveLaunchOption(asset);
+        
+        // Show effective launch option at the top (if available)
+        if (effectiveLaunch) {
+            std::string primaryLabel = effectiveLaunch->label + " (Default)";
             if (ImGui::MenuItem(primaryLabel.c_str())) {
-                LaunchAsset(asset, asset.typeInfo->primaryLaunch);
+                LaunchAsset(asset, *effectiveLaunch);
             }
             ImGui::Separator();
         }
 
-        // "Open With" submenu containing all secondary options
+        // "Open With" submenu containing remaining secondary options
         if (asset.typeInfo && !asset.typeInfo->secondaryLaunches.empty()) {
             if (ImGui::BeginMenu("Open With")) {
                 for (const auto& option : asset.typeInfo->secondaryLaunches) {
+                    // Skip the option if it's already shown as the default
+                    if (effectiveLaunch && &option == effectiveLaunch) {
+                        continue;
+                    }
                     if (ImGui::MenuItem(option.label.c_str())) {
                         LaunchAsset(asset, option);
                     }
@@ -547,6 +595,32 @@ void AssetBrowser::RenderAssetContextMenu(const AssetEntry& asset)
             LaunchAsset(asset, sysDefault);
         }
 
+        ImGui::Separator();
+
+        // Rename asset
+        if (ImGui::MenuItem("Rename...")) {
+            OpenRenameAssetDialog(asset);
+        }
+
+        // Delete asset
+        if (ImGui::MenuItem("Delete")) {
+            DeleteAsset(asset.fullPath);
+        }
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::PopID();
+}
+
+void AssetBrowser::RenderFolderContextMenu(FolderNode& node)
+{
+    ImGui::PushID(node.fullPath.c_str());
+
+    if (ImGui::BeginPopupContextItem("##FolderCtx")) {
+        if (ImGui::MenuItem("New Asset...")) {
+            OpenCreateAssetDialog(node.fullPath);
+        }
         ImGui::EndPopup();
     }
 
@@ -554,6 +628,27 @@ void AssetBrowser::RenderAssetContextMenu(const AssetEntry& asset)
 }
 
 // ── Launch helpers ──────────────────────────────────────────────────────────
+
+const AssetLaunchOption* AssetBrowser::GetEffectiveLaunchOption(const AssetEntry& asset) const
+{
+    if (!asset.typeInfo) {
+        return nullptr;
+    }
+
+    // Use primary if it has a handler or is external
+    if (!asset.typeInfo->primaryLaunch.label.empty() &&
+        (asset.typeInfo->primaryLaunch.internalHandler || 
+         asset.typeInfo->primaryLaunch.mode == AssetLaunchMode::External)) {
+        return &asset.typeInfo->primaryLaunch;
+    }
+
+    // Otherwise use first secondary option if available
+    if (!asset.typeInfo->secondaryLaunches.empty()) {
+        return &asset.typeInfo->secondaryLaunches[0];
+    }
+
+    return nullptr;
+}
 
 void AssetBrowser::LaunchAsset(const AssetEntry& asset, const AssetLaunchOption& option)
 {
@@ -592,6 +687,324 @@ void AssetBrowser::LaunchExternal(const std::string& assetPath, const std::strin
     }
     std::system(command.c_str());
 #endif
+}
+
+// ── Asset Creation ──────────────────────────────────────────────────────────
+
+void AssetBrowser::OpenCreateAssetDialog(const std::string& folderPath)
+{
+    m_showCreateAssetDialog = true;
+    m_createAssetFolder = folderPath;
+    std::memset(m_createAssetNameBuffer, 0, sizeof(m_createAssetNameBuffer));
+    m_selectedAssetTypeIndex = 0;
+}
+
+void AssetBrowser::RenderCreateAssetDialog()
+{
+    if (!m_showCreateAssetDialog) {
+        return;
+    }
+
+    ImGui::OpenPopup("Create New Asset");
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Create New Asset", &m_showCreateAssetDialog, 
+                                ImGuiWindowFlags_AlwaysAutoResize)) {
+
+        const auto& allTypes = m_registry.GetAll();
+
+        if (allTypes.empty()) {
+            ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "No asset types registered!");
+            ImGui::Separator();
+            if (ImGui::Button("Close", ImVec2(120, 0))) {
+                m_showCreateAssetDialog = false;
+            }
+            ImGui::EndPopup();
+            return;
+        }
+
+        ImGui::Text("Folder: %s", m_createAssetFolder.c_str());
+        ImGui::Separator();
+
+        // Asset type selection
+        ImGui::Text("Asset Type:");
+        const char* currentTypeName = (m_selectedAssetTypeIndex >= 0 && m_selectedAssetTypeIndex < static_cast<int>(allTypes.size()))
+            ? allTypes[m_selectedAssetTypeIndex].displayName.c_str()
+            : "";
+
+        if (ImGui::BeginCombo("##AssetType", currentTypeName)) {
+            for (int i = 0; i < static_cast<int>(allTypes.size()); ++i) {
+                bool isSelected = (m_selectedAssetTypeIndex == i);
+                if (ImGui::Selectable(allTypes[i].displayName.c_str(), isSelected)) {
+                    m_selectedAssetTypeIndex = i;
+                }
+                if (isSelected) {
+                    ImGui::SetItemDefaultFocus();
+                }
+            }
+            ImGui::EndCombo();
+        }
+
+        // Asset name input
+        ImGui::Text("Asset Name:");
+        ImGui::SetNextItemWidth(300.0f);
+        ImGui::InputTextWithHint("##AssetName", "Enter asset name...", 
+                                  m_createAssetNameBuffer, sizeof(m_createAssetNameBuffer));
+
+        ImGui::Separator();
+
+        // Buttons
+        bool canCreate = (m_createAssetNameBuffer[0] != '\0') && 
+                         (m_selectedAssetTypeIndex >= 0 && m_selectedAssetTypeIndex < static_cast<int>(allTypes.size()));
+
+        if (!canCreate) {
+            ImGui::BeginDisabled();
+        }
+
+        if (ImGui::Button("Create", ImVec2(120, 0))) {
+            const AssetTypeInfo* selectedType = &allTypes[m_selectedAssetTypeIndex];
+            std::string assetName = m_createAssetNameBuffer;
+
+            if (CreateAssetFromTemplate(m_createAssetFolder, assetName, selectedType)) {
+                m_showCreateAssetDialog = false;
+                m_needsRefresh = true;
+            }
+        }
+
+        if (!canCreate) {
+            ImGui::EndDisabled();
+        }
+
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            m_showCreateAssetDialog = false;
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
+bool AssetBrowser::CreateAssetFromTemplate(const std::string& folderPath, 
+                                           const std::string& assetName, 
+                                           const AssetTypeInfo* typeInfo)
+{
+    if (!m_fileSystem || !typeInfo) {
+        return false;
+    }
+
+    // Find the template file
+    std::string templatePath = FindTemplateFile(typeInfo->extension);
+    if (templatePath.empty()) {
+        // No template found, show error message
+        // For now, just return false
+        return false;
+    }
+
+    // Construct the destination path
+    std::string destFileName = assetName + typeInfo->extension;
+    std::string destPath = folderPath;
+    if (!destPath.empty() && destPath.back() != '/' && destPath.back() != '\\') {
+        destPath += "/";
+    }
+    destPath += destFileName;
+
+    // Copy the template to the destination
+    auto result = m_fileSystem->CopyFile(templatePath, destPath);
+    if (!result.IsSuccess()) {
+        return false;
+    }
+
+    return true;
+}
+
+std::string AssetBrowser::FindTemplateFile(const std::string& extension) const
+{
+    if (!m_fileSystem) {
+        return "";
+    }
+
+    // Template file name format: "template" + extension
+    // For example: "template.scene.json" for ".scene.json"
+    std::string templateFileName = "template" + extension;
+    std::string templatePath = m_templateAssetsPath;
+    if (!templatePath.empty() && templatePath.back() != '/' && templatePath.back() != '\\') {
+        templatePath += "/";
+    }
+    templatePath += templateFileName;
+
+    // Check if the template file exists
+    if (m_fileSystem->Exists(templatePath) && m_fileSystem->IsFile(templatePath)) {
+        return templatePath;
+    }
+
+    return "";
+}
+
+// ── Asset Operations ────────────────────────────────────────────────────────
+
+void AssetBrowser::OpenRenameAssetDialog(const AssetEntry& asset)
+{
+    m_showRenameAssetDialog = true;
+    m_renameAssetPath = asset.fullPath;
+    m_renameAssetOldName = asset.fileName;
+
+    // Pre-fill the buffer with the current name (without extension)
+    std::string nameWithoutExt = asset.fileName;
+    if (asset.typeInfo) {
+        size_t extPos = nameWithoutExt.rfind(asset.typeInfo->extension);
+        if (extPos != std::string::npos) {
+            nameWithoutExt = nameWithoutExt.substr(0, extPos);
+        }
+    }
+
+    std::strncpy(m_renameAssetNameBuffer, nameWithoutExt.c_str(), sizeof(m_renameAssetNameBuffer) - 1);
+    m_renameAssetNameBuffer[sizeof(m_renameAssetNameBuffer) - 1] = '\0';
+}
+
+void AssetBrowser::RenderRenameAssetDialog()
+{
+    if (!m_showRenameAssetDialog) {
+        return;
+    }
+
+    ImGui::OpenPopup("Rename Asset");
+
+    ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+    ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+    if (ImGui::BeginPopupModal("Rename Asset", &m_showRenameAssetDialog, 
+                                ImGuiWindowFlags_AlwaysAutoResize)) {
+
+        ImGui::Text("Current name: %s", m_renameAssetOldName.c_str());
+        ImGui::Separator();
+
+        // Asset name input
+        ImGui::Text("New Name:");
+        ImGui::SetNextItemWidth(300.0f);
+        ImGui::InputTextWithHint("##NewAssetName", "Enter new name...", 
+                                  m_renameAssetNameBuffer, sizeof(m_renameAssetNameBuffer));
+
+        ImGui::Separator();
+
+        // Buttons
+        bool canRename = (m_renameAssetNameBuffer[0] != '\0');
+
+        if (!canRename) {
+            ImGui::BeginDisabled();
+        }
+
+        if (ImGui::Button("Rename", ImVec2(120, 0))) {
+            std::string newName = m_renameAssetNameBuffer;
+            if (RenameAsset(m_renameAssetPath, newName)) {
+                m_showRenameAssetDialog = false;
+                m_needsRefresh = true;
+            }
+        }
+
+        if (!canRename) {
+            ImGui::EndDisabled();
+        }
+
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+
+        if (ImGui::Button("Cancel", ImVec2(120, 0))) {
+            m_showRenameAssetDialog = false;
+        }
+
+        ImGui::EndPopup();
+    }
+}
+
+bool AssetBrowser::RenameAsset(const std::string& oldPath, const std::string& newName)
+{
+    if (!m_fileSystem) {
+        return false;
+    }
+
+    // Extract the directory from the old path
+    size_t lastSlash = oldPath.find_last_of("/\\");
+    std::string directory = (lastSlash != std::string::npos) ? oldPath.substr(0, lastSlash + 1) : "";
+
+    // Extract the filename from the old path
+    std::string oldFileName = (lastSlash != std::string::npos) ? oldPath.substr(lastSlash + 1) : oldPath;
+
+    // Get the full extension (everything from the first dot onwards)
+    // This preserves multi-part extensions like .obj.json
+    std::string extension;
+    size_t firstDot = oldFileName.find('.');
+    if (firstDot != std::string::npos) {
+        extension = oldFileName.substr(firstDot);
+    }
+
+    // Construct the new path
+    std::string newPath = directory + newName + extension;
+
+    // Check if the new path already exists
+    if (m_fileSystem->Exists(newPath)) {
+        // Could show an error message here
+        return false;
+    }
+
+    // Rename (move) the file
+    auto result = m_fileSystem->MoveFile(oldPath, newPath);
+    return result.IsSuccess();
+}
+
+bool AssetBrowser::DeleteAsset(const std::string& assetPath)
+{
+    if (!m_fileSystem) {
+        return false;
+    }
+
+    // Delete the file
+    auto result = m_fileSystem->DeleteFile(assetPath);
+    if (result.IsSuccess()) {
+        m_needsRefresh = true;
+        return true;
+    }
+    return false;
+}
+
+bool AssetBrowser::MoveAsset(const std::string& assetPath, const std::string& targetFolder)
+{
+    if (!m_fileSystem) {
+        return false;
+    }
+
+    // Extract the filename from the asset path
+    size_t lastSlash = assetPath.find_last_of("/\\");
+    std::string fileName = (lastSlash != std::string::npos) ? assetPath.substr(lastSlash + 1) : assetPath;
+
+    // Construct the new path
+    std::string newPath = targetFolder;
+    if (!newPath.empty() && newPath.back() != '/' && newPath.back() != '\\') {
+        newPath += "/";
+    }
+    newPath += fileName;
+
+    // Check if source and destination are the same
+    if (assetPath == newPath) {
+        return false;
+    }
+
+    // Check if the destination already exists
+    if (m_fileSystem->Exists(newPath)) {
+        // Could show an error message here
+        return false;
+    }
+
+    // Move the file
+    auto result = m_fileSystem->MoveFile(assetPath, newPath);
+    if (result.IsSuccess()) {
+        m_needsRefresh = true;
+        return true;
+    }
+    return false;
 }
 
 // ── Utility ─────────────────────────────────────────────────────────────────

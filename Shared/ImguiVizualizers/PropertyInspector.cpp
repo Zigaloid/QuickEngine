@@ -3,11 +3,20 @@
 #include "Math/Vector3f.h"
 #include "Math/Vector4f.h"
 #include "Math/Matrix4f.h"
+#include "CoreSystem/CoreSystem.h"
+#include "ClassFactory/ClassFactory.h"
 #include <algorithm>
 #include <sstream>
 #include "ComponentSystem/ComponentSystem.h"
+#include "ComponentSystem/ComponentRegistry.h"
 
 namespace ImGuiVisualizers {
+
+
+	// ═════════════════════════════════════════════════════════════════════════════
+	// PropertyInspector
+	// ═════════════════════════════════════════════════════════════════════════════
+
 	// Colors for different types
 	static const ImVec4 COLOR_TYPE_PRIMITIVE = ImVec4(0.7f, 0.9f, 0.7f, 1.0f);
 	static const ImVec4 COLOR_TYPE_OBJECT = ImVec4(0.7f, 0.7f, 0.9f, 1.0f);
@@ -73,10 +82,13 @@ namespace ImGuiVisualizers {
 			RenderObjectProperties(m_Object, m_Object->GetRflClassName() ? m_Object->GetRflClassName() : "Root");
 		}
 		else {
-			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No object selected");
-		}
+				ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No object selected");
+			}
 
-		m_FirstRender = false;
+			// Process any pending component deletions after rendering
+			ProcessPendingDeletions();
+
+			m_FirstRender = false;
 	}
 
 	void PropertyInspector::SetObject(CReflectedBase* object)
@@ -274,6 +286,7 @@ namespace ImGuiVisualizers {
 			RenderComponentPtrProperty(property, object);
 			break;
 		case RT_ComponentPtrVec:
+		case RT_ComponentRawPtrVec:
 			RenderComponentPtrVectorProperty(property, object);
 			break;
 		default:
@@ -656,6 +669,9 @@ namespace ImGuiVisualizers {
 		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
 			UpdateExpandedState(nodeId, true);
 
+			// Right-click context menu for adding components (must be called right after TreeNodeEx)
+			RenderComponentArrayContextMenu(property, object);
+
 			ImGui::SameLine();
 			ImGui::TextColored(GetTypeColor(property.GetType()), "[Vector<Component*>]");
 
@@ -666,7 +682,12 @@ namespace ImGuiVisualizers {
 				const std::string elementNodeId = GenerateTreeNodeId(elementName, (*componentVector)[i]);
 				bool elementExpanded = ShouldExpandNode(elementNodeId);
 
-				if (ImGui::TreeNodeEx(elementNodeId.c_str(), elementExpanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", elementName.c_str())) {
+				bool nodeOpen = ImGui::TreeNodeEx(elementNodeId.c_str(), elementExpanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", elementName.c_str());
+
+				// Right-click context menu for individual component (works both expanded and collapsed)
+				RenderComponentItemContextMenu(property, object, i);
+
+				if (nodeOpen) {
 					UpdateExpandedState(elementNodeId, true);
 
 					if ((*componentVector)[i]) {
@@ -742,6 +763,7 @@ namespace ImGuiVisualizers {
 		case RT_Component: return "Component";
 		case RT_ComponentPtr: return "Component*";
 		case RT_ComponentPtrVec: return "Vector<Component*>";
+		case RT_ComponentRawPtrVec: return "Vector<Component*>";
 		default: return "Unknown";
 		}
 	}
@@ -766,6 +788,7 @@ namespace ImGuiVisualizers {
 		case RT_Component:
 		case RT_ComponentPtr:
 		case RT_ComponentPtrVec:
+		case RT_ComponentRawPtrVec:
 			return COLOR_TYPE_COMPONENT;
 		default:
 			return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -783,6 +806,150 @@ namespace ImGuiVisualizers {
 	void PropertyInspector::RenderNullPointer(const std::string& name)
 	{
 		ImGui::TextColored(ImVec4(0.7f, 0.3f, 0.3f, 1.0f), "%s: (null)", name.c_str());
+	}
+
+	void PropertyInspector::RenderComponentArrayContextMenu(const CPropertyBase& property, CReflectedBase* object)
+	{
+		// Skip if read-only
+		if (m_ReadOnly) {
+			return;
+		}
+
+		ImGui::PushID(property.GetName().c_str());
+
+		if (ImGui::BeginPopupContextItem("##ComponentArrayCtx")) {
+			const auto& allComponents = GetComponentRegistry().GetAll();
+
+			if (allComponents.empty()) {
+				ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "No components registered!");
+			}
+			else {
+				ImGui::TextColored(ImVec4(0.8f, 0.8f, 0.8f, 1.0f), "Add Component:");
+				ImGui::Separator();
+
+				// Group by category if categories are used
+				std::unordered_map<std::string, std::vector<const ComponentTypeInfo*>> categorized;
+				for (const auto& info : allComponents) {
+					categorized[info.category].push_back(&info);
+				}
+
+				// Render components grouped by category
+				for (const auto& [category, components] : categorized) {
+					if (!category.empty()) {
+						ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "// %s", category.c_str());
+					}
+
+					for (const auto* info : components) {
+						if (ImGui::MenuItem(info->displayName.c_str())) {
+							AddComponentToArray(property, object, info->className);
+						}
+					}
+
+					if (!category.empty() && categorized.size() > 1) {
+						ImGui::Separator();
+					}
+				}
+			}
+
+			ImGui::EndPopup();
+		}
+
+		ImGui::PopID();
+	}
+
+	void PropertyInspector::RenderComponentItemContextMenu(const CPropertyBase& property, CReflectedBase* object, size_t index)
+	{
+		// Skip if read-only
+		if (m_ReadOnly) {
+			return;
+		}
+
+		ImGui::PushID(static_cast<int>(index));
+
+		if (ImGui::BeginPopupContextItem("##ComponentItemCtx")) {
+			if (ImGui::MenuItem("Delete Component")) {
+				// Defer deletion to avoid modifying vector during iteration
+				m_PendingDeletions.push_back({ &property, object, index });
+			}
+
+			ImGui::EndPopup();
+		}
+
+		ImGui::PopID();
+	}
+
+	bool PropertyInspector::AddComponentToArray(const CPropertyBase& property, CReflectedBase* object, const std::string& componentClassName)
+	{
+		std::vector<ComponentSystem::Component*>* componentVector =
+			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
+
+		// Create the component using ClassFactory
+		CReflectedBase* newObject = ClassFactory::createObject(componentClassName.c_str());
+		if (!newObject) {
+			return false;
+		}
+
+		// Ensure it's actually a Component
+		ComponentSystem::Component* newComponent = dynamic_cast<ComponentSystem::Component*>(newObject);
+		if (!newComponent) {
+			delete newObject;
+			return false;
+		}
+
+		// Add to the vector
+		componentVector->push_back(newComponent);
+
+		return true;
+	}
+
+	bool PropertyInspector::RemoveComponentFromArray(const CPropertyBase& property, CReflectedBase* object, size_t index)
+	{
+		std::vector<ComponentSystem::Component*>* componentVector =
+			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
+
+		// Validate index
+		if (index >= componentVector->size()) {
+			return false;
+		}
+
+		// Get the component to delete
+		ComponentSystem::Component* componentToDelete = (*componentVector)[index];
+
+		// Remove from vector
+		componentVector->erase(componentVector->begin() + index);
+
+		// Delete the component object
+		if (componentToDelete) {
+			delete componentToDelete;
+		}
+
+		return true;
+	}
+
+	void PropertyInspector::ProcessPendingDeletions()
+	{
+		if (m_PendingDeletions.empty()) {
+			return;
+		}
+
+		// Sort deletions by index in descending order to maintain correct indices
+		// when deleting multiple items from the same vector
+		std::sort(m_PendingDeletions.begin(), m_PendingDeletions.end(),
+			[](const PendingComponentDeletion& a, const PendingComponentDeletion& b) {
+				// First compare by property address, then by object address, then by index
+				if (a.property < b.property) return false;
+				if (a.property > b.property) return true;
+				if (a.object < b.object) return false;
+				if (a.object > b.object) return true;
+				return a.index > b.index; // Sort descending by index
+			});
+
+		// Process deletions
+		for (const auto& deletion : m_PendingDeletions) {
+			RemoveComponentFromArray(*deletion.property, deletion.object, deletion.index);
+		}
+
+		m_PendingDeletions.clear();
 	}
 
 	bool PropertyInspector::ValidateFloatInput(float& value, float min, float max)

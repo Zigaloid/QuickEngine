@@ -246,10 +246,27 @@ private:
     void RenderAssetList();
     void RenderFilterBar();
     void RenderAssetContextMenu(const AssetEntry& asset);
+    void RenderFolderContextMenu(FolderNode& node);
 
     // Launch helpers
     void LaunchAsset(const AssetEntry& asset, const AssetLaunchOption& option);
     void LaunchExternal(const std::string& assetPath, const std::string& program);
+
+    /// Get the effective launch option (primary if defined, otherwise first secondary)
+    const AssetLaunchOption* GetEffectiveLaunchOption(const AssetEntry& asset) const;
+
+    // Asset creation
+    void OpenCreateAssetDialog(const std::string& folderPath);
+    void RenderCreateAssetDialog();
+    bool CreateAssetFromTemplate(const std::string& folderPath, const std::string& assetName, const AssetTypeInfo* typeInfo);
+    std::string FindTemplateFile(const std::string& extension) const;
+
+    // Asset operations
+    void OpenRenameAssetDialog(const AssetEntry& asset);
+    void RenderRenameAssetDialog();
+    bool RenameAsset(const std::string& oldPath, const std::string& newName);
+    bool DeleteAsset(const std::string& assetPath);
+    bool MoveAsset(const std::string& assetPath, const std::string& targetFolder);
 
     // Utility
     std::string FormatFileSize(uint64_t bytes) const;
@@ -274,6 +291,19 @@ private:
 
     // Filter visibility per registered type (keyed by lowercase extension)
     std::unordered_map<std::string, bool> m_typeFilterVisible;
+
+    // Asset creation dialog state
+    bool m_showCreateAssetDialog = false;
+    std::string m_createAssetFolder;
+    char m_createAssetNameBuffer[256] = {};
+    int m_selectedAssetTypeIndex = 0;
+    std::string m_templateAssetsPath = "./TemplateAssets";
+
+    // Asset rename dialog state
+    bool m_showRenameAssetDialog = false;
+    std::string m_renameAssetPath;
+    std::string m_renameAssetOldName;
+    char m_renameAssetNameBuffer[256] = {};
 };
 
 } // namespace ImGuiVisualizers

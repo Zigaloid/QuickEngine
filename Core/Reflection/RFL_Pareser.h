@@ -47,6 +47,8 @@ public:
 	virtual void ReadComponentPtr(const CPropertyBase& property, CReflectedBase* obj) = 0;
 	virtual void WriteComponentPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
 	virtual void ReadComponentPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
+	virtual void WriteComponentRawPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
+	virtual void ReadComponentRawPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
 
 	// --- Add these for bool support ---
 	virtual void WriteBool(const CPropertyBase& property, CReflectedBase* obj) = 0;

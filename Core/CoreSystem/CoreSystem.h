@@ -15,6 +15,7 @@ namespace FileSystem {
     class FileSystemManager;
 }
 class CNexusClient;
+class ComponentRegistry;
 
 // Helper macros for simplified Nexus client usage in application code
 #define NEXUS_SUBSCRIBE(pipe, app) Core::CoreSystem::GetNexusClient()->Subscribe(pipe, app);
@@ -114,7 +115,7 @@ namespace Core {
         static CNexusClient* GetNexusClient() {
             return s_nexusClient.get();
         }
-
+        
         // Component retrieval methods
         template<typename T>
         static std::vector<T*> GetComponentsOfType() {

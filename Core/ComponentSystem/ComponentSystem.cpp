@@ -6,7 +6,7 @@ using namespace ComponentSystem;
 
 REFL_DEFINE_OBJECT(Component)
 	REFL_DEFINE_BOOL_MEMBER(Component, m_active),	
-	REFL_DEFINE_COMPONENT_PTR_VECTOR_MEMBER(Component, m_children),
+	REFL_DEFINE_COMPONENT_RAW_PTR_VECTOR_MEMBER(Component, m_children),
 REFL_DEFINE_END
 
 void Component::Update(double deltaTime)

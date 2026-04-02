@@ -23,6 +23,7 @@ enum RFL_Type
 	RT_BoolVec = 16,
 	RT_StringVec = 17,
 	RT_StringBoolMap = 18,
+	RT_ComponentRawPtrVec = 19,
 };
 
 class CReflectedBase;

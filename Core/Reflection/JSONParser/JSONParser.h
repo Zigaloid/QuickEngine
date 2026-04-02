@@ -539,6 +539,100 @@ public:
 		EndObject(property.GetName().c_str());
 	}
 
+	void ReadComponentRawPtrArray(const CPropertyBase& property, CReflectedBase* obj)
+	{
+		Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
+
+		Value* valueMember = FindValue(property);
+		if (valueMember)
+		{
+			std::vector<ComponentSystem::Component*>* vectorOfComponent =
+				reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(obj));
+
+			vectorOfComponent->clear(); // Clear existing content
+
+			Value* arrayMember = &member->FindMember(JTAG_ELELMENTS)->value;
+			if (arrayMember->IsArray())
+			{
+				ReflectionDebug.print("ReadComponentRawPtrArray: Found array with " + std::to_string(arrayMember->GetArray().Size()) + " elements\n");
+				vectorOfComponent->reserve(arrayMember->GetArray().Size());
+
+				ComponentSystem::Component* parentComponent = dynamic_cast<ComponentSystem::Component*>(obj);
+				ReflectionDebug.print("ReadComponentRawPtrArray: Parent component is " + std::string(parentComponent ? "valid" : "null") + "\n");
+
+				for (auto& element : arrayMember->GetArray())
+				{
+					Push(&element);
+					Value* valueMember = &element.FindMember(JTAG_VALUE)->value;
+
+					std::string className = valueMember->GetString();
+					ReflectionDebug.print("ReadComponentRawPtrArray: Creating component of type: " + className + "\n");
+
+					// Create component through ClassFactory
+					CReflectedBase* newObject = ClassFactory::createObject(className.c_str());
+					if (newObject) {
+						// Ensure it's actually a Component
+						ComponentSystem::Component* childComponent = dynamic_cast<ComponentSystem::Component*>(newObject);
+						if (childComponent) {
+							ReflectionDebug.print("ReadComponentRawPtrArray: Component created successfully\n");
+							childComponent->ReadMembers(*this);
+
+							// If the parent is a Component, use AddChild to properly set up the relationship
+							if (parentComponent) {
+								parentComponent->AddChild(childComponent);
+								ReflectionDebug.print("ReadComponentRawPtrArray: Added child to parent via AddChild\n");
+							}
+							else {
+								// Fallback: just add to the vector if not a Component parent
+								vectorOfComponent->push_back(childComponent);
+								ReflectionDebug.print("ReadComponentRawPtrArray: Added component directly to vector\n");
+							}
+						}
+						else {
+							ReflectionDebug.print("ReadComponentRawPtrArray: Created object is not a Component! Deleting.\n");
+							delete newObject;
+						}
+					}
+					else {
+						ReflectionDebug.print("ReadComponentRawPtrArray: FAILED to create component of type: " + className + "\n");
+					}
+					Pop();
+				}
+			}
+			else {
+				ReflectionDebug.print("ReadComponentRawPtrArray: arrayMember is not an array!\n");
+			}
+		}
+		else {
+			ReflectionDebug.print("ReadComponentRawPtrArray: valueMember is NULL for property: " + property.GetName() + "\n");
+		}
+	}
+
+	void WriteComponentRawPtrArray(const CPropertyBase& property, CReflectedBase* obj)
+	{
+		std::vector<ComponentSystem::Component*>* componentVector =
+			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(obj));
+
+		BeginObject(obj->GetRflClassName());
+		BeginArray();
+		for (const auto& element : *componentVector)
+		{
+			if (element) {
+				BeginObject(element->GetRflClassName());
+				element->WriteMembers(*this);
+				EndObject(property.GetName().c_str());
+			}
+			else {
+				// Handle null pointer case in array
+				BeginObject("");
+				EndObject(property.GetName().c_str());
+			}
+		}
+		EndArray();
+		WriteProperties(property);
+		EndObject(property.GetName().c_str());
+	}
+
 	void ReadBool(const CPropertyBase& property, CReflectedBase* obj)
 	{
 		Value* valueMember = FindValue(property);

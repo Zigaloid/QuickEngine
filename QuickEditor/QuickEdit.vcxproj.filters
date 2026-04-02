@@ -275,6 +275,9 @@
     </ClInclude>
     <ClInclude Include="logo.h" />
     <ClInclude Include="DocumentManager.h" />
+    <ClInclude Include="..\AssetClasses\EntityInstance.h">
+      <Filter>..\AssetClasses</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
@@ -431,5 +434,8 @@
       <Filter>common\ps</Filter>
     </ClCompile>
     <ClCompile Include="DocumentManager.cpp" />
+    <ClCompile Include="..\AssetClasses\EntityInstance.cpp">
+      <Filter>..\AssetClasses</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

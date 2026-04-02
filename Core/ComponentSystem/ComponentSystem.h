@@ -1,9 +1,10 @@
 #pragma once
 
 #include "Reflection/Reflection.h"
-
+#include "ComponentRegistry.h"
 #include <vector>
 #include <memory>
+#include <string>
 #include <unordered_map>
 #include <typeindex>
 #include <type_traits>
@@ -32,8 +33,7 @@ namespace ComponentSystem {
 		bool m_initialized;
 		bool m_active;
 		Component* m_parent;
-		std::vector<Component*> m_children;
-
+		std::vector<Component*> m_children;		
 	protected:
 		// Called during initialization phase
 		virtual bool OnInitialize() { return true; }

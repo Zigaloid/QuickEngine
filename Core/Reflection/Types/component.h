@@ -79,4 +79,26 @@ public:
     virtual const char* GetTypeAsString() override { return "vector_component_ptr"; }
 };
 
+// Custom property type for vector of raw Component pointers (managed by ComponentManager)
+class CComponentRawPtrVectorProperty : public CPropertyBase
+{
+public:
+    CComponentRawPtrVectorProperty(RFL_Type type, size_t size, unsigned int memberOffset, const char *name) 
+        : CPropertyBase(type, size, memberOffset, name)
+    {
+    }
+
+    virtual void Read(IRFL_Parser* doc, CReflectedBase *obj) override
+    {
+        doc->ReadComponentRawPtrArray(*this, obj);
+    }
+
+    virtual void Write(IRFL_Parser* doc, CReflectedBase* obj) override
+    {
+        doc->WriteComponentRawPtrArray(*this, obj);
+    }
+
+    virtual const char* GetTypeAsString() override { return "vector_component_raw_ptr"; }
+};
+
 #endif

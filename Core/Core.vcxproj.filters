@@ -238,6 +238,9 @@
       <Filter>ResourceManager</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="ComponentSystem\ComponentRegistry.h">
+      <Filter>ComponentSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp">
@@ -329,6 +332,9 @@
     </ClCompile>
     <ClCompile Include="Reflection\ReflectionError.cpp">
       <Filter>Reflection</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentSystem\ComponentRegistry.cpp">
+      <Filter>ComponentSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
