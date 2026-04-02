@@ -16,11 +16,17 @@ namespace ImGuiVisualizers {
 	 * Uses the ClassFactory reflection system to instantiate an object by class
 	 * name, loads the JSON file via CReflectedBase::Read(), and presents it
 	 * through an embedded PropertyInspector for viewing and editing.
+	 *
+	 * Multiple instances can coexist — each gets a unique ImGui window ID.
 	 */
 	class ObjJsonEditor : public IImGuiVisualizer
 	{
 	public:
-		ObjJsonEditor() = default;
+		ObjJsonEditor()
+			: m_instanceId(s_nextInstanceId++)
+			, m_imguiId("###ObjJsonEditor_" + std::to_string(m_instanceId))
+			, m_displayName("Object Editor")
+		{}
 		~ObjJsonEditor() override = default;
 
 		// ── IImGuiVisualizer interface ──────────────────────────────────────
@@ -31,24 +37,36 @@ namespace ImGuiVisualizers {
 
 		bool Render(bool* isOpen) override
 		{
+			// Build window title with unique ImGui ID for multi-instance support
+			std::string title;
+			if (m_object) {
+				title = "Object Editor - " + m_displayName + m_imguiId;
+			} else {
+				title = "Object Editor" + m_imguiId;
+			}
+
+			bool visible = ImGui::Begin(title.c_str(), isOpen);
+
+			// Handle window close via X button
+			if (isOpen && !*isOpen) {
+				Close();
+				ImGui::End();
+				return false;
+			}
+
+			if (!visible) {
+				ImGui::End();
+				return false;
+			}
+
 			if (!m_object) {
 				// Nothing loaded – render an empty window
-				if (!ImGui::Begin("Object Editor", isOpen)) {
-					ImGui::End();
-					return false;
-				}
 				ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
 					"No object loaded. Open an .obj.json file from the Asset Browser.");
 				ImGui::End();
 				return true;
 			}
 
-			// Build a descriptive window title
-			std::string title = "Object Editor - " + m_filePath + "###ObjJsonEditor";
-			if (!ImGui::Begin(title.c_str(), isOpen)) {
-				ImGui::End();
-				return false;
-			}
 			static char* buffer = new char[200];
 			buffer[0] = '\0';
 
@@ -65,6 +83,7 @@ namespace ImGuiVisualizers {
 			ImGui::SameLine();
 			if (ImGui::Button("Close")) {
 				Close();
+				if (isOpen) *isOpen = false;
 				ImGui::End();
 				return true;
 			}
@@ -90,7 +109,7 @@ namespace ImGuiVisualizers {
 			return true;
 		}
 
-		const char* GetName() const override { return "Object Editor"; }
+		const char* GetName() const override { return m_displayName.c_str(); }
 		const char* GetShortcut() const override { return nullptr; }
 		const char* GetMenuCategory() const override { return "Show"; }
 
@@ -109,6 +128,14 @@ namespace ImGuiVisualizers {
 
 			m_filePath = filePath;
 			m_className = className;
+
+			// Update display name from filename
+			std::string fileName = filePath;
+			auto lastSlash = fileName.find_last_of("/\\");
+			if (lastSlash != std::string::npos) {
+				fileName = fileName.substr(lastSlash + 1);
+			}
+			m_displayName = fileName;
 
 			// Instantiate via the reflection class factory
 			CReflectedBase* raw = ClassFactory::createObject(className.c_str());
@@ -177,6 +204,7 @@ namespace ImGuiVisualizers {
 			m_className.clear();
 			m_statusMessage.clear();
 			m_statusIsError = false;
+			m_displayName = "Object Editor";
 		}
 
 		/**
@@ -189,7 +217,23 @@ namespace ImGuiVisualizers {
 		 */
 		const std::string& GetFilePath() const { return m_filePath; }
 
+		/**
+		 * @brief Generate a unique visualizer-manager key for a document path.
+		 *
+		 * Use this when registering / looking up per-document editor instances
+		 * in the ImGuiVisualizerManager.
+		 */
+		static std::string MakeDocumentKey(const std::string& filePath)
+		{
+			return "ObjEditor:" + filePath;
+		}
+
 	private:
+		static inline int s_nextInstanceId = 0;
+		int               m_instanceId = 0;
+		std::string       m_imguiId;          ///< "###ObjJsonEditor_<N>" for unique window IDs
+		std::string       m_displayName;      ///< Shown in menus / window title
+
 		std::unique_ptr<CReflectedBase> m_object;
 		PropertyInspector               m_inspector;
 

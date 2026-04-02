@@ -12,11 +12,6 @@ bool QuickEditApp::Initialize()
 	m_visualizerManager.Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), true);
 
-	// Register the generic object editor
-	auto objEditor = std::make_unique<ImGuiVisualizers::ObjJsonEditor>();
-	auto* objEditorPtr = objEditor.get();
-	m_visualizerManager.Register("Object Editor", std::move(objEditor), false);
-
 	// Asset Browser with example asset type registrations
 	auto assetBrowser = std::make_unique<ImGuiVisualizers::AssetBrowser>();
 	auto& registry = assetBrowser->GetRegistry();
@@ -31,28 +26,30 @@ bool QuickEditApp::Initialize()
 
 	// .obj.json files: use the generic ObjJsonEditor
 	if (auto* objType = registry.FindMutable(".def.obj.json")) {
-		// The reflected class name is embedded in the filename:
-		// e.g. "CEntityDefinition.obj.json" -> className = "CEntityDefinition"
-		// Alternatively, set a fixed class name per registered sub-extension.
 		objType->primaryLaunch = {
 			"Object Editor",
 			ImGuiVisualizers::AssetLaunchMode::Internal,
-			[this, objEditorPtr](const std::string& path) {
-				// Derive the class name from the filename.
-				// Convention: <ClassName>.obj.json
+			[this](const std::string& path) {
 				std::string fileName = path;
-				// Strip directory part
 				auto lastSlash = fileName.find_last_of("/\\");
 				if (lastSlash != std::string::npos) {
 					fileName = fileName.substr(lastSlash + 1);
 				}
-				// Strip ".obj.json" to get the class name
 				const std::string suffix = ".def.obj.json";
 				std::string className = "CEntityDefinition";
 
 				if (!className.empty()) {
-					objEditorPtr->Open(path, className);
-					m_visualizerManager.SetVisible("Object Editor", true);
+					std::string key = ImGuiVisualizers::ObjJsonEditor::MakeDocumentKey(path);
+
+					// If already open, just bring it to front
+					if (m_openEditorKeys.contains(key)) {
+						m_visualizerManager.SetVisible(key, true);
+						return;
+					}
+
+					// Defer registration — calling Register() here would mutate
+					// m_entries while RenderAll() is iterating over it.
+					m_pendingEditors.push_back({ key, path, className });
 				}
 			}
 		};
@@ -117,7 +114,9 @@ bool QuickEditApp::Initialize()
 
 void QuickEditApp::Update(double deltaTime)
 {
+	ProcessPendingEditors();
 	m_visualizerManager.Update(static_cast<float>(deltaTime));
+	CleanupClosedEditors();
 }
 
 void QuickEditApp::Render(double deltaTime)
@@ -138,4 +137,32 @@ void QuickEditApp::ImguiMainMenu()
 bool QuickEditApp::Shutdown()
 {
 	return true;
+}
+
+void QuickEditApp::ProcessPendingEditors()
+{
+	for (auto& pending : m_pendingEditors) {
+		// Guard against duplicates (e.g. rapid double-clicks across frames)
+		if (m_openEditorKeys.contains(pending.key)) {
+			m_visualizerManager.SetVisible(pending.key, true);
+			continue;
+		}
+
+		auto editor = std::make_unique<ImGuiVisualizers::ObjJsonEditor>();
+		editor->Open(pending.filePath, pending.className);
+		m_visualizerManager.Register(pending.key, std::move(editor), true);
+		m_openEditorKeys.insert(pending.key);
+	}
+	m_pendingEditors.clear();
+}
+
+void QuickEditApp::CleanupClosedEditors()
+{
+	std::erase_if(m_openEditorKeys, [this](const std::string& key) {
+		if (!m_visualizerManager.IsVisible(key)) {
+			m_visualizerManager.Unregister(key);
+			return true;
+		}
+		return false;
+	});
 }
