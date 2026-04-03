@@ -162,11 +162,19 @@
     <ClInclude Include="..\External\bgfx_common\ps\fs_particle.bin.h" />
     <ClInclude Include="..\External\bgfx_common\ps\particle_system.h" />
     <ClInclude Include="..\External\bgfx_common\ps\vs_particle.bin.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\BgfxViewIdAllocator.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyInspector.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.h" />
     <ClInclude Include="AssetBrowser.h" />
+    <ClInclude Include="AssetClasses\EntityInstance.h" />
+    <ClInclude Include="Core\Reflection\ReflectionBase.h" />
     <ClInclude Include="DocumentManager.h" />
     <ClInclude Include="ObjJsonEditor.h" />
     <ClInclude Include="QuickEdit.h" />
@@ -223,11 +231,18 @@
     <ClCompile Include="..\External\imgui-docking\imgui_Widgets.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.cpp" />
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
+    <ClCompile Include="External\bgfx_common\imgui\imgui.cpp">
+      <ObjectFileName>$(IntDir)\imgui2.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
   </ItemGroup>

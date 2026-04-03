@@ -4,6 +4,8 @@
 #include "Reflection/ReflectionBase.h"
 #include "Reflection/ReflectionMap.h"
 #include "ComponentSystem/ComponentRegistry.h"
+#include "PropertyInspector.h"
+#include "PropertyWidgetMap.h"
 
 #include <string>
 #include <unordered_set>
@@ -39,6 +41,7 @@ namespace ImGuiVisualizers {
 		void SetShowInternalData(bool show) { m_ShowInternalData = show; }
 		void SetExpandByDefault(bool expand) { m_ExpandByDefault = expand; }
 		void SetDisplayMode(PropertyDisplayMode mode) { m_DisplayMode = mode; }
+		void SetWidgetMap(const PropertyWidgetMap* widgetMap) { m_WidgetMap = widgetMap; }
 
 		// Getters
 		bool IsReadOnly() const { return m_ReadOnly; }
@@ -46,6 +49,7 @@ namespace ImGuiVisualizers {
 		bool ExpandByDefault() const { return m_ExpandByDefault; }
 		PropertyDisplayMode GetDisplayMode() const { return m_DisplayMode; }
 		CReflectedBase* GetObject() const { return m_Object; }
+		const PropertyWidgetMap* GetWidgetMap() const { return m_WidgetMap; }
 
 	private:
 		// Core rendering methods
@@ -69,6 +73,18 @@ namespace ImGuiVisualizers {
 		void RenderComponentProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object);
+
+		// Widget-specific rendering methods (used by PropertyWidgetMap overrides)
+		bool RenderWithCustomWidget(const CPropertyBase& property, CReflectedBase* object, EditorWidgetType widgetType);
+		void RenderSliderFloat(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
+		void RenderSliderInt(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
+		void RenderDragFloat(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
+		void RenderDragInt(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
+		void RenderColorPicker3(const CPropertyBase& property, CReflectedBase* object);
+		void RenderColorPicker4(const CPropertyBase& property, CReflectedBase* object);
+		void RenderDropdown(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
+		void RenderTextArea(const CPropertyBase& property, CReflectedBase* object);
+		void RenderReadOnlyProperty(const CPropertyBase& property, CReflectedBase* object);
 
 		// Context menu for component arrays
 		void RenderComponentArrayContextMenu(const CPropertyBase& property, CReflectedBase* object);
@@ -95,6 +111,9 @@ namespace ImGuiVisualizers {
 	private:
 		// Current object being inspected
 		CReflectedBase* m_Object;
+
+		// Widget map for custom property widgets
+		const PropertyWidgetMap* m_WidgetMap;
 
 		// Configuration options
 		bool m_ReadOnly;

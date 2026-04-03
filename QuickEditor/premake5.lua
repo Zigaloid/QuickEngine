@@ -76,6 +76,14 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/CommandConsole.h" }
 	files { "../Shared/ImguiVizualizers/PropertyInspector.cpp" }
 	files { "../Shared/ImguiVizualizers/PropertyInspector.h" }
+	files { "../Shared/ImguiVizualizers/ImGui3DViewVisualizer.cpp" }
+	files { "../Shared/ImguiVizualizers/ImGui3DViewVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/PropertyWidgetMap.cpp" }
+	files { "../Shared/ImguiVizualizers/PropertyWidgetMap.h" }
+	files { "../Shared/ImguiVizualizers/bgfx*.h" }
+	files { "../Shared/ImguiVizualizers/bgfx*.cpp" }
+	files { "../Shared/ImguiVizualizers/bgfx*.h" }
+	
 
 	files { "./**.cpp", "./**.h" }      
 

@@ -10,7 +10,8 @@
 #include "ComponentSystem/ComponentSystem.h"
 #include "ComponentSystem/ComponentRegistry.h"
 
-namespace ImGuiVisualizers {
+namespace ImGuiVisualizers 
+{
 
 
 	// ═════════════════════════════════════════════════════════════════════════════
@@ -26,6 +27,7 @@ namespace ImGuiVisualizers {
 
 	PropertyInspector::PropertyInspector()
 		: m_Object(nullptr)
+		, m_WidgetMap(nullptr)
 		, m_ReadOnly(false)
 		, m_ShowInternalData(true)
 		, m_ExpandByDefault(true)
@@ -96,6 +98,9 @@ namespace ImGuiVisualizers {
 		m_Object = object;
 		m_FirstRender = true;
 
+		// Try to get a widget map from the object (if it provides one)
+		m_WidgetMap = object ? object->GetPropertyWidgetMap() : nullptr;
+
 		// Clear expanded state when changing objects
 		m_ExpandedNodes.clear();
 		m_StringBuffers.clear();
@@ -104,6 +109,7 @@ namespace ImGuiVisualizers {
 	void PropertyInspector::ClearObject()
 	{
 		m_Object = nullptr;
+		m_WidgetMap = nullptr;
 		m_ExpandedNodes.clear();
 		m_StringBuffers.clear();
 	}
@@ -246,6 +252,14 @@ namespace ImGuiVisualizers {
 		// Skip internal properties if not showing them
 		if (!m_ShowInternalData && property.GetName().find("m_") == 0) {
 			return;
+		}
+
+		// Check widget map for a custom widget override
+		if (m_WidgetMap && m_WidgetMap->HasCustomWidget(property.GetName())) {
+			EditorWidgetType widgetType = m_WidgetMap->GetWidget(property.GetName());
+			if (RenderWithCustomWidget(property, object, widgetType)) {
+				return;
+			}
 		}
 
 		switch (property.GetType()) {
@@ -978,4 +992,324 @@ namespace ImGuiVisualizers {
 		return true;
 	}
 
-} // namespace ImGuiVisualizers
+
+// ═════════════════════════════════════════════════════════════════════════════
+	// ════════════════════════════════════════════════════════════════════════════
+	// Widget-specific rendering methods
+	// ════════════════════════════════════════════════════════════════════════════
+
+	bool PropertyInspector::RenderWithCustomWidget(const CPropertyBase& property, CReflectedBase* object, EditorWidgetType widgetType)
+	{
+		const WidgetConfig* config = m_WidgetMap ? m_WidgetMap->GetConfig(property.GetName()) : nullptr;
+
+		switch (widgetType) {
+		case EditorWidgetType::ReadOnly:
+			RenderReadOnlyProperty(property, object);
+			return true;
+
+		case EditorWidgetType::Slider:
+			if (property.GetType() == RT_Float) {
+				RenderSliderFloat(property, object, config);
+				return true;
+			}
+			if (property.GetType() == RT_Int) {
+				RenderSliderInt(property, object, config);
+				return true;
+			}
+			return false;
+
+		case EditorWidgetType::Drag:
+			if (property.GetType() == RT_Float) {
+				RenderDragFloat(property, object, config);
+				return true;
+			}
+			if (property.GetType() == RT_Int) {
+				RenderDragInt(property, object, config);
+				return true;
+			}
+			return false;
+
+		case EditorWidgetType::ColorPicker:
+			if (property.GetType() == RT_Vector3) {
+				RenderColorPicker3(property, object);
+				return true;
+			}
+			if (property.GetType() == RT_Vector4) {
+				RenderColorPicker4(property, object);
+				return true;
+			}
+			return false;
+
+		case EditorWidgetType::Dropdown:
+			if (property.GetType() == RT_String || property.GetType() == RT_Int) {
+				RenderDropdown(property, object, config);
+				return true;
+			}
+			return false;
+
+		case EditorWidgetType::TextArea:
+			if (property.GetType() == RT_String) {
+				RenderTextArea(property, object);
+				return true;
+			}
+			return false;
+
+		case EditorWidgetType::InputField:
+		case EditorWidgetType::Checkbox:
+		case EditorWidgetType::Default:
+		default:
+			return false;
+		}
+	}
+
+	void PropertyInspector::RenderSliderFloat(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config)
+	{
+		float* value = reinterpret_cast<float*>(property.GetAddress(object));
+		float minVal = config ? config->minValue : 0.0f;
+		float maxVal = config ? config->maxValue : 1.0f;
+
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		if (m_ReadOnly) {
+			ImGui::Text("%.3f", *value);
+		}
+		else {
+			ImGui::PushID(property.GetName().c_str());
+			ImGui::SliderFloat("", value, minVal, maxVal, "%.3f");
+			ImGui::PopID();
+		}
+	}
+
+	void PropertyInspector::RenderSliderInt(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config)
+	{
+		int* value = reinterpret_cast<int*>(property.GetAddress(object));
+		int minVal = config ? static_cast<int>(config->minValue) : 0;
+		int maxVal = config ? static_cast<int>(config->maxValue) : 100;
+
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		if (m_ReadOnly) {
+			ImGui::Text("%d", *value);
+		}
+		else {
+			ImGui::PushID(property.GetName().c_str());
+			ImGui::SliderInt("", value, minVal, maxVal);
+			ImGui::PopID();
+		}
+	}
+
+	void PropertyInspector::RenderDragFloat(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config)
+	{
+		float* value = reinterpret_cast<float*>(property.GetAddress(object));
+		float speed = config ? config->step : 0.01f;
+		float minVal = config ? config->minValue : -FLT_MAX;
+		float maxVal = config ? config->maxValue : FLT_MAX;
+
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		if (m_ReadOnly) {
+			ImGui::Text("%.3f", *value);
+		}
+		else {
+			ImGui::PushID(property.GetName().c_str());
+			ImGui::DragFloat("", value, speed, minVal, maxVal, "%.3f");
+			ImGui::PopID();
+		}
+	}
+
+	void PropertyInspector::RenderDragInt(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config)
+	{
+		int* value = reinterpret_cast<int*>(property.GetAddress(object));
+		float speed = config ? config->step : 1.0f;
+		int minVal = config ? static_cast<int>(config->minValue) : INT_MIN;
+		int maxVal = config ? static_cast<int>(config->maxValue) : INT_MAX;
+
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		if (m_ReadOnly) {
+			ImGui::Text("%d", *value);
+		}
+		else {
+			ImGui::PushID(property.GetName().c_str());
+			ImGui::DragInt("", value, speed, minVal, maxVal);
+			ImGui::PopID();
+		}
+	}
+
+	void PropertyInspector::RenderColorPicker3(const CPropertyBase& property, CReflectedBase* object)
+	{
+		Vector3f* value = reinterpret_cast<Vector3f*>(property.GetAddress(object));
+		float col[3] = { value->getX(), value->getY(), value->getZ() };
+
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		if (m_ReadOnly) {
+			ImGui::ColorButton("##preview", ImVec4(col[0], col[1], col[2], 1.0f));
+			ImGui::SameLine();
+			ImGui::Text("(%.3f, %.3f, %.3f)", col[0], col[1], col[2]);
+		}
+		else {
+			ImGui::PushID(property.GetName().c_str());
+			if (ImGui::ColorEdit3("", col)) {
+				value->setX(col[0]);
+				value->setY(col[1]);
+				value->setZ(col[2]);
+			}
+			ImGui::PopID();
+		}
+	}
+
+	void PropertyInspector::RenderColorPicker4(const CPropertyBase& property, CReflectedBase* object)
+	{
+		Vector4f* value = reinterpret_cast<Vector4f*>(property.GetAddress(object));
+		float col[4] = { value->getX(), value->getY(), value->getZ(), value->getW() };
+
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		if (m_ReadOnly) {
+			ImGui::ColorButton("##preview", ImVec4(col[0], col[1], col[2], col[3]));
+			ImGui::SameLine();
+			ImGui::Text("(%.3f, %.3f, %.3f, %.3f)", col[0], col[1], col[2], col[3]);
+		}
+		else {
+			ImGui::PushID(property.GetName().c_str());
+			if (ImGui::ColorEdit4("", col)) {
+				value->setX(col[0]);
+				value->setY(col[1]);
+				value->setZ(col[2]);
+				value->setW(col[3]);
+			}
+			ImGui::PopID();
+		}
+	}
+
+	void PropertyInspector::RenderDropdown(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config)
+	{
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		if (!config || config->dropdownOptions.empty()) {
+			ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "(no dropdown options configured)");
+			return;
+		}
+
+		ImGui::PushID(property.GetName().c_str());
+
+		if (property.GetType() == RT_String) {
+			std::string* value = reinterpret_cast<std::string*>(property.GetAddress(object));
+
+			if (m_ReadOnly) {
+				ImGui::Text("%s", value->c_str());
+			}
+			else {
+				if (ImGui::BeginCombo("", value->c_str())) {
+					for (int i = 0; i < static_cast<int>(config->dropdownOptions.size()); ++i) {
+						bool isSelected = (config->dropdownOptions[i] == *value);
+						if (ImGui::Selectable(config->dropdownOptions[i].c_str(), isSelected)) {
+							*value = config->dropdownOptions[i];
+						}
+						if (isSelected) {
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+			}
+		}
+		else if (property.GetType() == RT_Int) {
+			int* value = reinterpret_cast<int*>(property.GetAddress(object));
+			int currentIndex = *value;
+			if (currentIndex < 0 || currentIndex >= static_cast<int>(config->dropdownOptions.size())) {
+				currentIndex = 0;
+			}
+
+			if (m_ReadOnly) {
+				ImGui::Text("%s", config->dropdownOptions[currentIndex].c_str());
+			}
+			else {
+				const char* previewValue = config->dropdownOptions[currentIndex].c_str();
+				if (ImGui::BeginCombo("", previewValue)) {
+					for (int i = 0; i < static_cast<int>(config->dropdownOptions.size()); ++i) {
+						bool isSelected = (i == *value);
+						if (ImGui::Selectable(config->dropdownOptions[i].c_str(), isSelected)) {
+							*value = i;
+						}
+						if (isSelected) {
+							ImGui::SetItemDefaultFocus();
+						}
+					}
+					ImGui::EndCombo();
+				}
+			}
+		}
+
+		ImGui::PopID();
+	}
+
+	void PropertyInspector::RenderTextArea(const CPropertyBase& property, CReflectedBase* object)
+	{
+		std::string* value = reinterpret_cast<std::string*>(property.GetAddress(object));
+
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		if (m_ReadOnly) {
+			ImGui::TextWrapped("%s", value->c_str());
+		}
+		else {
+			void* propAddr = property.GetAddress(object);
+			StringEditBuffer& buf = m_StringBuffers[propAddr];
+
+			if (!buf.isBeingEdited) {
+				strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
+				buf.data[sizeof(buf.data) - 1] = '\0';
+			}
+
+			ImGui::PushID(property.GetName().c_str());
+			if (ImGui::InputTextMultiline("", buf.data, sizeof(buf.data), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 6))) {
+				*value = buf.data;
+			}
+			buf.isBeingEdited = ImGui::IsItemActive();
+			ImGui::PopID();
+		}
+	}
+
+	void PropertyInspector::RenderReadOnlyProperty(const CPropertyBase& property, CReflectedBase* object)
+	{
+		RenderPropertyLabel(property.GetName(), property.GetType());
+
+		switch (property.GetType()) {
+		case RT_Float: {
+			float* value = reinterpret_cast<float*>(property.GetAddress(object));
+			ImGui::Text("%.3f", *value);
+			break;
+		}
+		case RT_Int: {
+			int* value = reinterpret_cast<int*>(property.GetAddress(object));
+			ImGui::Text("%d", *value);
+			break;
+		}
+		case RT_String: {
+			std::string* value = reinterpret_cast<std::string*>(property.GetAddress(object));
+			ImGui::Text("\"%s\"", value->c_str());
+			break;
+		}
+		case RT_Bool: {
+			bool* value = reinterpret_cast<bool*>(property.GetAddress(object));
+			ImGui::Text("%s", *value ? "true" : "false");
+			break;
+		}
+		case RT_Vector3: {
+			Vector3f* value = reinterpret_cast<Vector3f*>(property.GetAddress(object));
+			ImGui::Text("(%.3f, %.3f, %.3f)", value->getX(), value->getY(), value->getZ());
+			break;
+		}
+		case RT_Vector4: {
+			Vector4f* value = reinterpret_cast<Vector4f*>(property.GetAddress(object));
+			ImGui::Text("(%.3f, %.3f, %.3f, %.3f)", value->getX(), value->getY(), value->getZ(), value->getW());
+			break;
+		}
+		default:
+			ImGui::Text("(read-only)");
+			break;
+		}
+	}
+	}

@@ -57,6 +57,7 @@ void DocumentManager::InitializeLaunchers()
     // ObjJson launchers
     m_launchers["DefObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".def.obj.json", "CEntityDefinition");
     m_launchers["EntityObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".entity.obj.json", "CEntityInstance");
+    m_launchers["MeshObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".mesh.obj.json", "CMeshComponent");
 
     // Material launcher (TODO)
     m_launchers["Material"] = std::make_unique<NoOpLauncher>();
@@ -76,6 +77,7 @@ std::vector<DocumentManager::AssetTypeConfig> DocumentManager::GetAssetTypeConfi
     return 
     {
         // ObjJson types
+        { ".mesh.obj.json",     "Mesh Component",         IM_COL32(100, 200, 255, 255),   "O",  "MeshObjJson",   true, false },
         { ".def.obj.json",      "Definition Object",      IM_COL32(100, 200, 255, 255),   "O",  "DefObjJson",    true, false },
         { ".entity.obj.json",   "Entity Object",          IM_COL32(100, 200, 255, 255),   "O",  "EntityObjJson", true, false },        
         { ".png",               "PNG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",      false,  true },

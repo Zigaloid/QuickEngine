@@ -55,6 +55,24 @@
     <Filter Include="..\Shared\ImguiVizualizers">
       <UniqueIdentifier>{F90243E0-E512-EFB0-4ECC-53CF3AFBDD49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AssetClasses">
+      <UniqueIdentifier>{137D46AB-FFDF-D54F-A865-0E0694A7A1D2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Reflection">
+      <UniqueIdentifier>{28B22CF9-943D-9ABD-9D4E-1DB20959F6BD}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External">
+      <UniqueIdentifier>{089DB854-F469-1360-1D83-010809AF48EE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\bgfx_common">
+      <UniqueIdentifier>{66AA423F-5239-CC08-FB57-E003E7C5DCAE}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="External\bgfx_common\imgui">
+      <UniqueIdentifier>{506C1A76-3C7C-C646-A535-2B659164B5DF}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AssetClasses\EntityDefinition.h">
@@ -261,10 +279,25 @@
     <ClInclude Include="..\External\bgfx_common\ps\vs_particle.bin.h">
       <Filter>..\External\bgfx_common\ps</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\BgfxViewIdAllocator.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h">
@@ -273,7 +306,16 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyInspector.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
+    <ClInclude Include="AssetClasses\EntityInstance.h">
+      <Filter>AssetClasses</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Reflection\ReflectionBase.h">
+      <Filter>Core\Reflection</Filter>
+    </ClInclude>
     <ClInclude Include="DocumentManager.h" />
     <ClInclude Include="ObjJsonEditor.h" />
     <ClInclude Include="QuickEdit.h" />
@@ -424,7 +466,16 @@
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp">
       <Filter>..\External\imgui-docking</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp">
@@ -433,8 +484,14 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
+    <ClCompile Include="External\bgfx_common\imgui\imgui.cpp">
+      <Filter>External\bgfx_common\imgui</Filter>
+    </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
   </ItemGroup>

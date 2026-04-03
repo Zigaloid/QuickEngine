@@ -44,10 +44,10 @@ namespace
 		virtual int shutdown() override
 		{
 			DECLARE_FUNC_VLOW();
+			theApp.Shutdown();
 			ShutdownCoreEngine();
 			imguiDestroy();
 			bgfx::shutdown();
-			theApp.Shutdown();
 			return 0;
 		}
 
