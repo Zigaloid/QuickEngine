@@ -58,7 +58,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\AssetClasses;common;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\AssetClasses;..\External\bgfx_common;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -76,7 +76,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\AssetClasses;common;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\AssetClasses;..\External\bgfx_common;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -98,6 +98,70 @@
     <ClInclude Include="..\AssetClasses\EntityInstance.h" />
     <ClInclude Include="..\AssetClasses\StaticMeshDefinition.h" />
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
+    <ClInclude Include="..\External\bgfx_common\args.h" />
+    <ClInclude Include="..\External\bgfx_common\aviwriter.h" />
+    <ClInclude Include="..\External\bgfx_common\bgfx_utils.h" />
+    <ClInclude Include="..\External\bgfx_common\camera.h" />
+    <ClInclude Include="..\External\bgfx_common\common.h" />
+    <ClInclude Include="..\External\bgfx_common\cube_atlas.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\debugdraw.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\fs_debugdraw_fill.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\fs_debugdraw_fill_lit.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\fs_debugdraw_fill_texture.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\fs_debugdraw_lines.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\fs_debugdraw_lines_stipple.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\vs_debugdraw_fill.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\vs_debugdraw_fill_lit.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\vs_debugdraw_fill_lit_mesh.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\vs_debugdraw_fill_mesh.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\vs_debugdraw_fill_texture.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\vs_debugdraw_lines.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\debugdraw\vs_debugdraw_lines_stipple.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\entry\cmd.h" />
+    <ClInclude Include="..\External\bgfx_common\entry\dbg.h" />
+    <ClInclude Include="..\External\bgfx_common\entry\dialog.h" />
+    <ClInclude Include="..\External\bgfx_common\entry\entry.h" />
+    <ClInclude Include="..\External\bgfx_common\entry\entry_p.h" />
+    <ClInclude Include="..\External\bgfx_common\entry\input.h" />
+    <ClInclude Include="..\External\bgfx_common\font\font_manager.h" />
+    <ClInclude Include="..\External\bgfx_common\font\fs_font_basic.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\fs_font_distance_field.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\fs_font_distance_field_drop_shadow.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\fs_font_distance_field_drop_shadow_image.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\fs_font_distance_field_outline.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\fs_font_distance_field_outline_drop_shadow_image.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\fs_font_distance_field_outline_image.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\fs_font_distance_field_subpixel.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\text_buffer_manager.h" />
+    <ClInclude Include="..\External\bgfx_common\font\text_metrics.h" />
+    <ClInclude Include="..\External\bgfx_common\font\utf8.h" />
+    <ClInclude Include="..\External\bgfx_common\font\vs_font_basic.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\vs_font_distance_field.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\vs_font_distance_field_drop_shadow.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\vs_font_distance_field_drop_shadow_image.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\vs_font_distance_field_outline.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\vs_font_distance_field_outline_drop_shadow_image.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\vs_font_distance_field_outline_image.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\font\vs_font_distance_field_subpixel.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\droidsans.ttf.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\fs_imgui_image.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\fs_ocornut_imgui.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\icons_font_awesome.ttf.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\icons_kenney.ttf.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\imgui.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\roboto_regular.ttf.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\robotomono_regular.ttf.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\vs_imgui_image.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\imgui\vs_ocornut_imgui.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\nanovg\fontstash.h" />
+    <ClInclude Include="..\External\bgfx_common\nanovg\fs_nanovg_fill.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\nanovg\nanovg.h" />
+    <ClInclude Include="..\External\bgfx_common\nanovg\nanovg_bgfx.h" />
+    <ClInclude Include="..\External\bgfx_common\nanovg\vs_nanovg_fill.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\packrect.h" />
+    <ClInclude Include="..\External\bgfx_common\ps\fs_particle.bin.h" />
+    <ClInclude Include="..\External\bgfx_common\ps\particle_system.h" />
+    <ClInclude Include="..\External\bgfx_common\ps\vs_particle.bin.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
@@ -106,70 +170,6 @@
     <ClInclude Include="DocumentManager.h" />
     <ClInclude Include="ObjJsonEditor.h" />
     <ClInclude Include="QuickEdit.h" />
-    <ClInclude Include="common\args.h" />
-    <ClInclude Include="common\aviwriter.h" />
-    <ClInclude Include="common\bgfx_utils.h" />
-    <ClInclude Include="common\camera.h" />
-    <ClInclude Include="common\common.h" />
-    <ClInclude Include="common\cube_atlas.h" />
-    <ClInclude Include="common\debugdraw\debugdraw.h" />
-    <ClInclude Include="common\debugdraw\fs_debugdraw_fill.bin.h" />
-    <ClInclude Include="common\debugdraw\fs_debugdraw_fill_lit.bin.h" />
-    <ClInclude Include="common\debugdraw\fs_debugdraw_fill_texture.bin.h" />
-    <ClInclude Include="common\debugdraw\fs_debugdraw_lines.bin.h" />
-    <ClInclude Include="common\debugdraw\fs_debugdraw_lines_stipple.bin.h" />
-    <ClInclude Include="common\debugdraw\vs_debugdraw_fill.bin.h" />
-    <ClInclude Include="common\debugdraw\vs_debugdraw_fill_lit.bin.h" />
-    <ClInclude Include="common\debugdraw\vs_debugdraw_fill_lit_mesh.bin.h" />
-    <ClInclude Include="common\debugdraw\vs_debugdraw_fill_mesh.bin.h" />
-    <ClInclude Include="common\debugdraw\vs_debugdraw_fill_texture.bin.h" />
-    <ClInclude Include="common\debugdraw\vs_debugdraw_lines.bin.h" />
-    <ClInclude Include="common\debugdraw\vs_debugdraw_lines_stipple.bin.h" />
-    <ClInclude Include="common\entry\cmd.h" />
-    <ClInclude Include="common\entry\dbg.h" />
-    <ClInclude Include="common\entry\dialog.h" />
-    <ClInclude Include="common\entry\entry.h" />
-    <ClInclude Include="common\entry\entry_p.h" />
-    <ClInclude Include="common\entry\input.h" />
-    <ClInclude Include="common\font\font_manager.h" />
-    <ClInclude Include="common\font\fs_font_basic.bin.h" />
-    <ClInclude Include="common\font\fs_font_distance_field.bin.h" />
-    <ClInclude Include="common\font\fs_font_distance_field_drop_shadow.bin.h" />
-    <ClInclude Include="common\font\fs_font_distance_field_drop_shadow_image.bin.h" />
-    <ClInclude Include="common\font\fs_font_distance_field_outline.bin.h" />
-    <ClInclude Include="common\font\fs_font_distance_field_outline_drop_shadow_image.bin.h" />
-    <ClInclude Include="common\font\fs_font_distance_field_outline_image.bin.h" />
-    <ClInclude Include="common\font\fs_font_distance_field_subpixel.bin.h" />
-    <ClInclude Include="common\font\text_buffer_manager.h" />
-    <ClInclude Include="common\font\text_metrics.h" />
-    <ClInclude Include="common\font\utf8.h" />
-    <ClInclude Include="common\font\vs_font_basic.bin.h" />
-    <ClInclude Include="common\font\vs_font_distance_field.bin.h" />
-    <ClInclude Include="common\font\vs_font_distance_field_drop_shadow.bin.h" />
-    <ClInclude Include="common\font\vs_font_distance_field_drop_shadow_image.bin.h" />
-    <ClInclude Include="common\font\vs_font_distance_field_outline.bin.h" />
-    <ClInclude Include="common\font\vs_font_distance_field_outline_drop_shadow_image.bin.h" />
-    <ClInclude Include="common\font\vs_font_distance_field_outline_image.bin.h" />
-    <ClInclude Include="common\font\vs_font_distance_field_subpixel.bin.h" />
-    <ClInclude Include="common\imgui\droidsans.ttf.h" />
-    <ClInclude Include="common\imgui\fs_imgui_image.bin.h" />
-    <ClInclude Include="common\imgui\fs_ocornut_imgui.bin.h" />
-    <ClInclude Include="common\imgui\icons_font_awesome.ttf.h" />
-    <ClInclude Include="common\imgui\icons_kenney.ttf.h" />
-    <ClInclude Include="common\imgui\imgui.h" />
-    <ClInclude Include="common\imgui\roboto_regular.ttf.h" />
-    <ClInclude Include="common\imgui\robotomono_regular.ttf.h" />
-    <ClInclude Include="common\imgui\vs_imgui_image.bin.h" />
-    <ClInclude Include="common\imgui\vs_ocornut_imgui.bin.h" />
-    <ClInclude Include="common\nanovg\fontstash.h" />
-    <ClInclude Include="common\nanovg\fs_nanovg_fill.bin.h" />
-    <ClInclude Include="common\nanovg\nanovg.h" />
-    <ClInclude Include="common\nanovg\nanovg_bgfx.h" />
-    <ClInclude Include="common\nanovg\vs_nanovg_fill.bin.h" />
-    <ClInclude Include="common\packrect.h" />
-    <ClInclude Include="common\ps\fs_particle.bin.h" />
-    <ClInclude Include="common\ps\particle_system.h" />
-    <ClInclude Include="common\ps\vs_particle.bin.h" />
     <ClInclude Include="logo.h" />
   </ItemGroup>
   <ItemGroup>
@@ -192,8 +192,34 @@
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vertexcodec.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vertexfilter.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vfetchoptimizer.cpp" />
+    <ClCompile Include="..\External\bgfx_common\bgfx_utils.cpp" />
+    <ClCompile Include="..\External\bgfx_common\camera.cpp" />
+    <ClCompile Include="..\External\bgfx_common\cube_atlas.cpp" />
+    <ClCompile Include="..\External\bgfx_common\debugdraw\debugdraw.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\cmd.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\dialog.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\entry.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\entry_android.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\entry_glfw.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\entry_html5.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\entry_noop.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\entry_sdl.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\entry_windows.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\entry_x11.cpp" />
+    <ClCompile Include="..\External\bgfx_common\entry\input.cpp" />
+    <ClCompile Include="..\External\bgfx_common\example-glue.cpp" />
+    <ClCompile Include="..\External\bgfx_common\font\font_manager.cpp" />
+    <ClCompile Include="..\External\bgfx_common\font\text_buffer_manager.cpp" />
+    <ClCompile Include="..\External\bgfx_common\font\text_metrics.cpp" />
+    <ClCompile Include="..\External\bgfx_common\font\utf8.cpp" />
+    <ClCompile Include="..\External\bgfx_common\imgui\imgui.cpp" />
+    <ClCompile Include="..\External\bgfx_common\nanovg\nanovg.cpp" />
+    <ClCompile Include="..\External\bgfx_common\nanovg\nanovg_bgfx.cpp" />
+    <ClCompile Include="..\External\bgfx_common\ps\particle_system.cpp" />
     <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_opengl3.cpp" />
-    <ClCompile Include="..\External\imgui-docking\imgui.cpp" />
+    <ClCompile Include="..\External\imgui-docking\imgui.cpp">
+      <ObjectFileName>$(IntDir)\imgui1.obj</ObjectFileName>
+    </ClCompile>
     <ClCompile Include="..\External\imgui-docking\imgui_Widgets.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp" />
@@ -204,32 +230,6 @@
     <ClCompile Include="DocumentManager.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
-    <ClCompile Include="common\bgfx_utils.cpp" />
-    <ClCompile Include="common\camera.cpp" />
-    <ClCompile Include="common\cube_atlas.cpp" />
-    <ClCompile Include="common\debugdraw\debugdraw.cpp" />
-    <ClCompile Include="common\entry\cmd.cpp" />
-    <ClCompile Include="common\entry\dialog.cpp" />
-    <ClCompile Include="common\entry\entry.cpp" />
-    <ClCompile Include="common\entry\entry_android.cpp" />
-    <ClCompile Include="common\entry\entry_glfw.cpp" />
-    <ClCompile Include="common\entry\entry_html5.cpp" />
-    <ClCompile Include="common\entry\entry_noop.cpp" />
-    <ClCompile Include="common\entry\entry_sdl.cpp" />
-    <ClCompile Include="common\entry\entry_windows.cpp" />
-    <ClCompile Include="common\entry\entry_x11.cpp" />
-    <ClCompile Include="common\entry\input.cpp" />
-    <ClCompile Include="common\example-glue.cpp" />
-    <ClCompile Include="common\font\font_manager.cpp" />
-    <ClCompile Include="common\font\text_buffer_manager.cpp" />
-    <ClCompile Include="common\font\text_metrics.cpp" />
-    <ClCompile Include="common\font\utf8.cpp" />
-    <ClCompile Include="common\imgui\imgui.cpp">
-      <ObjectFileName>$(IntDir)\imgui1.obj</ObjectFileName>
-    </ClCompile>
-    <ClCompile Include="common\nanovg\nanovg.cpp" />
-    <ClCompile Include="common\nanovg\nanovg_bgfx.cpp" />
-    <ClCompile Include="common\ps\particle_system.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

@@ -43,4 +43,4 @@ public:
 ComponentRegistry& GetComponentRegistry();
 
 #define DECLARE_COMPONENT() static AutoRegisterComponent s_autoRegister;
-#define REGISTER_COMPONENT(className, prettyName, category) static AutoRegisterComponent s_autoRegister(className, prettyName, category);
+#define REGISTER_COMPONENT(_className, _prettyName, _category) AutoRegisterComponent _className::s_autoRegister(#_className, _prettyName, _category);

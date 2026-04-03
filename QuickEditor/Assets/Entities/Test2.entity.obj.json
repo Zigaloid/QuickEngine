@@ -95,6 +95,40 @@
                         "Type": 19,
                         "Size": 32
                     }
+                },
+                {
+                    "Value": "CMeshComponent",
+                    "m_meshResource": {
+                        "Value": "undfined",
+                        "Type": 3,
+                        "Size": 40
+                    },
+                    "m_materialResource": {
+                        "Value": "undfined",
+                        "Type": 3,
+                        "Size": 40
+                    },
+                    "m_color": {
+                        "Value": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Type": 7,
+                        "Size": 16
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CMeshComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 32
+                    }
                 }
             ],
             "Type": 19,

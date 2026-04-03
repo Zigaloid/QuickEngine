@@ -52,8 +52,7 @@ project "QuickEdit"
 	includedirs { "../Shared/ImguiVizualizers" }  
 	includedirs { "../AssetClasses" }
 
-	includedirs { "./common/" }   
-
+	includedirs { "../External/bgfx_common" }   
 	includedirs { "../External/imgui-docking" }   	
 	includedirs { "../External/bx/include/compat/msvc" }   
 	includedirs { "../External/OpenGL/Include" }  
@@ -62,6 +61,8 @@ project "QuickEdit"
 	files { "../AssetClasses/**.h" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.cpp" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.h" }
+	files { "../External/bgfx_common/**.cpp" }   
+	files { "../External/bgfx_common/**.h" }   
 	files { "../External/imgui-docking/imgui.cpp" }
 	files { "../External/imgui-docking/backends/imgui_impl_opengl3.cpp" }
 	files { "../External/imgui-docking/imgui_tables.cpp" }

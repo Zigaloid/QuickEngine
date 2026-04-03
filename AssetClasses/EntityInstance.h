@@ -2,10 +2,10 @@
 #include "Reflection/ReflectionBase.h"
 #include "ComponentSystem/ComponentSystem.h"
 #include "ComponentSystem/ComponentRegistry.h"
+#include "ResourceManager/ResourceManager.h"
 #include "math\Vector4f.h"
-
-//#define AUTO_REGISTER_COMPONENT(className, prettyName, category) \
-	
+#include "bgfx\bgfx.h"
+#include "bgfx_utils.h"
 
 class CEntityInstance : public ComponentSystem::Component
 {
@@ -17,4 +17,25 @@ private:
 	std::string m_entityDefinition = "undfined";
 	std::string m_name = "undfined";
 	Vector4f m_color = Vector4f(1, 1, 1, 1);
+};
+
+class CMeshComponent : public ComponentSystem::Component
+{
+public:
+	REFL_DECLARE_OBJECT(CMeshComponent, Component);
+	DECLARE_COMPONENT();
+
+private:
+
+	Mesh* m_mesh;
+	bgfx::ProgramHandle m_program;
+
+	std::string m_meshResource = "undfined";
+	std::string m_materialResource = "undfined";
+	Vector4f m_color = Vector4f(1, 1, 1, 1);
+};
+
+
+class : public ResourceSystem::Resource
+{
 };
