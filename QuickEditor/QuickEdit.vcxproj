@@ -172,6 +172,7 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyInspector.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.h" />
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="AssetClasses\EntityInstance.h" />
     <ClInclude Include="Core\Reflection\ReflectionBase.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.cpp" />
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="DocumentManager.cpp" />
     <ClCompile Include="External\bgfx_common\imgui\imgui.cpp">

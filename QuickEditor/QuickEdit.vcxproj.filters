@@ -320,6 +320,9 @@
     <ClInclude Include="ObjJsonEditor.h" />
     <ClInclude Include="QuickEdit.h" />
     <ClInclude Include="logo.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
@@ -494,5 +497,8 @@
     </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

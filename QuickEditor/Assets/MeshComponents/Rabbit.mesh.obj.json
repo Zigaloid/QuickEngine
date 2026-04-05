@@ -1,19 +1,25 @@
 {
     "RootObject": {
-        "m_name": {
-            "Value": "Test 2 ",
+        "m_meshResource": {
+            "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\meshes\\bunny.bin",
             "Type": 3,
             "Size": 40
         },
-        "m_color": {
-            "Value": [
-                2.0,
-                3.0,
-                4.0,
-                5.0
-            ],
-            "Type": 7,
-            "Size": 16
+        "m_shaderResource": {
+            "Value": "mesh",
+            "Type": 3,
+            "Size": 40
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CMeshComponent",
+            "Elements": [],
+            "Type": 19,
+            "Size": 32
         }
     }
 }

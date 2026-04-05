@@ -14,12 +14,10 @@ REFL_DEFINE_OBJECT(CEntityInstance)
 	REFL_DEFINE_VECTOR4_MEMBER(CEntityInstance, m_color)
 REFL_DEFINE_END
 
-
 // ── CResourceReference ────────────────────────────────────────────
 REFL_DEFINE_OBJECT(CResourceReference)
 	REFL_DEFINE_OBJECT_MEMBER(CResourceReference, m_resourceFileName),
 REFL_DEFINE_END
-
 
 // ── CMeshComponent ─────────────────────────────────────────────────
 REGISTER_COMPONENT(CMeshComponent, "Mesh", "Graphics");

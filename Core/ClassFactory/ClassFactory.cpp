@@ -20,3 +20,14 @@ CReflectedBase * ClassFactory::createObject(const char *className)
     }
     return nullptr;
 }
+
+std::vector<std::string> ClassFactory::GetRegisteredClassNames()
+{
+    std::vector<std::string> names;
+    if (!s_classFactoryMap) return names;
+    names.reserve(s_classFactoryMap->size());
+    for (const auto& kv : *s_classFactoryMap) {
+        names.push_back(kv.first);
+    }
+    return names;
+}

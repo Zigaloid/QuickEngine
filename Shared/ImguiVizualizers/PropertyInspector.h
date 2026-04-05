@@ -73,6 +73,10 @@ namespace ImGuiVisualizers {
 		void RenderComponentProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object);
+		void RenderIntVectorProperty(const CPropertyBase& property, CReflectedBase* object);
+		void RenderFloatVectorProperty(const CPropertyBase& property, CReflectedBase* object);
+		void RenderBoolVectorProperty(const CPropertyBase& property, CReflectedBase* object);
+		void RenderStringVectorProperty(const CPropertyBase& property, CReflectedBase* object);
 
 		// Widget-specific rendering methods (used by PropertyWidgetMap overrides)
 		bool RenderWithCustomWidget(const CPropertyBase& property, CReflectedBase* object, EditorWidgetType widgetType);
@@ -85,14 +89,18 @@ namespace ImGuiVisualizers {
 		void RenderDropdown(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
 		void RenderTextArea(const CPropertyBase& property, CReflectedBase* object);
 		void RenderReadOnlyProperty(const CPropertyBase& property, CReflectedBase* object);
+		void RenderFilePicker(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
 
 		// Context menu for component arrays
 		void RenderComponentArrayContextMenu(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentItemContextMenu(const CPropertyBase& property, CReflectedBase* object, size_t index);
-
+		void RenderObjectArrayContextMenu(const CPropertyBase& property, CReflectedBase* object);
+		
 		// Component management
 		bool AddComponentToArray(const CPropertyBase& property, CReflectedBase* object, const std::string& componentClassName);
 		bool RemoveComponentFromArray(const CPropertyBase& property, CReflectedBase* object, size_t index);
+		bool AddObjectToArray(const CPropertyBase& property, CReflectedBase* object, const std::string& className);
+		bool RemoveObjectFromArray(const CPropertyBase& property, CReflectedBase* object, size_t index);
 		void ProcessPendingDeletions();
 
 		// Helper methods

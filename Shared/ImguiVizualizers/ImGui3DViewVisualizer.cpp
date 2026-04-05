@@ -23,11 +23,9 @@ void ImGui3DViewVisualizer::Initialize()
 {
     m_primitives.Initialize();
     // Viewport is lazily created on first Render() when we know the size.
-
     auto componentManager = Core::CoreSystem::GetComponentManager();
     g_meshComp = componentManager->CreateComponent<CMeshComponent>();
-    g_meshComp->SetMeshPath("./assets/meshes/bunny.bin");
-    g_meshComp->SetShaderPath("mesh");
+    g_meshComp->SafeRead("./assets/meshcomponents/Rabbit.mesh.obj.json");
     g_meshComp->Initialize();   
 }
 
@@ -97,6 +95,7 @@ bool ImGui3DViewVisualizer::Render(bool* isOpen)
             bx::mtxRotateXY(mtx, 0.0f, 0.0f);
             g_meshComp->Render(viewId, mtx);
         }
+
 
         // Display the offscreen texture
         ImVec2 cursorPos = ImGui::GetCursorScreenPos();

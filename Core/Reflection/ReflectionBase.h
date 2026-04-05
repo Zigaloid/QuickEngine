@@ -10,8 +10,6 @@
 
 #include <vector>
 
-namespace ImGuiVisualizers { class PropertyWidgetMap; }
-
 #define REFL_DECLARE_OBJECT(_O_,_P_)												\
     std::vector<CReflectionMapEntry> &GetReflectionMap() { return _O_::s_ReflectionMap; }\
     virtual const char *GetRflClassName() const override { return #_O_; }				\
@@ -99,8 +97,6 @@ public:
 	virtual const char* GetRflClassName() const { return nullptr; }
 	virtual void CollectHierarchyReflectionMaps(std::vector<std::pair<const char*, std::vector<CReflectionMapEntry>*>>& hierarchyMaps) const {}
 
-	// Override to provide a widget map for the PropertyInspector
-	virtual const ImGuiVisualizers::PropertyWidgetMap* GetPropertyWidgetMap() const { return nullptr; }
 protected:
 	void InternalReadMembers(std::vector<CReflectionMapEntry>& reflectionMap, IRFL_Parser& doc);
 	void InternalWriteMembers(std::vector<CReflectionMapEntry>& reflectionMap, IRFL_Parser& doc);

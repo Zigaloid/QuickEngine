@@ -5,6 +5,7 @@
 #include "EntityInstance.h"
 #include "StaticMeshDefinition.h"
 #include <iostream>
+#include "PropertyWidgetMapRegistry.h"
 
 bool QuickEditApp::Initialize()
 {
