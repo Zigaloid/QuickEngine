@@ -1,14 +1,19 @@
 {
     "RootObject": {
         "m_meshResource": {
-            "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\meshes\\bunny.bin",
+            "Value": "",
             "Type": 3,
             "Size": 40
         },
-        "m_shaderResource": {
-            "Value": "mesh",
-            "Type": 3,
-            "Size": 40
+        "m_materialFile": {
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\Materials\\Bunny.mat.obj.json",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 48
         },
         "m_active": {
             "Value": true,

@@ -50,7 +50,10 @@ project "QuickEdit"
 	includedirs { "../External/bgfx/"}
 	includedirs { "../External"}
 	includedirs { "../Shared/ImguiVizualizers" }  
+	includedirs { "../Shared" }  
 	includedirs { "../AssetClasses" }
+	includedirs { "../Shared/ResourceTypes" }  
+	includedirs { "../Shared/Components" } 
 
 	includedirs { "../External/bgfx_common" }   
 	includedirs { "../External/imgui-docking" }   	
@@ -68,7 +71,11 @@ project "QuickEdit"
 	files { "../External/imgui-docking/imgui_tables.cpp" }
 	files { "../External/imgui-docking/imgui_Widgets.cpp" }
 	files { "../External/imgui-docking/imgui_draw.cpp" }
-
+	
+	files { "../Shared/ResourceTypes/**.cpp" }
+	files { "../Shared/ResourceTypes/**.h" }
+	files { "../Shared/Components/**.cpp" }
+	files { "../Shared/Components/**.h" }
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.cpp" }
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.h" }
 	files { "../Shared/ImguiVizualizers/IImGuiVisualizer.h" }	
@@ -83,7 +90,18 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/bgfx*.h" }
 	files { "../Shared/ImguiVizualizers/bgfx*.cpp" }
 	files { "../Shared/ImguiVizualizers/bgfx*.h" }
-	
+	files { "../Shared/ImguiVizualizers/DocumentManager.cpp" }
+	files { "../Shared/ImguiVizualizers/DocumentManager.h" }
+	files { "../Shared/ImguiVizualizers/ObjJsonEditor.h" }
+	files { "../Shared/ImguiVizualizers/CombinedObjJson3DVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/PropertyWidgetMapRegistry.cpp" }
+	files { "../Shared/ImguiVizualizers/PropertyWidgetMapRegistry.h" }
+	files { "../Shared/ImguiVizualizers/PropertyWidgetMapEditor.cpp" }
+	files { "../Shared/ImguiVizualizers/PropertyWidgetMapEditor.h" }
+	files { "../Shared/ImguiVizualizers/UnifiedActionManager.cpp" }
+	files { "../Shared/ImguiVizualizers/UnifiedActionManager.h" }
+	files { "../Shared/KeyboardShortcutManager.cpp" }
+	files { "../Shared/KeyboardShortcutManager.h" }
 
 	files { "./**.cpp", "./**.h" }      
 

@@ -1,5 +1,7 @@
 #include "DocumentManager.h"
 #include "ObjJsonEditor.h"
+#include "CombinedObjJson3DVisualizer.h"
+#include "PropertyWidgetMapEditor.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -30,7 +32,82 @@ void ObjJsonLauncher::Launch(const std::string& assetPath)
     }
 
     // Defer registration to avoid mutating m_entries during RenderAll
-    m_manager.EnqueueEditor(key, assetPath, m_className);
+    m_manager.EnqueueEditor(key, assetPath, m_className, this);
+}
+
+std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+ObjJsonLauncher::Create(const std::string& assetPath, const std::string& className)
+{
+    auto editor = std::make_unique<ImGuiVisualizers::ObjJsonEditor>();
+    editor->Open(assetPath, className);
+    return editor;
+}
+
+MeshComponentLauncher::MeshComponentLauncher(DocumentManager& manager,
+    const std::string& suffix,
+    const std::string& className)
+    : m_manager(manager)
+    , m_suffix(suffix)
+    , m_className(className)
+{
+}
+
+void MeshComponentLauncher::Launch(const std::string& assetPath)
+{
+    std::string key = ImGuiVisualizers::CombinedObjJson3DVisualizer::MakeDocumentKey(assetPath);
+
+    // If already open, just bring it to front
+    if (m_manager.m_openEditorKeys.contains(key)) {
+        m_manager.m_visualizerManager.SetVisible(key, true);
+        return;
+    }
+
+    // Defer registration to avoid mutating m_entries during RenderAll
+    m_manager.EnqueueEditor(key, assetPath, m_className, this);
+}
+
+std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+MeshComponentLauncher::Create(const std::string& assetPath, const std::string& className)
+{
+    auto combined = std::make_unique<ImGuiVisualizers::CombinedObjJson3DVisualizer>();
+    // Combined visualizer exposes OpenObjectFile(...)
+    combined->OpenObjectFile(assetPath, className);
+    combined->Get3DView().LoadMesh(assetPath);
+    return combined;
+}
+
+
+
+
+WidgetEditorLauncher::WidgetEditorLauncher(DocumentManager& manager,
+    const std::string& suffix,
+    const std::string& className)
+    : m_manager(manager)
+    , m_suffix(suffix)
+    , m_className(className)
+{
+}
+
+void WidgetEditorLauncher::Launch(const std::string& assetPath)
+{
+    std::string key = ImGuiVisualizers::PropertyWidgetMapEditor::MakeDocumentKey(assetPath);
+
+    // If already open, just bring it to front
+    if (m_manager.m_openEditorKeys.contains(key)) {
+        m_manager.m_visualizerManager.SetVisible(key, true);
+        return;
+    }
+
+    // Defer registration to avoid mutating m_entries during RenderAll
+    m_manager.EnqueueEditor(key, assetPath, m_className, this);
+}
+
+std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+WidgetEditorLauncher::Create(const std::string& assetPath, const std::string& className)
+{
+    auto editor = std::make_unique<ImGuiVisualizers::PropertyWidgetMapEditor>();
+    editor->SetPath(assetPath);
+    return editor;
 }
 
 void NoOpLauncher::Launch(const std::string& assetPath)
@@ -41,6 +118,14 @@ void NoOpLauncher::Launch(const std::string& assetPath)
     std::string command = "xdg-open \"" + assetPath + "\" &";
     std::system(command.c_str());
 #endif
+}
+
+std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+NoOpLauncher::Create(const std::string& assetPath, const std::string& className)
+{
+    // No internal visualizer for this launcher
+    (void)assetPath; (void)className;
+    return nullptr;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -55,13 +140,12 @@ DocumentManager::DocumentManager(ImGuiVisualizers::ImGuiVisualizerManager& visua
 void DocumentManager::InitializeLaunchers()
 {
     // ObjJson launchers
+    m_launchers["MatObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".mat.obj.json", "CMaterialDefinition");
     m_launchers["DefObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".def.obj.json", "CEntityDefinition");
     m_launchers["EntityObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".entity.obj.json", "CEntityInstance");
-    m_launchers["MeshObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".mesh.obj.json", "CMeshComponent");
-    m_launchers["WidgetsObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".widgets.obj.json", "PropertyWidgetMapRegistry");
+    m_launchers["MeshObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".mesh.obj.json", "CMeshComponent");
+    m_launchers["WidgetsObjJson"] = std::make_unique<WidgetEditorLauncher>(*this, ".widgets.obj.json", "PropertyWidgetMapRegistry");
 
-    // Material launcher (TODO)
-    m_launchers["Material"] = std::make_unique<NoOpLauncher>();
 
     // Texture launcher (TODO)
     m_launchers["Texture"] = std::make_unique<NoOpLauncher>();
@@ -80,6 +164,7 @@ std::vector<DocumentManager::AssetTypeConfig> DocumentManager::GetAssetTypeConfi
         // ObjJson types
         { ".mesh.obj.json",     "Mesh Component",         IM_COL32(100, 200, 255, 255),   "O",  "MeshObjJson",   true, false },
         { ".def.obj.json",      "Definition Object",      IM_COL32(100, 200, 255, 255),   "O",  "DefObjJson",    true, false },
+        { ".mat.obj.json",      "Material Definition",    IM_COL32(100, 200, 255, 255),   "O",  "MatObjJson",    true, false },
         { ".entity.obj.json",   "Entity Object",          IM_COL32(100, 200, 255, 255),   "O",  "EntityObjJson", true, false },        
         { ".widgets.obj.json",  "Class Widgets",          IM_COL32(100, 200, 255, 255),   "O",  "WidgetsObjJson",true, false },
         { ".png",               "PNG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",      false,  true },
@@ -152,9 +237,10 @@ void DocumentManager::RegisterAssetTypes()
 
 void DocumentManager::EnqueueEditor(const std::string& key,
                                     const std::string& filePath,
-                                    const std::string& className)
+                                    const std::string& className,
+                                    IAssetLauncher* launcher)
 {
-    m_pendingEditors.push_back({ key, filePath, className });
+    m_pendingEditors.push_back({ key, filePath, className, launcher });
 }
 
 void DocumentManager::ProcessPendingEditors()
@@ -166,10 +252,23 @@ void DocumentManager::ProcessPendingEditors()
             continue;
         }
 
-        auto editor = std::make_unique<ImGuiVisualizers::ObjJsonEditor>();
-        editor->Open(pending.filePath, pending.className);
-        m_visualizerManager.Register(pending.key, std::move(editor), true);
-        m_openEditorKeys.insert(pending.key);
+        // Ask the launcher to create the appropriate visualizer.
+        std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer> viz;
+        if (pending.launcher) {
+            viz = pending.launcher->Create(pending.filePath, pending.className);
+        }
+
+        // Fallback: if launcher returned nullptr, create a generic ObjJsonEditor.
+        if (!viz) {
+            auto editor = std::make_unique<ImGuiVisualizers::ObjJsonEditor>();
+            editor->Open(pending.filePath, pending.className);
+            viz = std::move(editor);
+        }
+
+        if (viz) {
+            m_visualizerManager.Register(pending.key, std::move(viz), true);
+            m_openEditorKeys.insert(pending.key);
+        }
     }
     m_pendingEditors.clear();
 }

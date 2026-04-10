@@ -58,7 +58,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\AssetClasses;..\External\bgfx_common;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\External\bgfx_common;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -76,7 +76,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\AssetClasses;..\External\bgfx_common;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\External\bgfx_common;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -162,24 +162,34 @@
     <ClInclude Include="..\External\bgfx_common\ps\fs_particle.bin.h" />
     <ClInclude Include="..\External\bgfx_common\ps\particle_system.h" />
     <ClInclude Include="..\External\bgfx_common\ps\vs_particle.bin.h" />
+    <ClInclude Include="..\Shared\Components\MeshComponent.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxViewIdAllocator.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\CombinedObjJson3DVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\DocumentManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\ObjJsonEditor.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyInspector.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMapEditor.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
+    <ClInclude Include="..\Shared\KeyboardShortcutManager.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\TextureResource.h" />
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="AssetClasses\EntityInstance.h" />
     <ClInclude Include="Core\Reflection\ReflectionBase.h" />
-    <ClInclude Include="DocumentManager.h" />
-    <ClInclude Include="ObjJsonEditor.h" />
     <ClInclude Include="QuickEdit.h" />
     <ClInclude Include="logo.h" />
+    <ClInclude Include="Shared\ImguiVizualizers\PropertyWidgetMapEditor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp" />
@@ -232,19 +242,24 @@
     <ClCompile Include="..\External\imgui-docking\imgui_Widgets.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp" />
+    <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapEditor.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp" />
+    <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp" />
     <ClCompile Include="AssetBrowser.cpp" />
-    <ClCompile Include="DocumentManager.cpp" />
-    <ClCompile Include="External\bgfx_common\imgui\imgui.cpp">
-      <ObjectFileName>$(IntDir)\imgui2.obj</ObjectFileName>
-    </ClCompile>
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
   </ItemGroup>

@@ -37,6 +37,9 @@
     <Filter Include="Math">
       <UniqueIdentifier>{AFF4887C-9B2B-8A0D-4418-7010302E060F}</UniqueIdentifier>
     </Filter>
+    <Filter Include="MessageSystem">
+      <UniqueIdentifier>{EFE1C1B0-5BA2-3DE7-24DD-8664905C82C3}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Net">
       <UniqueIdentifier>{2C0C880B-9815-887C-2191-9E7C8D99937C}</UniqueIdentifier>
     </Filter>
@@ -71,6 +74,9 @@
     </ClInclude>
     <ClInclude Include="ClassFactory\ClassFactory.h">
       <Filter>ClassFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\ComponentRegistry.h">
+      <Filter>ComponentSystem</Filter>
     </ClInclude>
     <ClInclude Include="ComponentSystem\ComponentSystem.h">
       <Filter>ComponentSystem</Filter>
@@ -149,6 +155,9 @@
     </ClInclude>
     <ClInclude Include="Math\Vector4f.h">
       <Filter>Math</Filter>
+    </ClInclude>
+    <ClInclude Include="MessageSystem\MessageBus.h">
+      <Filter>MessageSystem</Filter>
     </ClInclude>
     <ClInclude Include="Net\BerkeleySocket.h">
       <Filter>Net</Filter>
@@ -238,9 +247,6 @@
       <Filter>ResourceManager</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="ComponentSystem\ComponentRegistry.h">
-      <Filter>ComponentSystem</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp">
@@ -251,6 +257,9 @@
     </ClCompile>
     <ClCompile Include="ClassFactory\ClassFactory.cpp">
       <Filter>ClassFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentSystem\ComponentRegistry.cpp">
+      <Filter>ComponentSystem</Filter>
     </ClCompile>
     <ClCompile Include="ComponentSystem\ComponentSystem.cpp">
       <Filter>ComponentSystem</Filter>
@@ -309,6 +318,9 @@
     <ClCompile Include="Math\Vector4f.cpp">
       <Filter>Math</Filter>
     </ClCompile>
+    <ClCompile Include="MessageSystem\MessageBus.cpp">
+      <Filter>MessageSystem</Filter>
+    </ClCompile>
     <ClCompile Include="Net\BerkeleySocket.cpp">
       <Filter>Net</Filter>
     </ClCompile>
@@ -333,8 +345,8 @@
     <ClCompile Include="Reflection\ReflectionError.cpp">
       <Filter>Reflection</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentSystem\ComponentRegistry.cpp">
-      <Filter>ComponentSystem</Filter>
+    <ClCompile Include="ResourceManager\ResourceManager.cpp">
+      <Filter>ResourceManager</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

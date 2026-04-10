@@ -22,7 +22,6 @@ namespace UI {
     // -------------------------------------------------------------------------
     // Registration
     // -------------------------------------------------------------------------
-
     void UnifiedActionManager::RegisterAction(const ActionDescriptor& descriptor)
     {
         m_actions[descriptor.path] = descriptor;

@@ -58,6 +58,7 @@ namespace ImGuiVisualizers {
 		void RenderObjectPropertiesHierarchy(CReflectedBase* object);
 		void RenderClassProperties(const char* className, std::vector<CReflectionMapEntry>* reflectionMap, CReflectedBase* object);
 		void RenderProperty(const CPropertyBase& property, CReflectedBase* object, const std::string& prefix = "");
+		void DumpReflectionMap(CReflectedBase* object);
 
 		// Type-specific rendering methods
 		void RenderFloatProperty(const CPropertyBase& property, CReflectedBase* object);
@@ -78,7 +79,11 @@ namespace ImGuiVisualizers {
 		void RenderBoolVectorProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderStringVectorProperty(const CPropertyBase& property, CReflectedBase* object);
 
+		template<typename ValueT, typename DrawElemFn>
+		void RenderVectorGeneric(const CPropertyBase& property, CReflectedBase* object, const char* vectorTag, DrawElemFn drawElement, std::function<ValueT()> makeDefault = std::function<ValueT()>(), std::function<void(void*)> removeCleanup = std::function<void(void*)>());
+
 		// Widget-specific rendering methods (used by PropertyWidgetMap overrides)
+		
 		bool RenderWithCustomWidget(const CPropertyBase& property, CReflectedBase* object, EditorWidgetType widgetType);
 		void RenderSliderFloat(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
 		void RenderSliderInt(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
@@ -152,6 +157,7 @@ namespace ImGuiVisualizers {
 		float m_FloatBuffer;
 		int m_IntBuffer;
 		bool m_BoolBuffer;
+		bool m_ShowDetails = false;
 	};
 
 } // namespace ImGuiVisualizers

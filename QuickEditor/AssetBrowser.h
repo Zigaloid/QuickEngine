@@ -150,8 +150,11 @@ public:
      * @brief Get the number of registered types.
      */
     std::size_t GetCount() const { return m_types.size(); }
+    
 
 private:
+    
+
     std::string ToLower(const std::string& str) const;
     bool EndsWith(const std::string& str, const std::string& suffix) const;
 

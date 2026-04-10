@@ -134,6 +134,7 @@ void AssetBrowser::Initialize()
         auto result = m_fileSystem->GetCurrentDirectory();
         if (result.IsSuccess()) {
             m_rootPath = result.GetValue();
+            m_rootPath = m_rootPath + "/assets";
         }
     }
 
@@ -144,8 +145,10 @@ void AssetBrowser::Initialize()
     // Initialize type filter visibility from existing registrations
     for (const auto& type : m_registry.GetAll()) {
         m_typeFilterVisible[type.extension] = type.visibleByDefault;
-    }
+    }    
 }
+
+
 
 void AssetBrowser::Shutdown()
 {

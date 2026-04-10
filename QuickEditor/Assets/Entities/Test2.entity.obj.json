@@ -12,9 +12,9 @@
         },
         "m_color": {
             "Value": [
-                2.0,
-                3.0,
-                4.0,
+                0.49420851469039917,
+                0.1679164171218872,
+                0.3342120349407196,
                 5.0
             ],
             "Type": 7,
@@ -27,110 +27,7 @@
         },
         "m_children": {
             "Value": "CEntityInstance",
-            "Elements": [
-                {
-                    "Value": "CEntityInstance",
-                    "m_entityDefinition": {
-                        "Value": "undfined",
-                        "Type": 3,
-                        "Size": 40
-                    },
-                    "m_name": {
-                        "Value": "undfined",
-                        "Type": 3,
-                        "Size": 40
-                    },
-                    "m_color": {
-                        "Value": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Type": 7,
-                        "Size": 16
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CEntityInstance",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 32
-                    }
-                },
-                {
-                    "Value": "CEntityInstance",
-                    "m_entityDefinition": {
-                        "Value": "undfined",
-                        "Type": 3,
-                        "Size": 40
-                    },
-                    "m_name": {
-                        "Value": "undfined",
-                        "Type": 3,
-                        "Size": 40
-                    },
-                    "m_color": {
-                        "Value": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Type": 7,
-                        "Size": 16
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CEntityInstance",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 32
-                    }
-                },
-                {
-                    "Value": "CMeshComponent",
-                    "m_meshResource": {
-                        "Value": "undfined",
-                        "Type": 3,
-                        "Size": 40
-                    },
-                    "m_materialResource": {
-                        "Value": "undfined",
-                        "Type": 3,
-                        "Size": 40
-                    },
-                    "m_color": {
-                        "Value": [
-                            1.0,
-                            1.0,
-                            1.0,
-                            1.0
-                        ],
-                        "Type": 7,
-                        "Size": 16
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CMeshComponent",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 32
-                    }
-                }
-            ],
+            "Elements": [],
             "Type": 19,
             "Size": 32
         }

@@ -1,7 +1,11 @@
 #include "ImGui3DViewVisualizer.h"
 
 #include "EntityInstance.h"
+
 #include "CoreSystem/CoreSystem.h"
+#include "MeshComponent.h"
+
+#include <algorithm>
 
 namespace ImGuiVisualizers {
 
@@ -17,26 +21,42 @@ ImGui3DViewVisualizer::ImGui3DViewVisualizer(const char* name,
 }
 
 // ── IImGuiVisualizer lifecycle ──────────────────────────────────────────
-CMeshComponent* g_meshComp = nullptr;
 
 void ImGui3DViewVisualizer::Initialize()
 {
     m_primitives.Initialize();
-    // Viewport is lazily created on first Render() when we know the size.
-    auto componentManager = Core::CoreSystem::GetComponentManager();
-    g_meshComp = componentManager->CreateComponent<CMeshComponent>();
-    g_meshComp->SafeRead("./assets/meshcomponents/Rabbit.mesh.obj.json");
-    g_meshComp->Initialize();   
 }
 
 void ImGui3DViewVisualizer::Shutdown()
 {
     m_viewport.Shutdown();
-    m_primitives.Shutdown();
+    m_primitives.Shutdown();    
+    // Note: mesh component lifetime handled by component manager; do not delete g_meshComp here.
 }
 
 void ImGui3DViewVisualizer::Update(float deltaTime)
 {
+}
+
+// ── Public mesh-loading API ─────────────────────────────────────────────
+
+void ImGui3DViewVisualizer::LoadMesh(const std::string& meshPath)
+{
+    m_meshPath = meshPath;
+
+    // Lazily create and initialize the mesh component so caller can invoke
+    // LoadMesh at any time (before or after Initialize()).
+    
+    auto componentManager = Core::CoreSystem::GetComponentManager();    
+    if (m_meshComp)
+    {
+        m_meshComp->Shutdown();                
+    }
+    m_meshComp = componentManager->CreateComponent<CMeshComponent>();
+    if (!m_meshPath.empty()) {
+        m_meshComp->SafeRead(m_meshPath.c_str());
+        m_meshComp->ReInitialize();
+    }
 }
 
 // ── Render ──────────────────────────────────────────────────────────────
@@ -48,14 +68,38 @@ bool ImGui3DViewVisualizer::Render(bool* isOpen)
         return false;
     }
 
-    RenderToolbar();
-
+    // Render toolbar and viewport content into the current window
     ImVec2 contentSize = ImGui::GetContentRegionAvail();
     if (contentSize.x < 1.0f) contentSize.x = 1.0f;
     if (contentSize.y < 1.0f) contentSize.y = 1.0f;
 
-    uint16_t w = static_cast<uint16_t>(contentSize.x);
-    uint16_t h = static_cast<uint16_t>(contentSize.y);
+    RenderContent(contentSize);
+
+    m_lastContentSize = contentSize;
+    ImGui::End();
+    return true;
+}
+
+void ImGui3DViewVisualizer::RenderContent(const ImVec2& contentSize)
+{
+    // Render toolbar (uses ImGui calls)
+    RenderToolbar();
+
+    // After rendering the toolbar, the remaining content region is the viewport area.
+    // Use the remaining region to size the offscreen framebuffer so we exclude toolbar/menu height.
+    ImVec2 remaining = ImGui::GetContentRegionAvail();
+
+    // Defensive: clamp to the originally provided contentSize (in case parent's content constraints differ)
+    ImVec2 size;
+    size.x = std::min(contentSize.x, remaining.x);
+    size.y = std::min(contentSize.y, remaining.y);
+
+    // Ensure non-zero size
+    if (size.x < 1.0f) size.x = 1.0f;
+    if (size.y < 1.0f) size.y = 1.0f;
+
+    uint16_t w = static_cast<uint16_t>(size.x);
+    uint16_t h = static_cast<uint16_t>(size.y);
 
     // Lazy-init or resize
     if (!m_viewport.IsValid()) {
@@ -65,7 +109,7 @@ bool ImGui3DViewVisualizer::Render(bool* isOpen)
     }
 
     if (m_viewport.IsValid()) {
-        float aspect = contentSize.x / contentSize.y;
+        float aspect = size.x / size.y;
 
         float viewMtx[16];
         float projMtx[16];
@@ -89,25 +133,26 @@ bool ImGui3DViewVisualizer::Render(bool* isOpen)
             m_renderCallback(viewId, m_primitives);
         }
 
-        if (g_meshComp->IsReadyToRender())
+        if (m_meshComp && m_meshComp->IsReady())
         {
             float mtx[16];
             bx::mtxRotateXY(mtx, 0.0f, 0.0f);
-            g_meshComp->Render(viewId, mtx);
+            m_meshComp->Render(viewId, mtx);
         }
 
-
-        // Display the offscreen texture
+        // Display the offscreen texture and create an invisible interactive item
         ImVec2 cursorPos = ImGui::GetCursorScreenPos();
-        ImGui::Image(m_viewport.GetColorTexture(), contentSize);
+        ImGui::Image(m_viewport.GetColorTexture(), size);
 
-        // Handle mouse input over the image
-        HandleInput(cursorPos, contentSize);
+        // place an invisible button exactly over the image so ImGui captures mouse input
+        ImGui::SetCursorScreenPos(cursorPos);
+        ImGui::InvisibleButton("##viewport", size);
+        bool hovered = ImGui::IsItemHovered();
+        bool active  = ImGui::IsItemActive();
+
+        // Handle mouse input over the image (now using ImGui's item state)
+        HandleInput(cursorPos, size, hovered, active);
     }
-
-    m_lastContentSize = contentSize;
-    ImGui::End();
-    return true;
 }
 
 // ── Toolbar ─────────────────────────────────────────────────────────────
@@ -136,16 +181,12 @@ void ImGui3DViewVisualizer::RenderToolbar()
 // ── Mouse input ─────────────────────────────────────────────────────────
 
 void ImGui3DViewVisualizer::HandleInput(const ImVec2& regionMin,
-                                         const ImVec2& regionSize)
+                                         const ImVec2& regionSize,
+                                         bool itemHovered,
+                                         bool itemActive)
 {
-    // Determine if the mouse is over the viewport image
-    ImVec2 mousePos = ImGui::GetMousePos();
-    bool hovered = (mousePos.x >= regionMin.x &&
-                    mousePos.x <= regionMin.x + regionSize.x &&
-                    mousePos.y >= regionMin.y &&
-                    mousePos.y <= regionMin.y + regionSize.y);
-
-    if (!hovered) {
+    // If the widget is neither hovered nor active, clear drag state and return
+    if (!itemHovered && !itemActive) {
         m_orbiting = false;
         m_panning  = false;
         return;
@@ -153,8 +194,8 @@ void ImGui3DViewVisualizer::HandleInput(const ImVec2& regionMin,
 
     ImGuiIO& io = ImGui::GetIO();
 
-    // Orbit – left mouse drag
-    if (ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+    // Orbit – left mouse drag (only when our invisible item is active)
+    if (itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
         m_orbiting = true;
         ImVec2 delta = io.MouseDelta;
         m_camera.Orbit(-delta.x * 0.005f, -delta.y * 0.005f);
@@ -162,8 +203,8 @@ void ImGui3DViewVisualizer::HandleInput(const ImVec2& regionMin,
         m_orbiting = false;
     }
 
-    // Pan – middle mouse drag
-    if (ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) {
+    // Pan – middle mouse drag (only when our invisible item is active)
+    if (itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) {
         m_panning = true;
         ImVec2 delta = io.MouseDelta;
         float panSpeed = m_camera.GetDistance() * 0.002f;
@@ -172,9 +213,14 @@ void ImGui3DViewVisualizer::HandleInput(const ImVec2& regionMin,
         m_panning = false;
     }
 
-    // Zoom – scroll wheel
-    if (io.MouseWheel != 0.0f) {
+    // Zoom – scroll wheel, only when hovered (so wheel doesn't scroll parent)
+    if (itemHovered && io.MouseWheel != 0.0f) {
         m_camera.Zoom(io.MouseWheel * m_camera.GetDistance() * 0.1f);
+
+        // Consume the wheel input so ImGui / parent windows won't also scroll.
+        // Clearing both vertical and horizontal wheel values is defensive.
+        io.MouseWheel = 0.0f;
+        io.MouseWheelH = 0.0f;
     }
 }
 

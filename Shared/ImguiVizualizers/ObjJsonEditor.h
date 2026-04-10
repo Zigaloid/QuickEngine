@@ -4,6 +4,8 @@
 #include "PropertyInspector.h"
 #include "Reflection/ReflectionBase.h"
 #include "ClassFactory/ClassFactory.h"
+#include "UnifiedActionManager.h"
+#include "MessageSystem/MessageBus.h"
 
 #include <string>
 #include <memory>
@@ -26,14 +28,20 @@ namespace ImGuiVisualizers {
 			: m_instanceId(s_nextInstanceId++)
 			, m_imguiId("###ObjJsonEditor_" + std::to_string(m_instanceId))
 			, m_displayName("Object Editor")
-		{}
-		~ObjJsonEditor() override = default;
+		{
+			RegisterEditorActions();
+		}
+		~ObjJsonEditor() override
+		{
+			UnregisterEditorActions();
+		}
 
 		// ── IImGuiVisualizer interface ──────────────────────────────────────
 
 		void Initialize() override {}
 		void Shutdown() override { Close(); }
 		void Update(float deltaTime) override { (void)deltaTime; }
+		UI::UnifiedActionManager& GetActionManager() { return m_actionManager; }
 
 		bool Render(bool* isOpen) override
 		{
@@ -45,7 +53,7 @@ namespace ImGuiVisualizers {
 				title = "Object Editor" + m_imguiId;
 			}
 
-			bool visible = ImGui::Begin(title.c_str(), isOpen);
+			bool visible = ImGui::Begin(title.c_str(), isOpen, ImGuiWindowFlags_MenuBar);
 
 			// Handle window close via X button
 			if (isOpen && !*isOpen) {
@@ -59,6 +67,13 @@ namespace ImGuiVisualizers {
 				return false;
 			}
 
+			// Menu bar for display options
+			if (ImGui::BeginMenuBar())
+			{
+				m_actionManager.RenderMenuBar();
+				ImGui::EndMenuBar();
+			}
+
 			if (!m_object) {
 				// Nothing loaded – render an empty window
 				ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
@@ -70,21 +85,8 @@ namespace ImGuiVisualizers {
 			static char* buffer = new char[200];
 			buffer[0] = '\0';			
 			
-			// Toolbar
-			if (ImGui::Button("Save")) {
-				Save();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Reload")) {
-				Reload();
-			}
-			ImGui::SameLine();
-			if (ImGui::Button("Close")) {
-				Close();
-				if (isOpen) *isOpen = false;
-				ImGui::End();
-				return true;
-			}
+			// Toolbar (render via UnifiedActionManager)
+			m_actionManager.RenderToolbar();
 
 			ImGui::SameLine();
 			ImGui::TextColored(ImVec4(0.6f, 0.8f, 1.0f, 1.0f),
@@ -157,6 +159,10 @@ namespace ImGuiVisualizers {
 			}
 
 			m_inspector.SetObject(m_object.get());
+
+			// Re-register actions to ensure callbacks reflect current state (safe to call multiple times)
+			RegisterEditorActions();
+
 			return true;
 		}
 
@@ -165,6 +171,7 @@ namespace ImGuiVisualizers {
 		 */
 		bool Save()
 		{
+
 			if (!m_object || m_filePath.empty()) {
 				return false;
 			}
@@ -172,6 +179,7 @@ namespace ImGuiVisualizers {
 			if (m_object->Write(m_filePath.c_str())) {
 				m_statusMessage = "Saved";
 				m_statusIsError = false;
+				Core::MessageSystem::MessageBus::Get().PostString("ObjJsonEditor.FileSaved", m_filePath);
 				return true;
 			}
 
@@ -198,11 +206,9 @@ namespace ImGuiVisualizers {
 		{
 			m_inspector.ClearObject();
 			m_object.reset();
-			m_filePath.clear();
-			m_className.clear();
 			m_statusMessage.clear();
 			m_statusIsError = false;
-			m_displayName = "Object Editor";
+			m_displayName = "Object Editor";			
 		}
 
 		/**
@@ -226,6 +232,56 @@ namespace ImGuiVisualizers {
 			return "ObjEditor:" + filePath;
 		}
 
+		// Render the property inspector inline (no window Begin/End).
+		void RenderInspectorInline()
+		{
+			m_inspector.RenderContent();
+		}
+
+	public:
+		void RegisterEditorActions()
+		{
+			// Save action
+			m_actionManager.RegisterAction({
+				.path = "File.Save",
+				.description = "Save the currently opened object to disk",
+				.targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
+				.callback = [this]() { Save(); },
+				.isEnabled = [this]() { return m_object != nullptr && !m_filePath.empty(); },
+				.sortPriority = 10
+				});
+
+			// Reload action
+			m_actionManager.RegisterAction({
+				.path = "File.Reload",
+				.description = "Reload the object from disk (discard changes)",
+				.targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
+				.callback = [this]() { Reload(); },
+				.isEnabled = [this]() { return !m_filePath.empty(); },
+				.sortPriority = 20
+				});
+
+			// Close action
+			m_actionManager.RegisterAction({
+				.path = "File.Close",
+				.description = "Close the editor",
+				.targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
+				.callback = [this]() {
+					Close();
+				},
+				.isEnabled = [this]() { return m_object != nullptr; },
+				.sortPriority = 30
+				});
+		}
+
+		void UnregisterEditorActions()
+		{
+			std::string prefix = "ObjEditor." + std::to_string(m_instanceId);
+			m_actionManager.UnregisterAction(prefix + ".Save");
+			m_actionManager.UnregisterAction(prefix + ".Reload");
+			m_actionManager.UnregisterAction(prefix + ".Close");
+		}
+		
 	private:
 		static inline int s_nextInstanceId = 0;
 		int               m_instanceId = 0;
@@ -239,6 +295,8 @@ namespace ImGuiVisualizers {
 		std::string m_className;
 		std::string m_statusMessage;
 		bool        m_statusIsError = false;
+
+		UI::UnifiedActionManager m_actionManager;
 	};
 
 } // namespace ImGuiVisualizers

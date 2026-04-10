@@ -121,6 +121,7 @@
     <ClInclude Include="Math\Quaternion.h" />
     <ClInclude Include="Math\Vector3f.h" />
     <ClInclude Include="Math\Vector4f.h" />
+    <ClInclude Include="MessageSystem\MessageBus.h" />
     <ClInclude Include="Net\BerkeleySocket.h" />
     <ClInclude Include="Net\IBerkeleySocket.h" />
     <ClInclude Include="Net\NexusClient.h" />
@@ -176,6 +177,7 @@
     <ClCompile Include="Math\Quaternion.cpp" />
     <ClCompile Include="Math\Vector3f.cpp" />
     <ClCompile Include="Math\Vector4f.cpp" />
+    <ClCompile Include="MessageSystem\MessageBus.cpp" />
     <ClCompile Include="Net\BerkeleySocket.cpp" />
     <ClCompile Include="Net\NexusClient.cpp" />
     <ClCompile Include="Net\NexusServer.cpp" />
@@ -184,6 +186,7 @@
     <ClCompile Include="Profiler\ProfilerAnalyzer.cpp" />
     <ClCompile Include="Reflection\ReflectionBase.cpp" />
     <ClCompile Include="Reflection\ReflectionError.cpp" />
+    <ClCompile Include="ResourceManager\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\ComponentSystemDocumentation.html" />

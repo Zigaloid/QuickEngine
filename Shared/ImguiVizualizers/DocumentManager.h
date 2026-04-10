@@ -11,6 +11,7 @@
 
 // Forward declarations
 class IAssetLauncher;
+namespace ImGuiVisualizers { class IImGuiVisualizer; }
 
 /**
  * @brief Manages document registration (asset types and launch options)
@@ -23,7 +24,8 @@ class DocumentManager
 {
     // Allow launchers to access private members
     friend class ObjJsonLauncher;
-
+    friend class MeshComponentLauncher;
+    friend class WidgetEditorLauncher;
 public:
     explicit DocumentManager(ImGuiVisualizers::ImGuiVisualizerManager& visualizerManager);
 
@@ -39,9 +41,12 @@ public:
 
 private:
     /// Queue an editor to be opened on the next ProcessPendingEditors() call.
+    // Note: store a non-owning pointer to the launcher so ProcessPendingEditors
+    // can call its Create(...) factory method.
     void EnqueueEditor(const std::string& key,
                        const std::string& filePath,
-                       const std::string& className);
+                       const std::string& className,
+                       IAssetLauncher* launcher);
 
     // ── Asset Launcher Registry ─────────────────────────────────────────
 
@@ -77,6 +82,7 @@ private:
         std::string key;
         std::string filePath;
         std::string className;
+        IAssetLauncher* launcher = nullptr; // non-owning
     };
     std::vector<PendingEditor> m_pendingEditors;
 
@@ -95,7 +101,14 @@ class IAssetLauncher
 {
 public:
     virtual ~IAssetLauncher() = default;
+
+    // Launch is the callback used by the AssetBrowser (keeps behavior).
     virtual void Launch(const std::string& assetPath) = 0;
+
+    // Factory method: create and (optionally) initialize a visualizer for the
+    // given asset. Return nullptr if the launcher has no internal visualizer.
+    virtual std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) = 0;
 };
 
 /**
@@ -110,6 +123,47 @@ public:
 
     void Launch(const std::string& assetPath) override;
 
+    std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) override;
+
+private:
+    DocumentManager& m_manager;
+    std::string m_suffix;
+    std::string m_className;
+};
+
+
+class MeshComponentLauncher : public IAssetLauncher
+{
+public:
+    MeshComponentLauncher(DocumentManager& manager,
+        const std::string& suffix,
+        const std::string& className);
+
+    void Launch(const std::string& assetPath) override;
+
+    std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) override;
+
+private:
+    DocumentManager& m_manager;
+    std::string m_suffix;
+    std::string m_className;
+};
+
+
+class WidgetEditorLauncher : public IAssetLauncher
+{
+public:
+    WidgetEditorLauncher(DocumentManager& manager,
+        const std::string& suffix,
+        const std::string& className);
+
+    void Launch(const std::string& assetPath) override;
+
+    std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) override;
+
 private:
     DocumentManager& m_manager;
     std::string m_suffix;
@@ -123,4 +177,6 @@ class NoOpLauncher : public IAssetLauncher
 {
 public:
     void Launch(const std::string& assetPath) override;
+    std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) override;
 };

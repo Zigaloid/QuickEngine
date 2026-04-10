@@ -57,6 +57,7 @@ namespace ImGuiVisualizers {
             int idx = FindIndex(memberName);
             if (idx >= 0) {
                 m_MemberWidgets[idx]->type = widgetType;
+                m_MemberWidgets[idx]->hasConfig = false;
                 return;
             }
             m_MemberNames.push_back(memberName);
@@ -81,6 +82,16 @@ namespace ImGuiVisualizers {
             entry->config = config;
             entry->hasConfig = true;
             m_MemberWidgets.push_back(std::move(entry));
+        }
+
+        // Remove a custom widget mapping for a member. Returns true if removed.
+        bool RemoveWidget(const std::string& memberName)
+        {
+            int idx = FindIndex(memberName);
+            if (idx < 0) return false;
+            m_MemberNames.erase(m_MemberNames.begin() + idx);
+            m_MemberWidgets.erase(m_MemberWidgets.begin() + idx);
+            return true;
         }
 
         // Query which widget to use for a given member (returns Default if not mapped)

@@ -55,7 +55,7 @@
 #define REFL_DEFINE_FLOAT_MEMBER(_O_,_M_)				CReflectionMapEntry(new CFloatProperty( RT_Float, sizeof(float), offsetof(_O_, _M_), #_M_) )
 #define REFL_DEFINE_STRING_MEMBER(_O_,_M_)				CReflectionMapEntry(new CStringProperty( RT_String, sizeof(std::string), offsetof(_O_, _M_), #_M_) )
 #define REFL_DEFINE_INT_MEMBER(_O_,_M_)					CReflectionMapEntry(new CIntProperty( RT_Int, sizeof(int), offsetof(_O_, _M_), #_M_ ) )
-#define REFL_DEFINE_OBJECT_MEMBER(_O_,_M_)				CReflectionMapEntry(new CSubObjectProperty( RT_Object, sizeof(void *), offsetof(_O_, _M_), #_M_ ) )
+#define REFL_DEFINE_OBJECT_MEMBER(_O_,_M_)              CReflectionMapEntry(new CSubObjectProperty( RT_Object, sizeof((( _O_*)0)->_M_), offsetof(_O_, _M_), #_M_ ) )
 #define REFL_DEFINE_OBJECT_PTR_MEMBER(_O_,_M_)			CReflectionMapEntry(new CSubObjectPtrProperty(RT_ObjectPtr, sizeof(void *), offsetof(_O_, _M_), #_M_ ) )
 #define REFL_DEFINE_OBJECT_PTR_VECTOR_MEMBER(_O_,_M_)	CReflectionMapEntry(new CObjPtrVectorProperty( RT_ObjectPtrVec, sizeof(std::vector<CPropertyBase*>), offsetof(_O_, _M_), #_M_ ) )
 #define REFL_DEFINE_VECTOR4_MEMBER(_O_,_M_)				CReflectionMapEntry(new CVector4Property( RT_Vector4, sizeof(Vector4f),offsetof(_O_, _M_), #_M_) )

@@ -60,6 +60,8 @@ namespace ResourceSystem {
         // Getters
         const std::string& GetPath() const { return path_; }
         const std::vector<uint8_t>& GetData() const { return data_; }
+        // Returns the size (in bytes) of the loaded data block.
+        size_t GetLoadedSize() const { return data_.size(); }
         bool IsInitialized() const { return isInitialized_; }
         bool IsLoaded() const { return isLoaded_; }
         bool IsFinalized() const { return isFinalized_; }
@@ -303,62 +305,12 @@ namespace ResourceSystem {
 
 } // namespace ResourceSystem
 
-// Example usage and specialized resource types:
 
-/*
-// Example specialized resource class
-class TextureResource : public ResourceSystem::Resource {
-private:
-    int width_, height_, channels_;
-
+class CResourceReference : public CReflectedBase
+{
 public:
-    TextureResource(const std::string& path) : Resource(path), width_(0), height_(0), channels_(0) {}
-
-    bool Initialize() override {
-        // Custom initialization logic
-        return Resource::Initialize();
-    }
-
-    void Finalize() override {
-        // Custom finalization logic (GPU texture upload, etc.)
-        // This runs on the main thread
-        Resource::Finalize();
-    }
-
-    // Getters for texture-specific data
-    int GetWidth() const { return width_; }
-    int GetHeight() const { return height_; }
-    int GetChannels() const { return channels_; }
+    REFL_DECLARE_OBJECT(CResourceReference, CReflectedBase);
+	const std::string GetResourceFileName() const { return m_resourceFileName; }
+private:
+    std::string m_resourceFileName = "undifined";
 };
-
-// Example usage:
-void ExampleUsage() {
-    FileSystem::FileSystemManager fileSystemManager;
-    ResourceSystem::ResourceManager resourceManager(&fileSystemManager);
-
-    // Start the resource manager
-    resourceManager.Start();
-
-    // Request resources (can be called from any thread)
-    auto texture1 = resourceManager.RequestResource<TextureResource>("textures/grass.png");
-    auto texture2 = resourceManager.RequestResource<TextureResource>("textures/stone.png");
-    auto sameTexture = resourceManager.RequestResource<TextureResource>("textures/grass.png"); // Returns same instance
-
-    // Main game loop
-    while (gameRunning) {
-        // Update finalization on main thread (call once per frame)
-        resourceManager.UpdateFinalization();
-
-        // Check if resources are ready
-        if (resourceManager.IsResourceFinalized("textures/grass.png")) {
-            auto grassTexture = resourceManager.GetResource<TextureResource>("textures/grass.png");
-            // Use the texture...
-        }
-
-        // Other game logic...
-    }
-
-    // Cleanup
-    resourceManager.Stop();
-}
-*/

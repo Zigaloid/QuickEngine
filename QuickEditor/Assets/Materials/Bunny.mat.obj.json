@@ -1,0 +1,24 @@
+{
+    "RootObject": {
+        "m_vertexShaderResource": {
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\shaders\\dxbc\\vs_mesh.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 48
+        },
+        "m_fragmentShaderResource": {
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\shaders\\dxbc\\fs_mesh.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 48
+        }
+    }
+}

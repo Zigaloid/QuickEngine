@@ -781,10 +781,14 @@ public:
 		}
 
 		m_document.Parse(textResult.GetValue().c_str());
-		if (m_document.HasParseError() == false)
+		if (!m_document.HasParseError())
 		{
-			m_currentObject = nullptr;
-			m_currentObject = &m_document.FindMember(JTAG_ROOT)->value;
+			auto it = m_document.FindMember(JTAG_ROOT);
+			if (it == m_document.MemberEnd()) {
+				ReflectionDebug.print("BeginInput: missing RootObject\n");
+				return false;
+			}
+			m_currentObject = &it->value;
 			return true;
 		}
 
@@ -798,43 +802,43 @@ public:
 			m_inputFile.reset();
 		}
 	}
+	
+	// safer ValidateProperties
 	bool ValidateProperties(const CPropertyBase& property, Value* objectValue)
 	{
-		if (objectValue->IsObject())
-		{
-			if (objectValue->HasMember(JTAG_SIZE))
-			{
-				Value* sizeMember = &objectValue->FindMember(JTAG_SIZE)->value;
-				if (property.GetSize() == sizeMember->GetInt())
-				{
-					if (objectValue->HasMember(JTAG_TYPE))
-					{
-						Value* typeMember = &objectValue->FindMember(JTAG_TYPE)->value;
-						if (property.GetType() == typeMember->GetInt())
-						{
-							return true;
-						}
-					}
-				}
-			}
-		}
-		ReflectionDebug.print("Bad size or Type found while reading object.\n");
+		if (!objectValue || !objectValue->IsObject())
+			return false;
 
-		return false;
+		auto sizeIt = objectValue->FindMember(JTAG_SIZE);
+		if (sizeIt == objectValue->MemberEnd()) return false;
+		if (property.GetSize() != sizeIt->value.GetInt()) return false;
+
+		auto typeIt = objectValue->FindMember(JTAG_TYPE);
+		if (typeIt == objectValue->MemberEnd()) return false;
+		if (property.GetType() != typeIt->value.GetInt()) return false;
+
+		return true;
 	}
+
 	Value* FindValue(const CPropertyBase& property)
 	{
-		Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
-		if (member)
-		{
-			if (ValidateProperties(property, member))
-			{
-				Value* valueMember = &member->FindMember(JTAG_VALUE)->value;
-				return valueMember;
-			}
-		}
-		return nullptr;
+		if (!m_currentObject) return nullptr;
+
+		auto memberIt = m_currentObject->FindMember(property.GetName().c_str());
+		if (memberIt == m_currentObject->MemberEnd())
+			return nullptr;
+
+		Value* member = &memberIt->value;
+		if (!ValidateProperties(property, member))
+			return nullptr;
+
+		auto valueIt = member->FindMember(JTAG_VALUE);
+		if (valueIt == member->MemberEnd())
+			return nullptr;
+
+		return &valueIt->value;
 	}
+
 	void ReadStringBoolMap(const CPropertyBase& property, CReflectedBase* obj)
 	{
 		Value* valueMember = FindValue(property);

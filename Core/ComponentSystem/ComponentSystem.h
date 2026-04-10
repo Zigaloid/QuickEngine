@@ -64,6 +64,11 @@ namespace ComponentSystem {
 		Component& operator=(Component&&) = default;
 
 		// Component lifecycle
+		bool ReInitialize()
+		{
+			Shutdown();
+			return Initialize();
+		}
 		bool Initialize() {
 			if (m_initialized) return true;
 
