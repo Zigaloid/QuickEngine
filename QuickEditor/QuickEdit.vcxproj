@@ -188,7 +188,6 @@
     <ClInclude Include="AssetClasses\EntityInstance.h" />
     <ClInclude Include="Core\Reflection\ReflectionBase.h" />
     <ClInclude Include="QuickEdit.h" />
-    <ClInclude Include="logo.h" />
     <ClInclude Include="Shared\ImguiVizualizers\PropertyWidgetMapEditor.h" />
   </ItemGroup>
   <ItemGroup>

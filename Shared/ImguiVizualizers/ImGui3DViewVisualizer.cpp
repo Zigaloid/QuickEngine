@@ -30,8 +30,17 @@ void ImGui3DViewVisualizer::Initialize()
 void ImGui3DViewVisualizer::Shutdown()
 {
     m_viewport.Shutdown();
-    m_primitives.Shutdown();    
-    // Note: mesh component lifetime handled by component manager; do not delete g_meshComp here.
+    m_primitives.Shutdown();
+    // If we created a component earlier, release it back to the manager so its resources are returned.
+    if (m_meshComp)
+    {
+        auto componentManager = Core::CoreSystem::GetComponentManager();
+        if (componentManager)
+        {
+            componentManager->ReleaseComponent(m_meshComp);
+        }
+        m_meshComp = nullptr;
+    }
 }
 
 void ImGui3DViewVisualizer::Update(float deltaTime)
@@ -50,7 +59,9 @@ void ImGui3DViewVisualizer::LoadMesh(const std::string& meshPath)
     auto componentManager = Core::CoreSystem::GetComponentManager();    
     if (m_meshComp)
     {
-        m_meshComp->Shutdown();                
+        // Return previous component to manager (pool). Shutdown alone is not enough.
+        componentManager->ReleaseComponent(m_meshComp);
+        m_meshComp = nullptr;
     }
     m_meshComp = componentManager->CreateComponent<CMeshComponent>();
     if (!m_meshPath.empty()) {

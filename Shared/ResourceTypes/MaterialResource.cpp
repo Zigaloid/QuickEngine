@@ -7,9 +7,23 @@
 REFL_DEFINE_OBJECT(CMaterialDefinition)
 	REFL_DEFINE_OBJECT_MEMBER(CMaterialDefinition, m_vertexShaderResource),
 	REFL_DEFINE_OBJECT_MEMBER(CMaterialDefinition, m_fragmentShaderResource),	
+	REFL_DEFINE_OBJECT_PTR_VECTOR_MEMBER(CMaterialDefinition, m_textureResources),
+	
 REFL_DEFINE_END
 
-
+bool CMaterialDefinition::IsLoaded() const
+{ 	
+	if(m_vertexShader && m_vertexShader->IsFinalized() && m_fragmentShader && m_fragmentShader->IsFinalized() )
+	{		
+		for (const auto& texture : m_textures)
+		{
+			if (!texture->IsFinalized())
+				return false;
+		}
+		return true;
+	}
+	return false;
+}
 bool CMaterialDefinition::Initialize()
 {
 	m_shader = BGFX_INVALID_HANDLE;
@@ -33,12 +47,12 @@ bool CMaterialDefinition::Initialize()
 		return false;
 	}	
 
-/*
+
 	for (const auto& texResRef : m_textureResources)
 	{
-		if (texResRef && !texResRef->m_resourceFileName.empty())
+		if (texResRef && !texResRef->GetResourceFileName().empty())
 		{
-			auto texRes = resourceManager->RequestResource<CTextureResource>(texResRef->m_resourceFileName);
+			auto texRes = resourceManager->RequestResource<CTextureResource>(texResRef->GetResourceFileName());
 			if (texRes)
 			{
 				m_textures.push_back(texRes);
@@ -46,12 +60,11 @@ bool CMaterialDefinition::Initialize()
 			else
 			{
 				std::cerr << "CMaterialDefinition: Failed to request texture resource: "
-					<< texResRef->m_resourceFileName << std::endl;
+					<< texResRef->GetResourceFileName() << std::endl;
 				return false;
 			}
 		}
 	}
-*/
 
 	return true;
 }

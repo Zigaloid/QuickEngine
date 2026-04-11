@@ -7,28 +7,45 @@
 class CTextureResource : public ResourceSystem::Resource
 {
 public:
-	Mesh* m_mesh = nullptr;
+	bgfx::TextureHandle m_texture = BGFX_INVALID_HANDLE;
 
 	CTextureResource(const std::string& path)
 		: Resource(path)
+		, m_texture(BGFX_INVALID_HANDLE)
 	{
 	}
 
 	~CTextureResource() override
 	{
+		if (bgfx::isValid(m_texture))
+		{
+			bgfx::destroy(m_texture);
+			m_texture = BGFX_INVALID_HANDLE;
+		}
 	}
 
-	// Skip base-class file reading; bgfx meshLoad handles its own I/O.
-	bool Update(FileSystem::FileSystemManager& /*fileSystem*/) override
+	bgfx::TextureHandle& GetTextureHandle() { return m_texture; }
+
+	// Use base-class Update to load the file data on the worker thread.
+	bool Update(FileSystem::FileSystemManager& fileSystem) override
 	{
-		isLoaded_ = true;
-		return true;
+		return Resource::Update(fileSystem);
 	}
 
 	// Finalize runs on the main thread – safe for bgfx resource creation.
-	// path_ should be the mesh binary path, e.g. "meshes/bunny.bin".
+	// Uses bgfx_utils to create a texture from the in-memory data loaded by the Resource system.
 	void Finalize() override
 	{
-		isFinalized_ = true;
+		// Guard: only attempt to create texture if data was actually loaded.
+		if (GetLoadedSize() == 0 || GetData().empty())
+		{
+			isFinalized_ = false;
+			return;
+		}
+
+		// bgfx_utils should provide a helper similar to loadShaderFromMemory for textures.
+		// This mirrors how shaders are created in CShaderResource.
+		m_texture = loadTextureFromMemory(GetData().data(), static_cast<uint32_t>(GetLoadedSize()), path_.c_str());
+		isFinalized_ = bgfx::isValid(m_texture);
 	}
 };

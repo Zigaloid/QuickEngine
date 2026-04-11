@@ -19,7 +19,7 @@ public:
 
 	/// Submit the mesh for rendering on the given bgfx view with a 4x4 transform.
 	/// Follows the bgfx 04-mesh example pattern: meshSubmit(mesh, view, program, mtx).
-	void Render(bgfx::ViewId viewId, const float* mtx) const;
+	void Render(bgfx::ViewId viewId, const float* mtx);
 
 	/// Returns true when both the mesh and shader resources have been
 	/// fully loaded and finalized by the ResourceManager.
@@ -36,6 +36,9 @@ private:
 	// Runtime resource handles (managed by ResourceManager, not serialized)
 	std::shared_ptr<CMeshResource>  m_meshRes;	
 	CResourceReference m_materialFile;
+
+	MeshState m_meshState;
+	MeshState::Texture m_texture;
 
 	CMaterialDefinition m_materialDefinition;
 	bool m_ready = false;

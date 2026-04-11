@@ -3,7 +3,7 @@
         "m_vertexShaderResource": {
             "Value": "CResourceReference",
             "m_resourceFileName": {
-                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\shaders\\dxbc\\vs_mesh.bin",
+                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\shaders\\dxbc\\vs_test.bin",
                 "Type": 3,
                 "Size": 40
             },
@@ -13,7 +13,7 @@
         "m_fragmentShaderResource": {
             "Value": "CResourceReference",
             "m_resourceFileName": {
-                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\shaders\\dxbc\\fs_mesh.bin",
+                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\shaders\\dxbc\\fs_test.bin",
                 "Type": 3,
                 "Size": 40
             },
@@ -27,14 +27,6 @@
                     "Value": "CResourceReference",
                     "m_resourceFileName": {
                         "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\textures\\bark1.dds",
-                        "Type": 3,
-                        "Size": 40
-                    }
-                },
-                {
-                    "Value": "CResourceReference",
-                    "m_resourceFileName": {
-                        "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\textures\\leafs1.dds",
                         "Type": 3,
                         "Size": 40
                     }

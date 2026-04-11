@@ -14,6 +14,9 @@
 std::shared_ptr<CShaderResource> testShader;
 bool QuickEditApp::Initialize()
 {
+	
+	CMaterialDefinition testMat;
+	testMat.SafeRead("c:\\Code\\QuickEngine\\QuickEditor\\Assets\\Materials\\Bunny.mat.obj.json");
 
 	// Initialize application-specific resources here
 	m_visualizerManager.Initialize();

@@ -6,6 +6,7 @@
 #include "ComponentSystem/ComponentRegistry.h"
 #include "PropertyInspector.h"
 #include "PropertyWidgetMap.h"
+#include "PropertyWidgetMapRegistry.h"
 
 #include <string>
 #include <unordered_set>
@@ -68,9 +69,11 @@ namespace ImGuiVisualizers {
 		void RenderVector3Property(const CPropertyBase& property, CReflectedBase* object);
 		void RenderVector4Property(const CPropertyBase& property, CReflectedBase* object);
 		void RenderMatrix4Property(const CPropertyBase& property, CReflectedBase* object);
+		void RenderReflectedObjectCommon( const CPropertyBase& property, CReflectedBase* subObject, const void* idSource, const char* typeTag, bool showAddress, const char* nullNameOverride);
 		void RenderObjectProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderObjectPtrProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderObjectPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object);
+		void RenderComponentCommon(const CPropertyBase& property, ComponentSystem::Component* comp, const void* idSource, const char* typeTag, bool showAddress, const char* nullNameOverride);
 		void RenderComponentProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object);
@@ -158,6 +161,31 @@ namespace ImGuiVisualizers {
 		int m_IntBuffer;
 		bool m_BoolBuffer;
 		bool m_ShowDetails = false;
+
+		struct WidgetMapScope {
+			const PropertyWidgetMap* m_prev;
+			PropertyInspector* m_owner;
+			WidgetMapScope(PropertyInspector* owner, CReflectedBase* obj)
+				: m_prev(owner->m_WidgetMap), m_owner(owner)
+			{
+				if (obj) {
+					const char* subClassName = obj->GetRflClassName();
+					if (subClassName && subClassName[0] != '\0') {
+						auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
+						owner->m_WidgetMap = mapPtr ? mapPtr.get() : nullptr;
+					}
+					else {
+						owner->m_WidgetMap = nullptr;
+					}
+				}
+				else {
+					owner->m_WidgetMap = nullptr;
+				}
+			}
+			~WidgetMapScope() {
+				m_owner->m_WidgetMap = m_prev;
+			}
+		};
 	};
 
 } // namespace ImGuiVisualizers

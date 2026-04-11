@@ -66,11 +66,21 @@ void CMeshComponent::OnShutdown()
 	m_materialDefinition.Reset();	
 }
 
-void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx) const
+void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx) 
 {
 	if (IsReady())
-	{
-		meshSubmit(m_meshRes->m_mesh, viewId, m_materialDefinition.GetShaderProgram(), mtx);
+	{		
+		m_texture.m_texture = m_materialDefinition.GetTexture(0);
+		m_texture.m_flags = 0;
+		m_texture.m_sampler = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+		m_meshState.m_textures[0] = m_texture;
+		m_meshState.m_numTextures = 1;
+		m_meshState.m_state = BGFX_STATE_DEFAULT;
+		m_meshState.m_program = m_materialDefinition.GetShaderProgram();
+		m_meshState.m_viewId = viewId;
+
+		const MeshState* statePtr = &m_meshState;
+		m_meshRes->m_mesh->submit(&statePtr, 1, mtx, 1);
 	}
 }
 

@@ -27,7 +27,42 @@
         },
         "m_children": {
             "Value": "CEntityInstance",
-            "Elements": [],
+            "Elements": [
+                {
+                    "Value": "CMeshComponent",
+                    "m_meshResource": {
+                        "Value": "CResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "undifined",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 48
+                    },
+                    "m_materialFile": {
+                        "Value": "CResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "undifined",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 48
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CMeshComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 32
+                    }
+                }
+            ],
             "Type": 19,
             "Size": 32
         }

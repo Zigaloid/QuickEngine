@@ -6,7 +6,6 @@
 #include <bx/uint32_t.h>
 #include "common.h"
 #include "bgfx_utils.h"
-#include "logo.h"
 #include "imgui/imgui.h"
 #include "CoreSystem/CoreSystem.h"
 #include "CoreSystem/Timer.h"

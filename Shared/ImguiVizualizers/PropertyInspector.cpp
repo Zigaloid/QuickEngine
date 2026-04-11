@@ -59,13 +59,13 @@ namespace ImGuiVisualizers
 		ImGui::PushID(idBase.c_str());
 		if (!readOnly) {
 			if (onAdd) {
-				if (ImGui::SmallButton("+")) {
+				if (ImGui::SmallButton(" + ")) {
 					onAdd();
 				}
 			}
 			ImGui::SameLine();
 			if (onRemove) {
-				if (ImGui::SmallButton("-")) {
+				if (ImGui::SmallButton(" - ")) {
 					onRemove();
 				}
 			}
@@ -547,107 +547,37 @@ namespace ImGuiVisualizers
 			ImGui::TextColored(GetTypeColor(property.GetType()), "[Matrix4]");
 		}
 	}
-
-	void PropertyInspector::RenderObjectProperty(const CPropertyBase& property, CReflectedBase* object)
+	void PropertyInspector::RenderReflectedObjectCommon(
+		const CPropertyBase& property,
+		CReflectedBase* subObject,
+		const void* idSource,
+		const char* typeTag,
+		bool showAddress,
+		const char* nullNameOverride)
 	{
-	    // Compute address and collect diagnostics
-	    void* addr = property.GetAddress(object);
-	    uintptr_t objAddr = reinterpret_cast<uintptr_t>(object);
-	    uintptr_t memberAddr = reinterpret_cast<uintptr_t>(addr);
-	    size_t offset = property.GetOffset();
-	    size_t size = property.GetSize();
-
-	    // Basic sanity checks: avoid obvious invalid addresses.
-	    // Skip rendering if computed address is clearly invalid (helps isolate bad offsets/sizes).
-	    if (addr == nullptr) {
-	        RenderNullPointer("Embedded object");
-	        return;
-	    }
-	    // Reject tiny addresses (kernel / null-zone) and extremely large addresses (very likely bogus)
-	    const uintptr_t kLow = 0x10000u;                           // below this is almost always invalid for user memory
-	    const uintptr_t kHigh = (uintptr_t)0x00007fffffffffffULL;  // rough user-space high bound on x64
-	    if (memberAddr < kLow || memberAddr > kHigh) {
-	        RenderNullPointer("Embedded object (invalid address)");
-	        return;
-	    }
-		// Safe access: attempt to read Rfl class name guarded by validation above.		
-	    CReflectedBase* subObject = reinterpret_cast<CReflectedBase*>(addr);
-
-	    const std::string nodeId = GenerateTreeNodeId(property.GetName(), subObject);
-	    bool expanded = ShouldExpandNode(nodeId);
-
-	    if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
-	        UpdateExpandedState(nodeId, true);
-
-	        ImGui::SameLine();
-	        ImGui::TextColored(GetTypeColor(property.GetType()), "[Object]");
-
-	        if (subObject == nullptr) {
-	            RenderNullPointer("Embedded object");
-	        }
-	        else {
-	            // Temporarily switch widget map to the sub-object's widget map
-	            const PropertyWidgetMap* prevMap = m_WidgetMap;
-	            const char* subClassName = subObject->GetRflClassName();
-	            if (subClassName && subClassName[0] != '\0') {
-	                auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
-	                m_WidgetMap = mapPtr ? mapPtr.get() : nullptr;
-	            }
-	            else {
-	                m_WidgetMap = nullptr;
-	            }
-
-	            ImGui::Text("Type: %s", subObject->GetRflClassName() ? subObject->GetRflClassName() : "Unknown");
-	            RenderObjectProperties(subObject, property.GetName());
-
-	            // Restore previous widget map
-	            m_WidgetMap = prevMap;
-	        }
-
-	        ImGui::TreePop();
-	    }
-	    else {
-	        UpdateExpandedState(nodeId, false);
-	        ImGui::SameLine();
-	        ImGui::TextColored(GetTypeColor(property.GetType()), "[Object]");
-	    }
-	}
-
-	void PropertyInspector::RenderObjectPtrProperty(const CPropertyBase& property, CReflectedBase* object)
-	{
-		std::unique_ptr<CReflectedBase>* objectPtr =
-			reinterpret_cast<std::unique_ptr<CReflectedBase>*>(property.GetAddress(object));
-
-		const std::string nodeId = GenerateTreeNodeId(property.GetName(), objectPtr->get());
+		const std::string nodeId = GenerateTreeNodeId(property.GetName(), idSource);
 		bool expanded = ShouldExpandNode(nodeId);
 
 		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
 			UpdateExpandedState(nodeId, true);
 
 			ImGui::SameLine();
-			ImGui::TextColored(GetTypeColor(property.GetType()), "[Object*]");
+			ImGui::TextColored(GetTypeColor(property.GetType()), "%s", typeTag);
 
-			if (*objectPtr) {
-				// Switch widget map to pointed object's map while rendering
-				const PropertyWidgetMap* prevMap = m_WidgetMap;
-				const char* subClassName = (*objectPtr)->GetRflClassName();
-				if (subClassName && subClassName[0] != '\0') {
-					auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
-					m_WidgetMap = mapPtr ? mapPtr.get() : nullptr;
-				}
-				else {
-					m_WidgetMap = nullptr;
-				}
-
-				ImGui::Text("Type: %s", (*objectPtr)->GetRflClassName() ? (*objectPtr)->GetRflClassName() : "Unknown");
-				ImGui::Text("Address: %p", objectPtr->get());
-				RenderObjectProperties(objectPtr->get(), property.GetName());
-
-				// Restore previous widget map
-				m_WidgetMap = prevMap;
+			if (!subObject) {
+				RenderNullPointer(nullNameOverride ? nullNameOverride : property.GetName().c_str());
 			}
 			else {
-				RenderNullPointer("Object pointer");
+				// Set widget map for the duration of this scope (restored automatically)
+				WidgetMapScope wms(this, subObject);
+
+				if (m_ShowDetails)
+					ImGui::Text("Type: %s", subObject->GetRflClassName() ? subObject->GetRflClassName() : "Unknown");
+				if (showAddress)
+					ImGui::Text("Address: %p", subObject);
+
+				// Render child properties
+				RenderObjectProperties(subObject, property.GetName());
 			}
 
 			ImGui::TreePop();
@@ -655,12 +585,44 @@ namespace ImGuiVisualizers
 		else {
 			UpdateExpandedState(nodeId, false);
 			ImGui::SameLine();
-			ImGui::TextColored(GetTypeColor(property.GetType()), "[Object*]");
-			if (!*objectPtr) {
+			ImGui::TextColored(GetTypeColor(property.GetType()), "%s", typeTag);
+			if (!subObject) {
 				ImGui::SameLine();
 				ImGui::TextColored(ImVec4(0.7f, 0.3f, 0.3f, 1.0f), "(null)");
 			}
 		}
+	}
+
+	void PropertyInspector::RenderObjectProperty(const CPropertyBase& property, CReflectedBase* object)
+	{
+		// Compute address and collect diagnostics
+		void* addr = property.GetAddress(object);
+		uintptr_t memberAddr = reinterpret_cast<uintptr_t>(addr);
+
+		// Basic sanity checks: avoid obvious invalid addresses.
+		if (addr == nullptr) {
+			RenderNullPointer("Embedded object");
+			return;
+		}
+		// Reject tiny addresses (kernel / null-zone) and extremely large addresses (very likely bogus)
+		const uintptr_t kLow = 0x10000u;                           // below this is almost always invalid for user memory
+		const uintptr_t kHigh = (uintptr_t)0x00007fffffffffffULL;  // rough user-space high bound on x64
+		if (memberAddr < kLow || memberAddr > kHigh) {
+			RenderNullPointer("Embedded object (invalid address)");
+			return;
+		}
+
+		CReflectedBase* subObject = reinterpret_cast<CReflectedBase*>(addr);
+		RenderReflectedObjectCommon(property, subObject, subObject, "[Object]", true, "Embedded object");
+	}
+
+	void PropertyInspector::RenderObjectPtrProperty(const CPropertyBase& property, CReflectedBase* object)
+	{
+		std::unique_ptr<CReflectedBase>* objectPtr =
+			reinterpret_cast<std::unique_ptr<CReflectedBase>*>(property.GetAddress(object));
+
+		CReflectedBase* pointed = objectPtr ? objectPtr->get() : nullptr;
+		RenderReflectedObjectCommon(property, pointed, pointed ? pointed : static_cast<const void*>(objectPtr), "[Object*]", true, "Object pointer");
 	}
 
 	void PropertyInspector::RenderObjectPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object)
@@ -726,8 +688,6 @@ namespace ImGuiVisualizers
 						}
 						ImGui::EndCombo();
 					}
-
-					
 				}
 			}
 
@@ -742,23 +702,12 @@ namespace ImGuiVisualizers
 					UpdateExpandedState(elementNodeId, true);
 
 					if ((*objectVector)[i]) {
-						// set widget map to the element's class map while rendering
-						const PropertyWidgetMap* prevMap = m_WidgetMap;
-						const char* subClassName = (*objectVector)[i]->GetRflClassName();
-						if (subClassName && subClassName[0] != '\0') {
-							auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
-							m_WidgetMap = mapPtr ? mapPtr.get() : nullptr;
-						}
-						else {
-							m_WidgetMap = nullptr;
-						}
+						// set widget map to the element's class map while rendering (RAII)
+						WidgetMapScope wms(this, (*objectVector)[i].get());
 
 						ImGui::Text("Type: %s", (*objectVector)[i]->GetRflClassName() ? (*objectVector)[i]->GetRflClassName() : "Unknown");
 						ImGui::Text("Address: %p", (*objectVector)[i].get());
 						RenderObjectProperties((*objectVector)[i].get(), elementName);
-
-						// restore previous widget map
-						m_WidgetMap = prevMap;
 					}
 					else {
 						RenderNullPointer("Vector element");
@@ -825,49 +774,43 @@ namespace ImGuiVisualizers
 						}
 						ImGui::EndCombo();
 					}
-
-
 				}
 			}
 		}
 	}
-
-	void PropertyInspector::RenderComponentProperty(const CPropertyBase& property, CReflectedBase* object)
+	void PropertyInspector::RenderComponentCommon(
+		const CPropertyBase& property,
+		ComponentSystem::Component* comp,
+		const void* idSource,
+		const char* typeTag,
+		bool showAddress,
+		const char* nullNameOverride)
 	{
-		ComponentSystem::Component* component = reinterpret_cast<ComponentSystem::Component*>(property.GetAddress(object));
-
-		const std::string nodeId = GenerateTreeNodeId(property.GetName(), component);
+		const std::string nodeId = GenerateTreeNodeId(property.GetName(), idSource);
 		bool expanded = ShouldExpandNode(nodeId);
 
 		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
 			UpdateExpandedState(nodeId, true);
 
 			ImGui::SameLine();
-			ImGui::TextColored(GetTypeColor(property.GetType()), "[Component]");
+			ImGui::TextColored(GetTypeColor(property.GetType()), "%s", typeTag);
 
-			if (component) {
-				// Temporarily switch widget map to the component's class while rendering
-				const PropertyWidgetMap* prevMap = m_WidgetMap;
-				const char* subClassName = component->GetRflClassName();
-				if (subClassName && subClassName[0] != '\0') {
-					auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
-					m_WidgetMap = mapPtr ? mapPtr.get() : nullptr;
-				}
-				else {
-					m_WidgetMap = nullptr;
-				}
-
-				ImGui::Text("Type: %s", component->GetRflClassName() ? component->GetRflClassName() : "Unknown");
-				ImGui::Text("ID: %u", component->GetId());
-				ImGui::Text("Active: %s", component->IsActive() ? "true" : "false");
-				ImGui::Text("Initialized: %s", component->IsInitialized() ? "true" : "false");
-				RenderObjectProperties(component, property.GetName());
-
-				// Restore previous widget map
-				m_WidgetMap = prevMap;
+			if (!comp) {
+				RenderNullPointer(nullNameOverride ? nullNameOverride : property.GetName().c_str());
 			}
 			else {
-				RenderNullPointer("Component");
+				// Temporarily switch widget map to the component's class while rendering (RAII)
+				WidgetMapScope wms(this, comp);
+
+				ImGui::Text("Type: %s", comp->GetRflClassName() ? comp->GetRflClassName() : "Unknown");
+				ImGui::Text("ID: %u", comp->GetId());
+				ImGui::Text("Active: %s", comp->IsActive() ? "true" : "false");
+				ImGui::Text("Initialized: %s", comp->IsInitialized() ? "true" : "false");
+				if (showAddress) {
+					ImGui::Text("Address: %p", comp);
+				}
+
+				RenderObjectProperties(comp, property.GetName());
 			}
 
 			ImGui::TreePop();
@@ -875,60 +818,27 @@ namespace ImGuiVisualizers
 		else {
 			UpdateExpandedState(nodeId, false);
 			ImGui::SameLine();
-			ImGui::TextColored(GetTypeColor(property.GetType()), "[Component]");
+			ImGui::TextColored(GetTypeColor(property.GetType()), "%s", typeTag);
+			if (!comp) {
+				ImGui::SameLine();
+				ImGui::TextColored(ImVec4(0.7f, 0.3f, 0.3f, 1.0f), "(null)");
+			}
 		}
+	}
+	void PropertyInspector::RenderComponentProperty(const CPropertyBase& property, CReflectedBase* object)
+	{
+		ComponentSystem::Component* component = reinterpret_cast<ComponentSystem::Component*>(property.GetAddress(object));
+		RenderComponentCommon(property, component, component, "[Component]", false, "Component");
 	}
 
 	void PropertyInspector::RenderComponentPtrProperty(const CPropertyBase& property, CReflectedBase* object)
 	{
 		ComponentSystem::Component** componentPtr = reinterpret_cast<ComponentSystem::Component**>(property.GetAddress(object));
+		ComponentSystem::Component* pointed = componentPtr ? *componentPtr : nullptr;
+		RenderComponentCommon(property, pointed, pointed ? pointed : static_cast<const void*>(componentPtr), "[Component*]", true, "Component pointer");
+	}
 
-		const std::string nodeId = GenerateTreeNodeId(property.GetName(), *componentPtr);
-		bool expanded = ShouldExpandNode(nodeId);
-
-		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
-			UpdateExpandedState(nodeId, true);
-
-			ImGui::SameLine();
-			ImGui::TextColored(GetTypeColor(property.GetType()), "[Component*]");
-
-			if (*componentPtr) {
-				// switch widget map to pointed component's map
-				const PropertyWidgetMap* prevMap = m_WidgetMap;
-				const char* subClassName = (*componentPtr)->GetRflClassName();
-				if (subClassName && subClassName[0] != '\0') {
-					auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
-					m_WidgetMap = mapPtr ? mapPtr.get() : nullptr;
-				}
-				else {
-					m_WidgetMap = nullptr;
-				}
-
-				ImGui::Text("Type: %s", (*componentPtr)->GetRflClassName() ? (*componentPtr)->GetRflClassName() : "Unknown");
-				ImGui::Text("ID: %u", (*componentPtr)->GetId());
-				ImGui::Text("Active: %s", (*componentPtr)->IsActive() ? "true" : "false");
-				ImGui::Text("Address: %p", *componentPtr);
-				RenderObjectProperties(*componentPtr, property.GetName());
-
-				// restore
-				m_WidgetMap = prevMap;
-			}
-			else {
-				RenderNullPointer("Component pointer");
-			}
-
-			ImGui::TreePop();
-		}
-		else {
-			UpdateExpandedState(nodeId, false);
-			ImGui::SameLine();
-			ImGui::TextColored(GetTypeColor(property.GetType()), "[Component*]");
-			if (!*componentPtr) {
-				ImGui::SameLine();
-				ImGui::TextColored(ImVec4(0.7f, 0.3f, 0.3f, 1.0f), "(null)");
-			}
-		}
-	}void PropertyInspector::RenderComponentPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object)
+	void PropertyInspector::RenderComponentPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object)
 	{
 		std::vector<ComponentSystem::Component*>* componentVector =
 			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
@@ -1013,16 +923,9 @@ namespace ImGuiVisualizers
 					if ((*componentVector)[i]) {
 						ComponentSystem::Component* comp = (*componentVector)[i];
 
-						// temporarily switch widget map to the component's class
-						const PropertyWidgetMap* prevMap = m_WidgetMap;
-						const char* subClassName = comp->GetRflClassName();
-						if (subClassName && subClassName[0] != '\0') {
-							auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
-							m_WidgetMap = mapPtr ? mapPtr.get() : nullptr;
-						}
-						else {
-							m_WidgetMap = nullptr;
-						}
+						// temporarily switch widget map to the component's class (RAII)
+						WidgetMapScope wms(this, comp);
+
 						if (m_ShowDetails) {
 							ImGui::Text("Type: %s", comp->GetRflClassName() ? comp->GetRflClassName() : "Unknown");
 							ImGui::Text("ID: %u", comp->GetId());
@@ -1030,9 +933,6 @@ namespace ImGuiVisualizers
 							ImGui::Text("Address: %p", comp);
 						}
 						RenderObjectProperties(comp, elementName);
-
-						// restore previous widget map
-						m_WidgetMap = prevMap;
 					}
 					else {
 						RenderNullPointer("Vector element");
@@ -1098,7 +998,6 @@ namespace ImGuiVisualizers
 						}
 						ImGui::EndCombo();
 					}
-
 				}
 			}
 		}
@@ -1648,7 +1547,8 @@ namespace ImGuiVisualizers
 			UpdateExpandedState(nodeId, true);
 
 			ImGui::SameLine();
-			ImGui::TextColored(GetTypeColor(property.GetType()), "%s", vectorTag);
+			if( m_ShowDetails )
+				ImGui::TextColored(GetTypeColor(property.GetType()), "%s", vectorTag);
 
 			// Add / Remove controls (use the existing free function)
 			RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons", m_ReadOnly,
@@ -1671,6 +1571,7 @@ namespace ImGuiVisualizers
 					}
 				});
 
+			ImGui::SameLine();
 			ImGui::Text("Size: %zu", vec->size());
 
 			for (size_t i = 0; i < vec->size(); ++i) {
@@ -1685,8 +1586,11 @@ namespace ImGuiVisualizers
 		}
 		else {
 			UpdateExpandedState(nodeId, false);
-			ImGui::SameLine();
-			ImGui::TextColored(GetTypeColor(property.GetType()), "%s (%zu)", vectorTag, vec->size());
+			if (m_ShowDetails)
+			{
+				ImGui::SameLine();
+				ImGui::TextColored(GetTypeColor(property.GetType()), "%s (%zu)", vectorTag, vec->size());
+			}
 
 			// Quick add/remove when collapsed
 			RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons_collapsed", m_ReadOnly,
@@ -1708,6 +1612,8 @@ namespace ImGuiVisualizers
 						vec->pop_back();
 					}
 				});
+			ImGui::SameLine();
+			ImGui::Text("Size: %zu", vec->size());
 		}
 	}
 

@@ -70,6 +70,12 @@
     <Filter Include="Core\Reflection">
       <UniqueIdentifier>{28B22CF9-943D-9ABD-9D4E-1DB20959F6BD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Shared">
+      <UniqueIdentifier>{7C480CD1-68EA-36A7-51A5-4AFB3DE6BDF7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shared\ImguiVizualizers">
+      <UniqueIdentifier>{AE13D55F-1A4B-1DF7-2355-811A8F0B44F0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AssetClasses\EntityDefinition.h">
@@ -350,8 +356,9 @@
       <Filter>Core\Reflection</Filter>
     </ClInclude>
     <ClInclude Include="QuickEdit.h" />
-    <ClInclude Include="logo.h" />
-    <ClInclude Include="Shared\ImguiVizualizers\PropertyWidgetMapEditor.h" />
+    <ClInclude Include="Shared\ImguiVizualizers\PropertyWidgetMapEditor.h">
+      <Filter>Shared\ImguiVizualizers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
