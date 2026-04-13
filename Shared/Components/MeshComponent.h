@@ -43,4 +43,12 @@ private:
 	CMaterialDefinition m_materialDefinition;
 	bool m_ready = false;
 
+	// declare static handle once (outside per-frame code)
+	bgfx::UniformHandle u_sampler = BGFX_INVALID_HANDLE;
+	bgfx::UniformHandle u_lightDir = BGFX_INVALID_HANDLE;
+	bgfx::UniformHandle u_lightColor = BGFX_INVALID_HANDLE;
+	bgfx::UniformHandle u_ambient = BGFX_INVALID_HANDLE;
+	bgfx::UniformHandle u_materialColor = BGFX_INVALID_HANDLE;
+
+
 };

@@ -41,9 +41,18 @@ bool CMeshComponent::OnInitialize()
 		}
 	}
 
+
 	// Request the mesh resource (async load → finalize on main thread)
 	m_materialDefinition.SafeRead(m_materialFile.GetResourceFileName());
 	m_materialDefinition.Initialize();
+
+
+	// declare static handle once (outside per-frame code)
+	u_sampler = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+	u_lightDir = bgfx::createUniform("u_lightDir", bgfx::UniformType::Vec4);
+	u_lightColor = bgfx::createUniform("u_lightColor", bgfx::UniformType::Vec4);
+	u_ambient = bgfx::createUniform("u_ambient", bgfx::UniformType::Vec4);
+	u_materialColor = bgfx::createUniform("u_materialColor", bgfx::UniformType::Vec4);
 	return true;
 }
 
@@ -64,23 +73,45 @@ void CMeshComponent::OnShutdown()
 {
 	m_meshRes.reset();
 	m_materialDefinition.Reset();	
-}
 
-void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx) 
+	bgfx::destroy(u_sampler);
+	bgfx::destroy(u_lightDir);
+	bgfx::destroy(u_lightColor);
+	bgfx::destroy(u_ambient);
+	bgfx::destroy(u_materialColor);
+	u_sampler = BGFX_INVALID_HANDLE;
+	u_lightDir = BGFX_INVALID_HANDLE;
+	u_lightColor = BGFX_INVALID_HANDLE;
+	u_ambient = BGFX_INVALID_HANDLE;
+	u_materialColor = BGFX_INVALID_HANDLE;
+}
+void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx)
 {
 	if (IsReady())
-	{		
+	{
+		// set uniform values (adjust values as needed)
+		const float lightDir[4] = { 0.57735f, -0.57735f, 0.57735f, 0.0f }; // normalized direction
+		const float lightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+		const float ambientColor[4] = { 0.2f, 0.2f, 0.2f, 1.0f };
+		const float materialColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
+		bgfx::setUniform(u_lightDir, lightDir);
+		bgfx::setUniform(u_lightColor, lightColor);
+		bgfx::setUniform(u_ambient, ambientColor);
+		bgfx::setUniform(u_materialColor, materialColor);
+
+		// assign the sampler handle (don't recreate each frame)
 		m_texture.m_texture = m_materialDefinition.GetTexture(0);
 		m_texture.m_flags = 0;
-		m_texture.m_sampler = bgfx::createUniform("s_texColor", bgfx::UniformType::Sampler);
+		m_texture.m_sampler = u_sampler;
 		m_meshState.m_textures[0] = m_texture;
 		m_meshState.m_numTextures = 1;
-		m_meshState.m_state = BGFX_STATE_DEFAULT;
+		m_meshState.m_state = BGFX_STATE_WRITE_RGB	| BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
 		m_meshState.m_program = m_materialDefinition.GetShaderProgram();
 		m_meshState.m_viewId = viewId;
-
-		const MeshState* statePtr = &m_meshState;
-		m_meshRes->m_mesh->submit(&statePtr, 1, mtx, 1);
+				
+		const MeshState* statePtr = &m_meshState;		
+		m_meshRes->m_mesh->submit(&statePtr, 1, mtx, 1);		
 	}
 }
 

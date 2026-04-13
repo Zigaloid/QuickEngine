@@ -29,8 +29,12 @@ public:
 	void Reset() 
 	{ 
 		m_fragmentShader.reset(); m_vertexShader.reset(); m_textureResources.clear();
-		bgfx::ProgramHandle m_shader = BGFX_INVALID_HANDLE;
-		
+		m_textures.clear();		
+		if (bgfx::isValid(m_shader))
+		{
+			bgfx::destroy(m_shader);
+			m_shader = BGFX_INVALID_HANDLE;
+		}		
 	}
 
 	const bgfx::ProgramHandle GetShaderProgram() const

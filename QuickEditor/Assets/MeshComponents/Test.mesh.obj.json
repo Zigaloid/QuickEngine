@@ -1,14 +1,19 @@
 {
     "RootObject": {
         "m_meshResource": {
-            "Value": "",
-            "Type": 3,
-            "Size": 40
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\meshes\\platform.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 48
         },
         "m_materialFile": {
             "Value": "CResourceReference",
             "m_resourceFileName": {
-                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\Materials\\Bunny.mat.obj.json",
+                "Value": "C:\\Code\\QuickEngine\\QuickEditor\\Assets\\Materials\\Grass.mat.obj.json",
                 "Type": 3,
                 "Size": 40
             },

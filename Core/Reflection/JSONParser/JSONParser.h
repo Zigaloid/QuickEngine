@@ -811,7 +811,7 @@ public:
 
 		auto sizeIt = objectValue->FindMember(JTAG_SIZE);
 		if (sizeIt == objectValue->MemberEnd()) return false;
-		if (property.GetSize() != sizeIt->value.GetInt()) return false;
+		//if (property.GetSize() != sizeIt->value.GetInt()) return false;
 
 		auto typeIt = objectValue->FindMember(JTAG_TYPE);
 		if (typeIt == objectValue->MemberEnd()) return false;
