@@ -28,6 +28,9 @@
     <Filter Include="..\External\imgui-docking\backends">
       <UniqueIdentifier>{13F91329-FF34-1793-6847-2F8A54A2BFAD}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\External\ufbx">
+      <UniqueIdentifier>{97AEDD11-83A7-FC63-ACD9-E1E89831DC6F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\Shared">
       <UniqueIdentifier>{67846B3F-D3EE-1FB6-1C2D-D15B88D6FD0A}</UniqueIdentifier>
     </Filter>
@@ -80,6 +83,12 @@
     </ClInclude>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
       <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\External\ufbx\ufbx.h">
+      <Filter>..\External\ufbx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\FbxMeshComponent.h">
+      <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\MeshComponent.h">
       <Filter>..\Shared\Components</Filter>
@@ -134,6 +143,9 @@
     </ClInclude>
     <ClInclude Include="..\Shared\KeyboardShortcutManager.h">
       <Filter>..\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
@@ -339,6 +351,12 @@
     <ClInclude Include="..\Shared\bgfx_common\ps\vs_particle.bin.h">
       <Filter>..\Shared\bgfx_common\ps</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\utils\BgfxBinaryMeshWriter.h">
+      <Filter>..\Shared\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\utils\FbxMeshConverter.h">
+      <Filter>..\Shared\utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\utils\StringUtils.h">
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
@@ -420,6 +438,12 @@
     </ClCompile>
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp">
       <Filter>..\External\imgui-docking</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\ufbx\ufbx.c">
+      <Filter>..\External\ufbx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\FbxMeshComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp">
       <Filter>..\Shared\Components</Filter>

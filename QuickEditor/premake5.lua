@@ -60,6 +60,8 @@ project "QuickEdit"
 	includedirs { "../External/imgui-docking" }   	
 	includedirs { "../External/bx/include/compat/msvc" }   
 	includedirs { "../External/OpenGL/Include" }  
+
+	includedirs { "../External/ufbx" }   	
 	
 	files { "../AssetClasses/**.cpp" }
 	files { "../AssetClasses/**.h" }
@@ -71,6 +73,8 @@ project "QuickEdit"
 	files { "../External/imgui-docking/imgui_Widgets.cpp" }
 	files { "../External/imgui-docking/imgui_draw.cpp" }
 	
+	files { "../External/ufbx/ufbx.c" }
+	files { "../External/ufbx/ufbx.h" }
 
 	files { "../Shared/utils/**.cpp" }
 	files { "../Shared/utils/**.h" }
