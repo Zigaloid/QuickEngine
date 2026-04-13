@@ -1,0 +1,77 @@
+{
+    "RootObject": {
+        "m_materialColor": {
+            "Value": [
+                0.953667938709259,
+                0.0,
+                0.0,
+                1.0
+            ],
+            "Type": 7,
+            "Size": 16
+        },
+        "m_ambientColor": {
+            "Value": [
+                0.30000001192092896,
+                0.30000001192092896,
+                0.30000001192092896,
+                1.0
+            ],
+            "Type": 7,
+            "Size": 16
+        },
+        "m_vertexShaderResource": {
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/shaders/dxbc/vs_bump.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 48
+        },
+        "m_fragmentShaderResource": {
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/shaders/dxbc/fs_bump.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 48
+        },
+        "m_textureResources": {
+            "Value": "CMaterialDefinition",
+            "Elements": [
+                {
+                    "Value": "CResourceReference",
+                    "m_resourceFileName": {
+                        "Value": "./assets/textures/fieldstone-rgba.dds",
+                        "Type": 3,
+                        "Size": 40
+                    }
+                },
+                {
+                    "Value": "CResourceReference",
+                    "m_resourceFileName": {
+                        "Value": "./assets/textures/fieldstone-n.dds",
+                        "Type": 3,
+                        "Size": 40
+                    }
+                }
+            ],
+            "Type": 6,
+            "Size": 32
+        },
+        "m_textureFlags": {
+            "Value": [],
+            "Type": 14,
+            "Size": 32
+        },
+        "m_textureStages": {
+            "Value": [],
+            "Type": 14,
+            "Size": 32
+        }
+    }
+}

@@ -38,13 +38,12 @@ private:
 	CResourceReference m_materialFile;
 
 	MeshState m_meshState;
-	MeshState::Texture m_texture;
-
+	MeshState::Texture m_texture[4];
+	bgfx::UniformHandle u_samplers[4] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
 	CMaterialDefinition m_materialDefinition;
 	bool m_ready = false;
-
-	// declare static handle once (outside per-frame code)
-	bgfx::UniformHandle u_sampler = BGFX_INVALID_HANDLE;
+    bool m_meshStateInitialized = false;
+	// declare static handle once (outside per-frame code)	
 	bgfx::UniformHandle u_lightDir = BGFX_INVALID_HANDLE;
 	bgfx::UniformHandle u_lightColor = BGFX_INVALID_HANDLE;
 	bgfx::UniformHandle u_ambient = BGFX_INVALID_HANDLE;

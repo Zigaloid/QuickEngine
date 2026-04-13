@@ -15,7 +15,8 @@ public:
     Vector4f() : x(0), y(0), z(0), w(0) {}
     Vector4f(float x, float y, float z, float w) : x(x), y(y), z(z), w(w) {}
     Vector4f(const Vector4f& other) : x(other.x), y(other.y), z(other.z), w(other.w) {}
-
+    
+    const float* data() const { return &x; }
     // Getters
     float getX() const { return x; }
     float getY() const { return y; }

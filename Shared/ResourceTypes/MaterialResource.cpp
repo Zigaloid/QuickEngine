@@ -5,10 +5,13 @@
 
 // ── CResourceReference ────────────────────────────────────────────
 REFL_DEFINE_OBJECT(CMaterialDefinition)
+	REFL_DEFINE_VECTOR4_MEMBER(CMaterialDefinition, m_materialColor),
+	REFL_DEFINE_VECTOR4_MEMBER(CMaterialDefinition, m_ambientColor),
 	REFL_DEFINE_OBJECT_MEMBER(CMaterialDefinition, m_vertexShaderResource),
 	REFL_DEFINE_OBJECT_MEMBER(CMaterialDefinition, m_fragmentShaderResource),	
 	REFL_DEFINE_OBJECT_PTR_VECTOR_MEMBER(CMaterialDefinition, m_textureResources),
-	
+	REFL_DEFINE_INT_VECTOR_MEMBER(CMaterialDefinition, m_textureFlags),
+	REFL_DEFINE_INT_VECTOR_MEMBER(CMaterialDefinition, m_textureStages)
 REFL_DEFINE_END
 
 bool CMaterialDefinition::IsLoaded() const
@@ -46,7 +49,6 @@ bool CMaterialDefinition::Initialize()
 		std::cerr << "CMaterialDefinition: Failed to request shader resource: " << m_fragmentShaderResource.GetResourceFileName();
 		return false;
 	}	
-
 
 	for (const auto& texResRef : m_textureResources)
 	{

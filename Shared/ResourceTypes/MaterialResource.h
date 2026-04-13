@@ -3,6 +3,7 @@
 #include "ResourceManager/ResourceManager.h"
 #include "ShaderResource.h"
 #include "TextureResource.h"
+#include "math/Vector4f.h"
 
 #include "bgfx\bgfx.h"
 #include "bgfx_utils.h"
@@ -57,6 +58,8 @@ public:
 	bool IsReady() const { return isValid(m_shader); }
 	bool IsLoaded() const;
 	
+	int GetNumberOfTextures() {	return (int)m_textures.size(); 	}
+
 	bgfx::TextureHandle GetTexture(int index)
 	{
 		if (index < m_textures.size() )
@@ -66,6 +69,9 @@ public:
 		}
 		return BGFX_INVALID_HANDLE;
 	}
+    const Vector4f &GetMaterialColor() const { return m_materialColor; }
+    const Vector4f &GetAmbientColor() const { return m_ambientColor; }
+
 private:
 	CResourceReference m_vertexShaderResource;
 	CResourceReference m_fragmentShaderResource;	
@@ -75,4 +81,11 @@ private:
 	std::shared_ptr<CShaderResource> m_vertexShader;
 	std::shared_ptr<CShaderResource> m_fragmentShader;	
 	std::vector<std::shared_ptr<CTextureResource>> m_textures;
+    std::vector<int> m_textureFlags;
+	std::vector<int> m_textureStages;
+	// set uniform values (adjust values as neede.2f, 1.0f };
+	Vector4f m_materialColor = { 1.0f, 1.0f, 1.0f, 1.0f };	
+	Vector4f m_ambientColor = { 0.3f, 0.3f, 0.3f, 1.0f };    
+	// assign the sampler handle (don't recreate each frame)
+	int m_flags;
 };
