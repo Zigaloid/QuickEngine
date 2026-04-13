@@ -3,7 +3,6 @@
 #include "ResourceManager/ResourceManager.h"
 #include "bgfx\bgfx.h"
 #include "bgfx_utils.h"
-#include "C:\\Code\\QuickEngine\\External\\bgfx_common\\bgfx_utils.h"
 
 #include "CoreSystem\CoreSystem.h"
 

@@ -1,14 +1,17 @@
 #include "PropertyInspector.h"
-#include "PropertyWidgetMapRegistry.h"
 
+#include <algorithm>
+#include <sstream>
+#include <functional>
+
+//
+#include "stringUtils.h"
+#include "PropertyWidgetMapRegistry.h"
 #include "Math/Vector3f.h"
 #include "Math/Vector4f.h"
 #include "Math/Matrix4f.h"
 #include "CoreSystem/CoreSystem.h"
 #include "ClassFactory/ClassFactory.h"
-#include <algorithm>
-#include <sstream>
-#include <functional>
 #include "ComponentSystem/ComponentSystem.h"
 #include "ComponentSystem/ComponentRegistry.h"
 
@@ -1897,9 +1900,17 @@ void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflect
 		ofn.nMaxFile = MAX_PATH;
 		ofn.lpstrFilter = filterBuf.data();
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+		ofn.lpstrInitialDir = ".\\assets\\";
 
-		if (GetOpenFileNameA(&ofn)) {
-			*value = filePath;
+		if (GetOpenFileNameA(&ofn)) 
+		{
+            // Strip the path to be relative to the project directory.
+            std::string  fixedFilePath = filePath;			
+			pathSanitize(fixedFilePath);
+			fixedFilePath.erase(0, fixedFilePath.find("assets/"));
+            fixedFilePath = "./" + fixedFilePath; // ensure it starts with ./
+			
+			*value = fixedFilePath;
 			strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
 			buf.data[sizeof(buf.data) - 1] = '\0';
 		}
