@@ -31,7 +31,8 @@ public:
                 if (m_fileName == msg.str)
                 {
                     const std::string& filePath = msg.str;
-                    if (filePath == m_editor.GetFilePath()) {
+                    if (filePath == m_editor.GetFilePath()) 
+                    {
                         m_view.LoadMesh(m_editor.GetFilePath());
                     }
                 }

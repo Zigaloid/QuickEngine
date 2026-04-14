@@ -4,6 +4,7 @@
 #include <array>
 #include <iostream>
 #include <vector>
+#include <tuple>
 #include "Vector3f.h"
 
 class Matrix4f {
@@ -30,14 +31,14 @@ public:
         m_matrix[2] = m20; m_matrix[6] = m21; m_matrix[10] = m22; m_matrix[14] = m23;
         m_matrix[3] = m30; m_matrix[7] = m31; m_matrix[11] = m32; m_matrix[15] = m33;
     }
-	// Add this public method to Matrix4x4
-	void setColumn(int col, const Vector3f& v) {
-		m_matrix[col * 4 + 0] = v.x;
-		m_matrix[col * 4 + 1] = v.y;
-		m_matrix[col * 4 + 2] = v.z;		
-	}
-	auto &GetData() const { return m_matrix; }
-    auto &GetWriteData() { return m_matrix; }
+    // Add this public method to Matrix4x4
+    void setColumn(int col, const Vector3f& v) {
+        m_matrix[col * 4 + 0] = v.x;
+        m_matrix[col * 4 + 1] = v.y;
+        m_matrix[col * 4 + 2] = v.z;
+    }
+    auto& GetData() const { return m_matrix; }
+    auto& GetWriteData() { return m_matrix; }
 
     // Element access
     float& operator()(int row, int col) {
@@ -194,6 +195,11 @@ public:
         return result;
     }
 
+    // Added overload: translation with Vector3f
+    static Matrix4f translation(const Vector3f& v) {
+        return translation(v.getX(), v.getY(), v.getZ());
+    }
+
     static Matrix4f scale(float x, float y, float z) {
         Matrix4f result;
         result.zero();
@@ -202,6 +208,11 @@ public:
         result(2, 2) = z;
         result(3, 3) = 1.0f;
         return result;
+    }
+
+    // Added overload: scale with Vector3f
+    static Matrix4f scale(const Vector3f& v) {
+        return scale(v.getX(), v.getY(), v.getZ());
     }
 
     static Matrix4f rotationX(float angleRad) {
@@ -273,6 +284,47 @@ public:
         return result;
     }
 
+    // Added overload: rotation with Vector3f axis
+    static Matrix4f rotation(const Vector3f& axis, float angleRad) {
+        return rotation(axis.getX(), axis.getY(), axis.getZ(), angleRad);
+    }
+
+    // Build a TRS matrix from Vector3f components.
+    // rotationDegrees is interpreted as Euler angles in degrees (X, Y, Z),
+    // using ZYX order (R = Rz * Ry * Rx). Resulting matrix is T * R * S.
+    static Matrix4f fromTRS(const Vector3f& translation, const Vector3f& rotationDegrees, const Vector3f& scaleVec) {
+        const float DEG_TO_RAD = static_cast<float>(M_PI) / 180.0f;
+        float rx = rotationDegrees.getX() * DEG_TO_RAD;
+        float ry = rotationDegrees.getY() * DEG_TO_RAD;
+        float rz = rotationDegrees.getZ() * DEG_TO_RAD;
+
+        Matrix4f S = Matrix4f::scale(scaleVec);
+        Matrix4f Rx = Matrix4f::rotationX(rx);
+        Matrix4f Ry = Matrix4f::rotationY(ry);
+        Matrix4f Rz = Matrix4f::rotationZ(rz);
+
+        // ZYX Euler: apply Rx, then Ry, then Rz -> combined R = Rz * Ry * Rx
+        Matrix4f R = Rz * Ry * Rx;
+
+        Matrix4f T = Matrix4f::translation(translation);
+
+        // Compose: translate * rotate * scale
+        return T * R * S;
+    }
+
+    // Convert this matrix into TRS components (compatible with fromTRS).
+    // Fills output references with translation, rotation (degrees, X,Y,Z ZYX convention), and scale.
+    void toTRS(Vector3f& outTranslation, Vector3f& outRotationDegrees, Vector3f& outScale) const {
+        decompose(outTranslation, outRotationDegrees, outScale);
+    }
+
+    // Convenience overload returning a tuple (translation, rotationDegrees, scale)
+    std::tuple<Vector3f, Vector3f, Vector3f> toTRS() const {
+        Vector3f t, r, s;
+        decompose(t, r, s);
+        return std::tuple{ t, r, s };
+    }
+
     // Camera/View matrices
     static Matrix4f lookAt(float eyeX, float eyeY, float eyeZ,
         float centerX, float centerY, float centerZ,
@@ -307,6 +359,13 @@ public:
         result(3, 0) = 0;   result(3, 1) = 0;   result(3, 2) = 0;   result(3, 3) = 1;
 
         return result;
+    }
+
+    // Added overload: lookAt with Vector3f parameters
+    static Matrix4f lookAt(const Vector3f& eye, const Vector3f& center, const Vector3f& up) {
+        return lookAt(eye.getX(), eye.getY(), eye.getZ(),
+            center.getX(), center.getY(), center.getZ(),
+            up.getX(), up.getY(), up.getZ());
     }
 
     // Projection matrices
@@ -456,14 +515,14 @@ public:
         Vector3f scaleX(m_matrix[0], m_matrix[1], m_matrix[2]);
         Vector3f scaleY(m_matrix[4], m_matrix[5], m_matrix[6]);
         Vector3f scaleZ(m_matrix[8], m_matrix[9], m_matrix[10]);
-        
+
         return Vector3f(scaleX.length(), scaleY.length(), scaleZ.length());
     }
 
     Vector3f extractRotationEuler() const {
         // Extract scale first to normalize the rotation matrix
         Vector3f scale = extractScale();
-        
+
         // Normalize the rotation matrix by dividing by scale
         float m00 = m_matrix[0] / scale.getX();
         float m01 = m_matrix[4] / scale.getY();
@@ -474,26 +533,28 @@ public:
         float m20 = m_matrix[2] / scale.getX();
         float m21 = m_matrix[6] / scale.getY();
         float m22 = m_matrix[10] / scale.getZ();
-        
+
         // Extract Euler angles from rotation matrix (ZYX order)
         float rotX, rotY, rotZ;
-        
+
         if (m20 < 0.99999f && m20 > -0.99999f) {
             rotY = std::asin(-m20);
             rotX = std::atan2(m21, m22);
             rotZ = std::atan2(m10, m00);
-        } else {
+        }
+        else {
             // Gimbal lock case
             rotZ = 0;
             if (m20 < 0) {
                 rotY = static_cast<float>(M_PI) / 2.0f;
                 rotX = std::atan2(m01, m11);
-            } else {
+            }
+            else {
                 rotY = -static_cast<float>(M_PI) / 2.0f;
                 rotX = std::atan2(-m01, m11);
             }
         }
-        
+
         // Convert from radians to degrees
         const float RAD_TO_DEG = 180.0f / static_cast<float>(M_PI);
         return Vector3f(rotX * RAD_TO_DEG, rotY * RAD_TO_DEG, rotZ * RAD_TO_DEG);

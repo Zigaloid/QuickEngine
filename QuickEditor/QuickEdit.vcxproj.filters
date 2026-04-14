@@ -67,9 +67,6 @@
     <Filter Include="..\Shared\utils">
       <UniqueIdentifier>{2707D659-9392-431E-9CA3-C61208AE9F1E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AssetClasses">
-      <UniqueIdentifier>{137D46AB-FFDF-D54F-A865-0E0694A7A1D2}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AssetClasses\EntityDefinition.h">
@@ -361,10 +358,16 @@
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
-    <ClInclude Include="AssetClasses\EntityInstance.h">
-      <Filter>AssetClasses</Filter>
-    </ClInclude>
     <ClInclude Include="QuickEdit.h" />
+    <ClInclude Include="..\Shared\Components\EntityComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\LevelComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\TransformComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
@@ -571,5 +574,14 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
+    <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\LevelComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -141,11 +141,11 @@ void DocumentManager::InitializeLaunchers()
 {
     // ObjJson launchers
     m_launchers["MatObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".mat.obj.json", "CMaterialDefinition");
-    m_launchers["DefObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".def.obj.json", "CEntityDefinition");
-    m_launchers["EntityObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".entity.obj.json", "CEntityInstance");
+    m_launchers["DefObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".def.obj.json", "CEntityDefinition");    
     m_launchers["MeshObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".mesh.obj.json", "CMeshComponent");
     m_launchers["WidgetsObjJson"] = std::make_unique<WidgetEditorLauncher>(*this, ".widgets.obj.json", "PropertyWidgetMapRegistry");
-
+    m_launchers["LevelObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".lvl.obj.json", "CLevelComponent");
+    m_launchers["EntityObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".ent.obj.json", "CEntityComponent");
 
     // Texture launcher (TODO)
     m_launchers["Texture"] = std::make_unique<NoOpLauncher>();
@@ -164,9 +164,10 @@ std::vector<DocumentManager::AssetTypeConfig> DocumentManager::GetAssetTypeConfi
         // ObjJson types
         { ".mesh.obj.json",     "Mesh Component",         IM_COL32(100, 200, 255, 255),   "O",  "MeshObjJson",   true, false },
         { ".def.obj.json",      "Definition Object",      IM_COL32(100, 200, 255, 255),   "O",  "DefObjJson",    true, false },
-        { ".mat.obj.json",      "Material Definition",    IM_COL32(100, 200, 255, 255),   "O",  "MatObjJson",    true, false },
-        { ".entity.obj.json",   "Entity Object",          IM_COL32(100, 200, 255, 255),   "O",  "EntityObjJson", true, false },        
+        { ".mat.obj.json",      "Material Definition",    IM_COL32(100, 200, 255, 255),   "O",  "MatObjJson",    true, false },        
         { ".widgets.obj.json",  "Class Widgets",          IM_COL32(100, 200, 255, 255),   "O",  "WidgetsObjJson",true, false },
+        { ".lvl.obj.json",      "Level Component",        IM_COL32(100, 200, 255, 255),   "O",  "LevelObjJson",   true, false },
+        { ".ent.obj.json",      "Entity Component",       IM_COL32(100, 200, 255, 255),   "O",  "EntityObjJson",   true, false },
         { ".png",               "PNG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",      false,  true },
         { ".bmp",               "BMP Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",      false,  true },
         { ".jpg",               "JPG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",      false,  true },

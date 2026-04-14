@@ -39,24 +39,38 @@ project "QuickScope"
 	includedirs { "../External/bx/include/" }   
 	includedirs { "../External/bgfx/"}
 	includedirs { "../External"}
-	includedirs { "../External/bgfx_common" }   
+	includedirs { "../Shared/ImguiVizualizers" }  
+	includedirs { "../Shared" }  
+	includedirs { "../AssetClasses" }
+	includedirs { "../Shared/ResourceTypes" }  
+	includedirs { "../Shared/Components" } 
+	includedirs { "../Shared/bgfx_common" }   
+	includedirs { "../Shared/utils/" }
+
 	includedirs { "../External/imgui-docking" }   	
 	includedirs { "../External/bx/include/compat/msvc" }   
 	includedirs { "../External/OpenGL/Include" }  
-	includedirs { "../Shared" } 
-	includedirs { "../Shared/ImguiVizualizers" } 
-	
 
---	Externals required.		
+	includedirs { "../External/ufbx" }   	
+	
+	files { "../AssetClasses/**.cpp" }
+	files { "../AssetClasses/**.h" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.cpp" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.h" }
-	files { "../External/bgfx_common/**.cpp" }
-	files { "../External/bgfx_common/**.h" }
 	files { "../External/imgui-docking/imgui.cpp" }
 	files { "../External/imgui-docking/backends/imgui_impl_opengl3.cpp" }
 	files { "../External/imgui-docking/imgui_tables.cpp" }
 	files { "../External/imgui-docking/imgui_Widgets.cpp" }
 	files { "../External/imgui-docking/imgui_draw.cpp" }
+	
+	files { "../External/ufbx/ufbx.c" }
+	files { "../External/ufbx/ufbx.h" }
+
+	files { "../Shared/utils/**.cpp" }
+	files { "../Shared/utils/**.h" }
+	files { "../Shared/bgfx_common/**.cpp" }
+	files { "../Shared/bgfx_common/**.h" }
+	
 	
 --	ImguiVisualizer required.
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.cpp" }

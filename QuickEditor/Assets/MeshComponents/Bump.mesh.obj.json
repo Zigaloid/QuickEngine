@@ -3,22 +3,22 @@
         "m_meshResource": {
             "Value": "CResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/meshes/platform.bin",
+                "Value": "./assets/meshes/bunny.bin",
                 "Type": 3,
-                "Size": 40
+                "Size": 32
             },
             "Type": 4,
-            "Size": 48
+            "Size": 40
         },
         "m_materialFile": {
             "Value": "CResourceReference",
             "m_resourceFileName": {
                 "Value": "./assets/materials/bump.mat.obj.json",
                 "Type": 3,
-                "Size": 40
+                "Size": 32
             },
             "Type": 4,
-            "Size": 48
+            "Size": 40
         },
         "m_active": {
             "Value": true,
@@ -29,7 +29,7 @@
             "Value": "CMeshComponent",
             "Elements": [],
             "Type": 19,
-            "Size": 32
+            "Size": 24
         }
     }
 }

@@ -7,7 +7,6 @@ class CEntityDefinition : public CReflectedBase
 public:
 	REFL_DECLARE_OBJECT(CEntityDefinition, CReflectedBase);
 private:
-	std::string m_name = "undfined";
-	Vector4f m_color = Vector4f(1, 1, 1, 1);
-	std::vector<int> m_numbers;
+	std::string m_name = "undfined";	
 };
+

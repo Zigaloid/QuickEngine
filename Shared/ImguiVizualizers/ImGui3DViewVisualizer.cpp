@@ -4,6 +4,7 @@
 
 #include "CoreSystem/CoreSystem.h"
 #include "MeshComponent.h"
+#include "EntityComponent.h"
 
 #include <algorithm>
 
@@ -51,24 +52,82 @@ void ImGui3DViewVisualizer::Update(float deltaTime)
 
 void ImGui3DViewVisualizer::LoadMesh(const std::string& meshPath)
 {
-    m_meshPath = meshPath;
+    m_meshPath.clear();
 
-    // Lazily create and initialize the mesh component so caller can invoke
-    // LoadMesh at any time (before or after Initialize()).
-    
-    auto componentManager = Core::CoreSystem::GetComponentManager();    
+    auto componentManager = Core::CoreSystem::GetComponentManager();
+    if (!componentManager)
+        return;
+
+    // Release any existing mesh component we created earlier.
     if (m_meshComp)
     {
-        // Return previous component to manager (pool). Shutdown alone is not enough.
         componentManager->ReleaseComponent(m_meshComp);
         m_meshComp = nullptr;
     }
-    m_meshComp = componentManager->CreateComponent<CMeshComponent>();
-    if (!m_meshPath.empty()) {
-        m_meshComp->SafeRead(m_meshPath.c_str());
-        m_meshComp->ReInitialize();
+
+    // Resolve input type based on file name suffix.
+    std::string resolvedMeshFile;
+    std::string_view pathView(meshPath);
+
+    // Recognize suffixes: ".mesh.obj.json" => direct mesh file, ".ent.obj.json" => entity def
+    if (pathView.ends_with(".mesh.obj.json"))
+    {
+        // Treat input as a mesh object JSON: construct a CMeshComponent and load it.
+        m_meshComp = componentManager->CreateComponent<CMeshComponent>();
+        if (m_meshComp)
+        {
+            m_meshComp->SafeRead(meshPath);
+            m_meshComp->ReInitialize();
+            resolvedMeshFile = meshPath;
+        }
+    }
+    else if (pathView.ends_with(".ent.obj.json"))
+    {
+        // Treat input as an entity definition: construct a CEntityComponent, read it,
+        // query its mesh reference, then construct a CMeshComponent for the referenced mesh.
+        CEntityComponent* entityComp = componentManager->CreateComponent<CEntityComponent>();
+        if (entityComp)
+        {
+            auto readResult = entityComp->SafeRead(meshPath);
+            if (readResult.IsSuccess() && readResult.GetValue())
+            {
+                std::string meshRef = entityComp->GetMeshResourceFileName();
+                if (!meshRef.empty())
+                {
+                    // Create a mesh component and load the referenced mesh file.
+                    m_meshComp = componentManager->CreateComponent<CMeshComponent>();
+                    if (m_meshComp)
+                    {
+                        m_meshComp->SafeRead(meshRef);
+                        m_meshComp->ReInitialize();
+                        resolvedMeshFile = meshRef;
+                    }
+                }
+            }
+
+            // We only needed entityComp as a temporary to extract the mesh reference.
+            componentManager->ReleaseComponent(entityComp);
+        }
+    }
+    else
+    {
+        // Unknown suffix: fallback to attempting to load as a mesh.
+        m_meshComp = componentManager->CreateComponent<CMeshComponent>();
+        if (m_meshComp)
+        {
+            m_meshComp->SafeRead(meshPath);
+            m_meshComp->ReInitialize();
+            resolvedMeshFile = meshPath;
+        }
+    }
+
+    // Remember the actual mesh path used (may differ when an entity file was provided).
+    if (!resolvedMeshFile.empty())
+    {
+        m_meshPath = resolvedMeshFile;
     }
 }
+
 
 // ── Render ──────────────────────────────────────────────────────────────
 

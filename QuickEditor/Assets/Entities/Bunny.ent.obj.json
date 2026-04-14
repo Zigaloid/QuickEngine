@@ -1,0 +1,72 @@
+{
+    "RootObject": {
+        "m_name": {
+            "Value": "Bunny",
+            "Type": 3,
+            "Size": 32
+        },
+        "m_meshResource": {
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/meshcomponents/bunny.mesh.obj.json",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 40
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CEntityComponent",
+            "Elements": [
+                {
+                    "Value": "CTransformComponent",
+                    "m_rotation": {
+                        "Value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_translation": {
+                        "Value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_scale": {
+                        "Value": [
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                }
+            ],
+            "Type": 19,
+            "Size": 24
+        }
+    }
+}
