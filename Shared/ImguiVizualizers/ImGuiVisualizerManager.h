@@ -32,7 +32,8 @@ class IImGuiVisualizer;
  *   mgr.RenderAll();
  * @endcode
  */
-class ImGuiVisualizerManager {
+class ImGuiVisualizerManager
+{
 public:
     ImGuiVisualizerManager();
     ~ImGuiVisualizerManager();
@@ -118,7 +119,8 @@ public:
      * @return Typed pointer, or nullptr if not found or type mismatch.
      */
     template <typename T>
-    T* GetVisualizerAs(const std::string& key) const {
+    T* GetVisualizerAs(const std::string& key) const
+    {
         return dynamic_cast<T*>(GetVisualizer(key));
     }
 
@@ -146,9 +148,9 @@ private:
     std::function<void()> m_fileMenuCallback;
 
     // Internal helpers
-    Entry* findEntry(const std::string& key);
-    const Entry* findEntry(const std::string& key) const;
-    void renderFileMenu();
+    Entry* FindEntry(const std::string& key);
+    const Entry* FindEntry(const std::string& key) const;
+    void RenderFileMenu();
 };
 
 } // namespace ImGuiVisualizers

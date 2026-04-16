@@ -15,7 +15,8 @@ namespace ImGuiVisualizers {
  *   - Pan     : middle-drag (translate the target in the camera plane)
  *   - Zoom    : scroll      (move distance closer/further)
  */
-class Bgfx3DCamera {
+class Bgfx3DCamera
+{
 public:
     Bgfx3DCamera()
         : m_target{0.0f, 0.0f, 0.0f}

@@ -16,7 +16,9 @@
 
 #pragma comment(lib, "ws2_32.lib")
 
-class WinBerkeleySocket : public IBerkeleySocket {
+/** @brief Windows Winsock2 implementation of IBerkeleySocket. */
+class WinBerkeleySocket : public IBerkeleySocket
+{
 public:
     WinBerkeleySocket();
     ~WinBerkeleySocket() override;
@@ -36,8 +38,9 @@ public:
     bool IsOpen() const override;
 
 private:
-    SOCKET m_socket;
-    bool m_isOpen;
+    SOCKET m_socket  = INVALID_SOCKET;
+    bool   m_isOpen  = false;
+
     static std::once_flag s_wsaOnceFlag;
     static void EnsureWSAStartup();
 

@@ -7,9 +7,7 @@
 class CTextureResource : public ResourceSystem::Resource
 {
 public:
-	bgfx::TextureHandle m_texture = BGFX_INVALID_HANDLE;
-
-	CTextureResource(const std::string& path)
+	explicit CTextureResource(const std::string& path)
 		: Resource(path)
 		, m_texture(BGFX_INVALID_HANDLE)
 	{
@@ -24,7 +22,7 @@ public:
 		}
 	}
 
-	bgfx::TextureHandle& GetTextureHandle() { return m_texture; }
+    bgfx::TextureHandle GetTextureHandle() const { return m_texture; }
 
 	// Use base-class Update to load the file data on the worker thread.
 	bool Update(FileSystem::FileSystemManager& fileSystem) override
@@ -39,13 +37,15 @@ public:
 		// Guard: only attempt to create texture if data was actually loaded.
 		if (GetLoadedSize() == 0 || GetData().empty())
 		{
-			isFinalized_ = false;
+			m_isFinalized = false;
 			return;
 		}
 
 		// bgfx_utils should provide a helper similar to loadShaderFromMemory for textures.
 		// This mirrors how shaders are created in CShaderResource.
-		m_texture = loadTextureFromMemory(GetData().data(), static_cast<uint32_t>(GetLoadedSize()), path_.c_str());
-		isFinalized_ = bgfx::isValid(m_texture);
+		m_texture = loadTextureFromMemory(GetData().data(), static_cast<uint32_t>(GetLoadedSize()), m_path.c_str());
+		m_isFinalized = bgfx::isValid(m_texture);
 	}
+private:
+	bgfx::TextureHandle m_texture = BGFX_INVALID_HANDLE;
 };

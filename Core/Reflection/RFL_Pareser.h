@@ -16,6 +16,7 @@ namespace Core {
 
 class CReflectedBase;
 
+/** @brief Abstract parser interface used by the reflection system for reading and writing objects. */
 class IRFL_Parser
 {
 public:
@@ -82,8 +83,9 @@ public:
 	virtual void EndArray() = 0;
 
 protected:
-	static std::unique_ptr<CReflectedBase> CreateObjectAsUniquePtr(const char* className) {
-		CReflectedBase* rawPtr = ClassFactory::createObject(className);
+	static std::unique_ptr<CReflectedBase> CreateObjectAsUniquePtr(const char* className)
+	{
+		CReflectedBase* rawPtr = ClassFactory::CreateObject(className);
 		return std::unique_ptr<CReflectedBase>(rawPtr);
 	}
 

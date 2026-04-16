@@ -1,9 +1,10 @@
 #pragma once
 
-#include <bgfx/bgfx.h>
-#include <vector>
-#include <mutex>
 #include <cstdint>
+#include <mutex>
+#include <vector>
+
+#include <bgfx/bgfx.h>
 
 namespace ImGuiVisualizers {
 
@@ -15,7 +16,8 @@ namespace ImGuiVisualizers {
  * This allocator hands out IDs from a configurable range for offscreen
  * framebuffer passes (e.g. 3D viewport panels).
  */
-class BgfxViewIdAllocator {
+class BgfxViewIdAllocator
+{
 public:
     static BgfxViewIdAllocator& Get()
     {

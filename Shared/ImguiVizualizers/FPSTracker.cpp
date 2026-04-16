@@ -8,13 +8,13 @@ static const float MAX_FPS = 200.0f;
 
 FPSTracker::FPSTracker(size_t maxSamples)
     : VisualizableMetricHeuristic(maxSamples, true)
-    , m_CurrentFPS(0.0f)
-    , m_FirstFrame(true)
-    , m_GraphType(GraphType::Both)  // Changed default to Both
-    , m_LineGraphNeedsUpdate(false)
-    , m_MaxLineGraphSamples(1000)
+    , m_currentFPS(0.0f)
+    , m_firstFrame(true)
+    , m_graphType(GraphType::Both)  // Changed default to Both
+    , m_lineGraphNeedsUpdate(false)
+    , m_maxLineGraphSamples(1000)
 {
-    m_StartTime = std::chrono::steady_clock::now();
+    m_startTime = std::chrono::steady_clock::now();
     InitializeFPSVisualization();
     InitializeLineGraph();
     SetupFPSBuckets();
@@ -26,12 +26,12 @@ void FPSTracker::UpdateFromDeltaTime(double deltaTime)
 {
     if (deltaTime > 0.0)
     {
-        m_CurrentFPS = static_cast<float>(1.0 / deltaTime);
+        m_currentFPS = static_cast<float>(1.0 / deltaTime);
         // Anything > MAX_FPS is clamped to just below MAX_FPS for visualization purposes.
-        if (m_CurrentFPS >= MAX_FPS)
-            m_CurrentFPS = MAX_FPS - 1.0f;
+        if (m_currentFPS >= MAX_FPS)
+            m_currentFPS = MAX_FPS - 1.0f;
 
-        AddSample(m_CurrentFPS);
+        AddSample(m_currentFPS);
         UpdateLineGraph();
     }
 }
@@ -40,42 +40,42 @@ void FPSTracker::UpdateFrame()
 {
     auto currentTime = std::chrono::steady_clock::now();
 
-    if (!m_FirstFrame)
+    if (!m_firstFrame)
     {
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - m_LastFrameTime);
+        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - m_lastFrameTime);
         double deltaTime = duration.count() / 1000000.0; // Convert to seconds
 
         if (deltaTime > 0.0)
         {
-            m_CurrentFPS = static_cast<float>(1.0 / deltaTime);
-            AddSample(m_CurrentFPS);
+            m_currentFPS = static_cast<float>(1.0 / deltaTime);
+            AddSample(m_currentFPS);
             UpdateLineGraph();
         }
     }
     else
     {
-        m_FirstFrame = false;
+        m_firstFrame = false;
     }
 
-    m_LastFrameTime = currentTime;
+    m_lastFrameTime = currentTime;
 }
 
 void FPSTracker::SetThresholds(const FPSThresholds& thresholds)
 {
-    m_Thresholds = thresholds;
+    m_thresholds = thresholds;
     SetupFPSBuckets();
     SetupPerformanceColors();
 }
 
 std::string FPSTracker::GetPerformanceCategory(float fps) const
 {
-    if (fps >= m_Thresholds.excellent)
+    if (fps >= m_thresholds.excellent)
         return "Excellent";
-    else if (fps >= m_Thresholds.good)
+    else if (fps >= m_thresholds.good)
         return "Good";
-    else if (fps >= m_Thresholds.acceptable)
+    else if (fps >= m_thresholds.acceptable)
         return "Acceptable";
-    else if (fps >= m_Thresholds.poor)
+    else if (fps >= m_thresholds.poor)
         return "Poor";
     else
         return "Unacceptable";
@@ -83,13 +83,13 @@ std::string FPSTracker::GetPerformanceCategory(float fps) const
 
 ImU32 FPSTracker::GetPerformanceCategoryColor(float fps) const
 {
-    if (fps >= m_Thresholds.excellent)
+    if (fps >= m_thresholds.excellent)
         return IM_COL32(0, 255, 0, 255);      // Bright Green - Excellent
-    else if (fps >= m_Thresholds.good)
+    else if (fps >= m_thresholds.good)
         return IM_COL32(0, 255, 0, 255);      // Bright Green - Good.
-    else if (fps >= m_Thresholds.acceptable)
+    else if (fps >= m_thresholds.acceptable)
         return IM_COL32(255, 255, 0, 255);    // Yellow - Acceptable
-    else if (fps >= m_Thresholds.poor)
+    else if (fps >= m_thresholds.poor)
         return IM_COL32(255, 128, 0, 255);    // Orange - Poor
     else
         return IM_COL32(255, 0, 0, 255);      // Red - Unacceptable
@@ -114,12 +114,12 @@ void FPSTracker::RenderFPSStatistics() const
     }
 
     // Current FPS with color coding
-    ImU32 currentColor = GetPerformanceCategoryColor(m_CurrentFPS);
+    ImU32 currentColor = GetPerformanceCategoryColor(m_currentFPS);
     ImVec4 colorVec = ImGui::ColorConvertU32ToFloat4(currentColor);
 
     ImGui::Text("Current FPS: ");
     ImGui::SameLine();
-    ImGui::TextColored(colorVec, "%.1f (%s)", m_CurrentFPS, GetPerformanceCategory(m_CurrentFPS).c_str());
+    ImGui::TextColored(colorVec, "%.1f (%s)", m_currentFPS, GetPerformanceCategory(m_currentFPS).c_str());
 
     // Statistics in two columns
     ImGui::Columns(2, "FPSStatsColumns", false);
@@ -146,7 +146,7 @@ void FPSTracker::RenderFPSStatistics() const
 void FPSTracker::RegisterFPSActions()
 {    
     // FPS.Display.ShowStatistics (toggle)
-    m_ActionManager.RegisterAction({
+    m_actionManager.RegisterAction({
         .path = "Frame Analysis.Display.Show Statistics",
         .description = "Toggle FPS statistics display",
         .targets = UI::ActionTarget::Menu | UI::ActionTarget::Console | UI::ActionTarget::Toolbar,
@@ -161,44 +161,44 @@ void FPSTracker::RegisterFPSActions()
         });
 
     // FPS.Display.BarGraph
-    m_ActionManager.RegisterAction({
+    m_actionManager.RegisterAction({
         .path = "Frame Analysis.Display.Bar Graph",
         .description = "Show FPS distribution as bar graph",
         .targets = UI::ActionTarget::Menu | UI::ActionTarget::Console | UI::ActionTarget::Toolbar,
-        .callback = [this]() { m_GraphType = GraphType::BarGraph; },
-        .isChecked = [this]() { return m_GraphType == GraphType::BarGraph; },
+        .callback = [this]() { m_graphType = GraphType::BarGraph; },
+        .isChecked = [this]() { return m_graphType == GraphType::BarGraph; },
         .sortPriority = 20
         });
 
     // FPS.Display.LineGraph
-    m_ActionManager.RegisterAction({
+    m_actionManager.RegisterAction({
         .path = "Frame Analysis.Display.Line Graph",
         .description = "Show FPS over time as line graph",
         .targets = UI::ActionTarget::Menu | UI::ActionTarget::Console | UI::ActionTarget::Toolbar,
-        .callback = [this]() { m_GraphType = GraphType::LineGraph; },
-        .isChecked = [this]() { return m_GraphType == GraphType::LineGraph; },
+        .callback = [this]() { m_graphType = GraphType::LineGraph; },
+        .isChecked = [this]() { return m_graphType == GraphType::LineGraph; },
         .sortPriority = 30
         });
 
     // FPS.Display.Both
-    m_ActionManager.RegisterAction({
+    m_actionManager.RegisterAction({
         .path = "Frame Analysis.Display.Both Graphs",
         .description = "Show both bar graph and line graph",
         .targets = UI::ActionTarget::Menu | UI::ActionTarget::Console | UI::ActionTarget::Toolbar,
-        .callback = [this]() { m_GraphType = GraphType::Both; },
-        .isChecked = [this]() { return m_GraphType == GraphType::Both; },
+        .callback = [this]() { m_graphType = GraphType::Both; },
+        .isChecked = [this]() { return m_graphType == GraphType::Both; },
         .sortPriority = 40
         });
 
     // FPS.Actions.ResetData
-    m_ActionManager.RegisterAction({
+    m_actionManager.RegisterAction({
         .path = "Frame Analysis.Actions.Reset Data",
         .description = "Reset all FPS tracking data",
         .targets = UI::ActionTarget::Menu | UI::ActionTarget::Console | UI::ActionTarget::Toolbar,
         .callback = [this]() {
             Reset();
-            m_LineGraph.Clear();
-            m_StartTime = std::chrono::steady_clock::now();
+            m_lineGraph.Clear();
+            m_startTime = std::chrono::steady_clock::now();
         },
         .sortPriority = 10
         });
@@ -206,11 +206,11 @@ void FPSTracker::RegisterFPSActions()
 
 void FPSTracker::UnregisterFPSActions()
 {
-    m_ActionManager.UnregisterAction("Frame Analysis.Display.Show Statistics");
-    m_ActionManager.UnregisterAction("Frame Analysis.Display.Bar Graph");
-    m_ActionManager.UnregisterAction("Frame Analysis.Display.Line Graph");
-    m_ActionManager.UnregisterAction("Frame Analysis.Display.Both Graphs");
-    m_ActionManager.UnregisterAction("Frame Analysis.Actions.Reset Data");
+    m_actionManager.UnregisterAction("Frame Analysis.Display.Show Statistics");
+    m_actionManager.UnregisterAction("Frame Analysis.Display.Bar Graph");
+    m_actionManager.UnregisterAction("Frame Analysis.Display.Line Graph");
+    m_actionManager.UnregisterAction("Frame Analysis.Display.Both Graphs");
+    m_actionManager.UnregisterAction("Frame Analysis.Actions.Reset Data");
 }
 bool FPSTracker::RenderFPSAnalysisWindow(const char* windowTitle, bool* isOpen)
 {
@@ -223,18 +223,18 @@ bool FPSTracker::RenderFPSAnalysisWindow(const char* windowTitle, bool* isOpen)
         // Menu bar for display options
         if (ImGui::BeginMenuBar())
         {
-            m_ActionManager.RenderMenuBar();
+            m_actionManager.RenderMenuBar();
             ImGui::EndMenuBar();
         }
 
-        m_ActionManager.RenderToolbar();
+        m_actionManager.RenderToolbar();
 
         // FPS Statistics
         RenderFPSStatistics();
         ImGui::Separator();
 
         // Render graphs based on selected type
-        switch (m_GraphType)
+        switch (m_graphType)
         {
         case GraphType::BarGraph:
             RenderGraphOnly("FPSBarGraph");
@@ -269,7 +269,7 @@ bool FPSTracker::RenderFPSAnalysisWindow(const char* windowTitle, bool* isOpen)
 
             // Store original sizes
             auto& barConfig = GetVisualizationConfig().graphConfig;
-            auto& lineConfig = m_LineGraph.GetConfig();
+            auto& lineConfig = m_lineGraph.GetConfig();
 
             ImVec2 originalBarSize = barConfig.size;
             ImVec2 originalLineSize = lineConfig.size;
@@ -326,7 +326,7 @@ bool FPSTracker::RenderFPSAnalysisWindow(const char* windowTitle, bool* isOpen)
 
 bool FPSTracker::RenderLineGraphOnly(const char* id)
 {
-    return m_LineGraph.Render(id);
+    return m_lineGraph.Render(id);
 }
 
 void FPSTracker::InitializeFPSVisualization()
@@ -351,7 +351,7 @@ void FPSTracker::InitializeFPSVisualization()
 
 void FPSTracker::InitializeLineGraph()
 {
-    auto& config = m_LineGraph.GetConfig();
+    auto& config = m_lineGraph.GetConfig();
 
     // Configure line graph appearance - use auto-height (0) so it adapts to container
     config.size = ImVec2(0, 0);  // Auto-size both width and height
@@ -380,7 +380,7 @@ void FPSTracker::InitializeLineGraph()
     config.yLabelPrecision = 0;  // FPS with 1 decimal place to match statistics
 
     // Set up performance-based color function for the line graph
-    m_LineGraph.SetColorFunction([this](size_t index, float x, float y, float normalizedX, float normalizedY) -> ImU32 {
+    m_lineGraph.SetColorFunction([this](size_t index, float x, float y, float normalizedX, float normalizedY) -> ImU32 {
         return GetPerformanceCategoryColor(y);
     });
 }
@@ -390,30 +390,30 @@ void FPSTracker::UpdateLineGraph()
     double elapsedTime = GetElapsedTime();
 
     // Add the current FPS sample with timestamp
-    m_LineGraph.AddPoint(static_cast<float>(elapsedTime), m_CurrentFPS,
-        "FPS: " + std::to_string(static_cast<int>(m_CurrentFPS)));
+    m_lineGraph.AddPoint(static_cast<float>(elapsedTime), m_currentFPS,
+        "FPS: " + std::to_string(static_cast<int>(m_currentFPS)));
 
     // Limit the number of points to keep performance good
-    if (m_LineGraph.GetPointCount() > m_MaxLineGraphSamples)
+    if (m_lineGraph.GetPointCount() > m_maxLineGraphSamples)
     {
         // Remove oldest points by recreating the data
         std::vector<ImGuiLineGraph::PointData> currentData;
-        currentData.reserve(m_MaxLineGraphSamples);
+        currentData.reserve(m_maxLineGraphSamples);
 
-        size_t startIndex = m_LineGraph.GetPointCount() - m_MaxLineGraphSamples;
-        for (size_t i = startIndex; i < m_LineGraph.GetPointCount(); ++i)
+        size_t startIndex = m_lineGraph.GetPointCount() - m_maxLineGraphSamples;
+        for (size_t i = startIndex; i < m_lineGraph.GetPointCount(); ++i)
         {
-            currentData.push_back(m_LineGraph.GetPoint(i));
+            currentData.push_back(m_lineGraph.GetPoint(i));
         }
 
-        m_LineGraph.SetData(currentData);
+        m_lineGraph.SetData(currentData);
     }
 }
 
 double FPSTracker::GetElapsedTime() const
 {
     auto currentTime = std::chrono::steady_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - m_StartTime);
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(currentTime - m_startTime);
     return duration.count() / 1000000.0; // Convert to seconds
 }
 

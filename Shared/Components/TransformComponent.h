@@ -2,8 +2,8 @@
 #include "ComponentSystem/ComponentSystem.h"
 #include "ResourceManager/ResourceManager.h"
 #include "MaterialResource.h"
-#include "math\vector3f.h"
-#include "math\Matrix4f.h"
+#include "math/vector3f.h"
+#include "math/Matrix4f.h"
 
 class CTransformComponent : public ComponentSystem::Component
 {
@@ -11,13 +11,12 @@ public:
 	REFL_DECLARE_OBJECT(CTransformComponent, Component);
 	DECLARE_COMPONENT();
 
-	// Component lifecycle
+	// ── IComponent lifecycle ────────────────────────────────────────────
+
 	bool OnInitialize() override;
 	void OnUpdate(double deltaTime) override;
 	void OnShutdown() override;
 
-	/// Returns true when both the mesh and shader resources have been
-	/// fully loaded and finalized by the ResourceManager.
 	bool IsLoaded() const;
 private:
 	Matrix4f m_matrix;

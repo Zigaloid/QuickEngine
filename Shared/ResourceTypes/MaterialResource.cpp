@@ -3,7 +3,7 @@
 #include "ResourceManager/ResourceManager.h"
 #include "CoreSystem/CoreSystem.h"
 
-// ── CResourceReference ────────────────────────────────────────────
+// ── CMaterialDefinition ───────────────────────────────────────────
 REFL_DEFINE_OBJECT(CMaterialDefinition)
 	REFL_DEFINE_VECTOR4_MEMBER(CMaterialDefinition, m_materialColor),
 	REFL_DEFINE_VECTOR4_MEMBER(CMaterialDefinition, m_ambientColor),
@@ -16,15 +16,16 @@ REFL_DEFINE_END
 
 bool CMaterialDefinition::IsLoaded() const
 { 	
-	if(m_vertexShader && m_vertexShader->IsFinalized() && m_fragmentShader && m_fragmentShader->IsFinalized() )
-	{		
+    if (m_vertexShader && m_vertexShader->IsFinalized() && m_fragmentShader && m_fragmentShader->IsFinalized())
+	{
 		for (const auto& texture : m_textures)
 		{
-			if (!texture->IsFinalized())
+			if (!texture || !texture->IsFinalized())
 				return false;
 		}
 		return true;
 	}
+
 	return false;
 }
 bool CMaterialDefinition::Initialize()

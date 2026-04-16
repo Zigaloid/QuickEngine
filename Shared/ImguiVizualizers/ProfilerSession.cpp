@@ -57,8 +57,8 @@ void ProfilerSession::HandleProfilerBinaryPacket(const std::vector<uint8_t>& mes
 		{
 			if (event)
 			{
-				if (event->GetTheadName() != "")
-					threadSet.insert(event->GetTheadName());
+				if (event->GetThreadName() != "")
+					threadSet.insert(event->GetThreadName());
 				else
 					threadSet.insert(event->GetThreadIdStr());
 			}

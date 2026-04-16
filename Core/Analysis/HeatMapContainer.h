@@ -6,6 +6,7 @@
 #include <array>
 #include <optional>
 
+/** @brief Grid-based spatial container for accumulating named metric series per cell. */
 class HeatMapContainer {
 public:
     static constexpr std::size_t MaxHistory = 1024;

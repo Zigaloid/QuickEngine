@@ -7,9 +7,7 @@
 class CMeshResource : public ResourceSystem::Resource
 {
 public:
-	Mesh* m_mesh = nullptr;
-
-	CMeshResource(const std::string& path)
+    explicit CMeshResource(const std::string& path)
 		: Resource(path)
 		, m_mesh(nullptr)
 	{
@@ -27,7 +25,7 @@ public:
 	// Skip base-class file reading; bgfx meshLoad handles its own I/O.
 	bool Update(FileSystem::FileSystemManager& /*fileSystem*/) override
 	{
-		isLoaded_ = true;
+		m_isLoaded = true;
 		return true;
 	}
 
@@ -35,7 +33,13 @@ public:
 	// path_ should be the mesh binary path, e.g. "meshes/bunny.bin".
 	void Finalize() override
 	{
-		m_mesh = meshLoad(path_.c_str());
-		isFinalized_ = (m_mesh != nullptr);
+		m_mesh = meshLoad(m_path.c_str());
+		m_isFinalized = (m_mesh != nullptr);
 	}
+
+	// Accessor
+	Mesh* GetMesh() { return m_mesh; }
+	const Mesh* GetMesh() const { return m_mesh; }
+private:
+	Mesh* m_mesh = nullptr;
 };

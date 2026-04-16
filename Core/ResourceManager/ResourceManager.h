@@ -15,302 +15,331 @@
 
 namespace ResourceSystem {
 
-    // Forward declarations
-    class ResourceManager;
+// Forward declarations
+class ResourceManager;
 
-    // Base Resource Class
-    class Resource {
-    protected:
-        std::string path_;
-        std::vector<uint8_t> data_;
-        std::atomic<bool> isInitialized_{ false };
-        std::atomic<bool> isLoaded_{ false };
-        std::atomic<bool> isFinalized_{ false };
+// ── Resource ──────────────────────────────────────────────────────────────────
 
-    public:
-        Resource(const std::string& path) : path_(path) {}
-        virtual ~Resource() = default;
+/** @brief Base class for all loadable resources with async two-phase loading. */
+class Resource
+{
+protected:
+    std::string             m_path;
+    std::vector<uint8_t>    m_data;
+    std::atomic<bool>       m_isInitialized{false};
+    std::atomic<bool>       m_isLoaded{false};
+    std::atomic<bool>       m_isFinalized{false};
 
-        // Virtual lifecycle methods
-        virtual bool Initialize() {
-            isInitialized_ = true;
+public:
+    explicit Resource(const std::string& path) : m_path(path) {}
+    virtual ~Resource() = default;
+
+    /** @return true on success. */
+    virtual bool Initialize()
+    {
+        m_isInitialized = true;
+        return true;
+    }
+
+    /** @param fileSystem File system to read from.
+     *  @return true once the data has been fully loaded. */
+    virtual bool Update(FileSystem::FileSystemManager& fileSystem)
+    {
+        DECLARE_FUNC_LOW();
+        if (m_isLoaded)
+        {
             return true;
         }
 
-        virtual bool Update(FileSystem::FileSystemManager& fileSystem) {
-            DECLARE_FUNC_LOW();
-            if (isLoaded_) {
-                return true;
-            }
-
-            auto result = fileSystem.ReadAllBytes(path_);
-            if (result.IsSuccess()) {
-                data_ = result.GetValue();
-                isLoaded_ = true;
-                return true;
-            }
-
-            return false;
+        auto result = fileSystem.ReadAllBytes(m_path);
+        if (result.IsSuccess())
+        {
+            m_data     = result.GetValue();
+            m_isLoaded = true;
+            return true;
         }
 
-        virtual void Finalize() {
-            isFinalized_ = true;
-        }
+        return false;
+    }
 
-        // Getters
-        const std::string& GetPath() const { return path_; }
-        const std::vector<uint8_t>& GetData() const { return data_; }
-        // Returns the size (in bytes) of the loaded data block.
-        size_t GetLoadedSize() const { return data_.size(); }
-        bool IsInitialized() const { return isInitialized_; }
-        bool IsLoaded() const { return isLoaded_; }
-        bool IsFinalized() const { return isFinalized_; }
-    };
+    /** @brief Called on the main thread after Update() completes. */
+    virtual void Finalize()
+    {
+        m_isFinalized = true;
+    }
 
-    // Resource Manager
-    class ResourceManager {
-    private:
-        // Thread management
-        std::unique_ptr<std::thread> workerThread_;
-        std::atomic<bool> isRunning_{ false };
-        std::atomic<bool> shouldStop_{ false };
+    const std::string&          GetPath()       const { return m_path; }
+    const std::vector<uint8_t>& GetData()       const { return m_data; }
+    size_t                      GetLoadedSize() const { return m_data.size(); }
+    bool                        IsInitialized() const { return m_isInitialized; }
+    bool                        IsLoaded()      const { return m_isLoaded; }
+    bool                        IsFinalized()   const { return m_isFinalized; }
+};
 
-        // File system reference
-        FileSystem::FileSystemManager* fileSystemManager_;
+// ── ResourceManager ───────────────────────────────────────────────────────────
 
-        // Resource storage
-        std::unordered_map<std::string, std::shared_ptr<Resource>> loadedResources_;
-        mutable std::mutex loadedResourcesMutex_;
+/** @brief Asynchronous resource manager with a worker-thread loading pipeline. */
+class ResourceManager
+{
+private:
+    // ── Thread Management ─────────────────────────────────────────────────────
+    std::unique_ptr<std::thread>    m_workerThread;
+    std::atomic<bool>               m_isRunning{false};
+    std::atomic<bool>               m_shouldStop{false};
 
-        // Processing queues
-        std::queue<std::shared_ptr<Resource>> loadingQueue_;
-        mutable std::mutex loadingQueueMutex_;
-        std::condition_variable loadingQueueCondition_;
+    // ── File System Reference ─────────────────────────────────────────────────
+    FileSystem::FileSystemManager*  m_fileSystemManager;
 
-        std::queue<std::shared_ptr<Resource>> finalizationQueue_;
-        mutable std::mutex finalizationQueueMutex_;
+    // ── Resource Storage ──────────────────────────────────────────────────────
+    std::unordered_map<std::string, std::shared_ptr<Resource>> m_loadedResources;
+    mutable std::mutex              m_loadedResourcesMutex;
 
-        // Worker thread function
-        void WorkerThreadFunction() {
-            while (!shouldStop_) {
-                DECLARE_FUNC_MEDIUM();
-                std::shared_ptr<Resource> resource = nullptr;
+    // ── Processing Queues ─────────────────────────────────────────────────────
+    std::queue<std::shared_ptr<Resource>> m_loadingQueue;
+    mutable std::mutex              m_loadingQueueMutex;
+    std::condition_variable         m_loadingQueueCondition;
 
-                // Wait for work or stop signal
+    std::queue<std::shared_ptr<Resource>> m_finalizationQueue;
+    mutable std::mutex              m_finalizationQueueMutex;
+
+    void WorkerThreadFunction()
+    {
+        while (!m_shouldStop)
+        {
+            DECLARE_FUNC_MEDIUM();
+            std::shared_ptr<Resource> resource = nullptr;
+
+            {
+                std::unique_lock<std::mutex> lock(m_loadingQueueMutex);
+                m_loadingQueueCondition.wait(lock, [this]
                 {
-                    std::unique_lock<std::mutex> lock(loadingQueueMutex_);
-                    loadingQueueCondition_.wait(lock, [this] {
-                        return !loadingQueue_.empty() || shouldStop_;
-                        });
+                    return !m_loadingQueue.empty() || m_shouldStop.load();
+                });
 
-                    if (shouldStop_) {
-                        break;
-                    }
-
-                    if (!loadingQueue_.empty()) {
-                        resource = loadingQueue_.front();
-                        loadingQueue_.pop();
-                    }
+                if (m_shouldStop)
+                {
+                    break;
                 }
 
-                // Process the resource if we have one
-                if (resource) {
-                    // Initialize if not already done
-                    if (!resource->IsInitialized()) {
-                        resource->Initialize();
-                    }
-
-                    // Update until complete
-                    bool updateComplete = false;
-                    while (!updateComplete && !shouldStop_) {
-                        updateComplete = resource->Update(*fileSystemManager_);
-
-                        if (!updateComplete) {
-                            // Small delay to prevent busy waiting
-                            std::this_thread::sleep_for(std::chrono::milliseconds(1));
-                        }
-                    }
-
-                    // Move to finalization queue if update completed
-                    if (updateComplete) {
-                        std::lock_guard<std::mutex> lock(finalizationQueueMutex_);
-                        finalizationQueue_.push(resource);
-                    }
+                if (!m_loadingQueue.empty())
+                {
+                    resource = m_loadingQueue.front();
+                    m_loadingQueue.pop();
                 }
             }
-        }
 
-    public:
-        ResourceManager(FileSystem::FileSystemManager* fileSystemManager)
-            : fileSystemManager_(fileSystemManager) {
-        }
-
-        ~ResourceManager() {
-            Stop();
-        }
-
-        // Start the resource manager
-        bool Start() {
-            if (isRunning_) {
-                return false; // Already running
-            }
-
-            if (!fileSystemManager_) {
-                return false; // No file system manager
-            }
-
-            shouldStop_ = false;
-            workerThread_ = std::make_unique<std::thread>(&ResourceManager::WorkerThreadFunction, this);
-            isRunning_ = true;
-            return true;
-        }
-
-        // Stop the resource manager
-        void Stop() {
-            if (!isRunning_) {
-                return;
-            }
-
-            shouldStop_ = true;
-            loadingQueueCondition_.notify_all();
-
-            if (workerThread_ && workerThread_->joinable()) {
-                workerThread_->join();
-            }
-
-            workerThread_.reset();
-            isRunning_ = false;
-        }
-
-        // Request a resource (returns existing one if already requested)
-        template<typename T = Resource>
-        std::shared_ptr<T> RequestResource(const std::string& path) {
-            static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
-
-            std::lock_guard<std::mutex> lock(loadedResourcesMutex_);
-
-            // Check if resource already exists
-            auto it = loadedResources_.find(path);
-            if (it != loadedResources_.end()) {
-                return std::static_pointer_cast<T>(it->second);
-            }
-
-            // Create new resource
-            auto resource = std::make_shared<T>(path);
-            loadedResources_[path] = resource;
-
-            // Add to loading queue
+            if (resource)
             {
-                std::lock_guard<std::mutex> queueLock(loadingQueueMutex_);
-                loadingQueue_.push(resource);
-            }
-            loadingQueueCondition_.notify_one();
+                if (!resource->IsInitialized())
+                {
+                    resource->Initialize();
+                }
 
-            return resource;
-        }
+                bool updateComplete = false;
+                while (!updateComplete && !m_shouldStop)
+                {
+                    updateComplete = resource->Update(*m_fileSystemManager);
 
-        // Update function to finalize resources on main thread
-        void UpdateFinalization() {
-            DECLARE_FUNC_LOW();
-            std::queue<std::shared_ptr<Resource>> resourcesToFinalize;
+                    if (!updateComplete)
+                    {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                    }
+                }
 
-            // Move all pending resources to local queue
-            {
-                std::lock_guard<std::mutex> lock(finalizationQueueMutex_);
-                resourcesToFinalize = std::move(finalizationQueue_);
-                finalizationQueue_ = std::queue<std::shared_ptr<Resource>>(); // Reset queue
-            }
-
-            // Finalize resources on main thread
-            while (!resourcesToFinalize.empty()) {
-                auto resource = resourcesToFinalize.front();
-                resourcesToFinalize.pop();
-
-                if (!resource->IsFinalized()) {
-                    resource->Finalize();
+                if (updateComplete)
+                {
+                    std::lock_guard<std::mutex> lock(m_finalizationQueueMutex);
+                    m_finalizationQueue.push(resource);
                 }
             }
         }
+    }
 
-        // Get resource if it exists and is loaded
-        template<typename T = Resource>
-        std::shared_ptr<T> GetResource(const std::string& path) {
-            static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
+public:
+    explicit ResourceManager(FileSystem::FileSystemManager* fileSystemManager)
+        : m_fileSystemManager(fileSystemManager)
+    {
+    }
 
-            std::lock_guard<std::mutex> lock(loadedResourcesMutex_);
+    ~ResourceManager()
+    {
+        Stop();
+    }
 
-            auto it = loadedResources_.find(path);
-            if (it != loadedResources_.end() && it->second->IsLoaded()) {
-                return std::static_pointer_cast<T>(it->second);
-            }
-
-            return nullptr;
-        }
-
-        // Check if resource exists and is loaded
-        bool IsResourceLoaded(const std::string& path) const {
-            std::lock_guard<std::mutex> lock(loadedResourcesMutex_);
-
-            auto it = loadedResources_.find(path);
-            return it != loadedResources_.end() && it->second->IsLoaded();
-        }
-
-        // Check if resource exists and is finalized
-        bool IsResourceFinalized(const std::string& path) const {
-            std::lock_guard<std::mutex> lock(loadedResourcesMutex_);
-
-            auto it = loadedResources_.find(path);
-            return it != loadedResources_.end() && it->second->IsFinalized();
-        }
-
-        // Get statistics
-        size_t GetLoadedResourceCount() const {
-            std::lock_guard<std::mutex> lock(loadedResourcesMutex_);
-            return loadedResources_.size();
-        }
-
-        size_t GetPendingLoadCount() const {
-            std::lock_guard<std::mutex> lock(loadingQueueMutex_);
-            return loadingQueue_.size();
-        }
-
-        size_t GetPendingFinalizationCount() const {
-            std::lock_guard<std::mutex> lock(finalizationQueueMutex_);
-            return finalizationQueue_.size();
-        }
-
-        // Remove a resource (useful for cleanup)
-        bool RemoveResource(const std::string& path) {
-            std::lock_guard<std::mutex> lock(loadedResourcesMutex_);
-
-            auto it = loadedResources_.find(path);
-            if (it != loadedResources_.end()) {
-                loadedResources_.erase(it);
-                return true;
-            }
+    /** @return false if already running or no file system manager is set. */
+    bool Start()
+    {
+        if (m_isRunning)
+        {
             return false;
         }
 
-        // Clear all resources
-        void ClearResources() {
-            std::lock_guard<std::mutex> lock(loadedResourcesMutex_);
-            loadedResources_.clear();
+        if (!m_fileSystemManager)
+        {
+            return false;
         }
 
-        // Check if manager is running
-        bool IsRunning() const {
-            return isRunning_;
+        m_shouldStop  = false;
+        m_workerThread = std::make_unique<std::thread>(&ResourceManager::WorkerThreadFunction, this);
+        m_isRunning   = true;
+        return true;
+    }
+
+    void Stop()
+    {
+        if (!m_isRunning)
+        {
+            return;
         }
-    };
+
+        m_shouldStop = true;
+        m_loadingQueueCondition.notify_all();
+
+        if (m_workerThread && m_workerThread->joinable())
+        {
+            m_workerThread->join();
+        }
+
+        m_workerThread.reset();
+        m_isRunning = false;
+    }
+
+    /** @brief Request a resource by path. Returns an existing instance if already requested.
+     *  @tparam T   Resource type (must derive from Resource).
+     *  @param path File path.
+     *  @return Shared pointer to the resource. */
+    template<typename T = Resource>
+    std::shared_ptr<T> RequestResource(const std::string& path)
+    {
+        static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
+
+        std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
+
+        auto it = m_loadedResources.find(path);
+        if (it != m_loadedResources.end())
+        {
+            return std::static_pointer_cast<T>(it->second);
+        }
+
+        auto resource = std::make_shared<T>(path);
+        m_loadedResources[path] = resource;
+
+        {
+            std::lock_guard<std::mutex> queueLock(m_loadingQueueMutex);
+            m_loadingQueue.push(resource);
+        }
+        m_loadingQueueCondition.notify_one();
+
+        return resource;
+    }
+
+    /** @brief Finalize all resources that have completed loading. Must be called on the main thread. */
+    void UpdateFinalization()
+    {
+        DECLARE_FUNC_LOW();
+        std::queue<std::shared_ptr<Resource>> resourcesToFinalize;
+
+        {
+            std::lock_guard<std::mutex> lock(m_finalizationQueueMutex);
+            resourcesToFinalize = std::move(m_finalizationQueue);
+            m_finalizationQueue = std::queue<std::shared_ptr<Resource>>();
+        }
+
+        while (!resourcesToFinalize.empty())
+        {
+            auto resource = resourcesToFinalize.front();
+            resourcesToFinalize.pop();
+
+            if (!resource->IsFinalized())
+            {
+                resource->Finalize();
+            }
+        }
+    }
+
+    /** @brief Returns an already-loaded resource, or nullptr.
+     *  @tparam T Resource type.
+     *  @param path File path. */
+    template<typename T = Resource>
+    std::shared_ptr<T> GetResource(const std::string& path)
+    {
+        static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
+
+        std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
+
+        auto it = m_loadedResources.find(path);
+        if (it != m_loadedResources.end() && it->second->IsLoaded())
+        {
+            return std::static_pointer_cast<T>(it->second);
+        }
+
+        return nullptr;
+    }
+
+    bool IsResourceLoaded(const std::string& path) const
+    {
+        std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
+        auto it = m_loadedResources.find(path);
+        return it != m_loadedResources.end() && it->second->IsLoaded();
+    }
+
+    bool IsResourceFinalized(const std::string& path) const
+    {
+        std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
+        auto it = m_loadedResources.find(path);
+        return it != m_loadedResources.end() && it->second->IsFinalized();
+    }
+
+    size_t GetLoadedResourceCount() const
+    {
+        std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
+        return m_loadedResources.size();
+    }
+
+    size_t GetPendingLoadCount() const
+    {
+        std::lock_guard<std::mutex> lock(m_loadingQueueMutex);
+        return m_loadingQueue.size();
+    }
+
+    size_t GetPendingFinalizationCount() const
+    {
+        std::lock_guard<std::mutex> lock(m_finalizationQueueMutex);
+        return m_finalizationQueue.size();
+    }
+
+    bool RemoveResource(const std::string& path)
+    {
+        std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
+        auto it = m_loadedResources.find(path);
+        if (it != m_loadedResources.end())
+        {
+            m_loadedResources.erase(it);
+            return true;
+        }
+        return false;
+    }
+
+    void ClearResources()
+    {
+        std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
+        m_loadedResources.clear();
+    }
+
+    bool IsRunning() const { return m_isRunning; }
+};
 
 } // namespace ResourceSystem
 
 
+/** @brief Serializable reference to a resource file. */
 class CResourceReference : public CReflectedBase
 {
 public:
     REFL_DECLARE_OBJECT(CResourceReference, CReflectedBase);
-	const std::string GetResourceFileName() const { return m_resourceFileName; }
+
+    const std::string GetResourceFileName() const { return m_resourceFileName; }
+
 private:
     std::string m_resourceFileName = "undifined";
 };

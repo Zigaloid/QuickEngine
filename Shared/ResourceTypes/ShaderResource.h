@@ -9,17 +9,14 @@
 class CShaderResource : public ResourceSystem::Resource
 {
 public:
-	bgfx::ShaderHandle m_shader = BGFX_INVALID_HANDLE;
-
-	// path is used as the base program name.
-	// Convention: "mesh" will load shaders "vs_mesh" and "fs_mesh".
-	CShaderResource(const std::string& path)
+	explicit CShaderResource(const std::string& path)
 		: Resource(path)
 		, m_shader(BGFX_INVALID_HANDLE)
 	{
 	}
-
-	bgfx::ShaderHandle& GetShaderHandle() { return m_shader; }
+	// path is used as the base program name.
+	// Convention: "mesh" will load shaders "vs_mesh" and "fs_mesh".
+	bgfx::ShaderHandle GetShaderHandle() const { return m_shader; }
 
 	~CShaderResource() override
 	{
@@ -34,9 +31,10 @@ public:
 	// Constructs vertex/fragment shader names from the base name:
 	//   "mesh" -> loadProgram("vs_mesh", "fs_mesh")
 	void Finalize() override
-	{		
-		//m_shader = loadProgram(vsName.c_str(), fsName.c_str());		
-		m_shader = loadShaderFromMemory(GetData().data(), static_cast<uint32_t>(GetLoadedSize()), path_.c_str());
-		isFinalized_ = bgfx::isValid(m_shader);
+	{
+		m_shader = loadShaderFromMemory(GetData().data(), static_cast<uint32_t>(GetLoadedSize()), m_path.c_str());
+		m_isFinalized = bgfx::isValid(m_shader);
 	}
+private:
+	bgfx::ShaderHandle m_shader = BGFX_INVALID_HANDLE;
 };

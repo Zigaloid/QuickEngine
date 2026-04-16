@@ -10,9 +10,10 @@
 
 namespace ImGuiVisualizers {
 
-class CombinedObjJson3DVisualizer : public IImGuiVisualizer {
+class CombinedObjJson3DVisualizer : public IImGuiVisualizer
+{
 public:
-    CombinedObjJson3DVisualizer(const char* name = "Mesh Editor")
+    explicit CombinedObjJson3DVisualizer(const char* name = "Mesh Editor")
         : m_windowName(name)
         , m_view("3D View (Obj)", nullptr, "Visualizers")
     {}

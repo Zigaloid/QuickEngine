@@ -22,7 +22,7 @@
 class CFbxMeshResource : public ResourceSystem::Resource
 {
 public:
-    CFbxMeshResource(const std::string& path)
+    explicit CFbxMeshResource(const std::string& path)
         : Resource(path)
     {
     }
@@ -45,10 +45,10 @@ public:
         opts.includeUVs     = true;
         opts.includeTangents = true;
 
-        if (!ConvertFbxToBgfxBinary(path_.c_str(), opts, m_binaryBlob))
+        if (!ConvertFbxToBgfxBinary(m_path.c_str(), opts, m_binaryBlob))
             return false;
 
-        isLoaded_ = true;
+        m_isLoaded = true;
         return true;
     }
 
@@ -57,7 +57,7 @@ public:
     {
         if (m_binaryBlob.empty())
         {
-            isFinalized_ = false;
+            m_isFinalized = false;
             return;
         }
 
@@ -72,7 +72,7 @@ public:
         m_binaryBlob.clear();
         m_binaryBlob.shrink_to_fit();
 
-        isFinalized_ = (m_mesh != nullptr && !m_mesh->m_groups.empty());
+        m_isFinalized = (m_mesh != nullptr && !m_mesh->m_groups.empty());
     }
 
     // ── Accessors ───────────────────────────────────────────────────
@@ -91,7 +91,7 @@ public:
         std::vector<uint8_t> blob;
         FbxConvertOptions opts;
         opts.scaleFactor = m_scaleFactor;
-        if (!ConvertFbxToBgfxBinary(path_.c_str(), opts, blob))
+        if (!ConvertFbxToBgfxBinary(m_path.c_str(), opts, blob))
             return false;
 
         auto result = fs.WriteAllBytes(binPath, blob);

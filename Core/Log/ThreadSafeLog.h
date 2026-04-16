@@ -9,10 +9,13 @@
 #include <functional>
 #include <chrono>
 #include <cstdarg>
+#include <vector>
 
 namespace Core {
 
-// Severity levels for log messages
+// ── Log Level ─────────────────────────────────────────────────────────────────
+
+/** @brief Severity levels for log messages. */
 enum class ELogLevel
 {
     Info,
@@ -20,17 +23,21 @@ enum class ELogLevel
     Error
 };
 
-// A single log entry with metadata
+// ── Log Entry ─────────────────────────────────────────────────────────────────
+
+/** @brief A single log entry with metadata. */
 struct SLogEntry
 {
-    ELogLevel level;
-    std::string message;
-    std::thread::id threadId;
-    std::chrono::system_clock::time_point timestamp;
+    ELogLevel                               level;
+    std::string                             message;
+    std::thread::id                         threadId;
+    std::chrono::system_clock::time_point   timestamp;
 };
 
-// Thread-safe log that accepts messages from any thread and
-// outputs them sequentially on a dedicated background thread.
+// ── CThreadSafeLog ────────────────────────────────────────────────────────────
+
+/** @brief Thread-safe log that accepts messages from any thread and
+ *  outputs them sequentially on a dedicated background thread. */
 class CThreadSafeLog
 {
 public:
@@ -39,41 +46,46 @@ public:
     CThreadSafeLog();
     ~CThreadSafeLog();
 
-    // Start the background output thread. Must be called before logging.
+    /** @brief Start the background output thread. Must be called before logging. */
     void Start();
 
-    // Stop the background output thread, flushing remaining messages.
+    /** @brief Stop the background output thread, flushing remaining messages. */
     void Stop();
 
-    // Log a message at a given severity level (thread-safe).
+    /** @brief Log a message at a given severity level (thread-safe).
+     *  @param level Severity of the message.
+     *  @param format printf-style format string. */
     void Log(ELogLevel level, const char* format, ...);
 
-    // Convenience helpers (thread-safe).
+    /** @param format printf-style format string. */
     void Info(const char* format, ...);
+    /** @param format printf-style format string. */
     void Warning(const char* format, ...);
+    /** @param format printf-style format string. */
     void Error(const char* format, ...);
 
-    // Set a custom output callback. If not set, defaults to stdout.
+    /** @brief Set a custom output callback. If not set, defaults to stdout.
+     *  @param callback Function called with each log entry. */
     void SetOutputCallback(OutputCallback callback);
 
-    // Returns the number of messages currently pending in the queue.
+    /** @brief Returns the number of messages currently pending in the queue. */
     size_t GetPendingCount() const;
 
-    // Returns true if the background thread is running.
+    /** @brief Returns true if the background thread is running. */
     bool IsRunning() const { return m_running.load(); }
 
 private:
-    void OutputLoop();
-    void Enqueue(ELogLevel level, const char* format, va_list args);
+    void        OutputLoop();
+    void        Enqueue(ELogLevel level, const char* format, va_list args);
     std::string FormatString(const char* fmt, va_list vl);
     static const char* LevelToString(ELogLevel level);
 
-    std::queue<SLogEntry> m_queue;
-    mutable std::mutex m_mutex;
+    std::queue<SLogEntry>   m_queue;
+    mutable std::mutex      m_mutex;
     std::condition_variable m_condition;
-    std::thread m_outputThread;
-    std::atomic<bool> m_running{ false };
-    OutputCallback m_outputCallback;
+    std::thread             m_outputThread;
+    std::atomic<bool>       m_running = false;
+    OutputCallback          m_outputCallback;
 };
 
 } // namespace Core

@@ -1,6 +1,7 @@
+#include "FbxMeshComponent.h"
+
 #include "CoreSystem/CoreSystem.h"
 #include "ComponentSystem/ComponentSystem.h"
-#include "FbxMeshComponent.h"
 #include "FbxMeshResource.h"
 
 // ── CFbxMeshComponent ──────────────────────────────────────────────
@@ -52,15 +53,15 @@ bool CFbxMeshComponent::OnInitialize()
     // Create uniform handles once.
     for (int i = 0; i < 4; i++)
     {
-        u_samplers[i] = bgfx::createUniform(
+        m_samplers[i] = bgfx::createUniform(
             ("s_texColor" + std::to_string(i)).c_str(),
             bgfx::UniformType::Sampler);
     }
 
-    u_lightDir       = bgfx::createUniform("u_lightDir",       bgfx::UniformType::Vec4);
-    u_lightColor     = bgfx::createUniform("u_lightColor",     bgfx::UniformType::Vec4);
-    u_ambient        = bgfx::createUniform("u_ambient",        bgfx::UniformType::Vec4);
-    u_materialColor  = bgfx::createUniform("u_materialColor",  bgfx::UniformType::Vec4);
+    m_lightDir       = bgfx::createUniform("u_lightDir",       bgfx::UniformType::Vec4);
+    m_lightColor     = bgfx::createUniform("u_lightColor",     bgfx::UniformType::Vec4);
+    m_ambient        = bgfx::createUniform("u_ambient",        bgfx::UniformType::Vec4);
+    m_materialColor  = bgfx::createUniform("u_materialColor",  bgfx::UniformType::Vec4);
 
     return true;
 }
@@ -82,21 +83,22 @@ void CFbxMeshComponent::OnShutdown()
     m_meshRes.reset();
     m_materialDefinition.Reset();
 
-    bgfx::destroy(u_lightDir);
-    bgfx::destroy(u_lightColor);
-    bgfx::destroy(u_ambient);
-    bgfx::destroy(u_materialColor);
+
+    bgfx::destroy(m_lightDir);
+    bgfx::destroy(m_lightColor);
+    bgfx::destroy(m_ambient);
+    bgfx::destroy(m_materialColor);
 
     for (int i = 0; i < 4; i++)
     {
-        bgfx::destroy(u_samplers[i]);
-        u_samplers[i] = BGFX_INVALID_HANDLE;
+        bgfx::destroy(m_samplers[i]);
+        m_samplers[i] = BGFX_INVALID_HANDLE;
     }
 
-    u_lightDir      = BGFX_INVALID_HANDLE;
-    u_lightColor    = BGFX_INVALID_HANDLE;
-    u_ambient       = BGFX_INVALID_HANDLE;
-    u_materialColor = BGFX_INVALID_HANDLE;
+    m_lightDir      = BGFX_INVALID_HANDLE;
+    m_lightColor    = BGFX_INVALID_HANDLE;
+    m_ambient       = BGFX_INVALID_HANDLE;
+    m_materialColor = BGFX_INVALID_HANDLE;
     m_meshStateInitialized = false;
 }
 
@@ -114,10 +116,10 @@ void CFbxMeshComponent::Render(bgfx::ViewId viewId, const float* mtx)
         // Set lighting uniforms.
         const float lightDir[4]   = { 0.57735f, -0.57735f, 0.57735f, 0.0f };
         const float lightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-        bgfx::setUniform(u_lightDir,   lightDir);
-        bgfx::setUniform(u_lightColor, lightColor);
-        bgfx::setUniform(u_ambient,        m_materialDefinition.GetAmbientColor().data());
-        bgfx::setUniform(u_materialColor,  m_materialDefinition.GetMaterialColor().data());
+        bgfx::setUniform(m_lightDir,   lightDir);
+        bgfx::setUniform(m_lightColor, lightColor);
+        bgfx::setUniform(m_ambient,        m_materialDefinition.GetAmbientColor().data());
+        bgfx::setUniform(m_materialColor,  m_materialDefinition.GetMaterialColor().data());
 
         // Bind texture samplers.
         int numTextures = m_materialDefinition.GetNumberOfTextures();
@@ -128,7 +130,7 @@ void CFbxMeshComponent::Render(bgfx::ViewId viewId, const float* mtx)
         {
             m_texture[i].m_texture = m_materialDefinition.GetTexture(i);
             m_texture[i].m_flags   = 0;
-            m_texture[i].m_sampler = u_samplers[i];
+            m_texture[i].m_sampler = m_samplers[i];
             m_meshState.m_textures[i] = m_texture[i];
         }
 

@@ -13,16 +13,15 @@ public:
 	REFL_DECLARE_OBJECT(CEntityComponent, Component);
 	DECLARE_COMPONENT();
 
-	// Component lifecycle
+	// ── IComponent lifecycle ────────────────────────────────────────────
+
 	bool OnInitialize() override;
 	void OnUpdate(double deltaTime) override;
 	void OnShutdown() override;
 
-	/// Returns true when both the mesh and shader resources have been
-	/// fully loaded and finalized by the ResourceManager.
+	// ── Public API ──────────────────────────────────────────────────────
+
 	bool IsReady() const;
-    
-    /// Returns the mesh resource filename referenced by this entity (may be empty).
     std::string GetMeshResourceFileName() const { return m_meshResource.GetResourceFileName(); }
 
 private:

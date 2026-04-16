@@ -1,13 +1,12 @@
 #pragma once
 
+#include "IImGuiVisualizer.h"
 #include "imgui.h"
 #include <vector>
 #include <string>
 #include <functional>
 #include <algorithm>
 #include <cctype>
-
-#include "IImGuiVisualizer.h"
 
 // Forward declaration
 namespace Core { class CoreSystem; }
@@ -25,63 +24,19 @@ class CommandConsole : public ImGuiVisualizers::IImGuiVisualizer
 {
 public:
 
-    /**
- * @brief Called once after the visualizer is registered with the manager.
- * Use this for deferred setup that requires external systems to be ready.
- */
-    void Initialize() {}
+    void Initialize() override {}
+    void Shutdown() override {}
+    void Update(float deltaTime) override { (void)deltaTime; }
 
-    /**
-     * @brief Called once when the visualizer is unregistered or the manager
-     * is destroyed. Use this to release resources.
-     */
-    void Shutdown() {}
-
-    /**
-     * @brief Called every frame regardless of visibility.
-     * Use this for logic updates that must run continuously (e.g. data polling).
-     * @param deltaTime Elapsed time in seconds since the last update.
-     */
-    void Update(float deltaTime) { (void)deltaTime; }
-
-    /**
-     * @brief Render the visualizer's ImGui window.
-     * Only called when the visualizer is visible.
-     * @param isOpen Pointer to a bool controlling window visibility.
-     *              Set to false to hide the window.
-     * @return true if the window was rendered, false otherwise.
-     */
-    bool Render(bool* isOpen)
+    bool Render(bool* isOpen) override
     {
         RenderConsoleWindow();
         return true;
     }
 
-    /**
-     * @brief Return a display name used in menus and window titles.
-     */
-    const char* GetName() const
-    {
-        return "Command Console";
-    }
-
-    /**
-     * @brief Optional keyboard shortcut label shown in the Windows menu.
-     * Return nullptr if no shortcut is assigned.
-     */
-    virtual const char* GetShortcut() const
-    {
-        return "nullptr";
-    }
-
-    /**
-     * @brief Optional menu category for grouping in the Windows menu.
-     * Return nullptr to place the item at the root level.
-     */
-    virtual const char* GetMenuCategory() const
-    {
-        return "Show";
-    }
+    const char* GetName() const override { return "Command Console"; }
+    const char* GetShortcut() const override { return nullptr; }
+    const char* GetMenuCategory() const override { return "Show"; }
 
 
     /**
@@ -115,7 +70,7 @@ public:
             : text(msg), color(msgColor) {}
     };
 
-    bool IsVisable() const { return m_isVisable; }
+    bool IsVisible() const { return m_isVisible; }
     bool IsEnabled() const { return m_isEnabled; }
     void SetEnabled(bool val) 
     { 
@@ -127,35 +82,35 @@ public:
     }
 private:
     // Console state
-    std::vector<CommandInfo> m_Commands;
-    std::vector<std::string> m_CommandHistory;
-    std::vector<ConsoleMessage> m_Messages;
-    std::vector<std::string> m_Suggestions;
-    
+    std::vector<CommandInfo> m_commands;
+    std::vector<std::string> m_commandHistory;
+    std::vector<ConsoleMessage> m_messages;
+    std::vector<std::string> m_suggestions;
+
     // Input handling
-    char m_InputBuffer[512];
-    int m_HistoryPosition;
-    bool m_ReclaimFocus;
-    bool m_ScrollToBottom;
-    bool m_AutoComplete;
-    bool m_CaseSensitive;
-    int m_MaxHistorySize;
-    int m_MaxMessageCount;
-    bool m_isVisable;
+    char m_inputBuffer[512];
+    int m_historyPosition;
+    bool m_reclaimFocus;
+    bool m_scrollToBottom;
+    bool m_autoComplete;
+    bool m_caseSensitive;
+    int m_maxHistorySize;
+    int m_maxMessageCount;
+    bool m_isVisible;
     // Callbacks
-    CommandCallback m_CommandCallback;
-    
+    CommandCallback m_commandCallback;
+
     // Auto-completion
-    std::string m_CurrentSuggestion;
-    int m_SuggestionIndex;
-    
+    std::string m_currentSuggestion;
+    int m_suggestionIndex;
+
     // FunctionCallManager integration
-    FunctionCall::FunctionCallManager* m_FunctionManager;
-    
+    FunctionCall::FunctionCallManager* m_functionManager;
+
     // Focus management
-    bool m_WasWindowOpen;
-    bool m_FocusInputOnNextFrame;
-	bool m_isEnabled = false;
+    bool m_wasWindowOpen;
+    bool m_focusInputOnNextFrame;
+    bool m_isEnabled = false;
 public:
     /**
      * @brief Constructor
@@ -249,32 +204,32 @@ public:
     /**
      * @brief Set whether auto-completion is enabled
      */
-    void SetAutoComplete(bool enabled) { m_AutoComplete = enabled; }
+    void SetAutoComplete(bool enabled) { m_autoComplete = enabled; }
 
     /**
      * @brief Check if auto-completion is enabled
      */
-    bool IsAutoCompleteEnabled() const { return m_AutoComplete; }
+    bool IsAutoCompleteEnabled() const { return m_autoComplete; }
 
     /**
      * @brief Set case sensitivity for command matching
      */
-    void SetCaseSensitive(bool caseSensitive) { m_CaseSensitive = caseSensitive; }
+    void SetCaseSensitive(bool caseSensitive) { m_caseSensitive = caseSensitive; }
 
     /**
      * @brief Check if case sensitive matching is enabled
      */
-    bool IsCaseSensitive() const { return m_CaseSensitive; }
+    bool IsCaseSensitive() const { return m_caseSensitive; }
 
     /**
      * @brief Get the current command history
      */
-    const std::vector<std::string>& GetCommandHistory() const { return m_CommandHistory; }
+    const std::vector<std::string>& GetCommandHistory() const { return m_commandHistory; }
 
     /**
      * @brief Get the registered commands
      */
-    const std::vector<CommandInfo>& GetRegisteredCommands() const { return m_Commands; }
+    const std::vector<CommandInfo>& GetRegisteredCommands() const { return m_commands; }
 
     /**
      * @brief Render the console window

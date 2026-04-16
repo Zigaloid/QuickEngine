@@ -32,7 +32,8 @@ struct PosColorVertex {
  * Shaders are loaded once at Initialize() time via the standard BGFX
  * loadProgram() helper.
  */
-class BgfxRenderPrimitives {
+class BgfxRenderPrimitives
+{
 public:
     BgfxRenderPrimitives() = default;
     ~BgfxRenderPrimitives() { Shutdown(); }

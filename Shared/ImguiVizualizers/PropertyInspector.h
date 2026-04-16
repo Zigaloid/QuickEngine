@@ -4,7 +4,6 @@
 #include "Reflection/ReflectionBase.h"
 #include "Reflection/ReflectionMap.h"
 #include "ComponentSystem/ComponentRegistry.h"
-#include "PropertyInspector.h"
 #include "PropertyWidgetMap.h"
 #include "PropertyWidgetMapRegistry.h"
 
@@ -38,19 +37,19 @@ namespace ImGuiVisualizers {
 		void ClearObject();
 
 		// Configuration
-		void SetReadOnly(bool readOnly) { m_ReadOnly = readOnly; }
-		void SetShowInternalData(bool show) { m_ShowInternalData = show; }
-		void SetExpandByDefault(bool expand) { m_ExpandByDefault = expand; }
-		void SetDisplayMode(PropertyDisplayMode mode) { m_DisplayMode = mode; }
-		void SetWidgetMap(const PropertyWidgetMap* widgetMap) { m_WidgetMap = widgetMap; }
+		void SetReadOnly(bool readOnly) { m_readOnly = readOnly; }
+		void SetShowInternalData(bool show) { m_showInternalData = show; }
+		void SetExpandByDefault(bool expand) { m_expandByDefault = expand; }
+		void SetDisplayMode(PropertyDisplayMode mode) { m_displayMode = mode; }
+		void SetWidgetMap(const PropertyWidgetMap* widgetMap) { m_widgetMap = widgetMap; }
 
 		// Getters
-		bool IsReadOnly() const { return m_ReadOnly; }
-		bool ShowInternalData() const { return m_ShowInternalData; }
-		bool ExpandByDefault() const { return m_ExpandByDefault; }
-		PropertyDisplayMode GetDisplayMode() const { return m_DisplayMode; }
-		CReflectedBase* GetObject() const { return m_Object; }
-		const PropertyWidgetMap* GetWidgetMap() const { return m_WidgetMap; }
+		bool IsReadOnly() const { return m_readOnly; }
+		bool ShowInternalData() const { return m_showInternalData; }
+		bool ExpandByDefault() const { return m_expandByDefault; }
+		PropertyDisplayMode GetDisplayMode() const { return m_displayMode; }
+		CReflectedBase* GetObject() const { return m_object; }
+		const PropertyWidgetMap* GetWidgetMap() const { return m_widgetMap; }
 
 	private:
 		// Core rendering methods
@@ -126,25 +125,25 @@ namespace ImGuiVisualizers {
 
 	private:
 		// Current object being inspected
-		CReflectedBase* m_Object;
+		CReflectedBase* m_object;
 
 		// Widget map for custom property widgets
-		const PropertyWidgetMap* m_WidgetMap;
+		const PropertyWidgetMap* m_widgetMap;
 
 		// Configuration options
-		bool m_ReadOnly;
-		bool m_ShowInternalData;
-		bool m_ExpandByDefault;
-		PropertyDisplayMode m_DisplayMode;
+		bool m_readOnly;
+		bool m_showInternalData;
+		bool m_expandByDefault;
+		PropertyDisplayMode m_displayMode;
 
 		// UI state
 		std::unordered_set<std::string> m_ExpandedNodes;
-		bool m_FirstRender;
+		bool m_firstRender;
 
 		// Per-property string edit buffers keyed by property address
 		struct StringEditBuffer {
 			char data[1024];
-			bool isBeingEdited;
+			bool m_isBeingEdited;
 		};
 		std::unordered_map<void*, StringEditBuffer> m_StringBuffers;
 
@@ -157,33 +156,33 @@ namespace ImGuiVisualizers {
 		std::vector<PendingComponentDeletion> m_PendingDeletions;
 
 		// Input buffers for editable properties
-		float m_FloatBuffer;
-		int m_IntBuffer;
-		bool m_BoolBuffer;
-		bool m_ShowDetails = false;
+		float m_floatBuffer;
+		int m_intBuffer;
+		bool m_boolBuffer;
+		bool m_showDetails = false;
 
 		struct WidgetMapScope {
 			const PropertyWidgetMap* m_prev;
 			PropertyInspector* m_owner;
 			WidgetMapScope(PropertyInspector* owner, CReflectedBase* obj)
-				: m_prev(owner->m_WidgetMap), m_owner(owner)
+				: m_prev(owner->m_widgetMap), m_owner(owner)
 			{
 				if (obj) {
 					const char* subClassName = obj->GetRflClassName();
 					if (subClassName && subClassName[0] != '\0') {
 						auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
-						owner->m_WidgetMap = mapPtr ? mapPtr.get() : nullptr;
+						owner->m_widgetMap = mapPtr ? mapPtr.get() : nullptr;
 					}
 					else {
-						owner->m_WidgetMap = nullptr;
+						owner->m_widgetMap = nullptr;
 					}
 				}
 				else {
-					owner->m_WidgetMap = nullptr;
+					owner->m_widgetMap = nullptr;
 				}
 			}
 			~WidgetMapScope() {
-				m_owner->m_WidgetMap = m_prev;
+				m_owner->m_widgetMap = m_prev;
 			}
 		};
 	};

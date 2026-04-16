@@ -1,5 +1,4 @@
-#ifndef CLASSFACTORY_H
-#define CLASSFACTORY_H
+#pragma once
 
 #include <map>
 #include <string>
@@ -7,18 +6,24 @@
 
 class CReflectedBase;
 
-typedef CReflectedBase* (*createFunctionPtr)();
-typedef std::map<std::string, createFunctionPtr> tClassMap;
+using CreateFunctionPtr = CReflectedBase* (*)();
+using ClassMap = std::map<std::string, CreateFunctionPtr>;
 
+/** @brief Static registry that maps class name strings to factory functions for reflected objects. */
 class ClassFactory
 {
 public:
-    ClassFactory(std::string name, createFunctionPtr creatFunction );
-    static CReflectedBase *createObject(const char *);
-    // Return list of registered class names (snapshot)
-    static std::vector<std::string> GetRegisteredClassNames();
-private:
-    static tClassMap *s_classFactoryMap;    
-};
+	/** @param className Name of the class to register.
+	 *  @param createFunction Factory function that constructs an instance. */
+	explicit ClassFactory(std::string className, CreateFunctionPtr createFunction);
 
-#endif
+	/** @param className Name of the class to instantiate.
+	 *  @param Returns a new instance, or nullptr if the class is not registered. */
+	static CReflectedBase* CreateObject(const char* className);
+
+	/** @brief Returns a snapshot of all registered class names. */
+	static std::vector<std::string> GetRegisteredClassNames();
+
+private:
+	static ClassMap* s_classFactoryMap;
+};

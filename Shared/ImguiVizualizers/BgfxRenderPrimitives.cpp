@@ -1,7 +1,10 @@
 #include "BgfxRenderPrimitives.h"
 
+// bgfx helpers
 #include <bgfx/embedded_shader.h>
 #include "bgfx_utils.h"
+
+// External
 #include <bx/math.h>
 #include <vector>
 #include <cmath>
@@ -82,7 +85,8 @@ void BgfxRenderPrimitives::RenderGrid(bgfx::ViewId viewId, float size,
     auto* verts = reinterpret_cast<PosColorVertex*>(tvb.data);
     uint32_t idx = 0;
 
-    for (int i = -lineCount; i <= lineCount; ++i) {
+    for (int i = -lineCount; i <= lineCount; ++i)
+    {
         float pos = static_cast<float>(i) * step;
 
         // Line parallel to Z
@@ -277,12 +281,14 @@ void BgfxRenderPrimitives::CreateSphereBuffers(int rings, int segments)
     std::vector<PosColorVertex> verts;
     std::vector<uint16_t> indices;
 
-    for (int r = 0; r <= rings; ++r) {
+    for (int r = 0; r <= rings; ++r)
+    {
         float phi = bx::kPi * static_cast<float>(r) / static_cast<float>(rings);
         float y   = bx::cos(phi);
         float rr  = bx::sin(phi);
 
-        for (int s = 0; s <= segments; ++s) {
+        for (int s = 0; s <= segments; ++s)
+        {
             float theta = 2.0f * bx::kPi * static_cast<float>(s) / static_cast<float>(segments);
             float x = rr * bx::cos(theta);
             float z = rr * bx::sin(theta);
@@ -290,8 +296,10 @@ void BgfxRenderPrimitives::CreateSphereBuffers(int rings, int segments)
         }
     }
 
-    for (int r = 0; r < rings; ++r) {
-        for (int s = 0; s < segments; ++s) {
+    for (int r = 0; r < rings; ++r)
+    {
+        for (int s = 0; s < segments; ++s)
+        {
             uint16_t a = static_cast<uint16_t>(r * (segments + 1) + s);
             uint16_t b = static_cast<uint16_t>(a + segments + 1);
             indices.push_back(a);

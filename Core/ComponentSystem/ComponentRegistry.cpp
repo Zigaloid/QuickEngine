@@ -1,8 +1,6 @@
 #include "ComponentRegistry.h"
 #include "CoreSystem/CoreSystem.h"
-// ═════════════════════════════════════════════════════════════════════════════
-// ComponentRegistry
-// ═════════════════════════════════════════════════════════════════════════════
+// ── ComponentRegistry ─────────────────────────────────────────────────────────
 
 ComponentRegistry& GetComponentRegistry()
 {

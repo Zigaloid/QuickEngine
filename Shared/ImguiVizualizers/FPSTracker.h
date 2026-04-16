@@ -3,7 +3,7 @@
 #include "VisualizableMetricHeuristic.h"
 #include "UnifiedActionManager.h"
 #include "ImGuiLineGraph.h"
-#include "IImguiVisualizer.h"
+#include "IImGuiVisualizer.h"
 #include <chrono>
 
 /**
@@ -16,63 +16,19 @@ class FPSTracker : public VisualizableMetricHeuristic, public ImGuiVisualizers::
 {
 public:
 
-    /**
-* @brief Called once after the visualizer is registered with the manager.
-* Use this for deferred setup that requires external systems to be ready.
-*/
-    void Initialize() {}
+    void Initialize() override {}
+    void Shutdown() override {}
+    void Update(float deltaTime) override { (void)deltaTime; }
 
-    /**
-     * @brief Called once when the visualizer is unregistered or the manager
-     * is destroyed. Use this to release resources.
-     */
-    void Shutdown() {}
-
-    /**
-     * @brief Called every frame regardless of visibility.
-     * Use this for logic updates that must run continuously (e.g. data polling).
-     * @param deltaTime Elapsed time in seconds since the last update.
-     */
-    void Update(float deltaTime) { (void)deltaTime; }
-
-    /**
-     * @brief Render the visualizer's ImGui window.
-     * Only called when the visualizer is visible.
-     * @param isOpen Pointer to a bool controlling window visibility.
-     *              Set to false to hide the window.
-     * @return true if the window was rendered, false otherwise.
-     */
-    bool Render(bool* isOpen)
+    bool Render(bool* isOpen) override
     {
         RenderFPSAnalysisWindow();
         return true;
     }
 
-    /**
-     * @brief Return a display name used in menus and window titles.
-     */
-    const char* GetName() const
-    {
-        return "FPS Analytics";
-    }
-
-    /**
-     * @brief Optional keyboard shortcut label shown in the Windows menu.
-     * Return nullptr if no shortcut is assigned.
-     */
-    virtual const char* GetShortcut() const
-    {
-        return "nullptr";
-    }
-
-    /**
-     * @brief Optional menu category for grouping in the Windows menu.
-     * Return nullptr to place the item at the root level.
-     */
-    virtual const char* GetMenuCategory() const
-    {
-        return "Show";
-    }
+    const char* GetName() const override { return "FPS Analytics"; }
+    const char* GetShortcut() const override { return nullptr; }
+    const char* GetMenuCategory() const override { return "Show"; }
 
 
     /**
@@ -98,20 +54,20 @@ public:
     };
 
 private:
-    FPSThresholds m_Thresholds;
-    std::chrono::steady_clock::time_point m_LastFrameTime;
-    float m_CurrentFPS;
-    bool m_FirstFrame;
+    FPSThresholds m_thresholds;
+    std::chrono::steady_clock::time_point m_lastFrameTime;
+    float m_currentFPS;
+    bool m_firstFrame;
     
     // Line graph support
-    ImGuiLineGraph m_LineGraph;
-    GraphType m_GraphType;
-    std::chrono::steady_clock::time_point m_StartTime;
-    bool m_LineGraphNeedsUpdate;
-    size_t m_MaxLineGraphSamples;
+    ImGuiLineGraph m_lineGraph;
+    GraphType m_graphType;
+    std::chrono::steady_clock::time_point m_startTime;
+    bool m_lineGraphNeedsUpdate;
+    size_t m_maxLineGraphSamples;
 
     // Action manager for menu/toolbar/console integration
-    UI::UnifiedActionManager m_ActionManager;
+    UI::UnifiedActionManager m_actionManager;
 
 public:
     /**
@@ -135,7 +91,7 @@ public:
     /**
      * @brief Get current FPS value
      */
-    float GetCurrentFPS() const { return m_CurrentFPS; }
+    float GetCurrentFPS() const { return m_currentFPS; }
 
     /**
      * @brief Set FPS performance thresholds
@@ -145,7 +101,7 @@ public:
     /**
      * @brief Get FPS performance thresholds
      */
-    const FPSThresholds& GetThresholds() const { return m_Thresholds; }
+    const FPSThresholds& GetThresholds() const { return m_thresholds; }
 
     /**
      * @brief Get FPS performance category as string
@@ -178,22 +134,22 @@ public:
     /**
      * @brief Set the graph type for FPS visualization
      */
-    void SetGraphType(GraphType type) { m_GraphType = type; }
+    void SetGraphType(GraphType type) { m_graphType = type; }
 
     /**
      * @brief Get the current graph type
      */
-    GraphType GetGraphType() const { return m_GraphType; }
+    GraphType GetGraphType() const { return m_graphType; }
 
     /**
      * @brief Set maximum number of samples for the line graph
      */
-    void SetMaxLineGraphSamples(size_t maxSamples) { m_MaxLineGraphSamples = maxSamples; }
+    void SetMaxLineGraphSamples(size_t maxSamples) { m_maxLineGraphSamples = maxSamples; }
 
     /**
      * @brief Get line graph configuration for customization
      */
-    ImGuiLineGraph::Config& GetLineGraphConfig() { return m_LineGraph.GetConfig(); }
+    ImGuiLineGraph::Config& GetLineGraphConfig() { return m_lineGraph.GetConfig(); }
 
     /**
      * @brief Render just the line graph

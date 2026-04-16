@@ -13,224 +13,233 @@ namespace Core {
 }
 
 namespace Profiler {
-    // Forward declarations
-    class ProfileEvent;
-    enum class EventType;
 
-    // Internal structures
-    struct RawEvent {
-        size_t threadHash;        // Changed from std::thread::id to size_t
-        std::string name;
-        uint64_t clockCycles;
-        bool isStart;
-    };
+// Forward declarations
+class ProfileEvent;
+enum class EventType;
 
-    struct AnalyzedEvent {
-        size_t threadHash;        // Changed from std::thread::id to size_t
-        std::string name;
-        uint64_t startCycles;
-        uint64_t endCycles;
-        uint64_t duration;
-        int depth;
-    };
+// ── Internal Data Structures ──────────────────────────────────────────────────
 
-    // Frame marker structure
-    struct FrameMarker {
-        size_t threadHash;
-        uint64_t clockCycles;
-        uint64_t frameNumber;
+/** @brief Raw (unpaired) profiler event record. */
+struct RawEvent
+{
+    size_t      threadHash;    // Hash of thread ID
+    std::string name;
+    uint64_t    clockCycles;
+    bool        isStart;
+};
 
-        FrameMarker(size_t hash, uint64_t cycles, uint64_t frame)
-            : threadHash(hash), clockCycles(cycles), frameNumber(frame) {}
-    };
+/** @brief Paired start/end profiler event with computed duration. */
+struct AnalyzedEvent
+{
+    size_t      threadHash;
+    std::string name;
+    uint64_t    startCycles;
+    uint64_t    endCycles;
+    uint64_t    duration;
+    int         depth;
+};
 
-    // Timeline-based flamegraph data structures
-    struct TimelineFlameNode {
-        std::string name;
-        uint64_t startTime = 0;      // Actual start time of this specific event
-        uint64_t endTime = 0;        // Actual end time of this specific event
-        uint64_t duration = 0;       // Duration of this specific event
-        int depth = 0;               // Call stack depth
+/** @brief Frame boundary marker. */
+struct FrameMarker
+{
+    size_t   threadHash;
+    uint64_t clockCycles;
+    uint64_t frameNumber;
 
-        // Reference to the original event
-        const AnalyzedEvent* sourceEvent = nullptr;
+    FrameMarker(size_t hash, uint64_t cycles, uint64_t frame)
+        : threadHash(hash), clockCycles(cycles), frameNumber(frame)
+    {
+    }
+};
 
-        // Visualization helpers
-        float x = 0.0f;              // X position in flamegraph (0.0 to 1.0)
-        float width = 0.0f;          // Width in flamegraph (0.0 to 1.0)
+// ── Timeline Flamegraph Data Structures ───────────────────────────────────────
 
-        // Color/display helpers
-        uint32_t eventIndex = 0;     // Index for unique coloring
+/** @brief Single node in a timeline-based flamegraph. */
+struct TimelineFlameNode
+{
+    std::string name;
+    uint64_t    startTime   = 0;
+    uint64_t    endTime     = 0;
+    uint64_t    duration    = 0;
+    int         depth       = 0;
 
-        TimelineFlameNode(const AnalyzedEvent* event) : sourceEvent(event) {
-            if (event) {
-                name = event->name;
-                startTime = event->startCycles;
-                endTime = event->endCycles;
-                duration = event->duration;
-                depth = event->depth;
-            }
+    const AnalyzedEvent* sourceEvent = nullptr;
+
+    float    x          = 0.0f;
+    float    width      = 0.0f;
+    uint32_t eventIndex = 0;
+
+    explicit TimelineFlameNode(const AnalyzedEvent* event) : sourceEvent(event)
+    {
+        if (event)
+        {
+            name      = event->name;
+            startTime = event->startCycles;
+            endTime   = event->endCycles;
+            duration  = event->duration;
+            depth     = event->depth;
         }
+    }
 
-        // Calculate percentage of total thread time
-        float GetPercentage(uint64_t threadTotalTime) const {
-            return threadTotalTime > 0 ? static_cast<float>(duration) / threadTotalTime : 0.0f;
-        }
-    };
+    /** @param threadTotalTime Total time for the owning thread.
+     *  @return Fraction of thread time consumed by this event. */
+    float GetPercentage(uint64_t threadTotalTime) const
+    {
+        return threadTotalTime > 0 ? static_cast<float>(duration) / static_cast<float>(threadTotalTime) : 0.0f;
+    }
+};
 
-    struct TimelineThreadData {
-        size_t threadHash;
-        std::string threadName;
-        std::vector<std::unique_ptr<TimelineFlameNode>> events;  // All events in chronological order
-        std::vector<FrameMarker> frameMarkers;                   // Frame markers for this thread
+/** @brief All timeline events and frame markers for a single thread. */
+struct TimelineThreadData
+{
+    size_t      threadHash;
+    std::string threadName;
+    std::vector<std::unique_ptr<TimelineFlameNode>> events;
+    std::vector<FrameMarker> frameMarkers;
 
-        uint64_t threadStartTime = 0;     // Earliest event in this thread
-        uint64_t threadEndTime = 0;       // Latest event in this thread
-        uint64_t threadDuration = 0;      // Total thread timeline duration
-        int maxDepth = 0;                 // Maximum call stack depth
+    uint64_t threadStartTime = 0;
+    uint64_t threadEndTime   = 0;
+    uint64_t threadDuration  = 0;
+    int      maxDepth        = 0;
 
-        TimelineThreadData(size_t hash, const std::string& name)
-            : threadHash(hash), threadName(name) {}
+    TimelineThreadData(size_t hash, const std::string& name)
+        : threadHash(hash), threadName(name)
+    {
+    }
 
-        // Calculate layout positions for all events based on timeline
-        void CalculateTimelineLayout();
+    void CalculateTimelineLayout();
+    std::vector<TimelineFlameNode*> GetEventsAtDepth(int targetDepth) const;
+    std::vector<TimelineFlameNode*> GetEventsInTimeRange(uint64_t startTime, uint64_t endTime) const;
+    std::vector<const FrameMarker*> GetFrameMarkersInTimeRange(uint64_t startTime, uint64_t endTime) const;
+};
 
-        // Get events at a specific depth level
-        std::vector<TimelineFlameNode*> GetEventsAtDepth(int targetDepth) const;
+/** @brief Complete timeline flamegraph for all threads. */
+struct TimelineFlameGraphData
+{
+    std::vector<std::unique_ptr<TimelineThreadData>> threads;
+    uint64_t globalStartTime = UINT64_MAX;
+    uint64_t globalEndTime   = 0;
+    uint64_t globalDuration  = 0;
 
-        // Get all events that overlap with a given time range
-        std::vector<TimelineFlameNode*> GetEventsInTimeRange(uint64_t startTime, uint64_t endTime) const;
+    TimelineThreadData* FindThread(size_t threadHash);
+    TimelineThreadData* GetThread(size_t index);
+    size_t              GetThreadCount() const { return threads.size(); }
 
-        // Get frame markers in a time range
-        std::vector<const FrameMarker*> GetFrameMarkersInTimeRange(uint64_t startTime, uint64_t endTime) const;
-    };
+    void CalculateGlobalTimeline();
+    std::vector<TimelineFlameNode*>  GetAllEventsInTimeRange(uint64_t startTime, uint64_t endTime) const;
+    std::vector<const FrameMarker*>  GetAllFrameMarkersInTimeRange(uint64_t startTime, uint64_t endTime) const;
+};
 
-    struct TimelineFlameGraphData {
-        std::vector<std::unique_ptr<TimelineThreadData>> threads;
-        uint64_t globalStartTime = UINT64_MAX;
-        uint64_t globalEndTime = 0;
-        uint64_t globalDuration = 0;
+// ── Legacy Flamegraph Data Structures ─────────────────────────────────────────
 
-        // Find thread data by hash
-        TimelineThreadData* FindThread(size_t threadHash);
+/** @brief Node in the legacy accumulated flamegraph tree. */
+struct FlameNode
+{
+    std::string name;
+    uint64_t    selfTime  = 0;
+    uint64_t    totalTime = 0;
+    uint32_t    callCount = 0;
 
-        // Get thread by index for iteration
-        TimelineThreadData* GetThread(size_t index);
-        size_t GetThreadCount() const { return threads.size(); }
+    uint64_t startTime = 0;
+    uint64_t endTime   = 0;
 
-        // Calculate global timeline
-        void CalculateGlobalTimeline();
+    std::vector<std::unique_ptr<FlameNode>> children;
+    FlameNode* parent = nullptr;
 
-        // Get all events across all threads in a time range
-        std::vector<TimelineFlameNode*> GetAllEventsInTimeRange(uint64_t startTime, uint64_t endTime) const;
+    float x     = 0.0f;
+    float width = 0.0f;
+    int   level = 0;
 
-        // Get all frame markers across all threads in a time range
-        std::vector<const FrameMarker*> GetAllFrameMarkersInTimeRange(uint64_t startTime, uint64_t endTime) const;
-    };
+    void AddChild(std::unique_ptr<FlameNode> child);
+    FlameNode* FindChild(const std::string& functionName);
 
-    // Legacy flamegraph data structures (kept for compatibility)
-    struct FlameNode {
-        std::string name;
-        uint64_t selfTime = 0;       // Time spent in this function (excluding children)
-        uint64_t totalTime = 0;      // Total time including children
-        uint32_t callCount = 0;      // Number of times this function was called
+    float GetPercentage(uint64_t threadTotalTime) const
+    {
+        return threadTotalTime > 0 ? static_cast<float>(totalTime) / static_cast<float>(threadTotalTime) : 0.0f;
+    }
+};
 
-        // Timing bounds for visualization
-        uint64_t startTime = 0;      // Earliest start time for this node
-        uint64_t endTime = 0;        // Latest end time for this node
+/** @brief Accumulated flamegraph tree for a single thread. */
+struct ThreadFlameData
+{
+    size_t      threadHash;
+    std::string threadName;
+    std::unique_ptr<FlameNode> rootNode;
+    uint64_t    totalThreadTime  = 0;
+    uint64_t    threadStartTime  = 0;
+    uint64_t    threadEndTime    = 0;
+    int         maxDepth         = 0;
 
-        // Tree structure
-        std::vector<std::unique_ptr<FlameNode>> children;
-        FlameNode* parent = nullptr;
+    ThreadFlameData(size_t hash, const std::string& name)
+        : threadHash(hash), threadName(name)
+    {
+        rootNode = std::make_unique<FlameNode>();
+        rootNode->name = "Root";
+    }
 
-        // Visualization helpers
-        float x = 0.0f;              // X position in flamegraph (0.0 to 1.0)
-        float width = 0.0f;          // Width in flamegraph (0.0 to 1.0)
-        int level = 0;               // Depth level for Y positioning
+    void CalculateLayout();
+    void CalculateNodeLayout(FlameNode* node, float startX, float width,
+        uint64_t timelineStart, uint64_t timelineEnd);
+};
 
-        // Helper methods
-        void AddChild(std::unique_ptr<FlameNode> child);
-        FlameNode* FindChild(const std::string& functionName);
+/** @brief Complete accumulated flamegraph for all threads. */
+struct FlameGraphData
+{
+    std::vector<std::unique_ptr<ThreadFlameData>> threads;
 
-        // Calculate percentage of total thread time
-        float GetPercentage(uint64_t threadTotalTime) const {
-            return threadTotalTime > 0 ? static_cast<float>(totalTime) / threadTotalTime : 0.0f;
-        }
-    };
+    size_t GetThreadCount() const { return threads.size(); }
+    void CalculateGlobalTimeline();
+};
 
-    struct ThreadFlameData {
-        size_t threadHash;
-        std::string threadName;
-        std::unique_ptr<FlameNode> rootNode;
-        uint64_t totalThreadTime = 0;    // Total time for this thread
-        uint64_t threadStartTime = 0;    // Earliest event in this thread
-        uint64_t threadEndTime = 0;      // Latest event in this thread
-        int maxDepth = 0;                // Maximum call stack depth
+// ── ProfilerAnalyzer ──────────────────────────────────────────────────────────
 
-        ThreadFlameData(size_t hash, const std::string& name)
-            : threadHash(hash), threadName(name) {
-            rootNode = std::make_unique<FlameNode>();
-            rootNode->name = "Root";
-        }
+/** @brief Converts raw profiler events into analyzed flamegraph data. */
+class ProfilerAnalyzer
+{
+public:
+    void LoadFromFile(const std::string& filename);
+    void AnalyzeCallStack();
+    void PrintReport() const;
+    void PrintCallStack() const;
 
-        // Calculate layout positions for all nodes
-        void CalculateLayout();
-        void CalculateNodeLayout(FlameNode* node, float startX, float width,
-            uint64_t timelineStart, uint64_t timelineEnd);
-    };
+    /** @param events        Source events.
+     *  @param clearExisting If true, discards existing analyzed data first. */
+    void LoadFromProfileEvents(const std::deque<ProfileEvent>& events, bool clearExisting = true);
 
-    struct FlameGraphData {
-        std::vector<std::unique_ptr<ThreadFlameData>> threads;
+    /** @param events Events to append. */
+    void AppendFromProfileEvents(const std::deque<ProfileEvent>& events);
 
-        size_t GetThreadCount() const { return threads.size(); }
+    /** @brief Clears all analyzed events, frame markers, and thread maps. */
+    void Clear();
 
-        // Calculate global timeline
-        void CalculateGlobalTimeline();
-    };
+    /** @return Timeline-based flamegraph data for all threads. */
+    std::unique_ptr<TimelineFlameGraphData> GenerateTimelineFlameGraphData() const;
 
-    class ProfilerAnalyzer {
-    public:
-        // Existing file-based methods
-        void LoadFromFile(const std::string& filename);
-        void AnalyzeCallStack();
-        void PrintReport() const;
-        void PrintCallStack() const;
+    /** @return Legacy accumulated flamegraph data for all threads. */
+    std::unique_ptr<FlameGraphData> GenerateFlameGraphData() const;
 
-        // NEW: Direct data loading methods
-        void LoadFromProfileEvents(const std::deque<ProfileEvent>& events, bool clearExisting = true);
-        void AppendFromProfileEvents(const std::deque<ProfileEvent>& events);
-        void Clear();
+    void CalculateSelfTimes(FlameNode* node) const;
 
-        // Timeline-based flamegraph generation
-        std::unique_ptr<TimelineFlameGraphData> GenerateTimelineFlameGraphData() const;
+    const std::vector<AnalyzedEvent>& GetEvents() const { return m_analyzedEvents; }
+    const std::vector<FrameMarker>&   GetFrameMarkers() const { return m_frameMarkers; }
 
-        // Legacy accumulated flamegraph generation (kept for compatibility)
-        std::unique_ptr<FlameGraphData> GenerateFlameGraphData() const;
-        void CalculateSelfTimes(FlameNode* node) const;
+    size_t GetEventCount() const { return m_analyzedEvents.size(); }
+    size_t GetFrameMarkerCount() const { return m_frameMarkers.size(); }
+    size_t GetThreadCount() const;
 
-        // Data access methods
-        const std::vector<AnalyzedEvent>& GetEvents() const { return m_analyzedEvents; }
-        const std::vector<FrameMarker>& GetFrameMarkers() const { return m_frameMarkers; }
+private:
+    std::vector<AnalyzedEvent>       m_analyzedEvents;
+    std::vector<FrameMarker>         m_frameMarkers;
+    std::map<size_t, std::vector<std::string>> m_callStacks;
+    std::map<size_t, std::string>    m_threadHashToString;
 
-        // NEW: Statistics and info methods
-        size_t GetEventCount() const { return m_analyzedEvents.size(); }
-        size_t GetFrameMarkerCount() const { return m_frameMarkers.size(); }
-        size_t GetThreadCount() const;
+    void MatchStartEndPairs(const std::vector<RawEvent>& rawEvents);
+    void ReconstructCallStack();
 
-    private:
-        std::vector<AnalyzedEvent> m_analyzedEvents;
-        std::vector<FrameMarker> m_frameMarkers;             // Store frame markers separately
-        std::map<size_t, std::vector<std::string>> m_callStacks;    // Changed key from std::thread::id to size_t
-        std::map<size_t, std::string> m_threadHashToString;
-
-        // Internal processing methods
-        void MatchStartEndPairs(const std::vector<RawEvent>& rawEvents);
-        void ReconstructCallStack();
-
-        // NEW: Convert ProfileEvent to internal format
-        void ConvertProfileEventsToRawEvents(const std::deque<ProfileEvent>& events,
-            std::vector<RawEvent>& outRawEvents,
-            std::vector<FrameMarker>& outFrameMarkers);
-    };
+    void ConvertProfileEventsToRawEvents(const std::deque<ProfileEvent>& events,
+        std::vector<RawEvent>& outRawEvents,
+        std::vector<FrameMarker>& outFrameMarkers);
+};
 
 } // namespace Profiler

@@ -12,7 +12,7 @@ namespace Core {
  */
 struct ComponentTypeInfo
 {
-	std::string className;      // Class name for ClassFactory::createObject
+	std::string className;      // Class name for ClassFactory::CreateObject
 	std::string displayName;    // Human-readable name for UI
 	std::string category;       // Optional category for grouping
 };
@@ -34,10 +34,11 @@ private:
 	std::vector<ComponentTypeInfo> m_types;
 };
 
+/** @brief RAII helper that self-registers a component type at static init time. */
 class AutoRegisterComponent
 {
 public:
-	AutoRegisterComponent(const char *className, const char* prettyName, const char* category);
+	AutoRegisterComponent(const char* className, const char* prettyName, const char* category);
 };
 
 ComponentRegistry& GetComponentRegistry();

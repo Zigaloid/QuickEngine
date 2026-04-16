@@ -1,6 +1,7 @@
+#include "MeshComponent.h"
+
 #include "CoreSystem/CoreSystem.h"
 #include "ComponentSystem/ComponentSystem.h"
-#include "MeshComponent.h"
 #include "ShaderResource.h"
 #include "MeshResource.h"
 
@@ -42,21 +43,18 @@ bool CMeshComponent::OnInitialize()
 	}
 
 
-	// Request the mesh resource (async load → finalize on main thread)
 	m_materialDefinition.SafeRead(m_materialFile.GetResourceFileName());
 	m_materialDefinition.Initialize();
 
-
-	// declare static handle once (outside per-frame code)
     for (int i = 0; i < 4; i++)
 	{
-		u_samplers[i] = bgfx::createUniform(("s_texColor" + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
-	}	
+		m_samplers[i] = bgfx::createUniform(("s_texColor" + std::to_string(i)).c_str(), bgfx::UniformType::Sampler);
+	}    
 
-	u_lightDir = bgfx::createUniform("u_lightDir", bgfx::UniformType::Vec4);
-	u_lightColor = bgfx::createUniform("u_lightColor", bgfx::UniformType::Vec4);
-	u_ambient = bgfx::createUniform("u_ambient", bgfx::UniformType::Vec4);
-	u_materialColor = bgfx::createUniform("u_materialColor", bgfx::UniformType::Vec4);
+	m_lightDir = bgfx::createUniform("u_lightDir", bgfx::UniformType::Vec4);
+	m_lightColor = bgfx::createUniform("u_lightColor", bgfx::UniformType::Vec4);
+	m_ambient = bgfx::createUniform("u_ambient", bgfx::UniformType::Vec4);
+	m_materialColor = bgfx::createUniform("u_materialColor", bgfx::UniformType::Vec4);
 
     
 	return true;
@@ -80,19 +78,19 @@ void CMeshComponent::OnShutdown()
 	m_meshRes.reset();
 	m_materialDefinition.Reset();	
 	
-	bgfx::destroy(u_lightDir);
-	bgfx::destroy(u_lightColor);
-	bgfx::destroy(u_ambient);
-	bgfx::destroy(u_materialColor);
+    bgfx::destroy(m_lightDir);
+	bgfx::destroy(m_lightColor);
+	bgfx::destroy(m_ambient);
+	bgfx::destroy(m_materialColor);
     for (int i = 0; i < 4; i++)
 	{
-		bgfx::destroy(u_samplers[i]);
-		u_samplers[i] = BGFX_INVALID_HANDLE;
+        bgfx::destroy(m_samplers[i]);
+		m_samplers[i] = BGFX_INVALID_HANDLE;
 	}	
-	u_lightDir = BGFX_INVALID_HANDLE;
-	u_lightColor = BGFX_INVALID_HANDLE;
-	u_ambient = BGFX_INVALID_HANDLE;
-	u_materialColor = BGFX_INVALID_HANDLE;
+    m_lightDir = BGFX_INVALID_HANDLE;
+	m_lightColor = BGFX_INVALID_HANDLE;
+	m_ambient = BGFX_INVALID_HANDLE;
+	m_materialColor = BGFX_INVALID_HANDLE;
 	m_meshStateInitialized = false;
 }
 void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx)
@@ -104,10 +102,10 @@ void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx)
 			// set uniform values (adjust values as needed)
 			const float lightDir[4] = { 0.57735f, -0.57735f, 0.57735f, 0.0f }; // normalized direction
 			const float lightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-			bgfx::setUniform(u_lightDir, lightDir);
-			bgfx::setUniform(u_lightColor, lightColor);
-			bgfx::setUniform(u_ambient, m_materialDefinition.GetAmbientColor().data());
-			bgfx::setUniform(u_materialColor, m_materialDefinition.GetMaterialColor().data());
+            bgfx::setUniform(m_lightDir, lightDir);
+			bgfx::setUniform(m_lightColor, lightColor);
+			bgfx::setUniform(m_ambient, m_materialDefinition.GetAmbientColor().data());
+			bgfx::setUniform(m_materialColor, m_materialDefinition.GetMaterialColor().data());
 
 
 			// assign the sampler handle (don't recreate each frame)
@@ -117,21 +115,29 @@ void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx)
 			{
 				m_texture[i].m_texture = m_materialDefinition.GetTexture(i);
 				m_texture[i].m_flags = 0;
-				m_texture[i].m_sampler = u_samplers[i];
+                m_texture[i].m_sampler = m_samplers[i];
 				m_meshState.m_textures[i] = m_texture[i];
 			}
 
 			m_meshState.m_numTextures = 1;
-			m_meshState.m_state = BGFX_STATE_WRITE_RGB | BGFX_STATE_WRITE_A | BGFX_STATE_WRITE_Z | BGFX_STATE_DEPTH_TEST_LESS | BGFX_STATE_CULL_CCW | BGFX_STATE_MSAA;
+			m_meshState.m_state = BGFX_STATE_WRITE_RGB
+			                    | BGFX_STATE_WRITE_A
+			                    | BGFX_STATE_WRITE_Z
+			                    | BGFX_STATE_DEPTH_TEST_LESS
+			                    | BGFX_STATE_CULL_CCW
+			                    | BGFX_STATE_MSAA;
 			m_meshState.m_program = m_materialDefinition.GetShaderProgram();
 			m_meshState.m_viewId = viewId;
 			m_meshStateInitialized = true;
 		}
 		
-		if(m_meshStateInitialized)
+		if (m_meshStateInitialized)
 		{
 			const MeshState* statePtr = &m_meshState;
-			m_meshRes->m_mesh->submit(&statePtr, 1, mtx, 1);
+            if (m_meshRes->GetMesh())
+			{
+				m_meshRes->GetMesh()->submit(&statePtr, 1, mtx, 1);
+			}
 		}
 	}
 }
@@ -140,6 +146,6 @@ bool CMeshComponent::IsLoaded() const
 {	
 	return (m_meshRes
 		&& m_meshRes->IsFinalized()
-		&& m_meshRes->m_mesh != nullptr
+    && m_meshRes->GetMesh() != nullptr
 		&& m_materialDefinition.IsReady());
 }

@@ -28,58 +28,23 @@ public:
  * @brief Called once after the visualizer is registered with the manager.
  * Use this for deferred setup that requires external systems to be ready.
  */
-	void Initialize() 
+	void Initialize() override
 	{
 		InitializePipes();
 	}
 
-	void Shutdown();
+	void Shutdown() override;
+	void Update(float deltaTime) override { (void)deltaTime; }
 
-	/**
-	 * @brief Called every frame regardless of visibility.
-	 * Use this for logic updates that must run continuously (e.g. data polling).
-	 * @param deltaTime Elapsed time in seconds since the last update.
-	 */
-	void Update(float deltaTime) { (void)deltaTime; }
-
-	/**
-	 * @brief Render the visualizer's ImGui window.
-	 * Only called when the visualizer is visible.
-	 * @param isOpen Pointer to a bool controlling window visibility.
-	 *              Set to false to hide the window.
-	 * @return true if the window was rendered, false otherwise.
-	 */
-	bool Render(bool* isOpen)
-	{		
+	bool Render(bool* isOpen) override
+	{
 		RenderWindow(GetName(), isOpen);
 		return true;
 	}
 
-	/**
-	 * @brief Return a display name used in menus and window titles.
-	 */
-	const char* GetName() const
-	{
-		return "Log";
-	}
-
-	/**
-	 * @brief Optional keyboard shortcut label shown in the Windows menu.
-	 * Return nullptr if no shortcut is assigned.
-	 */
-	virtual const char* GetShortcut() const
-	{
-		return "nullptr";
-	}
-
-	/**
-	 * @brief Optional menu category for grouping in the Windows menu.
-	 * Return nullptr to place the item at the root level.
-	 */
-	virtual const char* GetMenuCategory() const
-	{
-		return "Show";
-	}
+	const char* GetName() const override { return "Log"; }
+	const char* GetShortcut() const override { return nullptr; }
+	const char* GetMenuCategory() const override { return "Show"; }
 
 	/**
 	 * @brief A single log entry received from the Nexus network.
@@ -180,11 +145,11 @@ private:
 	std::set<std::string> m_knownApps;
 	std::set<std::string> m_knownPipes;
 
-	// Filter state — multi-select visibility (true = shown in log view)
+	// Filter state ï¿½ multi-select visibility (true = shown in log view)
 	std::unordered_map<std::string, bool> m_appVisibility;
 	std::unordered_map<std::string, bool> m_pipeVisibility;
 
-	// Collection state — when false, incoming entries are discarded
+	// Collection state ï¿½ when false, incoming entries are discarded
 	std::unordered_map<std::string, bool> m_appCollectionEnabled;
 	std::unordered_map<std::string, bool> m_pipeCollectionEnabled;
 

@@ -137,7 +137,7 @@ namespace ImGuiVisualizers {
         if (className.empty()) return;
 
         // Create a temporary reflected instance via ClassFactory
-        CReflectedBase* raw = ClassFactory::createObject(className.c_str());
+        CReflectedBase* raw = ClassFactory::CreateObject(className.c_str());
         if (!raw) {
             REFL_ERROR(Reflection::ErrorCategory::ClassFactory, "ClassFactory failed to create instance", className);
             return;

@@ -1,27 +1,24 @@
-﻿#include "Net/NexusServer.h"
+#include "Net/NexusServer.h"
 #include "Net/IBerkeleySocket.h"
 #include "DebugChannel/DebugChannel.h"
 #include <algorithm>
 #include <cstring>
 
-// ---------------------------------------------------------------------------
-// Construction / destruction
-// ---------------------------------------------------------------------------
+// ── Construction / Destruction ────────────────────────────────────────────────
 
 DebugChannels::CDebugChannel NexusDebug("Nexus");
 
 CNexusServer::CNexusServer() = default;
 
-CNexusServer::~CNexusServer() {
+CNexusServer::~CNexusServer()
+{
     Stop();
 }
 
-// ---------------------------------------------------------------------------
-// Public interface
-// ---------------------------------------------------------------------------
+// ── Public Interface ──────────────────────────────────────────────────────────
 
-bool CNexusServer::Start( const std::string& address, uint16_t port) {
-
+bool CNexusServer::Start(const std::string& address, uint16_t port)
+{
     if (!m_listenSocket.Open(ESocketDomain::IPv4, ESocketType::Stream, ESocketProtocol::TCP)) return false;
 
     // Allow address reuse
@@ -36,14 +33,17 @@ bool CNexusServer::Start( const std::string& address, uint16_t port) {
     return true;
 }
 
-void CNexusServer::Stop() {
+void CNexusServer::Stop()
+{
     m_running = false;
 
-    if ( m_listenSocket.IsOpen()) {
+    if (m_listenSocket.IsOpen())
+    {
         m_listenSocket.Close();
     }
 
-    if (m_acceptThread.joinable()) {
+    if (m_acceptThread.joinable())
+    {
         m_acceptThread.join();
     }
 
@@ -52,8 +52,10 @@ void CNexusServer::Stop() {
     std::vector<std::shared_ptr<SNexusClientEntry>> remaining;
     {
         std::lock_guard<std::mutex> lock(m_clientsMutex);
-        for (auto& entry : m_clients) {
-            if (entry->socket && entry->socket->IsOpen()) {
+        for (auto& entry : m_clients)
+        {
+            if (entry->socket && entry->socket->IsOpen())
+            {
                 entry->socket->Close();
             }
         }
@@ -61,26 +63,31 @@ void CNexusServer::Stop() {
     }
 
     // Join all client threads outside the lock.
-    for (auto& entry : remaining) {
+    for (auto& entry : remaining)
+    {
         if (entry->thread.joinable()) entry->thread.join();
     }
 }
 
-void CNexusServer::SetMessageCallback(MessageCallback callback) {
+void CNexusServer::SetMessageCallback(MessageCallback callback)
+{
     std::lock_guard<std::mutex> lock(m_callbackMutex);
     m_messageCallback = std::move(callback);
 }
 
-void CNexusServer::SetBinaryMessageCallback(BinaryMessageCallback callback) {
+void CNexusServer::SetBinaryMessageCallback(BinaryMessageCallback callback)
+{
     std::lock_guard<std::mutex> lock(m_callbackMutex);
     m_binaryMessageCallback = std::move(callback);
 }
 
-std::vector<SNexusClientSnapshot> CNexusServer::GetClientSnapshots() const {
+std::vector<SNexusClientSnapshot> CNexusServer::GetClientSnapshots() const
+{
     std::vector<SNexusClientSnapshot> snapshots;
     std::lock_guard<std::mutex> lock(m_clientsMutex);
     snapshots.reserve(m_clients.size());
-    for (const auto& entry : m_clients) {
+    for (const auto& entry : m_clients)
+    {
         if (!entry || !entry->socket || !entry->socket->IsOpen()) continue;
         SNexusClientSnapshot snap;
         snap.appName       = entry->appName;
@@ -92,12 +99,12 @@ std::vector<SNexusClientSnapshot> CNexusServer::GetClientSnapshots() const {
     return snapshots;
 }
 
-// ---------------------------------------------------------------------------
-// Accept loop � runs on its own thread
-// ---------------------------------------------------------------------------
+// ── Accept Loop ───────────────────────────────────────────────────────────────
 
-void CNexusServer::AcceptLoop() {
-    while (m_running) {
+void CNexusServer::AcceptLoop()
+{
+    while (m_running)
+    {
         std::string addr;
         uint16_t port = 0;
         BerkeleySocket* clientSock = m_listenSocket.Accept(&addr, &port);
@@ -124,28 +131,30 @@ void CNexusServer::AcceptLoop() {
     }
 }
 
-// ---------------------------------------------------------------------------
-// Per-client receive loop
-// ---------------------------------------------------------------------------
+// ── Per-Client Receive Loop ───────────────────────────────────────────────────
 
-void CNexusServer::ClientLoop(std::shared_ptr<SNexusClientEntry> client) {
+void CNexusServer::ClientLoop(std::shared_ptr<SNexusClientEntry> client)
+{
     constexpr size_t kBufferSize = 8192;
     char buffer[kBufferSize];
     std::string accumulator;
 
-    while (m_running && client->socket && client->socket->IsOpen()) {
+    while (m_running && client->socket && client->socket->IsOpen())
+    {
         size_t bytesRead = client->socket->Receive(buffer, kBufferSize);
         if (bytesRead == 0 || bytesRead == static_cast<size_t>(-1)) break;
 
         accumulator.append(buffer, bytesRead);
 
         // Process as many complete packets as available
-        while (accumulator.size() >= sizeof(SNexusHeader)) {
+        while (accumulator.size() >= sizeof(SNexusHeader))
+        {
             SNexusHeader header{};
             std::memcpy(&header, accumulator.data(), sizeof(header));
 
             // Reject oversized payloads to prevent memory exhaustion
-            if (header.payloadSize > kNexusMaxPayloadSize) {
+            if (header.payloadSize > kNexusMaxPayloadSize)
+            {
                 accumulator.clear();
                 RemoveClient(client.get());
                 return;
@@ -164,18 +173,19 @@ void CNexusServer::ClientLoop(std::shared_ptr<SNexusClientEntry> client) {
     RemoveClient(client.get());
 }
 
-// ---------------------------------------------------------------------------
-// Packet handling
-// ---------------------------------------------------------------------------
+// ── Packet Handling ───────────────────────────────────────────────────────────
 
 void CNexusServer::HandlePacket(SNexusClientEntry* client,
                                 const SNexusHeader& header,
-                                const std::string& payload) {
+                                const std::string& payload)
+{
     const char* cursor = payload.data();
     size_t remaining = payload.size();
 
-    switch (header.type) {
-    case ENexusMessageType::Register: {
+    switch (header.type)
+    {
+    case ENexusMessageType::Register:
+    {
         std::string appName    = DeserializeString(cursor, remaining);
         std::string macAddress = DeserializeString(cursor, remaining);
 
@@ -192,7 +202,8 @@ void CNexusServer::HandlePacket(SNexusClientEntry* client,
         SendAll(client->socket.get(), ack.data(), ack.size());
         break;
     }
-    case ENexusMessageType::Subscribe: {
+    case ENexusMessageType::Subscribe:
+    {
         SNexusSubscription sub;
         sub.pipeName = DeserializeString(cursor, remaining);
         sub.appName  = DeserializeString(cursor, remaining);
@@ -207,7 +218,8 @@ void CNexusServer::HandlePacket(SNexusClientEntry* client,
         SendAll(client->socket.get(), ack.data(), ack.size());
         break;
     }
-    case ENexusMessageType::PipeMessage: {
+    case ENexusMessageType::PipeMessage:
+    {
         SNexusMessage msg;
         msg.senderApp   = DeserializeString(cursor, remaining);
         msg.pipeName    = DeserializeString(cursor, remaining);
@@ -220,7 +232,8 @@ void CNexusServer::HandlePacket(SNexusClientEntry* client,
 
         {
             std::lock_guard<std::mutex> lock(m_callbackMutex);
-            if (m_messageCallback) {
+            if (m_messageCallback)
+            {
                 m_messageCallback(msg);
             }
         }
@@ -228,7 +241,8 @@ void CNexusServer::HandlePacket(SNexusClientEntry* client,
         ForwardMessage(client, msg);
         break;
     }
-    case ENexusMessageType::BinaryMessage: {
+    case ENexusMessageType::BinaryMessage:
+    {
         SNexusBinaryMessage msg;
         msg.senderApp = DeserializeString(cursor, remaining);
         msg.pipeName  = DeserializeString(cursor, remaining);
@@ -240,7 +254,8 @@ void CNexusServer::HandlePacket(SNexusClientEntry* client,
 
         {
             std::lock_guard<std::mutex> lock(m_callbackMutex);
-            if (m_binaryMessageCallback) {
+            if (m_binaryMessageCallback)
+            {
                 m_binaryMessageCallback(msg);
             }
         }
@@ -253,21 +268,20 @@ void CNexusServer::HandlePacket(SNexusClientEntry* client,
     }
 }
 
-// ---------------------------------------------------------------------------
-// Message forwarding
-// ---------------------------------------------------------------------------
+// ── Message Forwarding ────────────────────────────────────────────────────────
 
 bool CNexusServer::MatchesSubscription(const SNexusSubscription& sub,
                                        const std::string& pipeName,
-                                       const std::string& senderApp) const {
+                                       const std::string& senderApp) const
+{
     bool pipeMatch = (sub.pipeName == "ANY" || sub.pipeName == pipeName);
     bool appMatch  = (sub.appName  == "ANY" || sub.appName  == senderApp);
     return pipeMatch && appMatch;
 }
 
-void CNexusServer::ForwardMessage(const SNexusClientEntry* sender, const SNexusMessage& msg) {
+void CNexusServer::ForwardMessage(const SNexusClientEntry* sender, const SNexusMessage& msg)
+{
     std::string packet = BuildPipeMessagePacket(msg.senderApp, msg.pipeName, msg.messageType, msg.body);
-
 
     // Snapshot matching targets as shared_ptrs under the lock.
     // The shared_ptr keeps each entry alive even if PruneDeadClients
@@ -276,14 +290,17 @@ void CNexusServer::ForwardMessage(const SNexusClientEntry* sender, const SNexusM
 
     {
         std::lock_guard<std::mutex> lock(m_clientsMutex);
-        for (auto& entry : m_clients) {
+        for (auto& entry : m_clients)
+        {
             if (!entry->registered || !entry->socket || !entry->socket->IsOpen()) continue;
 
             // Don't echo the message back to the sender
             if (entry.get() == sender) continue;
 
-            for (const auto& sub : entry->subscriptions) {
-                if (MatchesSubscription(sub, msg.pipeName, msg.senderApp)) {
+            for (const auto& sub : entry->subscriptions)
+            {
+                if (MatchesSubscription(sub, msg.pipeName, msg.senderApp))
+                {
                     targets.push_back(entry);
                     break; // send once per client
                 }
@@ -291,29 +308,35 @@ void CNexusServer::ForwardMessage(const SNexusClientEntry* sender, const SNexusM
         }
     }
 
-    // Send outside m_clientsMutex � each client's sendMutex still serialises writes.
-    for (auto& target : targets) {
+    // Send outside m_clientsMutex -- each client's sendMutex still serialises writes.
+    for (auto& target : targets)
+    {
         std::lock_guard<std::mutex> sendLock(target->sendMutex);
-        if (target->socket && target->socket->IsOpen()) {
+        if (target->socket && target->socket->IsOpen())
+        {
             SendAll(target->socket.get(), packet.data(), packet.size());
         }
     }
 }
 
-void CNexusServer::ForwardBinaryMessage(const SNexusClientEntry* sender, const SNexusBinaryMessage& msg) {
+void CNexusServer::ForwardBinaryMessage(const SNexusClientEntry* sender, const SNexusBinaryMessage& msg)
+{
     std::string packet = BuildBinaryMessagePacket(msg.senderApp, msg.pipeName, msg.data.data(), msg.data.size());
 
     std::vector<std::shared_ptr<SNexusClientEntry>> targets;
 
     {
         std::lock_guard<std::mutex> lock(m_clientsMutex);
-        for (auto& entry : m_clients) {
+        for (auto& entry : m_clients)
+        {
             if (!entry->registered || !entry->socket || !entry->socket->IsOpen()) continue;
 
             if (entry.get() == sender) continue;
 
-            for (const auto& sub : entry->subscriptions) {
-                if (MatchesSubscription(sub, msg.pipeName, msg.senderApp)) {
+            for (const auto& sub : entry->subscriptions)
+            {
+                if (MatchesSubscription(sub, msg.pipeName, msg.senderApp))
+                {
                     targets.push_back(entry);
                     break;
                 }
@@ -321,37 +344,45 @@ void CNexusServer::ForwardBinaryMessage(const SNexusClientEntry* sender, const S
         }
     }
 
-    for (auto& target : targets) {
+    for (auto& target : targets)
+    {
         std::lock_guard<std::mutex> sendLock(target->sendMutex);
-        if (target->socket && target->socket->IsOpen()) {
+        if (target->socket && target->socket->IsOpen())
+        {
             SendAll(target->socket.get(), packet.data(), packet.size());
         }
     }
 }
 
-// ---------------------------------------------------------------------------
-// Client removal & pruning
-// ---------------------------------------------------------------------------
+// ── Client Removal & Pruning ──────────────────────────────────────────────────
 
-void CNexusServer::RemoveClient(SNexusClientEntry* client) {
-    if (client->socket && client->socket->IsOpen()) {
+void CNexusServer::RemoveClient(SNexusClientEntry* client)
+{
+    if (client->socket && client->socket->IsOpen())
+    {
         client->socket->Close();
     }
     // The client entry will be pruned from the vector in PruneDeadClients(),
     // which is called under m_clientsMutex during the next accept.
 }
 
-void CNexusServer::PruneDeadClients() {
+void CNexusServer::PruneDeadClients()
+{
     // Must be called while m_clientsMutex is held.
     // Join finished threads and erase their corresponding client entries.
-    for (size_t i = 0; i < m_clients.size(); ) {
+    for (size_t i = 0; i < m_clients.size(); )
+    {
         bool isDead = !m_clients[i]->socket || !m_clients[i]->socket->IsOpen();
-        if (isDead) {
-            if (m_clients[i]->thread.joinable()) {
+        if (isDead)
+        {
+            if (m_clients[i]->thread.joinable())
+            {
                 m_clients[i]->thread.join();
             }
             m_clients.erase(m_clients.begin() + static_cast<ptrdiff_t>(i));
-        } else {
+        }
+        else
+        {
             ++i;
         }
     }

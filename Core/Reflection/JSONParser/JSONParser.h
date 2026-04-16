@@ -75,10 +75,10 @@ public:
 			Vector4f* value = reinterpret_cast<Vector4f*>(property.GetAddress(obj));
 
 			ReflectionDebug.Assert(valueMember->GetArray().Size() == 4, "Bad Vector4 Read");
-			value->setX(valueMember->GetArray()[0].GetFloat());
-			value->setY(valueMember->GetArray()[1].GetFloat());
-			value->setZ(valueMember->GetArray()[2].GetFloat());
-			value->setW(valueMember->GetArray()[3].GetFloat());
+			value->SetX(valueMember->GetArray()[0].GetFloat());
+			value->SetY(valueMember->GetArray()[1].GetFloat());
+			value->SetZ(valueMember->GetArray()[2].GetFloat());
+			value->SetW(valueMember->GetArray()[3].GetFloat());
 		}
 	}
 	void ReadVector3(const CPropertyBase& property, CReflectedBase* obj)
@@ -89,9 +89,9 @@ public:
 			Vector3f* value = reinterpret_cast<Vector3f*>(property.GetAddress(obj));
 
 			ReflectionDebug.Assert(valueMember->GetArray().Size() == 3, "Bad Vector3 Read");
-			value->setX(valueMember->GetArray()[0].GetFloat());
-			value->setY(valueMember->GetArray()[1].GetFloat());
-			value->setZ(valueMember->GetArray()[2].GetFloat());
+			value->SetX(valueMember->GetArray()[0].GetFloat());
+			value->SetY(valueMember->GetArray()[1].GetFloat());
+			value->SetZ(valueMember->GetArray()[2].GetFloat());
 		}
 	}
 	void ReadObject(const CPropertyBase& property, CReflectedBase* obj)
@@ -569,7 +569,7 @@ public:
 					ReflectionDebug.print("ReadComponentRawPtrArray: Creating component of type: " + className + "\n");
 
 					// Create component through ClassFactory
-					CReflectedBase* newObject = ClassFactory::createObject(className.c_str());
+					CReflectedBase* newObject = ClassFactory::CreateObject(className.c_str());
 					if (newObject) {
 						// Ensure it's actually a Component
 						ComponentSystem::Component* childComponent = dynamic_cast<ComponentSystem::Component*>(newObject);

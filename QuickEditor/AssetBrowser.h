@@ -70,7 +70,7 @@ struct AssetTypeInfo
 
     /// Reflected class name used by ClassFactory to instantiate the object.
     /// When non-empty, the asset browser can create an instance via
-    /// ClassFactory::createObject() and load the file with CReflectedBase::Read().
+    /// ClassFactory::CreateObject() and load the file with CReflectedBase::Read().
     std::string reflectedClassName;
 
     /// Primary launch option (triggered by double-click). May be empty.

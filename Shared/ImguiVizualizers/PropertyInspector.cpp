@@ -77,16 +77,16 @@ namespace ImGuiVisualizers
 	}
 
 	PropertyInspector::PropertyInspector()
-		: m_Object(nullptr)
-		, m_WidgetMap(nullptr)
-		, m_ReadOnly(false)
-		, m_ShowInternalData(true)
-		, m_ExpandByDefault(true)
-		, m_DisplayMode(PropertyDisplayMode::Hierarchy)
-		, m_FirstRender(true)
-		, m_FloatBuffer(0.0f)
-		, m_IntBuffer(0)
-		, m_BoolBuffer(false)
+		: m_object(nullptr)
+		, m_widgetMap(nullptr)
+		, m_readOnly(false)
+		, m_showInternalData(true)
+		, m_expandByDefault(true)
+		, m_displayMode(PropertyDisplayMode::Hierarchy)
+		, m_firstRender(true)
+		, m_floatBuffer(0.0f)
+		, m_intBuffer(0)
+		, m_boolBuffer(false)
 	{
 	}
 
@@ -100,7 +100,7 @@ namespace ImGuiVisualizers
 		RenderContent();
 
 		ImGui::End();
-		m_FirstRender = false;
+		m_firstRender = false;
 		return true;
 	}
 
@@ -111,28 +111,28 @@ namespace ImGuiVisualizers
 			ClearObject();
 		}
 		ImGui::SameLine();
-		ImGui::Checkbox("Read Only", &m_ReadOnly);
+		ImGui::Checkbox("Read Only", &m_readOnly);
 		ImGui::SameLine();
-		ImGui::Checkbox("Show Internal", &m_ShowInternalData);
+		ImGui::Checkbox("Show Internal", &m_showInternalData);
 		ImGui::SameLine();
-		ImGui::Checkbox("Expand by Default", &m_ExpandByDefault);
+		ImGui::Checkbox("Expand by Default", &m_expandByDefault);
 
 		// Display mode selection
 		ImGui::SameLine();
-		if (ImGui::Button(m_DisplayMode == PropertyDisplayMode::Hierarchy ? "Hierarchy" : "Flat List")) {
-			m_DisplayMode = (m_DisplayMode == PropertyDisplayMode::Hierarchy) ?
+		if (ImGui::Button(m_displayMode == PropertyDisplayMode::Hierarchy ? "Hierarchy" : "Flat List")) {
+			m_displayMode = (m_displayMode == PropertyDisplayMode::Hierarchy) ?
 				PropertyDisplayMode::FlatList : PropertyDisplayMode::Hierarchy;
 		}
 
 		ImGui::Separator();
 
 		// Content
-		if (m_Object) {
-			ImGui::Text("Object: %s", m_Object->GetRflClassName() ? m_Object->GetRflClassName() : "Unknown");
-			ImGui::Text("Address: %p", m_Object);
+		if (m_object) {
+			ImGui::Text("Object: %s", m_object->GetRflClassName() ? m_object->GetRflClassName() : "Unknown");
+			ImGui::Text("Address: %p", m_object);
 			ImGui::Separator();
 
-			RenderObjectProperties(m_Object, m_Object->GetRflClassName() ? m_Object->GetRflClassName() : "Root");
+			RenderObjectProperties(m_object, m_object->GetRflClassName() ? m_object->GetRflClassName() : "Root");
 		}
 		else {
 				ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No object selected");
@@ -141,22 +141,22 @@ namespace ImGuiVisualizers
 			// Process any pending component deletions after rendering
 			ProcessPendingDeletions();
 
-			m_FirstRender = false;
+			m_firstRender = false;
 	}
 
 	void PropertyInspector::SetObject(CReflectedBase* object)
 	{
-		m_Object = object;
-		m_FirstRender = true;
+		m_object = object;
+		m_firstRender = true;
 
 		// Try to get a widget map from the widget map registry.
-		m_WidgetMap = nullptr;
-		if (m_Object) {
-			const char* className = m_Object->GetRflClassName();
+		m_widgetMap = nullptr;
+		if (m_object) {
+			const char* className = m_object->GetRflClassName();
 			if (className && className[0] != '\0') {
 				auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(className);
 				if (mapPtr) {
-					m_WidgetMap = mapPtr.get();
+					m_widgetMap = mapPtr.get();
 				}
 			}
 		}
@@ -168,8 +168,8 @@ namespace ImGuiVisualizers
 
 	void PropertyInspector::ClearObject()
 	{
-		m_Object = nullptr;
-		m_WidgetMap = nullptr;
+		m_object = nullptr;
+		m_widgetMap = nullptr;
 		m_ExpandedNodes.clear();
 		m_StringBuffers.clear();
 	}
@@ -181,7 +181,7 @@ namespace ImGuiVisualizers
 			return;
 		}
 
-		if (m_DisplayMode == PropertyDisplayMode::FlatList) {
+		if (m_displayMode == PropertyDisplayMode::FlatList) {
 			RenderObjectPropertiesFlat(object);
 		}
 		else {
@@ -221,7 +221,7 @@ namespace ImGuiVisualizers
 				CPropertyBase* property = entry.GetProperty();
 				if (property) {
 					// Skip internal properties if not showing them
-					if (!m_ShowInternalData && property->GetName().find("m_") == 0) {
+					if (!m_showInternalData && property->GetName().find("m_") == 0) {
 						continue;
 					}
 
@@ -270,7 +270,7 @@ namespace ImGuiVisualizers
 		for (const auto& entry : *reflectionMap) {
 			CPropertyBase* property = entry.GetProperty();
 			if (property) {
-				if (m_ShowInternalData || property->GetName().find("m_") != 0) {
+				if (m_showInternalData || property->GetName().find("m_") != 0) {
 					visiblePropertyCount++;
 				}
 			}
@@ -290,7 +290,7 @@ namespace ImGuiVisualizers
 				CPropertyBase* property = entry.GetProperty();
 				if (property) {
 					// Skip internal properties if not showing them
-					if (!m_ShowInternalData && property->GetName().find("m_") == 0) {
+					if (!m_showInternalData && property->GetName().find("m_") == 0) {
 						continue;
 					}
 
@@ -310,13 +310,13 @@ namespace ImGuiVisualizers
 		const std::string fullName = prefix.empty() ? property.GetName() : prefix + "." + property.GetName();
 
 		// Skip internal properties if not showing them
-		if (!m_ShowInternalData && property.GetName().find("m_") == 0) {
+		if (!m_showInternalData && property.GetName().find("m_") == 0) {
 			return;
 		}
 
 		// Check widget map for a custom widget override
-		if (m_WidgetMap && m_WidgetMap->HasCustomWidget(property.GetName())) {
-			EditorWidgetType widgetType = m_WidgetMap->GetWidget(property.GetName());
+		if (m_widgetMap && m_widgetMap->HasCustomWidget(property.GetName())) {
+			EditorWidgetType widgetType = m_widgetMap->GetWidget(property.GetName());
 			if (RenderWithCustomWidget(property, object, widgetType)) {
 				return;
 			}
@@ -387,7 +387,7 @@ namespace ImGuiVisualizers
 
     RenderPropertyLabel(property.GetName(), property.GetType());
 
-    if (m_ReadOnly) {
+    if (m_readOnly) {
         ImGui::Text("%.3f", *value);
     }
     else {
@@ -406,7 +406,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("%d", *value);
 		}
 		else {
@@ -422,14 +422,14 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("\"%s\"", value->c_str());
 		}
 		else {
 			void* propAddr = property.GetAddress(object);
 			StringEditBuffer& buf = m_StringBuffers[propAddr];
 
-			if (!buf.isBeingEdited) {
+			if (!buf.m_isBeingEdited) {
 				strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
 				buf.data[sizeof(buf.data) - 1] = '\0';
 			}
@@ -439,7 +439,7 @@ namespace ImGuiVisualizers
 			if (ImGui::InputText("", buf.data, sizeof(buf.data))) {
 				*value = buf.data;
 			}
-			buf.isBeingEdited = ImGui::IsItemActive();
+			buf.m_isBeingEdited = ImGui::IsItemActive();
 			ImGui::PopID();
 		}
 	}
@@ -450,7 +450,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("%s", *value ? "true" : "false");
 		}
 		else {
@@ -466,7 +466,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("(%.3f, %.3f, %.3f)", value->getX(), value->getY(), value->getZ());
 		}
 		else {
@@ -474,9 +474,9 @@ namespace ImGuiVisualizers
 			ImGui::PushID(property.GetName().c_str());
 			SetNextItemWidthToContentRegionAvail();
 			if (ImGui::InputFloat3("", vec3)) {
-				value->setX(vec3[0]);
-				value->setY(vec3[1]);
-				value->setZ(vec3[2]);
+				value->SetX(vec3[0]);
+				value->SetY(vec3[1]);
+				value->SetZ(vec3[2]);
 			}
 			ImGui::PopID();
 		}
@@ -488,17 +488,17 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("(%.3f, %.3f, %.3f, %.3f)", value->getX(), value->getY(), value->getZ(), value->getW());
 		}
 		else {
 			float vec4[4] = { value->getX(), value->getY(), value->getZ(), value->getW() };
 			ImGui::PushID(property.GetName().c_str());
 			if (ImGui::InputFloat4("", vec4)) {
-				value->setX(vec4[0]);
-				value->setY(vec4[1]);
-				value->setZ(vec4[2]);
-				value->setW(vec4[3]);
+				value->SetX(vec4[0]);
+				value->SetY(vec4[1]);
+				value->SetZ(vec4[2]);
+				value->SetW(vec4[3]);
 			}
 			ImGui::PopID();
 		}
@@ -517,7 +517,7 @@ namespace ImGuiVisualizers
 			ImGui::SameLine();
 			ImGui::TextColored(GetTypeColor(property.GetType()), "[Matrix4]");
 
-			if (m_ReadOnly) {
+			if (m_readOnly) {
 				// Display matrix in a readable format
 				for (int row = 0; row < 4; ++row) {
 					ImGui::Text("[%.3f, %.3f, %.3f, %.3f]",
@@ -574,7 +574,7 @@ namespace ImGuiVisualizers
 				// Set widget map for the duration of this scope (restored automatically)
 				WidgetMapScope wms(this, subObject);
 
-				if (m_ShowDetails)
+				if (m_showDetails)
 					ImGui::Text("Type: %s", subObject->GetRflClassName() ? subObject->GetRflClassName() : "Unknown");
 				if (showAddress)
 					ImGui::Text("Address: %p", subObject);
@@ -657,14 +657,14 @@ namespace ImGuiVisualizers
 				if (classNames.empty()) {
 					ImGui::SameLine();
 					ImGui::PushID((property.GetName() + "##vec_buttons").c_str());
-					if (!m_ReadOnly) {
+					if (!m_readOnly) {
 						ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "(no classes)");
 					}
 					ImGui::PopID();
 				}
 				else 
 				{
-					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons", m_ReadOnly,
+					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons", m_readOnly,
 						[&]() {
 							auto classNamesAdd = ClassFactory::GetRegisteredClassNames();
 							if (!classNamesAdd.empty()) {
@@ -743,13 +743,13 @@ namespace ImGuiVisualizers
 				if (classNames.empty()) {
 					ImGui::SameLine();
 					ImGui::PushID((property.GetName() + "##vec_buttons_collapsed").c_str());
-					if (!m_ReadOnly) {
+					if (!m_readOnly) {
 						ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "(no classes)");
 					}
 					ImGui::PopID();
 				}
 				else {
-					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons_collapsed", m_ReadOnly,
+					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons_collapsed", m_readOnly,
 						[&]() {
 							auto classNamesAdd = ClassFactory::GetRegisteredClassNames();
 							if (!classNamesAdd.empty()) {
@@ -858,7 +858,7 @@ namespace ImGuiVisualizers
 			// Right-click context menu for adding components (must be called right after TreeNodeEx)
 			RenderComponentArrayContextMenu(property, object);
 
-			if (m_ShowDetails) {
+			if (m_showDetails) {
 				ImGui::SameLine();
 				ImGui::TextColored(GetTypeColor(property.GetType()), "[Vector<Component*>]");
 			}
@@ -872,13 +872,13 @@ namespace ImGuiVisualizers
 				if (allComponents.empty()) {
 					ImGui::SameLine();
 					ImGui::PushID((property.GetName() + "##vec_buttons").c_str());
-					if (!m_ReadOnly) {
+					if (!m_readOnly) {
 						ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "(no components)");
 					}
 					ImGui::PopID();
 				}
 				else {
-					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons", m_ReadOnly,
+					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons", m_readOnly,
 						[&]() {
 							const auto& all = GetComponentRegistry().GetAll();
 							if (!all.empty()) {
@@ -929,7 +929,7 @@ namespace ImGuiVisualizers
 						// temporarily switch widget map to the component's class (RAII)
 						WidgetMapScope wms(this, comp);
 
-						if (m_ShowDetails) {
+						if (m_showDetails) {
 							ImGui::Text("Type: %s", comp->GetRflClassName() ? comp->GetRflClassName() : "Unknown");
 							ImGui::Text("ID: %u", comp->GetId());
 							ImGui::Text("Active: %s", comp->IsActive() ? "true" : "false");
@@ -968,13 +968,13 @@ namespace ImGuiVisualizers
 				if (allComponents.empty()) {
 					ImGui::SameLine();
 					ImGui::PushID((property.GetName() + "##vec_buttons_collapsed").c_str());
-					if (!m_ReadOnly) {
+					if (!m_readOnly) {
 						ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "(no components)");
 					}
 					ImGui::PopID();
 				}
 				else {
-					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons_collapsed", m_ReadOnly,
+					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons_collapsed", m_readOnly,
 						[&]() {
 							const auto& all = GetComponentRegistry().GetAll();
 							if (!all.empty()) {
@@ -1015,7 +1015,7 @@ namespace ImGuiVisualizers
 
 	bool PropertyInspector::ShouldExpandNode(const std::string& nodeId)
 	{
-		if (m_FirstRender && m_ExpandByDefault) {
+		if (m_firstRender && m_expandByDefault) {
 			return true;
 		}
 		return m_ExpandedNodes.find(nodeId) != m_ExpandedNodes.end();
@@ -1103,7 +1103,7 @@ namespace ImGuiVisualizers
 	void PropertyInspector::RenderComponentArrayContextMenu(const CPropertyBase& property, CReflectedBase* object)
 	{
 		// Skip if read-only
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			return;
 		}
 
@@ -1210,7 +1210,7 @@ namespace ImGuiVisualizers
 
 	bool PropertyInspector::RenderWithCustomWidget(const CPropertyBase& property, CReflectedBase* object, EditorWidgetType widgetType)
 	{
-		const WidgetConfig* config = m_WidgetMap ? m_WidgetMap->GetConfig(property.GetName()) : nullptr;
+		const WidgetConfig* config = m_widgetMap ? m_widgetMap->GetConfig(property.GetName()) : nullptr;
 
 		switch (widgetType) {
 		case EditorWidgetType::ReadOnly:
@@ -1286,7 +1286,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("%.3f", *value);
 		}
 		else {
@@ -1304,7 +1304,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("%d", *value);
 		}
 		else {
@@ -1323,7 +1323,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("%.3f", *value);
 		}
 		else {
@@ -1342,7 +1342,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::Text("%d", *value);
 		}
 		else {
@@ -1359,7 +1359,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::ColorButton("##preview", ImVec4(col[0], col[1], col[2], 1.0f));
 			ImGui::SameLine();
 			ImGui::Text("(%.3f, %.3f, %.3f)", col[0], col[1], col[2]);
@@ -1382,7 +1382,7 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::ColorButton("##preview", ImVec4(col[0], col[1], col[2], col[3]));
 			ImGui::SameLine();
 			ImGui::Text("(%.3f, %.3f, %.3f, %.3f)", col[0], col[1], col[2], col[3]);
@@ -1390,10 +1390,10 @@ namespace ImGuiVisualizers
 		else {
 			ImGui::PushID(property.GetName().c_str());
 			if (ImGui::ColorEdit4("", col)) {
-				value->setX(col[0]);
-				value->setY(col[1]);
-				value->setZ(col[2]);
-				value->setW(col[3]);
+				value->SetX(col[0]);
+				value->SetY(col[1]);
+				value->SetZ(col[2]);
+				value->SetW(col[3]);
 			}
 			ImGui::PopID();
 		}
@@ -1413,7 +1413,7 @@ namespace ImGuiVisualizers
 		if (property.GetType() == RT_String) {
 			std::string* value = reinterpret_cast<std::string*>(property.GetAddress(object));
 
-			if (m_ReadOnly) {
+			if (m_readOnly) {
 				ImGui::Text("%s", value->c_str());
 			}
 			else {
@@ -1439,7 +1439,7 @@ namespace ImGuiVisualizers
 				currentIndex = 0;
 			}
 
-			if (m_ReadOnly) {
+			if (m_readOnly) {
 				ImGui::Text("%s", config->dropdownOptions[currentIndex].c_str());
 			}
 			else {
@@ -1469,14 +1469,14 @@ namespace ImGuiVisualizers
 
 		RenderPropertyLabel(property.GetName(), property.GetType());
 
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			ImGui::TextWrapped("%s", value->c_str());
 		}
 		else {
 			void* propAddr = property.GetAddress(object);
 			StringEditBuffer& buf = m_StringBuffers[propAddr];
 
-			if (!buf.isBeingEdited) {
+			if (!buf.m_isBeingEdited) {
 				strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
 				buf.data[sizeof(buf.data) - 1] = '\0';
 			}
@@ -1485,7 +1485,7 @@ namespace ImGuiVisualizers
 			if (ImGui::InputTextMultiline("", buf.data, sizeof(buf.data), ImVec2(-FLT_MIN, ImGui::GetTextLineHeight() * 6))) {
 				*value = buf.data;
 			}
-			buf.isBeingEdited = ImGui::IsItemActive();
+			buf.m_isBeingEdited = ImGui::IsItemActive();
 			ImGui::PopID();
 		}
 	}
@@ -1550,19 +1550,19 @@ namespace ImGuiVisualizers
 			UpdateExpandedState(nodeId, true);
 
 			ImGui::SameLine();
-			if( m_ShowDetails )
+			if( m_showDetails )
 				ImGui::TextColored(GetTypeColor(property.GetType()), "%s", vectorTag);
 
 			// Add / Remove controls (use the existing free function)
-			RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons", m_ReadOnly,
+			RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons", m_readOnly,
 				[&]() {
-					if (!m_ReadOnly) {
+					if (!m_readOnly) {
 						if (makeDefault) vec->push_back(makeDefault());
 						else vec->push_back(ValueT());
 					}
 				},
 				[&]() {
-					if (!m_ReadOnly && !vec->empty()) {
+					if (!m_readOnly && !vec->empty()) {
 						if (removeCleanup) {
 							// avoid taking address-of for vector<bool> proxy
 							if constexpr (!std::is_same<ValueT, bool>::value) {
@@ -1581,7 +1581,7 @@ namespace ImGuiVisualizers
 				ImGui::PushID(static_cast<int>(i));
 				ImGui::Text("[%zu]:", i);
 				ImGui::SameLine();
-				drawElement(vec, i, m_ReadOnly);
+				drawElement(vec, i, m_readOnly);
 				ImGui::PopID();
 			}
 
@@ -1589,22 +1589,22 @@ namespace ImGuiVisualizers
 		}
 		else {
 			UpdateExpandedState(nodeId, false);
-			if (m_ShowDetails)
+			if (m_showDetails)
 			{
 				ImGui::SameLine();
 				ImGui::TextColored(GetTypeColor(property.GetType()), "%s (%zu)", vectorTag, vec->size());
 			}
 
 			// Quick add/remove when collapsed
-			RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons_collapsed", m_ReadOnly,
+			RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons_collapsed", m_readOnly,
 				[&]() {
-					if (!m_ReadOnly) {
+					if (!m_readOnly) {
 						if (makeDefault) vec->push_back(makeDefault());
 						else vec->push_back(ValueT());
 					}
 				},
 				[&]() {
-					if (!m_ReadOnly && !vec->empty()) {
+					if (!m_readOnly && !vec->empty()) {
 						if (removeCleanup) {
 							// avoid taking address-of for vector<bool> proxy
 							if constexpr (!std::is_same<ValueT, bool>::value) {
@@ -1685,7 +1685,7 @@ namespace ImGuiVisualizers
 				void* elemAddr = &(*vec)[i];
 				StringEditBuffer& buf = m_StringBuffers[elemAddr];
 
-				if (!buf.isBeingEdited) {
+				if (!buf.m_isBeingEdited) {
 					strncpy_s(buf.data, (*vec)[i].c_str(), sizeof(buf.data) - 1);
 					buf.data[sizeof(buf.data) - 1] = '\0';
 				}
@@ -1698,7 +1698,7 @@ namespace ImGuiVisualizers
 					if (ImGui::InputText("##val", buf.data, sizeof(buf.data))) {
 						(*vec)[i] = buf.data;
 					}
-					buf.isBeingEdited = ImGui::IsItemActive();
+					buf.m_isBeingEdited = ImGui::IsItemActive();
 				}
 				ImGui::PopID();
 			},
@@ -1712,7 +1712,7 @@ namespace ImGuiVisualizers
 	void PropertyInspector::RenderObjectArrayContextMenu(const CPropertyBase& property, CReflectedBase* object)
 	{
 		// Skip if read-only
-		if (m_ReadOnly) {
+		if (m_readOnly) {
 			return;
 		}
 
@@ -1747,7 +1747,7 @@ namespace ImGuiVisualizers
 		if (!objectVector)
 			return false;
 
-		CReflectedBase* newObj = ClassFactory::createObject(className.c_str());
+		CReflectedBase* newObj = ClassFactory::CreateObject(className.c_str());
 		if (!newObj)
 			return false;
 
@@ -1770,7 +1770,7 @@ namespace ImGuiVisualizers
 void PropertyInspector::RenderComponentItemContextMenu(const CPropertyBase& property, CReflectedBase* object, size_t index)
 {
 	// Skip if read-only
-	if (m_ReadOnly) {
+	if (m_readOnly) {
 		return;
 	}
 
@@ -1797,7 +1797,7 @@ bool PropertyInspector::AddComponentToArray(const CPropertyBase& property, CRefl
 	}
 
 	// Create the component using ClassFactory
-	CReflectedBase* newObject = ClassFactory::createObject(componentClassName.c_str());
+	CReflectedBase* newObject = ClassFactory::CreateObject(componentClassName.c_str());
 	if (!newObject) {
 		return false;
 	}
@@ -1845,7 +1845,7 @@ void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflect
 
 	RenderPropertyLabel(property.GetName(), property.GetType());
 
-	if (m_ReadOnly) {
+	if (m_readOnly) {
 		ImGui::Text("%s", value->c_str());
 		return;
 	}
@@ -1854,7 +1854,7 @@ void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflect
 	void* propAddr = property.GetAddress(object);
 	StringEditBuffer& buf = m_StringBuffers[propAddr];
 
-	if (!buf.isBeingEdited) {
+	if (!buf.m_isBeingEdited) {
 		strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
 		buf.data[sizeof(buf.data) - 1] = '\0';
 	}
@@ -1921,7 +1921,7 @@ void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflect
 	}
 
 	// Track whether the text input is active
-	buf.isBeingEdited = ImGui::IsItemActive();
+	buf.m_isBeingEdited = ImGui::IsItemActive();
 
 	ImGui::PopID();
 }

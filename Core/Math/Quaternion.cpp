@@ -1,10 +1,11 @@
 #include "Quaternion.h"
-#include "Matrix4f.h"  // Include your Matrix4x4 header
+#include "Matrix4f.h"
 
-// Convert quaternion to rotation matrix
-Matrix4f Quaternion::toMatrix() const {
-    // Normalize the quaternion first
-    Quaternion q = normalized();
+// ── ToMatrix ──────────────────────────────────────────────────────────────────
+
+Matrix4f Quaternion::ToMatrix() const
+{
+    Quaternion q = Normalized();
 
     float xx = q.x * q.x;
     float xy = q.x * q.y;
@@ -40,40 +41,44 @@ Matrix4f Quaternion::toMatrix() const {
     return result;
 }
 
-// Create quaternion from rotation matrix
-Quaternion Quaternion::fromMatrix(const Matrix4f& matrix) {
-    // Extract the rotation part (3x3 upper-left)
+// ── FromMatrix ────────────────────────────────────────────────────────────────
+
+Quaternion Quaternion::FromMatrix(const Matrix4f& matrix)
+{
     float m00 = matrix(0, 0), m01 = matrix(0, 1), m02 = matrix(0, 2);
     float m10 = matrix(1, 0), m11 = matrix(1, 1), m12 = matrix(1, 2);
     float m20 = matrix(2, 0), m21 = matrix(2, 1), m22 = matrix(2, 2);
 
-    // Use Shepperd's method for numerical stability
-    float trace = m00 + m11 + m22;
+    float     trace = m00 + m11 + m22;
     Quaternion result;
 
-    if (trace > 0) {
-        float s = std::sqrt(trace + 1.0f) * 2; // s = 4 * qw
+    if (trace > 0)
+    {
+        float s  = std::sqrt(trace + 1.0f) * 2;
         result.w = 0.25f * s;
         result.x = (m21 - m12) / s;
         result.y = (m02 - m20) / s;
         result.z = (m10 - m01) / s;
     }
-    else if ((m00 > m11) && (m00 > m22)) {
-        float s = std::sqrt(1.0f + m00 - m11 - m22) * 2; // s = 4 * qx
+    else if ((m00 > m11) && (m00 > m22))
+    {
+        float s  = std::sqrt(1.0f + m00 - m11 - m22) * 2;
         result.w = (m21 - m12) / s;
         result.x = 0.25f * s;
         result.y = (m01 + m10) / s;
         result.z = (m02 + m20) / s;
     }
-    else if (m11 > m22) {
-        float s = std::sqrt(1.0f + m11 - m00 - m22) * 2; // s = 4 * qy
+    else if (m11 > m22)
+    {
+        float s  = std::sqrt(1.0f + m11 - m00 - m22) * 2;
         result.w = (m02 - m20) / s;
         result.x = (m01 + m10) / s;
         result.y = 0.25f * s;
         result.z = (m12 + m21) / s;
     }
-    else {
-        float s = std::sqrt(1.0f + m22 - m00 - m11) * 2; // s = 4 * qz
+    else
+    {
+        float s  = std::sqrt(1.0f + m22 - m00 - m11) * 2;
         result.w = (m10 - m01) / s;
         result.x = (m02 + m20) / s;
         result.y = (m12 + m21) / s;

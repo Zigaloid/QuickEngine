@@ -10,175 +10,172 @@
 using namespace ComponentSystem;
 using namespace Core;
 
-// Test component classes for testing the scheduler
+// ── Test component types ──────────────────────────────────────────────────────
+
 class MockComponent : public Component {
 private:
-	std::atomic<int> updateCount_;
-	std::atomic<bool> lastUpdateCalled_;
-	double lastDeltaTime_;
+	std::atomic<int>  m_updateCount     { 0 };
+	std::atomic<bool> m_lastUpdateCalled{ false };
+	double            m_lastDeltaTime   = 0.0;
 
 public:
-	MockComponent() : updateCount_(0), lastUpdateCalled_(false), lastDeltaTime_(0.0) {}
+	MockComponent() = default;
 
-	int GetUpdateCount() const { return updateCount_.load(); }
-	bool WasLastUpdateCalled() const { return lastUpdateCalled_.load(); }
-	double GetLastDeltaTime() const { return lastDeltaTime_; }
+	int    GetUpdateCount()       const { return m_updateCount.load(); }
+	bool   WasLastUpdateCalled()  const { return m_lastUpdateCalled.load(); }
+	double GetLastDeltaTime()     const { return m_lastDeltaTime; }
 
-	void ResetCounters() {
-		updateCount_ = 0;
-		lastUpdateCalled_ = false;
-		lastDeltaTime_ = 0.0;
+	void ResetCounters()
+	{
+		m_updateCount      = 0;
+		m_lastUpdateCalled = false;
+		m_lastDeltaTime    = 0.0;
 	}
 
 protected:
-	void OnUpdate(double deltaTime) override {
-		updateCount_.fetch_add(1);
-		lastUpdateCalled_ = true;
-		lastDeltaTime_ = deltaTime;
-
-		// Simulate some work
+	void OnUpdate(double deltaTime) override
+	{
+		m_updateCount.fetch_add(1);
+		m_lastUpdateCalled = true;
+		m_lastDeltaTime    = deltaTime;
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 };
 
 class SlowComponent : public Component {
 private:
-	std::atomic<int> updateCount_;
-	std::chrono::milliseconds delay_;
+	std::atomic<int>       m_updateCount{ 0 };
+	std::chrono::milliseconds m_delay   { 50 };
 
 public:
-	SlowComponent() : updateCount_(0), delay_(std::chrono::milliseconds(50)) {}
+	SlowComponent() = default;
 
-	int GetUpdateCount() const { return updateCount_.load(); }
+	int GetUpdateCount() const { return m_updateCount.load(); }
 
-	void ResetCounters() {
-		updateCount_ = 0;
-	}
-
-	void SetDelay(std::chrono::milliseconds delay) {
-		delay_ = delay;
-	}
+	void ResetCounters()  { m_updateCount = 0; }
+	void SetDelay(std::chrono::milliseconds delay) { m_delay = delay; }
 
 protected:
-	void OnUpdate(double deltaTime) override {
-		updateCount_.fetch_add(1);
-		std::this_thread::sleep_for(delay_);
+	void OnUpdate(double /*deltaTime*/) override
+	{
+		m_updateCount.fetch_add(1);
+		std::this_thread::sleep_for(m_delay);
 	}
 };
 
 class FastComponent : public Component {
 private:
-	std::atomic<int> updateCount_;
+	std::atomic<int> m_updateCount{ 0 };
 
 public:
-	FastComponent() : updateCount_(0) {}
+	FastComponent() = default;
 
-	int GetUpdateCount() const { return updateCount_.load(); }
+	int GetUpdateCount() const { return m_updateCount.load(); }
+	void ResetCounters()       { m_updateCount = 0; }
 
-	void ResetCounters() {
-		updateCount_ = 0;
-	}
-
-	protected:
-	void OnUpdate(double deltaTime) override {
-		updateCount_.fetch_add(1);
-		// Minimal work
+protected:
+	void OnUpdate(double /*deltaTime*/) override
+	{
+		m_updateCount.fetch_add(1);
 		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 };
 
-// ComponentSystemScheduler Test Fixture
+// ── Test fixture ──────────────────────────────────────────────────────────────
+
 class ComponentSystemSchedulerTest : public ::testing::Test {
 protected:
-	void SetUp() override {
-		// Initialize CoreSystem which sets up JobSystem and ComponentManager
+	void SetUp() override
+	{
 		ASSERT_TRUE(Core::CoreSystem::Initialize());
-
 		componentManager = Core::CoreSystem::GetComponentManager();
 		ASSERT_NE(componentManager, nullptr);
-
 		scheduler = std::make_unique<ComponentSystemScheduler>(componentManager);
 		ASSERT_NE(scheduler, nullptr);
 	}
 
-	void TearDown() override {
-		if (scheduler) {
+	void TearDown() override
+	{
+		if (scheduler)
+		{
 			scheduler->Shutdown();
 			scheduler.reset();
 		}
-
 		Core::CoreSystem::Shutdown();
 		componentManager = nullptr;
 	}
 
-	ComponentManager* componentManager;
+	ComponentManager* componentManager = nullptr;
 	std::unique_ptr<ComponentSystemScheduler> scheduler;
 };
 
-// ComponentUpdateBatch Tests
-TEST(ComponentUpdateBatchTest, Construction) {
+// ── ComponentUpdateBatch tests ────────────────────────────────────────────────
+
+TEST(ComponentUpdateBatchTest, Construction)
+{
 	std::type_index testType(typeid(MockComponent));
 	ComponentUpdateBatch batch(testType, 5);
 
-	EXPECT_EQ(batch.getComponentType(), testType);
-	EXPECT_EQ(batch.getComponentCount(), 5);
-	EXPECT_EQ(batch.getBatchSize(), 0); // No futures added yet
-	EXPECT_FALSE(batch.isCompleted()); // No futures means not completed yet
+	EXPECT_EQ(batch.GetComponentType(), testType);
+	EXPECT_EQ(batch.GetComponentCount(), 5);
+	EXPECT_EQ(batch.GetBatchSize(), 0);
+	EXPECT_FALSE(batch.IsCompleted());
 }
 
-TEST(ComponentUpdateBatchTest, FutureManagement) {
+TEST(ComponentUpdateBatchTest, FutureManagement)
+{
 	std::type_index testType(typeid(MockComponent));
 	ComponentUpdateBatch batch(testType, 2);
 
-	// Add some futures
 	std::promise<void> promise1, promise2;
-	batch.addFuture(promise1.get_future());
-	batch.addFuture(promise2.get_future());
+	batch.AddFuture(promise1.get_future());
+	batch.AddFuture(promise2.get_future());
 
-	EXPECT_EQ(batch.getBatchSize(), 2);
-	EXPECT_FALSE(batch.isCompleted());
+	EXPECT_EQ(batch.GetBatchSize(), 2);
+	EXPECT_FALSE(batch.IsCompleted());
 
-	// Complete the promises
 	promise1.set_value();
 	promise2.set_value();
 
-	// Wait for completion
-	batch.waitForCompletion();
-	EXPECT_TRUE(batch.isCompleted());
+	batch.WaitForCompletion();
+	EXPECT_TRUE(batch.IsCompleted());
 }
 
-// ComponentSystemScheduler Basic Tests
-TEST_F(ComponentSystemSchedulerTest, Construction) {
+// ── Scheduler basic tests ─────────────────────────────────────────────────────
+
+TEST_F(ComponentSystemSchedulerTest, Construction)
+{
 	EXPECT_EQ(scheduler->GetRegisteredPhaseCount(), 0);
 	EXPECT_EQ(scheduler->GetExecutionPolicy(), ExecutionPolicy::Sequential);
 }
 
-TEST_F(ComponentSystemSchedulerTest, Initialization) {
+TEST_F(ComponentSystemSchedulerTest, Initialization)
+{
 	EXPECT_TRUE(scheduler->Initialize());
-
-	// Double initialization should return true
-	EXPECT_TRUE(scheduler->Initialize());
+	EXPECT_TRUE(scheduler->Initialize()); // Double init should succeed
 }
 
-TEST_F(ComponentSystemSchedulerTest, InitializationWithoutCoreSystem) {
+TEST_F(ComponentSystemSchedulerTest, InitializationWithoutCoreSystem)
+{
 	Core::CoreSystem::Shutdown();
 
 	ComponentSystemScheduler isolatedScheduler(componentManager);
-	EXPECT_FALSE(isolatedScheduler.Initialize()); // Should fail without CoreSystem
+	EXPECT_FALSE(isolatedScheduler.Initialize());
 
-	// Reinitialize CoreSystem for cleanup
 	Core::CoreSystem::Initialize();
 }
 
-TEST_F(ComponentSystemSchedulerTest, Shutdown) {
+TEST_F(ComponentSystemSchedulerTest, Shutdown)
+{
 	EXPECT_TRUE(scheduler->Initialize());
-
 	scheduler->Shutdown();
 	EXPECT_EQ(scheduler->GetRegisteredPhaseCount(), 0);
 }
 
-// Component Registration Tests
-TEST_F(ComponentSystemSchedulerTest, RegisterComponentType) {
+// ── Registration tests ────────────────────────────────────────────────────────
+
+TEST_F(ComponentSystemSchedulerTest, RegisterComponentType)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
 	scheduler->RegisterComponentType<MockComponent>(10, "MockComponent");
@@ -193,7 +190,8 @@ TEST_F(ComponentSystemSchedulerTest, RegisterComponentType) {
 	EXPECT_TRUE(phases[0].dependencies.empty());
 }
 
-TEST_F(ComponentSystemSchedulerTest, RegisterMultipleComponentTypes) {
+TEST_F(ComponentSystemSchedulerTest, RegisterMultipleComponentTypes)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
 	scheduler->RegisterComponentType<MockComponent>(20, "Mock");
@@ -203,15 +201,13 @@ TEST_F(ComponentSystemSchedulerTest, RegisterMultipleComponentTypes) {
 	EXPECT_EQ(scheduler->GetRegisteredPhaseCount(), 3);
 
 	const auto& phases = scheduler->GetPhases();
-	EXPECT_EQ(phases.size(), 3);
-
-	// Should be sorted by priority (lower first)
 	EXPECT_EQ(phases[0].priority, 10); // SlowComponent
 	EXPECT_EQ(phases[1].priority, 20); // MockComponent
 	EXPECT_EQ(phases[2].priority, 30); // FastComponent
 }
 
-TEST_F(ComponentSystemSchedulerTest, DuplicateRegistration) {
+TEST_F(ComponentSystemSchedulerTest, DuplicateRegistration)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
 	scheduler->RegisterComponentType<MockComponent>(10, "First");
@@ -224,21 +220,22 @@ TEST_F(ComponentSystemSchedulerTest, DuplicateRegistration) {
 	EXPECT_EQ(phases[0].name, "First");
 }
 
-// Dependency Tests
-TEST_F(ComponentSystemSchedulerTest, AddDependency) {
+// ── Dependency tests ──────────────────────────────────────────────────────────
+
+TEST_F(ComponentSystemSchedulerTest, AddDependency)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
 	scheduler->RegisterComponentType<MockComponent>(10, "Mock");
 	scheduler->RegisterComponentType<SlowComponent>(20, "Slow");
-
 	scheduler->AddDependency<SlowComponent, MockComponent>();
 
 	const auto& phases = scheduler->GetPhases();
 	EXPECT_EQ(phases.size(), 2);
 
-	// Find SlowComponent phase
 	auto slowPhaseIt = std::find_if(phases.begin(), phases.end(),
-		[](const ComponentPhase& phase) {
+		[](const ComponentPhase& phase)
+		{
 			return phase.componentType == std::type_index(typeid(SlowComponent));
 		});
 
@@ -247,8 +244,10 @@ TEST_F(ComponentSystemSchedulerTest, AddDependency) {
 	EXPECT_EQ(slowPhaseIt->dependencies[0], std::type_index(typeid(MockComponent)));
 }
 
-// Execution Policy Tests
-TEST_F(ComponentSystemSchedulerTest, SetExecutionPolicy) {
+// ── Execution policy tests ────────────────────────────────────────────────────
+
+TEST_F(ComponentSystemSchedulerTest, SetExecutionPolicy)
+{
 	EXPECT_EQ(scheduler->GetExecutionPolicy(), ExecutionPolicy::Sequential);
 
 	scheduler->SetExecutionPolicy(ExecutionPolicy::Parallel);
@@ -258,24 +257,23 @@ TEST_F(ComponentSystemSchedulerTest, SetExecutionPolicy) {
 	EXPECT_EQ(scheduler->GetExecutionPolicy(), ExecutionPolicy::Custom);
 }
 
-// Update Tests
-TEST_F(ComponentSystemSchedulerTest, UpdateAllAsyncSequential) {
+// ── Update tests ──────────────────────────────────────────────────────────────
+
+TEST_F(ComponentSystemSchedulerTest, UpdateAllAsyncSequential)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
-	// Register component types
 	scheduler->RegisterComponentType<MockComponent>(10, "Mock");
 	scheduler->RegisterComponentType<SlowComponent>(20, "Slow");
 
-	// Create some components
 	MockComponent* mockComp1 = componentManager->CreateComponent<MockComponent>();
 	MockComponent* mockComp2 = componentManager->CreateComponent<MockComponent>();
-	SlowComponent* slowComp = componentManager->CreateComponent<SlowComponent>();
+	SlowComponent* slowComp  = componentManager->CreateComponent<SlowComponent>();
 
 	ASSERT_NE(mockComp1, nullptr);
 	ASSERT_NE(mockComp2, nullptr);
-	ASSERT_NE(slowComp, nullptr);
+	ASSERT_NE(slowComp,  nullptr);
 
-	// Initialize components
 	mockComp1->Initialize();
 	mockComp2->Initialize();
 	slowComp->Initialize();
@@ -287,23 +285,21 @@ TEST_F(ComponentSystemSchedulerTest, UpdateAllAsyncSequential) {
 	scheduler->WaitForCompletion();
 	auto endTime = std::chrono::high_resolution_clock::now();
 
-	// Verify components were updated
 	EXPECT_EQ(mockComp1->GetUpdateCount(), 1);
 	EXPECT_EQ(mockComp2->GetUpdateCount(), 1);
-	EXPECT_EQ(slowComp->GetUpdateCount(), 1);
+	EXPECT_EQ(slowComp->GetUpdateCount(),  1);
 
-	// Sequential should take longer (though this is timing-dependent)
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-	EXPECT_GT(duration.count(), 40); // At least 50ms from SlowComponent
+	EXPECT_GT(duration.count(), 40);
 }
 
-TEST_F(ComponentSystemSchedulerTest, UpdateAllAsyncParallel) {
+TEST_F(ComponentSystemSchedulerTest, UpdateAllAsyncParallel)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
 	scheduler->RegisterComponentType<MockComponent>(10, "Mock");
 	scheduler->RegisterComponentType<SlowComponent>(20, "Slow");
 
-	// Create components
 	MockComponent* mockComp = componentManager->CreateComponent<MockComponent>();
 	SlowComponent* slowComp = componentManager->CreateComponent<SlowComponent>();
 
@@ -320,25 +316,21 @@ TEST_F(ComponentSystemSchedulerTest, UpdateAllAsyncParallel) {
 	scheduler->WaitForCompletion();
 	auto endTime = std::chrono::high_resolution_clock::now();
 
-	// Verify components were updated
 	EXPECT_EQ(mockComp->GetUpdateCount(), 1);
-	EXPECT_EQ(slowComp->GetUpdateCount(), 1);
+	EXPECT_EQ(slowComp->GetUpdateCount(),  1);
 
-	// Parallel should be faster than sequential for this case
 	auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - startTime);
-	EXPECT_LT(duration.count(), 100); // Should be much faster than sequential
+	EXPECT_LT(duration.count(), 100);
 }
 
-TEST_F(ComponentSystemSchedulerTest, UpdateWithDependencies) {
+TEST_F(ComponentSystemSchedulerTest, UpdateWithDependencies)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
 	scheduler->RegisterComponentType<FastComponent>(10, "Fast");
 	scheduler->RegisterComponentType<SlowComponent>(20, "Slow");
-
-	// Add dependency: SlowComponent depends on FastComponent
 	scheduler->AddDependency<SlowComponent, FastComponent>();
 
-	// Create components
 	FastComponent* fastComp = componentManager->CreateComponent<FastComponent>();
 	SlowComponent* slowComp = componentManager->CreateComponent<SlowComponent>();
 
@@ -349,116 +341,109 @@ TEST_F(ComponentSystemSchedulerTest, UpdateWithDependencies) {
 	slowComp->Initialize();
 
 	scheduler->SetExecutionPolicy(ExecutionPolicy::Custom);
-
 	scheduler->UpdateAllAsync(0.016);
 	scheduler->WaitForCompletion();
 
-	// Both should be updated
 	EXPECT_EQ(fastComp->GetUpdateCount(), 1);
-	EXPECT_EQ(slowComp->GetUpdateCount(), 1);
+	EXPECT_EQ(slowComp->GetUpdateCount(),  1);
 }
 
-TEST_F(ComponentSystemSchedulerTest, UpdateWithoutInitialization) {
-	// Don't initialize scheduler
+TEST_F(ComponentSystemSchedulerTest, UpdateWithoutInitialization)
+{
 	scheduler->RegisterComponentType<MockComponent>();
 
 	MockComponent* comp = componentManager->CreateComponent<MockComponent>();
 	ASSERT_NE(comp, nullptr);
 	comp->Initialize();
 
-	// Should handle gracefully
 	scheduler->UpdateAllAsync(0.016);
 	scheduler->WaitForCompletion();
 
-	// Component should not be updated
 	EXPECT_EQ(comp->GetUpdateCount(), 0);
 }
 
-TEST_F(ComponentSystemSchedulerTest, UpdateInactiveComponents) {
+TEST_F(ComponentSystemSchedulerTest, UpdateInactiveComponents)
+{
 	EXPECT_TRUE(scheduler->Initialize());
-
 	scheduler->RegisterComponentType<MockComponent>();
 
-	MockComponent* activeComp = componentManager->CreateComponent<MockComponent>();
+	MockComponent* activeComp   = componentManager->CreateComponent<MockComponent>();
 	MockComponent* inactiveComp = componentManager->CreateComponent<MockComponent>();
 
-	ASSERT_NE(activeComp, nullptr);
+	ASSERT_NE(activeComp,   nullptr);
 	ASSERT_NE(inactiveComp, nullptr);
 
 	activeComp->Initialize();
 	inactiveComp->Initialize();
-	inactiveComp->SetActive(false); // Deactivate
+	inactiveComp->SetActive(false);
 
 	scheduler->UpdateAllAsync(0.016);
 	scheduler->WaitForCompletion();
 
-	// Only active component should be updated
-	EXPECT_EQ(activeComp->GetUpdateCount(), 1);
+	EXPECT_EQ(activeComp->GetUpdateCount(),   1);
 	EXPECT_EQ(inactiveComp->GetUpdateCount(), 0);
 }
 
-// Statistics Tests
-TEST_F(ComponentSystemSchedulerTest, GetStatistics) {
+// ── Statistics tests ──────────────────────────────────────────────────────────
+
+TEST_F(ComponentSystemSchedulerTest, GetStatistics)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
 	scheduler->RegisterComponentType<MockComponent>();
 	scheduler->RegisterComponentType<SlowComponent>();
 
 	EXPECT_EQ(scheduler->GetRegisteredPhaseCount(), 2);
-	EXPECT_GE(scheduler->GetPendingJobCount(), 0);
-	EXPECT_GE(scheduler->GetActiveJobCount(), 0);
+	EXPECT_GE(scheduler->GetPendingJobCount(), 0u);
+	EXPECT_GE(scheduler->GetActiveJobCount(),  0u);
 }
 
-// Edge Cases and Error Handling
-TEST_F(ComponentSystemSchedulerTest, NullComponentManager) {
-	EXPECT_DEATH({
+// ── Edge cases ────────────────────────────────────────────────────────────────
+
+TEST_F(ComponentSystemSchedulerTest, NullComponentManager)
+{
+	EXPECT_DEATH(
+	{
 		ComponentSystemScheduler nullScheduler(nullptr);
-		}, "ComponentManager cannot be null");
+	}, "ComponentManager cannot be null");
 }
 
-TEST_F(ComponentSystemSchedulerTest, EmptyUpdate) {
+TEST_F(ComponentSystemSchedulerTest, EmptyUpdate)
+{
 	EXPECT_TRUE(scheduler->Initialize());
-
-	// No registered component types
 	scheduler->UpdateAllAsync(0.016);
 	scheduler->WaitForCompletion();
-
-	// Should complete without issues
 	EXPECT_EQ(scheduler->GetRegisteredPhaseCount(), 0);
 }
 
-TEST_F(ComponentSystemSchedulerTest, UpdateWithNoComponents) {
+TEST_F(ComponentSystemSchedulerTest, UpdateWithNoComponents)
+{
 	EXPECT_TRUE(scheduler->Initialize());
-
 	scheduler->RegisterComponentType<MockComponent>();
-
-	// No components created
 	scheduler->UpdateAllAsync(0.016);
 	scheduler->WaitForCompletion();
-
-	// Should complete without issues
 	EXPECT_EQ(scheduler->GetRegisteredPhaseCount(), 1);
 }
 
-// Integration Test
-TEST_F(ComponentSystemSchedulerTest, CompleteWorkflow) {
+// ── Integration test ──────────────────────────────────────────────────────────
+
+TEST_F(ComponentSystemSchedulerTest, CompleteWorkflow)
+{
 	EXPECT_TRUE(scheduler->Initialize());
 
-	// Register types with priorities
 	scheduler->RegisterComponentType<FastComponent>(10, "Fast");
 	scheduler->RegisterComponentType<MockComponent>(20, "Mock");
 	scheduler->RegisterComponentType<SlowComponent>(30, "Slow");
 
-	// Add dependencies
 	scheduler->AddDependency<MockComponent, FastComponent>();
 	scheduler->AddDependency<SlowComponent, MockComponent>();
 
-	// Create components
 	std::vector<FastComponent*> fastComps;
 	std::vector<MockComponent*> mockComps;
 	std::vector<SlowComponent*> slowComps;
 
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 3; ++i)
+	{
 		fastComps.push_back(componentManager->CreateComponent<FastComponent>());
 		mockComps.push_back(componentManager->CreateComponent<MockComponent>());
 		slowComps.push_back(componentManager->CreateComponent<SlowComponent>());
@@ -468,11 +453,10 @@ TEST_F(ComponentSystemSchedulerTest, CompleteWorkflow) {
 		slowComps[i]->Initialize();
 	}
 
-	// Test all execution policies
-	for (auto policy : { ExecutionPolicy::Sequential, ExecutionPolicy::Parallel, ExecutionPolicy::Custom }) {
+	for (auto policy : { ExecutionPolicy::Sequential, ExecutionPolicy::Parallel, ExecutionPolicy::Custom })
+	{
 		scheduler->SetExecutionPolicy(policy);
 
-		// Reset counters
 		for (auto* comp : fastComps) comp->ResetCounters();
 		for (auto* comp : mockComps) comp->ResetCounters();
 		for (auto* comp : slowComps) comp->ResetCounters();
@@ -480,20 +464,11 @@ TEST_F(ComponentSystemSchedulerTest, CompleteWorkflow) {
 		scheduler->UpdateAllAsync(0.016);
 		scheduler->WaitForCompletion();
 
-		// Verify all components were updated
-		for (auto* comp : fastComps) {
-			EXPECT_EQ(comp->GetUpdateCount(), 1);
-		}
-		for (auto* comp : mockComps) {
-			EXPECT_EQ(comp->GetUpdateCount(), 1);
-		}
-		for (auto* comp : slowComps) {
-			EXPECT_EQ(comp->GetUpdateCount(), 1);
-		}
+		for (auto* comp : fastComps) { EXPECT_EQ(comp->GetUpdateCount(), 1); }
+		for (auto* comp : mockComps) { EXPECT_EQ(comp->GetUpdateCount(), 1); }
+		for (auto* comp : slowComps) { EXPECT_EQ(comp->GetUpdateCount(), 1); }
 	}
 
 	scheduler->Shutdown();
-	// Note: Cannot check IsInitialized() as the method doesn't exist
-	// We can only verify that Shutdown() clears the registered phases
 	EXPECT_EQ(scheduler->GetRegisteredPhaseCount(), 0);
 }

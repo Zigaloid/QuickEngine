@@ -1,12 +1,14 @@
 #include "ImGui3DViewVisualizer.h"
 
+// Project headers
 #include "EntityInstance.h"
-
 #include "CoreSystem/CoreSystem.h"
 #include "MeshComponent.h"
 #include "EntityComponent.h"
 
+// Standard headers
 #include <algorithm>
+#include <string_view>
 
 namespace ImGuiVisualizers {
 
@@ -133,7 +135,8 @@ void ImGui3DViewVisualizer::LoadMesh(const std::string& meshPath)
 
 bool ImGui3DViewVisualizer::Render(bool* isOpen)
 {
-    if (!ImGui::Begin(m_name.c_str(), isOpen, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+    if (!ImGui::Begin(m_name.c_str(), isOpen, ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) 
+    {
         ImGui::End();
         return false;
     }
@@ -172,9 +175,12 @@ void ImGui3DViewVisualizer::RenderContent(const ImVec2& contentSize)
     uint16_t h = static_cast<uint16_t>(size.y);
 
     // Lazy-init or resize
-    if (!m_viewport.IsValid()) {
+    if (!m_viewport.IsValid()) 
+    {
         m_viewport.Initialize(w, h);
-    } else if (w != m_viewport.GetWidth() || h != m_viewport.GetHeight()) {
+    } 
+    else if (w != m_viewport.GetWidth() || h != m_viewport.GetHeight()) 
+    {
         m_viewport.Resize(w, h);
     }
 
@@ -190,11 +196,13 @@ void ImGui3DViewVisualizer::RenderContent(const ImVec2& contentSize)
 
         bgfx::ViewId viewId = m_viewport.GetViewId();
 
-        if (m_showGrid) {
+        if (m_showGrid) 
+        {
             m_primitives.RenderGrid(viewId, m_gridConfig.size,
                                     m_gridConfig.step, m_gridConfig.color);
         }
-        if (m_showAxes) {
+        if (m_showAxes) 
+        {
             m_primitives.RenderAxes(viewId);
         }
 
@@ -234,14 +242,16 @@ void ImGui3DViewVisualizer::RenderToolbar()
     ImGui::Checkbox("Axes", &m_showAxes);
     ImGui::SameLine();
 
-    if (ImGui::Button("Reset Camera")) {
+    if (ImGui::Button("Reset Camera")) 
+    {
         m_camera.Reset();
     }
 
     ImGui::SameLine();
     float fov = m_camera.GetFov();
     ImGui::SetNextItemWidth(80.0f);
-    if (ImGui::SliderFloat("FOV", &fov, 15.0f, 120.0f, "%.0f")) {
+    if (ImGui::SliderFloat("FOV", &fov, 15.0f, 120.0f, "%.0f")) 
+    {
         m_camera.SetFov(fov);
     }
 
@@ -256,7 +266,8 @@ void ImGui3DViewVisualizer::HandleInput(const ImVec2& regionMin,
                                          bool itemActive)
 {
     // If the widget is neither hovered nor active, clear drag state and return
-    if (!itemHovered && !itemActive) {
+    if (!itemHovered && !itemActive) 
+    {
         m_orbiting = false;
         m_panning  = false;
         return;
@@ -265,26 +276,33 @@ void ImGui3DViewVisualizer::HandleInput(const ImVec2& regionMin,
     ImGuiIO& io = ImGui::GetIO();
 
     // Orbit – left mouse drag (only when our invisible item is active)
-    if (itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) {
+    if (itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) 
+    {
         m_orbiting = true;
         ImVec2 delta = io.MouseDelta;
         m_camera.Orbit(-delta.x * 0.005f, -delta.y * 0.005f);
-    } else {
+    }
+    else 
+    {
         m_orbiting = false;
     }
 
     // Pan – middle mouse drag (only when our invisible item is active)
-    if (itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) {
+    if (itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) 
+    {
         m_panning = true;
         ImVec2 delta = io.MouseDelta;
         float panSpeed = m_camera.GetDistance() * 0.002f;
         m_camera.Pan(-delta.x * panSpeed, delta.y * panSpeed);
-    } else {
+    } 
+    else 
+    {
         m_panning = false;
     }
 
     // Zoom – scroll wheel, only when hovered (so wheel doesn't scroll parent)
-    if (itemHovered && io.MouseWheel != 0.0f) {
+    if (itemHovered && io.MouseWheel != 0.0f) 
+    {
         m_camera.Zoom(io.MouseWheel * m_camera.GetDistance() * 0.1f);
 
         // Consume the wheel input so ImGui / parent windows won't also scroll.

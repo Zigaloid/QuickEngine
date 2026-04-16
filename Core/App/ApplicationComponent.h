@@ -2,14 +2,14 @@
 
 #include "ComponentSystem\ComponentSystem.h"
 
-// ApplicationComponent - Main application component that manages the application lifecycle
+/** @brief Main application component that manages the application lifecycle. */
 class ApplicationComponent : public ComponentSystem::Component {
 public:
 	REFL_DECLARE_OBJECT(ApplicationComponent, Component);
 
 private:
-	bool applicationRunning_;
-	double totalRunTime_;
+	bool m_applicationRunning = false;
+	double m_totalRunTime = 0.0;
 
 protected:
 	// Override the component lifecycle methods
@@ -26,8 +26,10 @@ public:
 	virtual ~ApplicationComponent() = default;
 
 	// Application-specific methods
-	bool IsApplicationRunning() const { return applicationRunning_; }
-	double GetTotalRunTime() const { return totalRunTime_; }
+	/** @param Returns whether the application is currently running. */
+	bool IsApplicationRunning() const { return m_applicationRunning; }
+	/** @param Returns total elapsed run time in seconds. */
+	double GetTotalRunTime() const { return m_totalRunTime; }
 
 	// Application control methods
 	void StartApplication();

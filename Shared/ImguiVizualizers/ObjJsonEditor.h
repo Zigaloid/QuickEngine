@@ -138,7 +138,7 @@ namespace ImGuiVisualizers {
 			m_displayName = fileName;
 
 			// Instantiate via the reflection class factory
-			CReflectedBase* raw = ClassFactory::createObject(className.c_str());
+			CReflectedBase* raw = ClassFactory::CreateObject(className.c_str());
 			if (!raw) {
 				m_statusMessage = "ClassFactory: unknown class '" + className + "'";
 				m_statusIsError = true;

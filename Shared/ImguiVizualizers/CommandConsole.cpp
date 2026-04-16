@@ -6,21 +6,21 @@
 #include <iomanip>
 
 CommandConsole::CommandConsole(int maxHistorySize, int maxMessageCount, bool caseSensitive, bool useFunctionCallManager)
-    : m_HistoryPosition(-1)
-    , m_ReclaimFocus(false)
-    , m_ScrollToBottom(false)
-    , m_AutoComplete(true)
-    , m_CaseSensitive(caseSensitive)
-    , m_MaxHistorySize(maxHistorySize)
-    , m_MaxMessageCount(maxMessageCount)
-    , m_SuggestionIndex(-1)
-    , m_FunctionManager(nullptr)
-    , m_WasWindowOpen(false)
-    , m_FocusInputOnNextFrame(false)
-    , m_isVisable(false)
+    : m_historyPosition(-1)
+    , m_reclaimFocus(false)
+    , m_scrollToBottom(false)
+    , m_autoComplete(true)
+    , m_caseSensitive(caseSensitive)
+    , m_maxHistorySize(maxHistorySize)
+    , m_maxMessageCount(maxMessageCount)
+    , m_suggestionIndex(-1)
+    , m_functionManager(nullptr)
+    , m_wasWindowOpen(false)
+    , m_focusInputOnNextFrame(false)
+    , m_isVisible(false)
 {
     DECLARE_FUNC_VLOW();
-    memset(m_InputBuffer, 0, sizeof(m_InputBuffer));
+    memset(m_inputBuffer, 0, sizeof(m_inputBuffer));
         
     // Add welcome message
     AddInfo("Console initialized. Type 'help' for available commands.");    
@@ -29,27 +29,27 @@ CommandConsole::CommandConsole(int maxHistorySize, int maxMessageCount, bool cas
 void CommandConsole::SetCommandCallback(CommandCallback callback)
 {
     DECLARE_FUNC_VLOW();
-    m_CommandCallback = callback;
+    m_commandCallback = callback;
 }
 
 void CommandConsole::RefreshFunctionCallManagerCommands()
 {
     DECLARE_FUNC_VLOW();
     
-    if (!m_FunctionManager) {
+    if (!m_functionManager) {
         return;
     }
     
     // Remove existing FunctionCallManager commands
-    m_Commands.erase(
-        std::remove_if(m_Commands.begin(), m_Commands.end(),
+    m_commands.erase(
+        std::remove_if(m_commands.begin(), m_commands.end(),
             [](const CommandInfo& cmd) {
                 return cmd.description == "FunctionCallManager command";
             }),
-        m_Commands.end());
+        m_commands.end());
     
     // Add current FunctionCallManager commands
-    auto registeredFunctions = m_FunctionManager->GetRegisteredFunctions();
+    auto registeredFunctions = m_functionManager->GetRegisteredFunctions();
     
     for (const auto& funcSignature : registeredFunctions) {
         // Extract function name from signature (before the first '(')
@@ -67,8 +67,8 @@ void CommandConsole::InitializeFunctionCallManager()
     DECLARE_FUNC_VLOW();
     
     // Get FunctionCallManager from CoreSystem
-    m_FunctionManager = Core::CoreSystem::GetFunctionManager();
-    if (m_FunctionManager)
+    m_functionManager = Core::CoreSystem::GetFunctionManager();
+    if (m_functionManager)
     {
         RefreshFunctionCallManagerCommands();
     }
@@ -82,17 +82,17 @@ void CommandConsole::RegisterCommand(const std::string& name, const std::string&
 {
     DECLARE_FUNC_VLOW();
     // Check if command already exists
-    auto it = std::find_if(m_Commands.begin(), m_Commands.end(),
+    auto it = std::find_if(m_commands.begin(), m_commands.end(),
         [&name, this](const CommandInfo& cmd) {
-            return m_CaseSensitive ? cmd.name == name : ToLower(cmd.name) == ToLower(name);
+            return m_caseSensitive ? cmd.name == name : ToLower(cmd.name) == ToLower(name);
         });
     
-    if (it != m_Commands.end()) {
+    if (it != m_commands.end()) {
         // Update existing command
         it->description = description;
     } else {
         // Add new command
-        m_Commands.emplace_back(name, description);
+        m_commands.emplace_back(name, description);
     }
 }
 
@@ -107,31 +107,31 @@ void CommandConsole::RegisterCommands(const std::vector<CommandInfo>& commands)
 void CommandConsole::UnregisterCommand(const std::string& name)
 {
     DECLARE_FUNC_VLOW();
-    m_Commands.erase(
-        std::remove_if(m_Commands.begin(), m_Commands.end(),
+    m_commands.erase(
+        std::remove_if(m_commands.begin(), m_commands.end(),
             [&name, this](const CommandInfo& cmd) {
-                return m_CaseSensitive ? cmd.name == name : ToLower(cmd.name) == ToLower(name);
+                return m_caseSensitive ? cmd.name == name : ToLower(cmd.name) == ToLower(name);
             }),
-        m_Commands.end());
+        m_commands.end());
 }
 
 void CommandConsole::ClearCommands()
 {
     DECLARE_FUNC_VLOW();
-    m_Commands.clear();
+    m_commands.clear();
 }
 
 void CommandConsole::AddMessage(const std::string& message, ImU32 color)
 {
     DECLARE_FUNC_VLOW();
-    m_Messages.emplace_back(message, color);
+    m_messages.emplace_back(message, color);
     
     // Limit message count
-    if (m_Messages.size() > static_cast<size_t>(m_MaxMessageCount)) {
-        m_Messages.erase(m_Messages.begin(), m_Messages.begin() + (m_Messages.size() - m_MaxMessageCount));
+    if (m_messages.size() > static_cast<size_t>(m_maxMessageCount)) {
+        m_messages.erase(m_messages.begin(), m_messages.begin() + (m_messages.size() - m_maxMessageCount));
     }
     
-    m_ScrollToBottom = true;
+    m_scrollToBottom = true;
 }
 
 void CommandConsole::AddInfo(const std::string& message)
@@ -157,14 +157,14 @@ void CommandConsole::AddSuccess(const std::string& message)
 void CommandConsole::ClearMessages()
 {
     DECLARE_FUNC_VLOW();
-    m_Messages.clear();
+    m_messages.clear();
 }
 
 void CommandConsole::ClearHistory()
 {
     DECLARE_FUNC_VLOW();
-    m_CommandHistory.clear();
-    m_HistoryPosition = -1;
+    m_commandHistory.clear();
+    m_historyPosition = -1;
 }
 
 void CommandConsole::ClearAll()
@@ -183,17 +183,17 @@ bool CommandConsole::RenderConsoleWindow(const char* windowTitle, bool* isOpen)
     bool windowShouldBeOpen = (isOpen == nullptr) || *isOpen;
     
     if (!windowShouldBeOpen) {
-        m_WasWindowOpen = false;
+        m_wasWindowOpen = false;
         return false;
     }
     
     // Detect if window is being opened this frame
-    bool windowJustOpened = !m_WasWindowOpen && windowShouldBeOpen;
-    m_WasWindowOpen = windowShouldBeOpen;
+    bool windowJustOpened = !m_wasWindowOpen && windowShouldBeOpen;
+    m_wasWindowOpen = windowShouldBeOpen;
     
     // If window was just opened, request focus on next frame
     if (windowJustOpened) {
-        m_FocusInputOnNextFrame = true;
+        m_focusInputOnNextFrame = true;
     }
     
     if (!ImGui::Begin(windowTitle, isOpen, ImGuiWindowFlags_None)) {
@@ -215,7 +215,7 @@ bool CommandConsole::RenderConsoleWindow(const char* windowTitle, bool* isOpen)
     RenderInputLine();
     
     // Suggestions
-    if (m_AutoComplete && !m_Suggestions.empty()) {
+    if (m_autoComplete && !m_suggestions.empty()) {
         RenderSuggestions();
     }
     
@@ -227,16 +227,16 @@ void CommandConsole::RenderMessages()
 {
     DECLARE_FUNC_LOW();
     
-    for (const auto& message : m_Messages) {
+        for (const auto& message : m_messages) {
         ImGui::PushStyleColor(ImGuiCol_Text, message.color);
         ImGui::TextWrapped("%s", message.text.c_str());
         ImGui::PopStyleColor();
     }
     
     // Auto-scroll to bottom
-    if (m_ScrollToBottom) {
+    if (m_scrollToBottom) {
         ImGui::SetScrollHereY(1.0f);
-        m_ScrollToBottom = false;
+        m_scrollToBottom = false;
     }
 }
 
@@ -253,15 +253,15 @@ void CommandConsole::RenderInputLine()
                                     ImGuiInputTextFlags_CallbackHistory |
                                     ImGuiInputTextFlags_CallbackAlways; // Add this flag to get callbacks on every change
     
-    if (ImGui::InputText("##Input", m_InputBuffer, sizeof(m_InputBuffer), inputFlags, 
-                         &CommandConsole::TextEditCallback, (void*)this)) {
-        std::string command = Trim(std::string(m_InputBuffer));
+    if (ImGui::InputText("##Input", m_inputBuffer, sizeof(m_inputBuffer), inputFlags, 
+                         &CommandConsole::TextEditCallback, static_cast<void*>(this))) {
+        std::string command = Trim(std::string(m_inputBuffer));
         if (!command.empty()) {
             ExecuteCommand(command);
-            strcpy_s(m_InputBuffer, "");
+            strcpy_s(m_inputBuffer, "");
             // Clear suggestions after command execution
-            m_Suggestions.clear();
-            m_SuggestionIndex = -1;
+            m_suggestions.clear();
+            m_suggestionIndex = -1;
         }
         reclaimFocus = true;
     }
@@ -272,15 +272,15 @@ void CommandConsole::RenderInputLine()
     bool shouldFocus = false;
     
     // Focus if window was just opened
-    if (m_FocusInputOnNextFrame) {
+    if (m_focusInputOnNextFrame) {
         shouldFocus = true;
-        m_FocusInputOnNextFrame = false;
+        m_focusInputOnNextFrame = false;
     }
     
     // Focus after command execution
-    if (reclaimFocus || m_ReclaimFocus) {
+    if (reclaimFocus || m_reclaimFocus) {
         shouldFocus = true;
-        m_ReclaimFocus = false;
+        m_reclaimFocus = false;
     }
     
     // Focus when window appears or gains focus for the first time
@@ -301,26 +301,26 @@ void CommandConsole::RenderSuggestions()
 {
     DECLARE_FUNC_LOW();
     
-    if (m_Suggestions.empty()) return;
+    if (m_suggestions.empty()) return;
     
     ImGui::Separator();
     ImGui::Text("Suggestions:");
     ImGui::Indent();
     
-    for (size_t i = 0; i < m_Suggestions.size() && i < 10; ++i) { // Limit to 10 suggestions
-        const std::string& suggestion = m_Suggestions[i];
+    for (size_t i = 0; i < m_suggestions.size() && i < 10; ++i) { // Limit to 10 suggestions
+        const std::string& suggestion = m_suggestions[i];
         
         // Highlight current suggestion
-        if (static_cast<int>(i) == m_SuggestionIndex) {
+            if (static_cast<int>(i) == m_suggestionIndex) {
             ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 255, 100, 255));
         }
         
         if (ImGui::Selectable(suggestion.c_str())) {
-            strcpy_s(m_InputBuffer, suggestion.c_str());
-            m_ReclaimFocus = true;
+            strcpy_s(m_inputBuffer, suggestion.c_str());
+            m_reclaimFocus = true;
         }
         
-        if (static_cast<int>(i) == m_SuggestionIndex) {
+        if (static_cast<int>(i) == m_suggestionIndex) {
             ImGui::PopStyleColor();
         }
     }
@@ -339,7 +339,7 @@ int CommandConsole::TextEditCallback(ImGuiInputTextCallbackData* data)
             std::string currentInput(data->Buf, data->BufTextLen);
             console->UpdateSuggestions(currentInput);
             
-            if (!console->m_Suggestions.empty()) {
+            if (!console->m_suggestions.empty()) {
                 std::string suggestion = console->GetNextSuggestion();
                 if (!suggestion.empty()) {
                     data->DeleteChars(0, data->BufTextLen);
@@ -352,26 +352,26 @@ int CommandConsole::TextEditCallback(ImGuiInputTextCallbackData* data)
     case ImGuiInputTextFlags_CallbackHistory:
         {
             // Command history with Up/Down arrows
-            const int prevHistoryPos = console->m_HistoryPosition;
+            const int prevHistoryPos = console->m_historyPosition;
             if (data->EventKey == ImGuiKey_UpArrow) {
-                if (console->m_HistoryPosition == -1) {
-                    console->m_HistoryPosition = static_cast<int>(console->m_CommandHistory.size()) - 1;
-                } else if (console->m_HistoryPosition > 0) {
-                    console->m_HistoryPosition--;
+                if (console->m_historyPosition == -1) {
+                    console->m_historyPosition = static_cast<int>(console->m_commandHistory.size()) - 1;
+                } else if (console->m_historyPosition > 0) {
+                    console->m_historyPosition--;
                 }
             } else if (data->EventKey == ImGuiKey_DownArrow) {
-                if (console->m_HistoryPosition != -1) {
-                    console->m_HistoryPosition++;
-                    if (console->m_HistoryPosition >= static_cast<int>(console->m_CommandHistory.size())) {
-                        console->m_HistoryPosition = -1;
+                if (console->m_historyPosition != -1) {
+                    console->m_historyPosition++;
+                    if (console->m_historyPosition >= static_cast<int>(console->m_commandHistory.size())) {
+                        console->m_historyPosition = -1;
                     }
                 }
             }
             
             // Apply history change
-            if (prevHistoryPos != console->m_HistoryPosition) {
-                const char* historyStr = (console->m_HistoryPosition >= 0) ? 
-                    console->m_CommandHistory[console->m_HistoryPosition].c_str() : "";
+            if (prevHistoryPos != console->m_historyPosition) {
+                const char* historyStr = (console->m_historyPosition >= 0) ? 
+                    console->m_commandHistory[console->m_historyPosition].c_str() : "";
                 data->DeleteChars(0, data->BufTextLen);
                 data->InsertChars(0, historyStr);
                 
@@ -401,20 +401,20 @@ void CommandConsole::ExecuteCommand(const std::string& commandLine)
     // Add to history
     if (!commandLine.empty()) {
         // Remove duplicate if it exists
-        auto it = std::find(m_CommandHistory.begin(), m_CommandHistory.end(), commandLine);
-        if (it != m_CommandHistory.end()) {
-            m_CommandHistory.erase(it);
+        auto it = std::find(m_commandHistory.begin(), m_commandHistory.end(), commandLine);
+        if (it != m_commandHistory.end()) {
+            m_commandHistory.erase(it);
         }
-        
+
         // Add to end
-        m_CommandHistory.push_back(commandLine);
-        
+        m_commandHistory.push_back(commandLine);
+
         // Limit history size
-        if (m_CommandHistory.size() > static_cast<size_t>(m_MaxHistorySize)) {
-            m_CommandHistory.erase(m_CommandHistory.begin());
+        if (m_commandHistory.size() > static_cast<size_t>(m_maxHistorySize)) {
+            m_commandHistory.erase(m_commandHistory.begin());
         }
     }
-    m_HistoryPosition = -1;
+    m_historyPosition = -1;
     
     // Display command in console
     AddMessage("> " + commandLine, IM_COL32(200, 200, 200, 255));
@@ -424,7 +424,7 @@ void CommandConsole::ExecuteCommand(const std::string& commandLine)
     
     if (command == "help" || command == "?") {
         AddInfo("Available commands:");
-        for (const auto& cmd : m_Commands) {
+        for (const auto& cmd : m_commands) {
             std::string helpText = "  " + cmd.name;
             if (!cmd.description.empty()) {
                 helpText += " - " + cmd.description;
@@ -447,8 +447,8 @@ void CommandConsole::ExecuteCommand(const std::string& commandLine)
     
     if (command == "history") {
         AddInfo("Command history:");
-        for (size_t i = 0; i < m_CommandHistory.size(); ++i) {
-            AddInfo("  " + std::to_string(i + 1) + ": " + m_CommandHistory[i]);
+        for (size_t i = 0; i < m_commandHistory.size(); ++i) {
+            AddInfo("  " + std::to_string(i + 1) + ": " + m_commandHistory[i]);
         }
         return;
     }
@@ -465,9 +465,9 @@ void CommandConsole::ExecuteCommand(const std::string& commandLine)
     
     // Try to execute through custom callback
     bool handled = false;
-    if (m_CommandCallback) {
+    if (m_commandCallback) {
         try {
-            handled = m_CommandCallback(commandLine);
+            handled = m_commandCallback(commandLine);
         } catch (const std::exception& e) {
             AddError("Command execution failed: " + std::string(e.what()));
             return;
@@ -484,12 +484,12 @@ bool CommandConsole::TryExecuteFunctionManagerCommand(const std::string& command
 {
     DECLARE_FUNC_LOW();
     
-    if (!m_FunctionManager) {
+    if (!m_functionManager) {
         return false;
     }
     
     try {
-        auto result = m_FunctionManager->CallFunction<void>(commandLine);
+        auto result = m_functionManager->CallFunction<void>(commandLine);
         if (result.IsSuccess()) {
             AddSuccess("Command executed successfully");
             return true;
@@ -507,8 +507,8 @@ void CommandConsole::UpdateSuggestions(const std::string& input)
 {
     DECLARE_FUNC_LOW();
     
-    m_Suggestions.clear();
-    m_SuggestionIndex = -1;
+    m_suggestions.clear();
+    m_suggestionIndex = -1;
     
     if (input.empty()) return;
     
@@ -516,30 +516,30 @@ void CommandConsole::UpdateSuggestions(const std::string& input)
     if (trimmedInput.empty()) return;
     
     // Find matching commands
-    for (const auto& cmd : m_Commands) {
+    for (const auto& cmd : m_commands) {
         if (StartsWith(cmd.name, trimmedInput)) {
-            m_Suggestions.push_back(cmd.name);
+            m_suggestions.push_back(cmd.name);
         }
     }
     
     // Sort suggestions
-    std::sort(m_Suggestions.begin(), m_Suggestions.end());
+    std::sort(m_suggestions.begin(), m_suggestions.end());
 }
 
 std::string CommandConsole::GetNextSuggestion()
 {
-    if (m_Suggestions.empty()) return "";
+    if (m_suggestions.empty()) return "";
     
-    m_SuggestionIndex = (m_SuggestionIndex + 1) % static_cast<int>(m_Suggestions.size());
-    return m_Suggestions[m_SuggestionIndex];
+    m_suggestionIndex = (m_suggestionIndex + 1) % static_cast<int>(m_suggestions.size());
+    return m_suggestions[m_suggestionIndex];
 }
 
 std::string CommandConsole::GetPreviousSuggestion()
 {
-    if (m_Suggestions.empty()) return "";
-    
-    m_SuggestionIndex = (m_SuggestionIndex - 1 + static_cast<int>(m_Suggestions.size())) % static_cast<int>(m_Suggestions.size());
-    return m_Suggestions[m_SuggestionIndex];
+    if (m_suggestions.empty()) return "";
+
+    m_suggestionIndex = (m_suggestionIndex - 1 + static_cast<int>(m_suggestions.size())) % static_cast<int>(m_suggestions.size());
+    return m_suggestions[m_suggestionIndex];
 }
 
 std::string CommandConsole::ToLower(const std::string& str) const
@@ -553,7 +553,7 @@ bool CommandConsole::StartsWith(const std::string& str, const std::string& prefi
 {
     if (prefix.length() > str.length()) return false;
     
-    if (m_CaseSensitive) {
+    if (m_caseSensitive) {
         return str.compare(0, prefix.length(), prefix) == 0;
     } else {
         return ToLower(str).compare(0, prefix.length(), ToLower(prefix)) == 0;

@@ -1,4 +1,5 @@
 ﻿#include "ImGuiVisualizerManager.h"
+
 #include "IImGuiVisualizer.h"
 #include "imgui.h"
 
@@ -39,7 +40,8 @@ void ImGuiVisualizerManager::Register(const std::string& key,
     m_entries.push_back(std::move(entry));
 
     // If the manager is already initialized, initialize the new entry immediately
-    if (m_initialized) {
+    if (m_initialized)
+    {
         auto& added = m_entries.back();
         added.visualizer->Initialize();
         added.initialized = true;
@@ -74,8 +76,10 @@ void ImGuiVisualizerManager::Unregister(const std::string& key)
 
 void ImGuiVisualizerManager::Initialize()
 {
-    for (auto& entry : m_entries) {
-        if (!entry.initialized) {
+    for (auto& entry : m_entries)
+    {
+        if (!entry.initialized)
+        {
             entry.visualizer->Initialize();
             entry.initialized = true;
         }
@@ -85,8 +89,10 @@ void ImGuiVisualizerManager::Initialize()
 
 void ImGuiVisualizerManager::Shutdown()
 {
-    for (auto& entry : m_entries) {
-        if (entry.initialized) {
+    for (auto& entry : m_entries)
+    {
+        if (entry.initialized)
+        {
             entry.visualizer->Shutdown();
             entry.initialized = false;
         }
@@ -100,60 +106,60 @@ void ImGuiVisualizerManager::Shutdown()
 
 void ImGuiVisualizerManager::Update(float deltaTime)
 {
-    for (auto& entry : m_entries) {
-        if (entry.initialized) {
+    for (auto& entry : m_entries)
+    {
+        if (entry.initialized)
             entry.visualizer->Update(deltaTime);
-        }
     }
 }
 
 void ImGuiVisualizerManager::RenderAll()
 {
-    for (auto& entry : m_entries) {
-        if (entry.visible && entry.initialized) {
+    for (auto& entry : m_entries)
+    {
+        if (entry.visible && entry.initialized)
             entry.visualizer->Render(&entry.visible);
-        }
     }
 }
 
 void ImGuiVisualizerManager::RenderMenuBar()
 {
-    renderFileMenu();
+    RenderFileMenu();
     RenderWindowsMenu();
 }
 
 void ImGuiVisualizerManager::RenderWindowsMenu()
 {
-    if (ImGui::BeginMenu("Windows")) {
-        // Group entries by menu category
-        // nullptr / empty category → root level
+    if (ImGui::BeginMenu("Windows"))
+    {
         std::map<std::string, std::vector<Entry*>> categories;
         std::vector<Entry*> rootItems;
 
-        for (auto& entry : m_entries) {
+        for (auto& entry : m_entries)
+        {
             const char* cat = entry.visualizer->GetMenuCategory();
-            if (cat && cat[0] != '\0') {
+            if (cat && cat[0] != '\0')
                 categories[cat].push_back(&entry);
-            } else {
+            else
                 rootItems.push_back(&entry);
-            }
         }
 
-        // Render root-level items first
-        for (auto* entry : rootItems) {
+        for (auto* entry : rootItems)
+        {
             ImGui::MenuItem(entry->visualizer->GetName(),
                             entry->visualizer->GetShortcut(),
                             &entry->visible);
         }
 
-        // Render categorized sub-menus
-        if (!categories.empty() && !rootItems.empty()) {
+        if (!categories.empty() && !rootItems.empty())
             ImGui::Separator();
-        }
 
-        for (auto& [category, entries] : categories) {
-            if (ImGui::BeginMenu(category.c_str())) {
-                for (auto* entry : entries) {
+        for (auto& [category, entries] : categories)
+        {
+            if (ImGui::BeginMenu(category.c_str()))
+            {
+                for (auto* entry : entries)
+                {
                     ImGui::MenuItem(entry->visualizer->GetName(),
                                     entry->visualizer->GetShortcut(),
                                     &entry->visible);
@@ -170,14 +176,14 @@ void ImGuiVisualizerManager::RenderWindowsMenu()
 
 void ImGuiVisualizerManager::SetVisible(const std::string& key, bool visible)
 {
-    if (auto* entry = findEntry(key)) {
+    if (auto* entry = FindEntry(key)) {
         entry->visible = visible;
     }
 }
 
 bool ImGuiVisualizerManager::IsVisible(const std::string& key) const
 {
-    if (const auto* entry = findEntry(key)) {
+    if (const auto* entry = FindEntry(key)) {
         return entry->visible;
     }
     return false;
@@ -185,7 +191,7 @@ bool ImGuiVisualizerManager::IsVisible(const std::string& key) const
 
 void ImGuiVisualizerManager::ToggleVisible(const std::string& key)
 {
-    if (auto* entry = findEntry(key)) {
+    if (auto* entry = FindEntry(key)) {
         entry->visible = !entry->visible;
     }
 }
@@ -194,7 +200,7 @@ void ImGuiVisualizerManager::ToggleVisible(const std::string& key)
 
 IImGuiVisualizer* ImGuiVisualizerManager::GetVisualizer(const std::string& key) const
 {
-    if (const auto* entry = findEntry(key)) {
+    if (const auto* entry = FindEntry(key)) {
         return entry->visualizer.get();
     }
     return nullptr;
@@ -212,7 +218,7 @@ void ImGuiVisualizerManager::SetFileMenuCallback(std::function<void()> callback)
 
 // ── Internal helpers ────────────────────────────────────────────────────
 
-ImGuiVisualizerManager::Entry* ImGuiVisualizerManager::findEntry(const std::string& key)
+ImGuiVisualizerManager::Entry* ImGuiVisualizerManager::FindEntry(const std::string& key)
 {
     auto it = m_keyIndex.find(key);
     if (it == m_keyIndex.end())
@@ -220,7 +226,7 @@ ImGuiVisualizerManager::Entry* ImGuiVisualizerManager::findEntry(const std::stri
     return &m_entries[it->second];
 }
 
-const ImGuiVisualizerManager::Entry* ImGuiVisualizerManager::findEntry(const std::string& key) const
+const ImGuiVisualizerManager::Entry* ImGuiVisualizerManager::FindEntry(const std::string& key) const
 {
     auto it = m_keyIndex.find(key);
     if (it == m_keyIndex.end())
@@ -228,13 +234,14 @@ const ImGuiVisualizerManager::Entry* ImGuiVisualizerManager::findEntry(const std
     return &m_entries[it->second];
 }
 
-void ImGuiVisualizerManager::renderFileMenu()
+void ImGuiVisualizerManager::RenderFileMenu()
 {
-    if (ImGui::BeginMenu("File")) {
-        if (m_fileMenuCallback) {
-            if (ImGui::MenuItem("Exit", "Alt+F4")) {
+    if (ImGui::BeginMenu("File"))
+    {
+        if (m_fileMenuCallback)
+        {
+            if (ImGui::MenuItem("Exit", "Alt+F4"))
                 m_fileMenuCallback();
-            }
         }
         ImGui::EndMenu();
     }

@@ -17,7 +17,8 @@
  * This class provides FPS-specific functionality including automatic bucket setup,
  * performance-based coloring, and FPS-specific statistics display.
  */
-class ProfilerSession {
+class ProfilerSession
+{
 public:
     enum class ViewMode {
         FlameGraph,
@@ -84,19 +85,8 @@ public:
      * @brief Optional keyboard shortcut label shown in the Windows menu.
      * Return nullptr if no shortcut is assigned.
      */
-    virtual const char* GetShortcut() const
-    {
-        return "nullptr";
-    }
-
-    /**
-     * @brief Optional menu category for grouping in the Windows menu.
-     * Return nullptr to place the item at the root level.
-     */
-    virtual const char* GetMenuCategory() const
-    {
-        return "Show";
-    }
+    virtual const char* GetShortcut() const { return nullptr; }
+    virtual const char* GetMenuCategory() const { return "Show"; }
 
     // Main profiler control
     void StartProfiling();

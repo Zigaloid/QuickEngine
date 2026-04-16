@@ -16,21 +16,25 @@
 // Forward declarations to avoid circular dependency
 namespace Core {
 	class CoreSystem;
-}
+} // namespace Core
 
 namespace ComponentSystem {
 
 	// Forward declaration
 	class ComponentSystemScheduler;
 
-	// Execution policy for component updates
+	// ── Execution Policy ─────────────────────────────────────────────────────────
+
+	/** @brief Controls how component update phases are dispatched each frame. */
 	enum class ExecutionPolicy {
 		Sequential,     // Execute component types one after another
 		Parallel,       // Execute all component types in parallel
 		Custom          // Use custom dependency graph
 	};
 
-	// Component update phase information
+	// ── ComponentPhase ────────────────────────────────────────────────────────────
+
+	/** @brief Metadata describing a single component type's update phase. */
 	struct ComponentPhase {
 		std::type_index componentType;
 		int priority;               // Lower values execute first
@@ -38,11 +42,12 @@ namespace ComponentSystem {
 		std::string name;           // Human-readable name for debugging
 
 		ComponentPhase(std::type_index type, int prio = 0, std::string phaseName = "")
-			: componentType(type), priority(prio), name(std::move(phaseName)) {
-		}
+			: componentType(type), priority(prio), name(std::move(phaseName)) {}
 	};
 
-	// Job batch for tracking completion of component type updates
+	// ── ComponentUpdateBatch ──────────────────────────────────────────────────────
+
+	/** @brief Tracks the set of async futures for one component type's update pass. */
 	class ComponentUpdateBatch {
 	private:
 		std::vector<std::future<void>> m_futures;
@@ -52,20 +57,27 @@ namespace ComponentSystem {
 
 	public:
 		ComponentUpdateBatch(std::type_index type, size_t count)
-			: m_componentType(type), m_componentCount(count), m_completed(false) {
+			: m_componentType(type), m_componentCount(count), m_completed(false)
+		{
 			m_futures.reserve(count);
 		}
 
-		void addFuture(std::future<void>&& future) {
+		/** @param future A job future to track as part of this batch. */
+		void AddFuture(std::future<void>&& future)
+		{
 			m_futures.push_back(std::move(future));
 		}
 
-		void waitForCompletion() 
+		/** @brief Blocks until all futures in this batch have completed. */
+		void WaitForCompletion()
 		{
 			DECLARE_FUNC_LOW();
-			if (!m_completed) {
-				for (auto& future : m_futures) {
-					if (future.valid()) {
+			if (!m_completed)
+			{
+				for (auto& future : m_futures)
+				{
+					if (future.valid())
+					{
 						future.wait();
 					}
 				}
@@ -73,14 +85,17 @@ namespace ComponentSystem {
 			}
 		}
 
-		bool isCompleted() const;
+		bool IsCompleted() const;
 
-		std::type_index getComponentType() const { return m_componentType; }
-		size_t getComponentCount() const { return m_componentCount; }
-		size_t getBatchSize() const { return m_futures.size(); }
+		std::type_index GetComponentType() const { return m_componentType; }
+		size_t GetComponentCount() const { return m_componentCount; }
+		size_t GetBatchSize() const { return m_futures.size(); }
 	};
 
-	// Main JobSystemScheduler class
+	// ── ComponentSystemScheduler ──────────────────────────────────────────────────
+
+	/** @brief Dispatches per-frame OnUpdate calls for all registered component types
+	 *         via the JobSystem, respecting priority order and optional dependencies. */
 	class ComponentSystemScheduler {
 	private:
 		ComponentManager* m_componentManager;
@@ -93,64 +108,67 @@ namespace ComponentSystem {
 		using ComponentUpdateFunction = std::function<std::unique_ptr<ComponentUpdateBatch>(double)>;
 		std::unordered_map<std::type_index, ComponentUpdateFunction> m_componentUpdateRegistry;
 
-		// Get JobSystem from CoreSystem - implementation moved to .cpp file
-		JobSystem* getJobSystem() const;
+		// Get JobSystem from CoreSystem - implementation in .cpp
+		JobSystem* GetJobSystem() const;
 
 		// Register an update function for a component type
 		template<typename T>
-		void registerComponentUpdateFunction() {
+		void RegisterComponentUpdateFunction()
+		{
 			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
 
 			std::type_index typeIndex(typeid(T));
 
-			// Create a lambda that captures the specific type T and calls updateComponentTypeAsync<T>
-			m_componentUpdateRegistry[typeIndex] = [this](double deltaTime) -> std::unique_ptr<ComponentUpdateBatch> {
-				return this->updateComponentTypeAsync<T>(deltaTime);
-				};
+			m_componentUpdateRegistry[typeIndex] = [this](double deltaTime) -> std::unique_ptr<ComponentUpdateBatch>
+			{
+				return this->UpdateComponentTypeAsync<T>(deltaTime);
+			};
 		}
 
 		// Dependency resolution - moved to .cpp
-		std::vector<std::vector<std::type_index>> resolveDependencies() const;
+		std::vector<std::vector<std::type_index>> ResolveDependencies() const;
 
 		// Sort phases by priority - moved to .cpp
-		void sortPhasesByPriority();
+		void SortPhasesByPriority();
 
 		// Update components of a specific type - implementation below class definition
 		template<typename T>
-		std::unique_ptr<ComponentUpdateBatch> updateComponentTypeAsync(double deltaTime);
+		std::unique_ptr<ComponentUpdateBatch> UpdateComponentTypeAsync(double deltaTime);
 
 		// Generic version using type_index - moved to .cpp
-		std::unique_ptr<ComponentUpdateBatch> updateComponentTypeByIndexAsync(std::type_index typeIndex, double deltaTime);
+		std::unique_ptr<ComponentUpdateBatch> UpdateComponentTypeByIndexAsync(std::type_index typeIndex, double deltaTime);
 
 		// Helper method to check if CoreSystem is initialized - implementation in .cpp
-		bool isCoreSystemInitialized() const;
+		bool IsCoreSystemInitialized() const;
 
 		// Private update methods - moved to .cpp
-		void updateSequential(double deltaTime);
-		void updateParallel(double deltaTime);
-		void updateWithDependencies(double deltaTime);
+		void UpdateSequential(double deltaTime);
+		void UpdateParallel(double deltaTime);
+		void UpdateWithDependencies(double deltaTime);
 
 	public:
-		ComponentSystemScheduler(ComponentManager* componentManager)
+		explicit ComponentSystemScheduler(ComponentManager* componentManager)
 			: m_componentManager(componentManager)
 			, m_executionPolicy(ExecutionPolicy::Sequential)
-			, m_initialized(false) {
-
+			, m_initialized(false)
+		{
 			assert(m_componentManager && "ComponentManager cannot be null");
 		}
 
 		~ComponentSystemScheduler() = default;
 
-		// Initialize the scheduler
-		bool Initialize() {
+		/** @brief Validates prerequisites and marks the scheduler ready for use. */
+		bool Initialize()
+		{
 			if (m_initialized) return true;
 
-			if (!m_componentManager) {
+			if (!m_componentManager)
+			{
 				return false;
 			}
 
-			// Check if CoreSystem and JobSystem are available
-			if (!getJobSystem()) {
+			if (!GetJobSystem())
+			{
 				return false;
 			}
 
@@ -158,46 +176,50 @@ namespace ComponentSystem {
 			return true;
 		}
 
-		// Shutdown the scheduler
-		void Shutdown() {
+		/** @brief Drains pending jobs and releases all registered phase data. */
+		void Shutdown()
+		{
 			if (!m_initialized) return;
 
-			// Wait for any pending operations
-			JobSystem* jobSystem = getJobSystem();
-			if (jobSystem) {
-				jobSystem->waitForAll();
+			JobSystem* jobSystem = GetJobSystem();
+			if (jobSystem)
+			{
+				jobSystem->WaitForAll();
 			}
 
 			m_phases.clear();
 			m_typeToPhaseIndex.clear();
-			m_componentUpdateRegistry.clear(); // Clear the update registry
+			m_componentUpdateRegistry.clear();
 			m_initialized = false;
 		}
 
-		// Register a component type for async updates
+		/** @brief Registers a component type for async updates each frame.
+		 *  @param priority Lower values execute first.
+		 *  @param name     Optional human-readable name for debugging. */
 		template<typename T>
-		void RegisterComponentType(int priority = 0, const std::string& name = "") {
+		void RegisterComponentType(int priority = 0, const std::string& name = "")
+		{
 			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
 
 			std::type_index typeIndex(typeid(T));
 
-			// Check if already registered
-			if (m_typeToPhaseIndex.find(typeIndex) != m_typeToPhaseIndex.end()) {
+			if (m_typeToPhaseIndex.find(typeIndex) != m_typeToPhaseIndex.end())
+			{
 				return; // Already registered
 			}
 
 			std::string phaseName = name.empty() ? typeid(T).name() : name;
 			m_phases.emplace_back(typeIndex, priority, phaseName);
 
-			// Register the update function for runtime dispatch
-			registerComponentUpdateFunction<T>();
+			RegisterComponentUpdateFunction<T>();
 
-			sortPhasesByPriority();
+			SortPhasesByPriority();
 		}
 
-		// Add dependency relationship between component types
+		/** @brief Declares that T must wait for Dependency to finish before updating. */
 		template<typename T, typename Dependency>
-		void AddDependency() {
+		void AddDependency()
+		{
 			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
 			static_assert(std::is_base_of_v<Component, Dependency>, "Dependency must derive from Component");
 
@@ -205,96 +227,113 @@ namespace ComponentSystem {
 			std::type_index depIndex(typeid(Dependency));
 
 			auto it = m_typeToPhaseIndex.find(typeIndex);
-			if (it != m_typeToPhaseIndex.end()) {
+			if (it != m_typeToPhaseIndex.end())
+			{
 				m_phases[it->second].dependencies.push_back(depIndex);
 			}
 		}
 
-		// Set execution policy
-		void SetExecutionPolicy(ExecutionPolicy policy) {
+		/** @param policy The desired dispatch strategy for this scheduler. */
+		void SetExecutionPolicy(ExecutionPolicy policy)
+		{
 			m_executionPolicy = policy;
 		}
 
-		// Update all registered component types asynchronously
-		void UpdateAllAsync(double deltaTime) {
-			JobSystem* jobSystem = getJobSystem();
-			if (!m_initialized || !m_componentManager || !jobSystem) {
+		/** @brief Submits update jobs for all registered component types. */
+		void UpdateAllAsync(double deltaTime)
+		{
+			JobSystem* jobSystem = GetJobSystem();
+			if (!m_initialized || !m_componentManager || !jobSystem)
+			{
 				return;
 			}
 
-			switch (m_executionPolicy) {
+			switch (m_executionPolicy)
+			{
 			case ExecutionPolicy::Sequential:
-				updateSequential(deltaTime);
+				UpdateSequential(deltaTime);
 				break;
 			case ExecutionPolicy::Parallel:
-				updateParallel(deltaTime);
+				UpdateParallel(deltaTime);
 				break;
 			case ExecutionPolicy::Custom:
-				updateWithDependencies(deltaTime);
+				UpdateWithDependencies(deltaTime);
 				break;
 			}
 		}
 
-		// Wait for all pending component updates to complete
-		void WaitForCompletion() 
+		/** @brief Blocks until all pending component update jobs have completed. */
+		void WaitForCompletion()
 		{
 			DECLARE_FUNC_LOW();
-			JobSystem* jobSystem = getJobSystem();
-			if (jobSystem) {
-				jobSystem->waitForAll();
+			JobSystem* jobSystem = GetJobSystem();
+			if (jobSystem)
+			{
+				jobSystem->WaitForAll();
 			}
 		}
 
-		// Wait for completion with timeout
+		/** @brief Waits up to the given duration for all pending jobs to complete.
+		 *  @param timeout Maximum time to wait.
+		 *  @param Returns false if the timeout elapsed before all jobs finished. */
 		template<typename Rep, typename Period>
-		bool WaitForCompletion(const std::chrono::duration<Rep, Period>& timeout) {
-			JobSystem* jobSystem = getJobSystem();
-			if (jobSystem) {
-				return jobSystem->waitForAll(timeout);
+		bool WaitForCompletion(const std::chrono::duration<Rep, Period>& timeout)
+		{
+			JobSystem* jobSystem = GetJobSystem();
+			if (jobSystem)
+			{
+				return jobSystem->WaitForAll(timeout);
 			}
-			return false; // Return false if JobSystem is not available
+			return false;
 		}
 
-		// Get statistics
+		// Getters
 		size_t GetRegisteredPhaseCount() const { return m_phases.size(); }
-		size_t GetPendingJobCount() const {
-			JobSystem* jobSystem = getJobSystem();
-			return jobSystem ? jobSystem->getPendingJobCount() : 0;
+		size_t GetPendingJobCount() const
+		{
+			JobSystem* jobSystem = GetJobSystem();
+			return jobSystem ? jobSystem->GetPendingJobCount() : 0;
 		}
-		size_t GetActiveJobCount() const {
-			JobSystem* jobSystem = getJobSystem();
-			return jobSystem ? jobSystem->getActiveJobCount() : 0;
+		size_t GetActiveJobCount() const
+		{
+			JobSystem* jobSystem = GetJobSystem();
+			return jobSystem ? jobSystem->GetActiveJobCount() : 0;
 		}
 
-		// Get phase information
 		const std::vector<ComponentPhase>& GetPhases() const { return m_phases; }
 		ExecutionPolicy GetExecutionPolicy() const { return m_executionPolicy; }
 	};
 
-	// Template implementation - must be in header for proper instantiation
+	// ── Template implementation ───────────────────────────────────────────────────
+
 	template<typename T>
-	std::unique_ptr<ComponentUpdateBatch> ComponentSystemScheduler::updateComponentTypeAsync(double deltaTime) {
+	std::unique_ptr<ComponentUpdateBatch> ComponentSystemScheduler::UpdateComponentTypeAsync(double deltaTime)
+	{
 		static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
 
-		JobSystem* jobSystem = getJobSystem();
-		if (!m_componentManager || !jobSystem) {
+		JobSystem* jobSystem = GetJobSystem();
+		if (!m_componentManager || !jobSystem)
+		{
 			return nullptr;
 		}
 
 		auto components = m_componentManager->GetActiveComponentsOfType<T>();
-		if (components.empty()) {
+		if (components.empty())
+		{
 			return std::make_unique<ComponentUpdateBatch>(std::type_index(typeid(T)), 0);
 		}
 
 		auto batch = std::make_unique<ComponentUpdateBatch>(std::type_index(typeid(T)), components.size());
 
-		// Submit each component as a separate job
-		for (T* component : components) {
-			if (component && component->IsActiveInHierarchy()) {
-				auto future = jobSystem->submitJobWithResult([component, deltaTime]() {
+		for (T* component : components)
+		{
+			if (component && component->IsActiveInHierarchy())
+			{
+				auto future = jobSystem->SubmitJobWithResult([component, deltaTime]()
+				{
 					component->Update(deltaTime);
-					});
-				batch->addFuture(std::move(future));
+				});
+				batch->AddFuture(std::move(future));
 			}
 		}
 

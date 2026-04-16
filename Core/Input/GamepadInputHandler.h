@@ -1,70 +1,85 @@
 #pragma once
 
 #include "GamepadInterface.h"
+#include <string>
 
 namespace Input {
 
-    // Input handler interface for gamepad input processing
-    class IGamepadInputHandler {
-    public:
-        virtual ~IGamepadInputHandler() = default;
+/** @brief Input handler interface for gamepad input processing. */
+class IGamepadInputHandler
+{
+public:
+    virtual ~IGamepadInputHandler() = default;
 
-        // Button input handling
-        // Return true if the input was handled and should not be passed to the next handler
-        virtual bool HandleButtonInput(int gamepadId, GamepadButton button, bool pressed, bool justPressed, bool justReleased) = 0;
+    // ── Button/Axis Handling ──────────────────────────────────────────────────
 
-        // Axis input handling
-        // Return true if the input was handled and should not be passed to the next handler
-        virtual bool HandleAxisInput(int gamepadId, GamepadAxis axis, float value, float delta) = 0;
+    /** @param gamepadId The gamepad index.
+     *  @param button The button that changed state.
+     *  @param pressed Whether the button is currently pressed.
+     *  @param justPressed True on the first frame the button was pressed.
+     *  @param justReleased True on the first frame the button was released.
+     *  Return true if the input was handled and should not be passed to the next handler. */
+    virtual bool HandleButtonInput(int gamepadId, GamepadButton button, bool pressed, bool justPressed, bool justReleased) = 0;
 
-        // Called at the beginning of each update frame
-        virtual void OnUpdate(double deltaTime) {}
+    /** @param gamepadId The gamepad index.
+     *  @param axis The axis that changed.
+     *  @param value Current axis value.
+     *  @param delta Change from last frame.
+     *  Return true if the input was handled and should not be passed to the next handler. */
+    virtual bool HandleAxisInput(int gamepadId, GamepadAxis axis, float value, float delta) = 0;
 
-        // Called when a gamepad is connected
-        virtual void OnGamepadConnected(int gamepadId) {}
+    // ── Lifecycle ────────────────────────────────────────────────────────────
 
-        // Called when a gamepad is disconnected
-        virtual void OnGamepadDisconnected(int gamepadId) {}
+    /** @param deltaTime Time since last frame in seconds. */
+    virtual void OnUpdate(double deltaTime) {}
 
-        // Handler priority (higher values = higher priority, called first)
-        virtual int GetPriority() const { return 0; }
+    /** @param gamepadId The gamepad that connected. */
+    virtual void OnGamepadConnected(int gamepadId) {}
 
-        // Whether this handler is currently active
-        virtual bool IsActive() const { return true; }
+    /** @param gamepadId The gamepad that disconnected. */
+    virtual void OnGamepadDisconnected(int gamepadId) {}
 
-        // Optional handler name for debugging
-        virtual const char* GetName() const { return "Unknown Handler"; }
-    };
+    // ── Accessors ────────────────────────────────────────────────────────────
 
-    // Base implementation with common functionality
-    class GamepadInputHandler : public IGamepadInputHandler {
-    private:
-        bool m_active;
-        int m_priority;
-        std::string m_name;
+    virtual int GetPriority() const { return 0; }
+    virtual bool IsActive() const { return true; }
+    virtual const char* GetName() const { return "Unknown Handler"; }
+};
 
-    public:
-        GamepadInputHandler(const std::string& name = "BaseHandler", int priority = 0, bool active = true)
-            : m_active(active), m_priority(priority), m_name(name) {}
+/** @brief Base implementation of IGamepadInputHandler with common functionality. */
+class GamepadInputHandler : public IGamepadInputHandler
+{
+private:
+    bool        m_active   = true;
+    int         m_priority = 0;
+    std::string m_name;
 
-        // IGamepadInputHandler interface
-        bool HandleButtonInput(int gamepadId, GamepadButton button, bool pressed, bool justPressed, bool justReleased) override {
-            return false; // Base implementation doesn't handle anything
-        }
+public:
+    explicit GamepadInputHandler(const std::string& name = "BaseHandler", int priority = 0, bool active = true)
+        : m_active(active), m_priority(priority), m_name(name) {}
 
-        bool HandleAxisInput(int gamepadId, GamepadAxis axis, float value, float delta) override {
-            return false; // Base implementation doesn't handle anything
-        }
+    // ── IGamepadInputHandler ─────────────────────────────────────────────────
 
-        // Accessor methods
-        bool IsActive() const override { return m_active; }
-        void SetActive(bool active) { m_active = active; }
+    bool HandleButtonInput(int gamepadId, GamepadButton button, bool pressed, bool justPressed, bool justReleased) override
+    {
+        return false;
+    }
 
-        int GetPriority() const override { return m_priority; }
-        void SetPriority(int priority) { m_priority = priority; }
+    bool HandleAxisInput(int gamepadId, GamepadAxis axis, float value, float delta) override
+    {
+        return false;
+    }
 
-        const char* GetName() const override { return m_name.c_str(); }
-        void SetName(const std::string& name) { m_name = name; }
-    };
+    // ── Accessors ────────────────────────────────────────────────────────────
+
+    bool IsActive() const override { return m_active; }
+    void SetActive(bool active) { m_active = active; }
+
+    int GetPriority() const override { return m_priority; }
+    void SetPriority(int priority) { m_priority = priority; }
+
+    const char* GetName() const override { return m_name.c_str(); }
+    void SetName(const std::string& name) { m_name = name; }
+};
 
 } // namespace Input
