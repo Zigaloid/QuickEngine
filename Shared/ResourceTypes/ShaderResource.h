@@ -38,3 +38,9 @@ public:
 private:
 	bgfx::ShaderHandle m_shader = BGFX_INVALID_HANDLE;
 };
+
+class CShaderResourceReference : public CTypedResourceReference<CShaderResource>
+{
+public:
+	REFL_DECLARE_OBJECT(CShaderResourceReference, CResourceReference);
+};

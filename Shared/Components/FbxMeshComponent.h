@@ -50,7 +50,7 @@ private:
     MeshState::Texture   m_texture[4];
     bgfx::UniformHandle  m_samplers[4]     = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE,
                                                 BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
-    CMaterialDefinition  m_materialDefinition;
+    CMaterialResource  m_materialDefinition;
     bool m_ready                = false;
     bool m_meshStateInitialized = false;
 

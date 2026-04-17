@@ -14,10 +14,14 @@
 std::shared_ptr<CShaderResource> testShader;
 bool QuickEditApp::Initialize()
 {
+	CTextureResourceReference testTextureRef;
+	testTextureRef.OnLoaded();
+
+
 	// Initialize application-specific resources here
 	m_visualizerManager.Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), false);
-	
+
 	// Create the document manager and register all asset types
 	m_documentManager = std::make_unique<DocumentManager>(m_visualizerManager);
 	m_documentManager->RegisterAssetTypes();

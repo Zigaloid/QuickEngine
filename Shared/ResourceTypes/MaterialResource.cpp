@@ -4,70 +4,41 @@
 #include "CoreSystem/CoreSystem.h"
 
 // ── CMaterialDefinition ───────────────────────────────────────────
-REFL_DEFINE_OBJECT(CMaterialDefinition)
-	REFL_DEFINE_VECTOR4_MEMBER(CMaterialDefinition, m_materialColor),
-	REFL_DEFINE_VECTOR4_MEMBER(CMaterialDefinition, m_ambientColor),
-	REFL_DEFINE_OBJECT_MEMBER(CMaterialDefinition, m_vertexShaderResource),
-	REFL_DEFINE_OBJECT_MEMBER(CMaterialDefinition, m_fragmentShaderResource),	
-	REFL_DEFINE_OBJECT_PTR_VECTOR_MEMBER(CMaterialDefinition, m_textureResources),
-	REFL_DEFINE_INT_VECTOR_MEMBER(CMaterialDefinition, m_textureFlags),
-	REFL_DEFINE_INT_VECTOR_MEMBER(CMaterialDefinition, m_textureStages)
+REFL_DEFINE_OBJECT(CMaterialResource)
+	REFL_DEFINE_VECTOR4_MEMBER(CMaterialResource, m_materialColor),
+	REFL_DEFINE_VECTOR4_MEMBER(CMaterialResource, m_ambientColor),
+	REFL_DEFINE_OBJECT_MEMBER(CMaterialResource, m_vertexShaderResource),
+	REFL_DEFINE_OBJECT_MEMBER(CMaterialResource, m_fragmentShaderResource),
+	REFL_DEFINE_OBJECT_PTR_VECTOR_MEMBER(CMaterialResource, m_textureResources),
+	REFL_DEFINE_INT_VECTOR_MEMBER(CMaterialResource, m_textureFlags),
+	REFL_DEFINE_INT_VECTOR_MEMBER(CMaterialResource, m_textureStages)
 REFL_DEFINE_END
 
-bool CMaterialDefinition::IsLoaded() const
-{ 	
-    if (m_vertexShader && m_vertexShader->IsFinalized() && m_fragmentShader && m_fragmentShader->IsFinalized())
+bool CMaterialResource::IsLoaded() const
+{
+	if (!m_vertexShaderResource.GetResourceAs<CShaderResource>()
+		|| !m_vertexShaderResource.GetResourceAs<CShaderResource>()->IsLoaded()
+		|| !m_vertexShaderResource.GetResourceAs<CShaderResource>()->IsFinalized())
 	{
-		for (const auto& texture : m_textures)
-		{
-			if (!texture || !texture->IsFinalized())
-				return false;
-		}
-		return true;
+		return false;
+	}
+	if (!m_fragmentShaderResource.GetResourceAs<CShaderResource>()
+		|| !m_fragmentShaderResource.GetResourceAs<CShaderResource>()->IsLoaded()
+		|| !m_fragmentShaderResource.GetResourceAs<CShaderResource>()->IsFinalized())
+	{
+		return false;
 	}
 
-	return false;
+	for (const auto& texture : m_textureResources)
+	{
+		if (!texture || !texture->GetResource() || !texture->GetResource()->IsFinalized())
+			return false;
+	}
+
+	return true;
 }
-bool CMaterialDefinition::Initialize()
+bool CMaterialResource::Initialize()
 {
 	m_shader = BGFX_INVALID_HANDLE;
-	auto* resourceManager = Core::CoreSystem::GetResourceManager();
-	if (!resourceManager)
-	{
-		std::cerr << "CMaterialDefinition: ResourceManager is null" << std::endl;
-		return false;
-	}		
-
-	m_vertexShader = resourceManager->RequestResource<CShaderResource>(m_vertexShaderResource.GetResourceFileName());
-	if (!m_vertexShader)
-	{
-		std::cerr << "CMaterialDefinition: Failed to request shader resource: " << m_vertexShaderResource.GetResourceFileName();
-		return false;
-	}
-	m_fragmentShader = resourceManager->RequestResource<CShaderResource>(m_fragmentShaderResource.GetResourceFileName());
-	if (!m_fragmentShader)
-	{
-		std::cerr << "CMaterialDefinition: Failed to request shader resource: " << m_fragmentShaderResource.GetResourceFileName();
-		return false;
-	}	
-
-	for (const auto& texResRef : m_textureResources)
-	{
-		if (texResRef && !texResRef->GetResourceFileName().empty())
-		{
-			auto texRes = resourceManager->RequestResource<CTextureResource>(texResRef->GetResourceFileName());
-			if (texRes)
-			{
-				m_textures.push_back(texRes);
-			}
-			else
-			{
-				std::cerr << "CMaterialDefinition: Failed to request texture resource: "
-					<< texResRef->GetResourceFileName() << std::endl;
-				return false;
-			}
-		}
-	}
-
 	return true;
 }

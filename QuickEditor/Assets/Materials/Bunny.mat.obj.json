@@ -1,40 +1,5 @@
 {
     "RootObject": {
-        "m_vertexShaderResource": {
-            "Value": "CResourceReference",
-            "m_resourceFileName": {
-                "Value": "./assets/shaders/dxbc/vs_basictextured.bin",
-                "Type": 3,
-                "Size": 40
-            },
-            "Type": 4,
-            "Size": 48
-        },
-        "m_fragmentShaderResource": {
-            "Value": "CResourceReference",
-            "m_resourceFileName": {
-                "Value": "./assets/shaders/dxbc/fs_basictextured.bin",
-                "Type": 3,
-                "Size": 40
-            },
-            "Type": 4,
-            "Size": 48
-        },
-        "m_textureResources": {
-            "Value": "CMaterialDefinition",
-            "Elements": [
-                {
-                    "Value": "CResourceReference",
-                    "m_resourceFileName": {
-                        "Value": "./assets/textures/bark1.dds",
-                        "Type": 3,
-                        "Size": 40
-                    }
-                }
-            ],
-            "Type": 6,
-            "Size": 32
-        },
         "m_materialColor": {
             "Value": [
                 1.0,
@@ -54,6 +19,51 @@
             ],
             "Type": 7,
             "Size": 16
+        },
+        "m_vertexShaderResource": {
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/shaders/dxbc/vs_basictextured.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 64
+        },
+        "m_fragmentShaderResource": {
+            "Value": "CResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/shaders/dxbc/fs_basictextured.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 64
+        },
+        "m_textureResources": {
+            "Value": "CMaterialDefinition",
+            "Elements": [
+                {
+                    "Value": "CTextureResourceReference",
+                    "m_resourceFileName": {
+                        "Value": "./assets/textures/fieldstone-rgba.dds",
+                        "Type": 3,
+                        "Size": 40
+                    }
+                }
+            ],
+            "Type": 6,
+            "Size": 32
+        },
+        "m_textureFlags": {
+            "Value": [],
+            "Type": 14,
+            "Size": 32
+        },
+        "m_textureStages": {
+            "Value": [],
+            "Type": 14,
+            "Size": 32
         }
     }
 }

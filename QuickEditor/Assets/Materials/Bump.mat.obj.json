@@ -28,7 +28,7 @@
                 "Size": 40
             },
             "Type": 4,
-            "Size": 48
+            "Size": 64
         },
         "m_fragmentShaderResource": {
             "Value": "CResourceReference",
@@ -38,23 +38,15 @@
                 "Size": 40
             },
             "Type": 4,
-            "Size": 48
+            "Size": 64
         },
         "m_textureResources": {
             "Value": "CMaterialDefinition",
             "Elements": [
                 {
-                    "Value": "CResourceReference",
+                    "Value": "CTextureResourceReference",
                     "m_resourceFileName": {
-                        "Value": "./assets/textures/fieldstone-rgba.dds",
-                        "Type": 3,
-                        "Size": 40
-                    }
-                },
-                {
-                    "Value": "CResourceReference",
-                    "m_resourceFileName": {
-                        "Value": "./assets/textures/fieldstone-n.dds",
+                        "Value": "./assets/textures/bark1.dds",
                         "Type": 3,
                         "Size": 40
                     }

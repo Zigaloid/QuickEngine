@@ -1,11 +1,11 @@
-#pragma once
-
 #include "imgui.h"
 #include "Reflection/ReflectionBase.h"
 #include "Reflection/ReflectionMap.h"
 #include "ComponentSystem/ComponentRegistry.h"
 #include "PropertyWidgetMap.h"
 #include "PropertyWidgetMapRegistry.h"
+
+#include "ClassFactory/ClassFactory.h"
 
 #include <string>
 #include <unordered_set>
@@ -68,11 +68,11 @@ namespace ImGuiVisualizers {
 		void RenderVector3Property(const CPropertyBase& property, CReflectedBase* object);
 		void RenderVector4Property(const CPropertyBase& property, CReflectedBase* object);
 		void RenderMatrix4Property(const CPropertyBase& property, CReflectedBase* object);
-		void RenderReflectedObjectCommon( const CPropertyBase& property, CReflectedBase* subObject, const void* idSource, const char* typeTag, bool showAddress, const char* nullNameOverride);
+		void RenderReflectedObjectCommon(const CPropertyBase& property, CReflectedBase* subObject, const void* idSource, const char* typeTag, bool showAddress, const char* nullNameOverride);
 		void RenderObjectProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderObjectPtrProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderObjectPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object);
-		void RenderComponentCommon(const CPropertyBase& property, ComponentSystem::Component* comp, const void* idSource, const char* typeTag, bool showAddress, const char* nullNameOverride);
+		void RenderComponentCommon(const CPropertyBase & property, ComponentSystem::Component * comp, const void* idSource, const char* typeTag, bool showAddress, const char* nullNameOverride);
 		void RenderComponentProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object);
@@ -85,7 +85,7 @@ namespace ImGuiVisualizers {
 		void RenderVectorGeneric(const CPropertyBase& property, CReflectedBase* object, const char* vectorTag, DrawElemFn drawElement, std::function<ValueT()> makeDefault = std::function<ValueT()>(), std::function<void(void*)> removeCleanup = std::function<void(void*)>());
 
 		// Widget-specific rendering methods (used by PropertyWidgetMap overrides)
-		
+
 		bool RenderWithCustomWidget(const CPropertyBase& property, CReflectedBase* object, EditorWidgetType widgetType);
 		void RenderSliderFloat(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
 		void RenderSliderInt(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config);
@@ -102,7 +102,7 @@ namespace ImGuiVisualizers {
 		void RenderComponentArrayContextMenu(const CPropertyBase& property, CReflectedBase* object);
 		void RenderComponentItemContextMenu(const CPropertyBase& property, CReflectedBase* object, size_t index);
 		void RenderObjectArrayContextMenu(const CPropertyBase& property, CReflectedBase* object);
-		
+
 		// Component management
 		bool AddComponentToArray(const CPropertyBase& property, CReflectedBase* object, const std::string& componentClassName);
 		bool RemoveComponentFromArray(const CPropertyBase& property, CReflectedBase* object, size_t index);
@@ -167,11 +167,36 @@ namespace ImGuiVisualizers {
 			WidgetMapScope(PropertyInspector* owner, CReflectedBase* obj)
 				: m_prev(owner->m_widgetMap), m_owner(owner)
 			{
+				owner->m_widgetMap = nullptr;
+
 				if (obj) {
 					const char* subClassName = obj->GetRflClassName();
 					if (subClassName && subClassName[0] != '\0') {
+						// Try the exact class first
 						auto mapPtr = PropertyWidgetMapRegistry::Instance().Get(subClassName);
-						owner->m_widgetMap = mapPtr ? mapPtr.get() : nullptr;
+						if (mapPtr) {
+							owner->m_widgetMap = mapPtr ? mapPtr.get() : nullptr;
+						}
+						else {
+							// No direct map for this concrete class: walk the reflection hierarchy
+							// (derived -> parent -> ...) and find the first ancestor that has a map.
+							std::unique_ptr<CReflectedBase> tmp(ClassFactory::CreateObject(subClassName));
+							if (tmp) {
+								std::vector<std::pair<const char*, std::vector<CReflectionMapEntry>*>> hierarchy;
+								tmp->CollectHierarchyReflectionMaps(hierarchy);
+								for (const auto& p : hierarchy) {
+									if (!p.first) continue;
+									auto ancestorMap = PropertyWidgetMapRegistry::Instance().Get(std::string(p.first));
+									if (ancestorMap) {
+										owner->m_widgetMap = ancestorMap.get();
+										break;
+									}
+								}
+							}
+							else {
+								owner->m_widgetMap = nullptr;
+							}
+						}
 					}
 					else {
 						owner->m_widgetMap = nullptr;

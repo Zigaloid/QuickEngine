@@ -110,6 +110,7 @@ public:
     virtual void WriteMembers(IRFL_Parser& doc) {}
     virtual const char* GetRflClassName() const { return nullptr; }
     virtual void CollectHierarchyReflectionMaps(std::vector<std::pair<const char*, std::vector<CReflectionMapEntry>*>>& hierarchyMaps) const {}
+	virtual void OnLoaded() {} // Called after successful read, can be overridden for post-processing
 
 protected:
     void InternalReadMembers(std::vector<CReflectionMapEntry>& reflectionMap, IRFL_Parser& doc);

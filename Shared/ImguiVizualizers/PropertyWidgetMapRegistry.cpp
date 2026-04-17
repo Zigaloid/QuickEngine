@@ -80,4 +80,20 @@ namespace ImGuiVisualizers {
         }
     }
 
+    std::string PropertyWidgetMapRegistry::FindClassNameForMap(const PropertyWidgetMap* map) const
+    {
+        if (!map) return std::string();
+
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        // Check the serialization-side clones first
+        for (size_t i = 0; i < m_classWidgets.size(); ++i) {
+            if (m_classWidgets[i].get() == map) return m_classNames[i];
+        }
+        // Check the owned shared maps
+        for (size_t i = 0; i < m_ownedMaps.size(); ++i) {
+            if (m_ownedMaps[i].get() == map) return m_classNames[i];
+        }
+        return std::string();
+    }
+
 } // namespace ImGuiVisualizers

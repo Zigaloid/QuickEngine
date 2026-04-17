@@ -49,3 +49,9 @@ public:
 private:
 	bgfx::TextureHandle m_texture = BGFX_INVALID_HANDLE;
 };
+
+class CTextureResourceReference : public CTypedResourceReference<CTextureResource>
+{
+public:
+	REFL_DECLARE_OBJECT(CTextureResourceReference, CResourceReference);
+};

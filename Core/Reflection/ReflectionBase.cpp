@@ -187,8 +187,7 @@ Reflection::Result<bool> CReflectedBase::SafeRead(const std::string &fileName)
 		}
 
 		ReadMembers(*parser);
-		parser->EndInput();
-
+		parser->EndInput();		
 		return Result<bool>::Success(true);
 	}
 	catch (const ReflectionException &e)
@@ -445,6 +444,7 @@ void CReflectedBase::InternalReadMembers(vector<CReflectionMapEntry> &reflection
 					   "Property: " + property.GetProperty()->GetName() + ", Error: " + e.what());
 		}
 	}
+	OnLoaded();
 }
 
 void CReflectedBase::InternalWriteMembers(vector<CReflectionMapEntry> &reflectionMap, IRFL_Parser &doc)

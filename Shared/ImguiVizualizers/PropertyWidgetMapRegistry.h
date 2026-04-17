@@ -26,6 +26,10 @@ namespace ImGuiVisualizers {
         // Unregister a widget map.
         void Unregister(const std::string& className);
 
+        // Find the class name associated with a given map pointer (by identity).
+        // Returns empty string if not found.
+        std::string FindClassNameForMap(const PropertyWidgetMap* map) const;
+
     private:        
         ~PropertyWidgetMapRegistry() = default;
         PropertyWidgetMapRegistry(const PropertyWidgetMapRegistry&) = delete;
