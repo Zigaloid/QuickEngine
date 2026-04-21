@@ -1900,7 +1900,35 @@ void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflect
 		ofn.nMaxFile = MAX_PATH;
 		ofn.lpstrFilter = filterBuf.data();
 		ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
-		ofn.lpstrInitialDir = ".\\assets\\";
+
+		// Build initial directory: <current working dir>\assets\ + optional WidgetConfig.defaultFolder
+		char initialDirBuf[MAX_PATH] = { 0 };
+		DWORD got = GetCurrentDirectoryA(MAX_PATH, initialDirBuf);
+		std::string initDir;
+		if (got != 0) {
+			initDir = std::string(initialDirBuf);
+		}
+		else {
+			initDir = std::string("."); // fallback
+		}
+
+		// Normalize trailing slash and append assets
+		if (!initDir.empty() && (initDir.back() == '\\' || initDir.back() == '/')) {
+			initDir.pop_back();
+		}
+		initDir += "\\assets\\";
+
+		// Append widget-config default folder if provided (strip any leading slashes)
+		if (config && !config->defaultFolder.empty()) {
+			std::string df = config->defaultFolder;
+			while (!df.empty() && (df.front() == '\\' || df.front() == '/')) df.erase(df.begin());
+			// Don't add an extra backslash if defaultFolder already contains it at end
+			initDir += df;
+		}
+
+		// Copy into buffer for OPENFILENAME
+		strcpy_s(initialDirBuf, sizeof(initialDirBuf), initDir.c_str());
+		ofn.lpstrInitialDir = initialDirBuf;
 
 		if (GetOpenFileNameA(&ofn)) 
 		{
@@ -1908,7 +1936,7 @@ void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflect
             std::string  fixedFilePath = filePath;			
 			pathSanitize(fixedFilePath);
 			fixedFilePath.erase(0, fixedFilePath.find("assets/"));
-            fixedFilePath = "./" + fixedFilePath; // ensure it starts with ./
+            fixedFilePath = "./" + fixedFilePath; // ensure it starts with ./			
 			
 			*value = fixedFilePath;
 			strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
@@ -1926,37 +1954,4 @@ void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflect
 	ImGui::PopID();
 }
 
-	void PropertyInspector::DumpReflectionMap(CReflectedBase* object)
-	{
-		if (!object) return;
-	#ifdef _WIN32
-		OutputDebugStringA("DumpReflectionMap for object\n");
-	#else
-		std::fprintf(stderr, "DumpReflectionMap for object\n");
-	#endif
-		std::vector<std::pair<const char*, std::vector<CReflectionMapEntry>*>> maps;
-		object->CollectHierarchyReflectionMaps(maps);
-		for (auto& p : maps) {
-			const char* className = p.first;
-	#ifdef _WIN32
-			char buf[256];
-			_snprintf_s(buf, sizeof(buf), "Class: %s\n", className);
-			OutputDebugStringA(buf);
-	#else
-			std::fprintf(stderr, "Class: %s\n", className);
-	#endif
-			for (auto& entry : *p.second) {
-				CPropertyBase* prop = entry.GetProperty();
-				if (!prop) continue;
-	#ifdef _WIN32
-				_snprintf_s(buf, sizeof(buf), "  prop='%s' type=%d offset=%zu size=%zu\n",
-							prop->GetName().c_str(), static_cast<int>(prop->GetType()), prop->GetOffset(), prop->GetSize());
-				OutputDebugStringA(buf);
-	#else
-				std::fprintf(stderr, "  prop='%s' type=%d offset=%zu size=%zu\n",
-							 prop->GetName().c_str(), static_cast<int>(prop->GetType()), prop->GetOffset(), prop->GetSize());
-	#endif
-			}
-		}
-	}
 }

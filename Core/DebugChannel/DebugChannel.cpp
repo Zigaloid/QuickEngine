@@ -51,6 +51,8 @@ string CDebugChannel::FormatString(const char* fmt, va_list vl)
 
 void CDebugChannel::print(const string& message)
 {
+    if (!m_enabled) return;
+
     if (m_outputFlags & OF_StdOut)
     {
         if (Core::CoreSystem::GetLog())
@@ -68,6 +70,7 @@ void CDebugChannel::print(const string& message)
 
 void CDebugChannel::printf(const char* format, ...)
 {
+    if (!m_enabled) return;
     va_list vl;
     va_start(vl, format);
     string formatted = FormatString(format, vl);
@@ -77,6 +80,7 @@ void CDebugChannel::printf(const char* format, ...)
 
 void CDebugChannel::warning(const char* format, ...)
 {
+    if (!m_enabled) return;
     va_list vl;
     va_start(vl, format);
     string formatted = FormatString(format, vl);
@@ -87,6 +91,7 @@ void CDebugChannel::warning(const char* format, ...)
 
 bool CDebugChannel::Assert(bool condition, const char* format, ...)
 {
+    if (!m_enabled) return true;
     va_list vl;
     va_start(vl, format);
     string formatted = FormatString(format, vl);

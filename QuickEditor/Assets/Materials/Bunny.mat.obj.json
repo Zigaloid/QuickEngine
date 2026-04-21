@@ -2,9 +2,9 @@
     "RootObject": {
         "m_materialColor": {
             "Value": [
-                1.0,
-                1.0,
-                1.0,
+                0.1202126070857048,
+                0.0,
+                0.9729729890823364,
                 1.0
             ],
             "Type": 7,
@@ -12,7 +12,7 @@
         },
         "m_ambientColor": {
             "Value": [
-                1.0,
+                0.30000001192092896,
                 0.30000001192092896,
                 0.30000001192092896,
                 1.0
@@ -21,9 +21,9 @@
             "Size": 16
         },
         "m_vertexShaderResource": {
-            "Value": "CResourceReference",
+            "Value": "CShaderResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/shaders/dxbc/vs_basictextured.bin",
+                "Value": "./assets/shaders/vs_basictextured.shader.bin",
                 "Type": 3,
                 "Size": 40
             },
@@ -31,9 +31,9 @@
             "Size": 64
         },
         "m_fragmentShaderResource": {
-            "Value": "CResourceReference",
+            "Value": "CShaderResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/shaders/dxbc/fs_basictextured.bin",
+                "Value": "./assets/shaders/fs_basictextured.shader.bin",
                 "Type": 3,
                 "Size": 40
             },
@@ -41,7 +41,7 @@
             "Size": 64
         },
         "m_textureResources": {
-            "Value": "CMaterialDefinition",
+            "Value": "CMaterialResource",
             "Elements": [
                 {
                     "Value": "CTextureResourceReference",

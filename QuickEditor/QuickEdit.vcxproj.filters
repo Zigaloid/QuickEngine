@@ -368,6 +368,9 @@
     <ClInclude Include="..\Shared\Components\TransformComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
@@ -582,6 +585,9 @@
     </ClCompile>
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
       <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

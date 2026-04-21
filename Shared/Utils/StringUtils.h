@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "CoreSystem/CoreDebugChannels.h"
 
 void toLower(std::string& str)
 {
@@ -22,3 +23,21 @@ void pathSanitize(std::string& path)
     toLower(path);
 }
 
+
+void DumpReflectionMap(CReflectedBase* object)
+{
+	if (!object) return;
+
+	ReflectionDebug.printf("DumpReflectionMap for object\n");
+	std::vector<std::pair<const char*, std::vector<CReflectionMapEntry>*>> maps;
+	object->CollectHierarchyReflectionMaps(maps);
+	for (auto& p : maps) {
+		const char* className = p.first;
+		ReflectionDebug.printf("Class: %s\n", className);
+		for (auto& entry : *p.second) {
+			CPropertyBase* prop = entry.GetProperty();
+			if (!prop) continue;
+				ReflectionDebug.printf("  prop='%s' type=%d offset=%zu size=%zu\n",	prop->GetName().c_str(), static_cast<int>(prop->GetType()), prop->GetOffset(), prop->GetSize());
+		}
+	}
+}

@@ -7,6 +7,11 @@
 class CTextureResource : public ResourceSystem::Resource
 {
 public:
+	static std::vector<std::string_view> GetSupportedExtensions()
+	{
+		return { ".dds" };
+	}
+
 	explicit CTextureResource(const std::string& path)
 		: Resource(path)
 		, m_texture(BGFX_INVALID_HANDLE)

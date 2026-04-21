@@ -1,9 +1,11 @@
-
 #include "MaterialResource.h"
 #include "ResourceManager/ResourceManager.h"
 #include "CoreSystem/CoreSystem.h"
 
 // ── CMaterialDefinition ───────────────────────────────────────────
+REFL_DEFINE_OBJECT(CMaterialResourceReference)
+REFL_DEFINE_END
+
 REFL_DEFINE_OBJECT(CMaterialResource)
 	REFL_DEFINE_VECTOR4_MEMBER(CMaterialResource, m_materialColor),
 	REFL_DEFINE_VECTOR4_MEMBER(CMaterialResource, m_ambientColor),
@@ -41,4 +43,40 @@ bool CMaterialResource::Initialize()
 {
 	m_shader = BGFX_INVALID_HANDLE;
 	return true;
+}
+
+bool CMaterialResource::Update(FileSystem::FileSystemManager& fileSystem)
+{	
+	m_isLoaded = true;
+	SafeRead(this->GetPath());		
+	return true;
+}
+
+void CMaterialResource::Finalize()
+{
+	// Ensure the shader sub-resources are available and finalized
+	auto vert = m_vertexShaderResource.GetResourceAs<CShaderResource>();
+	auto frag = m_fragmentShaderResource.GetResourceAs<CShaderResource>();
+
+	if (!vert || !frag)
+	{
+		m_isFinalized = false;
+		return;
+	}
+	if (!vert->IsFinalized() || !frag->IsFinalized())
+	{
+		m_isFinalized = false;
+		return;
+	}
+
+	// Create program on main thread
+	m_shader = bgfx::createProgram(vert->GetShaderHandle(), frag->GetShaderHandle(), false);
+	if (!bgfx::isValid(m_shader))
+	{
+		m_isFinalized = false;
+		return;
+	}
+
+	// mark finalized
+	m_isFinalized = true;
 }

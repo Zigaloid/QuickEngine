@@ -8,3 +8,4 @@ extern DebugChannels::CDebugChannel CoreDebug;
 extern DebugChannels::CDebugChannel JobSystemDebug;
 extern DebugChannels::CDebugChannel FileSystemDebug;
 extern DebugChannels::CDebugChannel ProfilerDebug;
+extern DebugChannels::CDebugChannel ResourceManagerDebug;

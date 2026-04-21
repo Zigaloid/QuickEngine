@@ -73,8 +73,7 @@ void CFbxMeshComponent::OnUpdate(double /*deltaTime*/)
         if (IsLoaded())
         {
             m_ready = true;
-        }
-        m_materialDefinition.Update();
+        }        
     }
 }
 

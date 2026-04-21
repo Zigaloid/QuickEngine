@@ -468,12 +468,20 @@ namespace ImGuiVisualizers {
 							}
 
 							// File picker filter
-							if (m_editWidgetType == EditorWidgetType::FilePicker) {
+							if (m_editWidgetType == EditorWidgetType::FilePicker) 
+							{
 								char buf[256];
 								strncpy(buf, m_editConfig.fileFilter.c_str(), sizeof(buf) - 1);
 								buf[sizeof(buf) - 1] = '\0';
 								if (ImGui::InputText("File Filter", buf, sizeof(buf))) {
 									m_editConfig.fileFilter = std::string(buf);
+								}
+
+								char folderBuffer[256];
+								strncpy(folderBuffer, m_editConfig.defaultFolder.c_str(), sizeof(folderBuffer) - 1);
+								buf[sizeof(folderBuffer) - 1] = '\0';
+								if (ImGui::InputText("Default Folder", folderBuffer, sizeof(folderBuffer))) {
+									m_editConfig.defaultFolder = std::string(folderBuffer);
 								}
 							}
 						}

@@ -1,7 +1,8 @@
 #pragma once
 #include "ComponentSystem/ComponentSystem.h"
 #include "ResourceManager/ResourceManager.h"
-#include "MaterialResource.h"
+#include "StaticMeshResource.h"
+
 #include <string>
 
 class CShaderResource;
@@ -18,14 +19,9 @@ public:
 	bool OnInitialize() override;
 	void OnUpdate(double deltaTime) override;
 	void OnShutdown() override;
-
-	// ── Public API ──────────────────────────────────────────────────────
-
-	bool IsReady() const;
-    std::string GetMeshResourceFileName() const { return m_meshResource.GetResourceFileName(); }
-
+		
 private:
 	std::string m_name;    
-    CResourceReference m_meshResource;
+    
 
 };

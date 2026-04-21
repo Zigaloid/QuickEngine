@@ -125,6 +125,7 @@
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\TextureResource.h" />
     <ClInclude Include="..\Shared\bgfx_common\args.h" />
     <ClInclude Include="..\Shared\bgfx_common\aviwriter.h" />
@@ -242,6 +243,7 @@
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\bgfx_utils.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\camera.cpp" />

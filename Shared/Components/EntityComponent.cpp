@@ -9,7 +9,6 @@ REGISTER_COMPONENT(CEntityComponent, "Level", "LD");
 
 REFL_DEFINE_OBJECT(CEntityComponent)
 	REFL_DEFINE_STRING_MEMBER(CEntityComponent, m_name),
-	REFL_DEFINE_OBJECT_MEMBER(CEntityComponent, m_meshResource),
 REFL_DEFINE_END
 
 bool CEntityComponent::OnInitialize()
@@ -25,9 +24,4 @@ void CEntityComponent::OnUpdate(double /*deltaTime*/)
 void CEntityComponent::OnShutdown()
 {
 
-}
-
-bool CEntityComponent::IsReady() const
-{
-	return true;
 }

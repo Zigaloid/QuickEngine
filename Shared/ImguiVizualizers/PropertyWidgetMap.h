@@ -32,6 +32,7 @@ namespace ImGuiVisualizers {
 		float step = 0.01f;
 		std::vector<std::string> dropdownOptions;  // for Dropdown type
 		std::string fileFilter;                     // for FilePicker type (e.g. "*.png;*.jpg")
+		std::string defaultFolder;                     // for FilePicker type (e.g. "*.png;*.jpg")
 	};
 	class WidgetEntry : public CReflectedBase
 	{

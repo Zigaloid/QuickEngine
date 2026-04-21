@@ -187,7 +187,11 @@ Reflection::Result<bool> CReflectedBase::SafeRead(const std::string &fileName)
 		}
 
 		ReadMembers(*parser);
-		parser->EndInput();		
+		parser->EndInput();
+
+		// Ensure the object's post-load hook runs for SafeRead path as well.
+		OnLoaded();
+
 		return Result<bool>::Success(true);
 	}
 	catch (const ReflectionException &e)
@@ -263,6 +267,9 @@ bool CReflectedBase::ReadFromJsonString(const std::string &jsonString)
 
 		ReadMembers(parser);
 		parser.EndInputFromBuffer();
+
+		// Call object's post-load hook so derived OnLoaded() implementations execute.
+		OnLoaded();
 
 		REFL_WARNING(Reflection::ErrorCategory::Parsing,
 					 "Successfully read object from JSON string", "Class: " + std::string(GetRflClassName()));
@@ -347,6 +354,9 @@ bool CReflectedBase::ReadFromBinaryBuffer(const std::vector<uint8_t> &binaryData
 		}
 
 		parser.EndInputFromBuffer();
+
+		// Ensure post-load hook runs for binary-buffer read path.
+		OnLoaded();
 
 		REFL_WARNING(Reflection::ErrorCategory::Parsing,
 					 "Successfully read object from binary buffer", "Class: " + std::string(GetRflClassName()));

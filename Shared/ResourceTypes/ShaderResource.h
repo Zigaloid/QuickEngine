@@ -14,6 +14,12 @@ public:
 		, m_shader(BGFX_INVALID_HANDLE)
 	{
 	}
+
+	static std::vector<std::string_view> GetSupportedExtensions()
+	{
+		return { ".shader.bin" };
+	}
+
 	// path is used as the base program name.
 	// Convention: "mesh" will load shaders "vs_mesh" and "fs_mesh".
 	bgfx::ShaderHandle GetShaderHandle() const { return m_shader; }
@@ -27,9 +33,6 @@ public:
 		}
 	}
 
-	// Finalize runs on the main thread – safe for bgfx resource creation.
-	// Constructs vertex/fragment shader names from the base name:
-	//   "mesh" -> loadProgram("vs_mesh", "fs_mesh")
 	void Finalize() override
 	{
 		m_shader = loadShaderFromMemory(GetData().data(), static_cast<uint32_t>(GetLoadedSize()), m_path.c_str());

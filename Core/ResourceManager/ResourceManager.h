@@ -3,6 +3,7 @@
 #include "Filesystem/FileSystemManager.h"
 #include "Profiler/Profiler.h"
 #include "Reflection/ReflectionBase.h"
+#include "CoreSystem/CoreDebugChannels.h"
 
 #include <string>
 #include <vector>
@@ -14,10 +15,26 @@
 #include <condition_variable>
 #include <atomic>
 
+#define RESOURCE_MANAGER_DEBUG 1
+
 namespace ResourceSystem {
 
 	// Forward declarations
 	class ResourceManager;
+
+	// ── Helpers ───────────────────────────────────────────────────────────────────
+
+	/** @brief Extracts the compound extension from a file path.
+	 *  e.g. "assets/mesh.staticmesh.json" -> ".staticmesh.json" */
+	inline std::string ExtractCompoundExtension(const std::string& path)
+	{
+		const size_t sepPos  = path.find_last_of("/\\");
+		const size_t startPos = (sepPos == std::string::npos) ? 0 : sepPos + 1;
+		const size_t dotPos  = path.find('.', startPos);
+		if (dotPos == std::string::npos)
+			return {};
+		return path.substr(dotPos);
+	}
 
 	// ── Resource ──────────────────────────────────────────────────────────────────
 	class Resource : public CReflectedBase
@@ -36,9 +53,16 @@ namespace ResourceSystem {
 		explicit Resource(const std::string& path) : m_path(path) {}
 		virtual ~Resource() = default;
 
+		/** @brief Returns the file extensions this resource type accepts.
+		 *  Derived types should shadow this with their own static implementation.
+		 *  An empty list means no extension restriction is enforced.
+		 *  Extensions must include all parts, e.g. ".staticmesh.json". */
+		static std::vector<std::string_view> GetSupportedExtensions() { return {}; }
+
 		/** @return true on success. */
 		virtual bool Initialize()
 		{
+			ResourceManagerDebug.SetEnabled(RESOURCE_MANAGER_DEBUG);			
 			m_isInitialized = true;
 			return true;
 		}
@@ -150,11 +174,43 @@ namespace ResourceSystem {
 
 					if (updateComplete)
 					{
+						ResourceManagerDebug.printf("Enqueueing resource for finalization: %s\n", resource->GetPath().c_str());
 						std::lock_guard<std::mutex> lock(m_finalizationQueueMutex);
 						m_finalizationQueue.push(resource);
 					}
 				}
 			}
+		}
+
+		/** @brief Checks that @p path has an extension accepted by T.
+		 *  Logs an error and returns false if there is a mismatch. */
+		template<typename T>
+		static bool ValidateExtension(const std::string& path)
+		{
+			const auto extensions = T::GetSupportedExtensions();
+			if (extensions.empty())
+				return true; // no restriction declared
+
+			const std::string ext = ExtractCompoundExtension(path);
+			for (const auto& supported : extensions)
+			{
+				if (ext == supported)
+					return true;
+			}
+
+			// Build a comma-separated list for the error message.
+			std::string list;
+			for (size_t i = 0; i < extensions.size(); ++i)
+			{
+				if (i > 0) list += ", ";
+				list += extensions[i];
+			}
+
+			ResourceManagerDebug.printf(
+				"ERROR: Resource type mismatch - '%s' has extension '%s' but expected one of: [%s]\n",
+				path.c_str(), ext.c_str(), list.c_str());
+
+			return false;
 		}
 
 	public:
@@ -214,19 +270,27 @@ namespace ResourceSystem {
 		std::shared_ptr<T> RequestResource(const std::string& path)
 		{
 			static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
+			ResourceManagerDebug.printf("Requesting resource: %s\n", path.c_str());
+
+			if (!ValidateExtension<T>(path))
+			{
+				// Do not proceed with loading if extension doesn't match the requested resource type.
+				return nullptr;
+			}
 
 			std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
 
 			auto it = m_loadedResources.find(path);
 			if (it != m_loadedResources.end())
 			{
+				ResourceManagerDebug.printf("Return already requested: %s\n", path.c_str());
 				return std::static_pointer_cast<T>(it->second);
 			}
 
 			auto resource = std::make_shared<T>(path);
 			m_loadedResources[path] = resource;
-
 			{
+				ResourceManagerDebug.printf("Enqueueing resource for loading: %s\n", path.c_str());
 				std::lock_guard<std::mutex> queueLock(m_loadingQueueMutex);
 				m_loadingQueue.push(resource);
 			}
@@ -254,7 +318,15 @@ namespace ResourceSystem {
 
 				if (!resource->IsFinalized())
 				{
+					ResourceManagerDebug.printf("Finalizing resource: %s\n", resource->GetPath().c_str());
 					resource->Finalize();
+
+					if (!resource->IsFinalized())
+					{
+						ResourceManagerDebug.printf("Deferring finalization (will retry later): %s\n", resource->GetPath().c_str());
+						std::lock_guard<std::mutex> lock(m_finalizationQueueMutex);
+						m_finalizationQueue.push(resource);
+					}
 				}
 			}
 		}
@@ -266,7 +338,6 @@ namespace ResourceSystem {
 		std::shared_ptr<T> GetResource(const std::string& path)
 		{
 			static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
-
 			std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
 
 			auto it = m_loadedResources.find(path);
@@ -312,6 +383,7 @@ namespace ResourceSystem {
 
 		bool RemoveResource(const std::string& path)
 		{
+			ResourceManagerDebug.printf("Removing resource: %s\n", path.c_str());
 			std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
 			auto it = m_loadedResources.find(path);
 			if (it != m_loadedResources.end())
@@ -342,7 +414,6 @@ public:
 	const std::string GetResourceFileName() const { return m_resourceFileName; }
 	std::shared_ptr<ResourceSystem::Resource> GetResource() const { return m_resource; }
 
-	// Templated helper: returns the stored resource cast to the requested derived type.
 	template<typename T>
 	std::shared_ptr<T> GetResourceAs() const
 	{
@@ -350,15 +421,25 @@ public:
 		return std::dynamic_pointer_cast<T>(m_resource);
 	}
 
+	void SetResourceFileName(const std::string& fileName)
+	{
+		m_resourceFileName = fileName;
+	}
+	
+	virtual std::string GetReourceTypeName() const
+	{
+		return "Resource";
+	}
+
 	void OnLoaded()
 	{
 	}
-
+	
 protected:
 	std::shared_ptr<ResourceSystem::Resource> m_resource;
 private:
 	std::string m_resourceFileName = "undifined";
-	
+
 };
 
 template<typename TResource>
@@ -376,5 +457,9 @@ public:
 				m_resource = resourceManager->RequestResource<TResource>(fileName);
 			}
 		}
+	}
+	std::string GetReourceTypeName() const
+	{
+		return typeid(TResource).name();
 	}
 };

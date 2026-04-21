@@ -3,7 +3,7 @@
         "m_meshResource": {
             "Value": "CStaticMeshResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/staticmeshes/bunny.smesh.obj.json",
+                "Value": "./assets/staticmeshes/tree.smesh.obj.json",
                 "Type": 3,
                 "Size": 40
             },

@@ -47,8 +47,13 @@
                                         "Type": 3,
                                         "Size": 40
                                     },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
                                     "Type": 4,
-                                    "Size": 96
+                                    "Size": 136
                                 }
                             }
                         ],
@@ -107,8 +112,13 @@
                                         "Type": 3,
                                         "Size": 40
                                     },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
                                     "Type": 4,
-                                    "Size": 96
+                                    "Size": 136
                                 }
                             }
                         ],
@@ -167,8 +177,13 @@
                                         "Type": 3,
                                         "Size": 40
                                     },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
                                     "Type": 4,
-                                    "Size": 96
+                                    "Size": 136
                                 }
                             }
                         ],
@@ -227,8 +242,13 @@
                                         "Type": 3,
                                         "Size": 40
                                     },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
                                     "Type": 4,
-                                    "Size": 96
+                                    "Size": 136
                                 }
                             },
                             {
@@ -270,8 +290,13 @@
                                         "Type": 3,
                                         "Size": 40
                                     },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
                                     "Type": 4,
-                                    "Size": 96
+                                    "Size": 136
                                 }
                             }
                         ],
@@ -286,6 +311,445 @@
                         "Type": 17,
                         "Size": 32
                     }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 4,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "hasConfig": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            },
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 4,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "hasConfig": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            }
+                        ],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [
+                            "m_materialColor",
+                            "m_ambientColor"
+                        ],
+                        "Type": 17,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 8,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "hasConfig": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "*.dds",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "textures",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            }
+                        ],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [
+                            "m_resourceFileName"
+                        ],
+                        "Type": 17,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 8,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "hasConfig": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "*.mesh.bin",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "meshes",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            }
+                        ],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [
+                            "m_resourceFileName"
+                        ],
+                        "Type": 17,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 8,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "hasConfig": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "*.smesh.obj.json",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "staticmeshes",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            }
+                        ],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [
+                            "m_resourceFileName"
+                        ],
+                        "Type": 17,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 8,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "hasConfig": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "*.shader.bin",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "shaders",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            }
+                        ],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [
+                            "m_resourceFileName"
+                        ],
+                        "Type": 17,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 8,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "hasConfig": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "*.mat.obj.json",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "materials",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            }
+                        ],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [
+                            "m_resourceFileName"
+                        ],
+                        "Type": 17,
+                        "Size": 32
+                    }
                 }
             ],
             "Type": 6,
@@ -296,7 +760,13 @@
                 "CResourceReference",
                 "CEntityDefinition",
                 "CEntityInstance",
-                "CMaterialDefinition"
+                "CMaterialDefinition",
+                "CMaterialResource",
+                "CTextureResourceReference",
+                "CMeshResourceReference",
+                "CStaticMeshResourceReference",
+                "CShaderResourceReference",
+                "CMaterialResourceReference"
             ],
             "Type": 17,
             "Size": 32

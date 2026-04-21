@@ -8,10 +8,26 @@
 #include "bgfx\bgfx.h"
 #include "bgfx_utils.h"
 
-class CMaterialResource: public ResourceSystem::Resource
+class CMaterialResource : public ResourceSystem::Resource
 {
 public:
 	REFL_DECLARE_OBJECT(CMaterialResource, ResourceSystem::Resource);
+
+	static std::vector<std::string_view> GetSupportedExtensions()
+	{
+		return { ".mat.obj.json" };
+	}
+
+	CMaterialResource()
+	{
+	}
+
+
+	explicit CMaterialResource(const std::string& path)
+		: Resource(path)
+	{
+	}
+
 	~CMaterialResource() override
 	{
 		if (bgfx::isValid(m_shader))
@@ -21,6 +37,13 @@ public:
 		}
 	}
 
+	// Use base-class Update to load the file data on the worker thread. 
+	bool Update(FileSystem::FileSystemManager& fileSystem) override;
+
+	// Finalize runs on the main thread – safe for bgfx resource creation.
+	// Uses shader handles from shader resources to create a program.
+	void Finalize() override;
+
 	std::shared_ptr<CShaderResource> GetVertexShaderResource() const { return m_vertexShaderResource.GetResourceAs<CShaderResource>(); }
 	std::shared_ptr<CShaderResource> GetFragmentShaderResource() const { return m_fragmentShaderResource.GetResourceAs<CShaderResource>(); }
 
@@ -29,7 +52,7 @@ public:
 	void Reset()
 	{
 		m_vertexShaderResource.GetResourceAs<CShaderResource>().reset(); m_fragmentShaderResource.GetResourceAs<CShaderResource>().reset(); m_textureResources.clear();
-		
+
 		if (bgfx::isValid(m_shader))
 		{
 			bgfx::destroy(m_shader);
@@ -42,16 +65,6 @@ public:
 		return m_shader;
 	}
 
-	void Update()
-	{
-		if (!IsReady())
-		{
-			if (IsLoaded())
-			{
-				m_shader = bgfx::createProgram(m_vertexShaderResource.GetResourceAs<CShaderResource>()->GetShaderHandle(), m_fragmentShaderResource.GetResourceAs<CShaderResource>()->GetShaderHandle(), false);
-			}
-		}
-	}
 
 
 	bool IsReady() const { return bgfx::isValid(m_shader); }
@@ -74,7 +87,7 @@ public:
 private:
 	CShaderResourceReference m_vertexShaderResource;
 	CShaderResourceReference m_fragmentShaderResource;
-	std::vector<std::unique_ptr<CTextureResourceReference>> m_textureResources;	
+	std::vector<std::unique_ptr<CTextureResourceReference>> m_textureResources;
 	bgfx::ProgramHandle m_shader = BGFX_INVALID_HANDLE;
 	std::vector<int> m_textureFlags;
 	std::vector<int> m_textureStages;
@@ -83,4 +96,10 @@ private:
 	Vector4f m_ambientColor = { 0.3f, 0.3f, 0.3f, 1.0f };
 	// assign the sampler handle (don't recreate each frame)
 	int m_flags = 0;
+};
+
+class CMaterialResourceReference : public CTypedResourceReference<CMaterialResource>
+{
+public:
+	REFL_DECLARE_OBJECT(CMaterialResourceReference, CTypedResourceReference<CMaterialResource>);
 };

@@ -15,7 +15,8 @@ namespace ImGuiVisualizers {
         REFL_DEFINE_FLOAT_MEMBER(WidgetConfig, maxValue),
         REFL_DEFINE_FLOAT_MEMBER(WidgetConfig, step),
         REFL_DEFINE_STRING_VECTOR_MEMBER(WidgetConfig, dropdownOptions),
-        REFL_DEFINE_STRING_MEMBER(WidgetConfig, fileFilter)
+        REFL_DEFINE_STRING_MEMBER(WidgetConfig, fileFilter),
+        REFL_DEFINE_STRING_MEMBER(WidgetConfig, defaultFolder)
         REFL_DEFINE_END
 
 

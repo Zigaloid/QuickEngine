@@ -57,8 +57,7 @@ namespace ImGuiVisualizers {
 		void RenderObjectPropertiesFlat(CReflectedBase* object);
 		void RenderObjectPropertiesHierarchy(CReflectedBase* object);
 		void RenderClassProperties(const char* className, std::vector<CReflectionMapEntry>* reflectionMap, CReflectedBase* object);
-		void RenderProperty(const CPropertyBase& property, CReflectedBase* object, const std::string& prefix = "");
-		void DumpReflectionMap(CReflectedBase* object);
+		void RenderProperty(const CPropertyBase& property, CReflectedBase* object, const std::string& prefix = "");		
 
 		// Type-specific rendering methods
 		void RenderFloatProperty(const CPropertyBase& property, CReflectedBase* object);

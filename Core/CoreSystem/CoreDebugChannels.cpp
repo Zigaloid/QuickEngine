@@ -9,3 +9,4 @@ DebugChannels::CDebugChannel CoreDebug("Core");
 DebugChannels::CDebugChannel JobSystemDebug("JobSystem");
 DebugChannels::CDebugChannel FileSystemDebug("FileSystem");
 DebugChannels::CDebugChannel ProfilerDebug("Profiler");
+DebugChannels::CDebugChannel ResourceManagerDebug("ResourceManager");
