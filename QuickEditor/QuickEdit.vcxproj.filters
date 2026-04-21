@@ -67,6 +67,9 @@
     <Filter Include="..\Shared\utils">
       <UniqueIdentifier>{2707D659-9392-431E-9CA3-C61208AE9F1E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="AssetClasses">
+      <UniqueIdentifier>{137D46AB-FFDF-D54F-A865-0E0694A7A1D2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\AssetClasses\EntityDefinition.h">
@@ -84,10 +87,19 @@
     <ClInclude Include="..\External\ufbx\ufbx.h">
       <Filter>..\External\ufbx</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\EntityComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\FbxMeshComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\LevelComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\MeshComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\TransformComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h">
@@ -118,6 +130,9 @@
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\ObjJsonEditor.h">
@@ -151,6 +166,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\TextureResource.h">
@@ -358,18 +376,12 @@
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
+    <ClInclude Include="AssetClasses\EntityInstance.h">
+      <Filter>AssetClasses</Filter>
+    </ClInclude>
     <ClInclude Include="QuickEdit.h" />
-    <ClInclude Include="..\Shared\Components\EntityComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\LevelComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\TransformComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h">
-      <Filter>..\Shared\ResourceTypes</Filter>
+    <ClInclude Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -448,10 +460,19 @@
     <ClCompile Include="..\External\ufbx\ufbx.c">
       <Filter>..\External\ufbx</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Components\FbxMeshComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\LevelComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp">
@@ -470,6 +491,9 @@
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp">
@@ -497,6 +521,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp">
@@ -577,17 +604,8 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
-    <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\LevelComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp">
-      <Filter>..\Shared\ResourceTypes</Filter>
+    <ClCompile Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -72,14 +72,6 @@ public:
 
     void SetGridConfig(const GridConfig& cfg) { m_gridConfig = cfg; }
 
-    // Load a mesh from disk and prepare it for rendering.
-    // Can be called before or after Initialize(); if called before,
-    // the mesh will be loaded during Initialize() as well.
-    void LoadMesh(const std::string& meshPath);
-
-    // Retrieve the currently configured mesh path (empty if none).
-    const std::string& GetMeshPath() const { return m_meshPath; }
-
     // Render the viewport & toolbar content into an existing ImGui region
     // (does NOT call ImGui::Begin / ImGui::End). Pass the desired content size
     // in pixels.
@@ -111,12 +103,7 @@ private:
 
     // Mouse drag tracking
     bool     m_orbiting = false;
-    bool     m_panning  = false;
-
-    // Configured mesh path (empty = no mesh configured)
-    std::string m_meshPath;
-
-    CMeshComponent* m_meshComp = nullptr;
+    bool     m_panning  = false;    
 };
 
 } // namespace ImGuiVisualizers

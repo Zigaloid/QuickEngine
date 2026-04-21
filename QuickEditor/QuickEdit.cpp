@@ -9,6 +9,7 @@
 #include "CoreSystem\CoreDebugChannels.h"
 #include "CoreSystem\CoreSystem.h"
 #include "MeshComponent.h"
+#include "imgui.h"
 
 
 std::shared_ptr<CShaderResource> testShader;
@@ -56,7 +57,40 @@ void QuickEditApp::Render(double deltaTime)
 
 void QuickEditApp::ImguiUpdate()
 {
-	m_visualizerManager.RenderAll();
+    // Create a full-viewport host window that contains the main dockspace.
+    // This ensures newly opened internal editor windows can dock into it by default.
+    ImGuiViewport* viewport = ImGui::GetMainViewport();
+    ImGui::SetNextWindowPos(viewport->WorkPos);
+    ImGui::SetNextWindowSize(viewport->WorkSize);
+    ImGui::SetNextWindowViewport(viewport->ID);
+
+    ImGuiWindowFlags hostWindowFlags = ImGuiWindowFlags_MenuBar
+                                     | ImGuiWindowFlags_NoTitleBar
+                                     | ImGuiWindowFlags_NoCollapse
+                                     | ImGuiWindowFlags_NoResize
+                                     | ImGuiWindowFlags_NoMove
+                                     | ImGuiWindowFlags_NoBringToFrontOnFocus
+                                     | ImGuiWindowFlags_NoNavFocus;
+
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+    ImGui::Begin("MainDockSpace", nullptr, hostWindowFlags);
+    ImGui::PopStyleVar(2);
+
+    // Create the dockspace
+    ImGuiID dockspaceId = ImGui::GetID("MainDockSpace");
+    ImGui::DockSpace(dockspaceId, ImVec2(0, 0), ImGuiDockNodeFlags_PassthruCentralNode);
+
+    // Render the menu bar into the host window (RenderMenuBar expects to be called inside a window with MenuBar)
+    if (ImGui::BeginMenuBar()) {
+        m_visualizerManager.RenderMenuBar();
+        ImGui::EndMenuBar();
+    }
+
+    // Render all registered visualizers (they will get a SetNextWindowDockID in the manager)
+    m_visualizerManager.RenderAll();
+
+    ImGui::End();
 }
 
 void QuickEditApp::ImguiMainMenu()

@@ -34,16 +34,6 @@ void ImGui3DViewVisualizer::Shutdown()
 {
     m_viewport.Shutdown();
     m_primitives.Shutdown();
-    // If we created a component earlier, release it back to the manager so its resources are returned.
-    if (m_meshComp)
-    {
-        auto componentManager = Core::CoreSystem::GetComponentManager();
-        if (componentManager)
-        {
-            componentManager->ReleaseComponent(m_meshComp);
-        }
-        m_meshComp = nullptr;
-    }
 }
 
 void ImGui3DViewVisualizer::Update(float deltaTime)
@@ -51,39 +41,6 @@ void ImGui3DViewVisualizer::Update(float deltaTime)
 }
 
 // ── Public mesh-loading API ─────────────────────────────────────────────
-
-void ImGui3DViewVisualizer::LoadMesh(const std::string& meshPath)
-{
-    m_meshPath.clear();
-
-    auto componentManager = Core::CoreSystem::GetComponentManager();
-    if (!componentManager)
-        return;
-
-
-    if (m_meshComp)
-    {
-        componentManager->ReleaseComponent(m_meshComp);
-        m_meshComp = nullptr;
-    }
-
-    // Resolve input type based on file name suffix.    
-    std::string_view pathView(meshPath);
-    // Recognize suffixes: ".mesh.obj.json" => direct mesh file, ".ent.obj.json" => entity def
-    if (pathView.ends_with(".mesh.obj.json"))
-    {
-        // Treat input as a mesh object JSON: construct a CMeshComponent and load it.
-        m_meshComp = componentManager->CreateComponent<CMeshComponent>();
-        if (m_meshComp)
-        {
-            m_meshComp->SafeRead(meshPath);
-            m_meshComp->ReInitialize();            
-        }
-    }
-    m_meshPath = meshPath;
-}
-
-// ── Render ──────────────────────────────────────────────────────────────
 
 bool ImGui3DViewVisualizer::Render(bool* isOpen)
 {
@@ -161,13 +118,6 @@ void ImGui3DViewVisualizer::RenderContent(const ImVec2& contentSize)
         // User-supplied draw calls
         if (m_renderCallback) {
             m_renderCallback(viewId, m_primitives);
-        }
-
-        if (m_meshComp && m_meshComp->IsReady())
-        {
-            float mtx[16];
-            bx::mtxRotateXY(mtx, 0.0f, 0.0f);
-            m_meshComp->Render(viewId, mtx);
         }
 
         // Display the offscreen texture and create an invisible interactive item

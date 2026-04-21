@@ -1,6 +1,7 @@
 #include "DocumentManager.h"
 #include "ObjJsonEditor.h"
-#include "CombinedObjJson3DVisualizer.h"
+#include "MeshComponentVisualizer.h"
+#include "LevelComponentVisualizer.h"
 #include "PropertyWidgetMapEditor.h"
 
 #ifdef _WIN32
@@ -51,17 +52,15 @@ MeshComponentLauncher::MeshComponentLauncher(DocumentManager& manager,
     , m_className(className)
 {
 }
-
 void MeshComponentLauncher::Launch(const std::string& assetPath)
 {
-    std::string key = ImGuiVisualizers::CombinedObjJson3DVisualizer::MakeDocumentKey(assetPath);
+    std::string key = ImGuiVisualizers::MeshComponentVisualizer::MakeDocumentKey(assetPath);
 
     // If already open, just bring it to front
     if (m_manager.m_openEditorKeys.contains(key)) {
         m_manager.m_visualizerManager.SetVisible(key, true);
         return;
     }
-
     // Defer registration to avoid mutating m_entries during RenderAll
     m_manager.EnqueueEditor(key, assetPath, m_className, this);
 }
@@ -69,13 +68,41 @@ void MeshComponentLauncher::Launch(const std::string& assetPath)
 std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
 MeshComponentLauncher::Create(const std::string& assetPath, const std::string& className)
 {
-    auto combined = std::make_unique<ImGuiVisualizers::CombinedObjJson3DVisualizer>();
+    auto combined = std::make_unique<ImGuiVisualizers::MeshComponentVisualizer>();
     // Combined visualizer exposes OpenObjectFile(...)
     combined->OpenObjectFile(assetPath, className);
-    combined->Get3DView().LoadMesh(assetPath);
     return combined;
 }
 
+LevelComponentLauncher::LevelComponentLauncher(DocumentManager& manager,
+    const std::string& suffix,
+    const std::string& className)
+    : m_manager(manager)
+    , m_suffix(suffix)
+    , m_className(className)
+{
+}
+void LevelComponentLauncher::Launch(const std::string& assetPath)
+{
+    std::string key = ImGuiVisualizers::LevelComponentVisualizer::MakeDocumentKey(assetPath);
+
+    // If already open, just bring it to front
+    if (m_manager.m_openEditorKeys.contains(key)) {
+        m_manager.m_visualizerManager.SetVisible(key, true);
+        return;
+    }
+    // Defer registration to avoid mutating m_entries during RenderAll
+    m_manager.EnqueueEditor(key, assetPath, m_className, this);
+}
+
+std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+LevelComponentLauncher::Create(const std::string& assetPath, const std::string& className)
+{
+    auto combined = std::make_unique<ImGuiVisualizers::LevelComponentVisualizer>();
+    // Combined visualizer exposes OpenObjectFile(...)
+    combined->OpenObjectFile(assetPath, className);
+    return combined;
+}
 
 
 
@@ -144,7 +171,7 @@ void DocumentManager::InitializeLaunchers()
     m_launchers["MatObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".mat.obj.json", "CMaterialResource");
     m_launchers["DefObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".def.obj.json", "CEntityDefinition");        
     m_launchers["WidgetsObjJson"] = std::make_unique<WidgetEditorLauncher>(*this, ".widgets.obj.json", "PropertyWidgetMapRegistry");
-    m_launchers["LevelObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".lvl.obj.json", "CLevelComponent");
+    m_launchers["LevelObjJson"] = std::make_unique<LevelComponentLauncher>(*this, ".lvl.obj.json", "CLevelComponent");
     m_launchers["EntityObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".ent.obj.json", "CEntityComponent");
     m_launchers["StaticMeshObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".smesh.obj.json", "CStaticMeshResource");
 

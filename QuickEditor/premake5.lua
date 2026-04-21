@@ -103,6 +103,8 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/DocumentManager.h" }
 	files { "../Shared/ImguiVizualizers/ObjJsonEditor.h" }
 	files { "../Shared/ImguiVizualizers/CombinedObjJson3DVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/MeshComponentVisualizer.cpp" }
+	files { "../Shared/ImguiVizualizers/MeshComponentVisualizer.h" }
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMapRegistry.cpp" }
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMapRegistry.h" }
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMapEditor.cpp" }

@@ -5,16 +5,6 @@
             "Type": 3,
             "Size": 32
         },
-        "m_meshResource": {
-            "Value": "CResourceReference",
-            "m_resourceFileName": {
-                "Value": "./assets/meshcomponents/bunny.mesh.obj.json",
-                "Type": 3,
-                "Size": 32
-            },
-            "Type": 4,
-            "Size": 40
-        },
         "m_active": {
             "Value": true,
             "Type": 12,
@@ -59,6 +49,30 @@
                     },
                     "m_children": {
                         "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CMeshComponent",
+                    "m_meshResource": {
+                        "Value": "CStaticMeshResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/staticmeshes/bunny.smesh.obj.json",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "Type": 4,
+                        "Size": 56
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CMeshComponent",
                         "Elements": [],
                         "Type": 19,
                         "Size": 24

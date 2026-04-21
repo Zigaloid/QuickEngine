@@ -25,6 +25,7 @@ class DocumentManager
     // Allow launchers to access private members
     friend class ObjJsonLauncher;
     friend class MeshComponentLauncher;
+    friend class LevelComponentLauncher;
     friend class WidgetEditorLauncher;
 public:
     explicit DocumentManager(ImGuiVisualizers::ImGuiVisualizerManager& visualizerManager);
@@ -150,6 +151,25 @@ private:
     std::string m_suffix;
     std::string m_className;
 };
+
+class LevelComponentLauncher : public IAssetLauncher
+{
+public:
+    LevelComponentLauncher(DocumentManager& manager,
+        const std::string& suffix,
+        const std::string& className);
+
+    void Launch(const std::string& assetPath) override;
+
+    std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) override;
+
+private:
+    DocumentManager& m_manager;
+    std::string m_suffix;
+    std::string m_className;
+};
+
 
 
 class WidgetEditorLauncher : public IAssetLauncher

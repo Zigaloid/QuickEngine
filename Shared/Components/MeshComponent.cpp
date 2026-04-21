@@ -6,15 +6,19 @@
 #include "MeshResource.h"
 
 // ── CMeshComponent ─────────────────────────────────────────────────
+REGISTER_COMPONENT(CRenderComponent, "RenComp", "Graphics");
 REGISTER_COMPONENT(CMeshComponent, "Mesh", "Graphics");
 
-REFL_DEFINE_OBJECT(CMeshComponent)	
+REFL_DEFINE_OBJECT(CMeshComponent)
 	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_meshResource),
 REFL_DEFINE_END
 
+REFL_DEFINE_OBJECT(CRenderComponent)	
+	REFL_DEFINE_MATRIX4_MEMBER(CRenderComponent, m_modelMatrix),
+REFL_DEFINE_END
+
 bool CMeshComponent::OnInitialize()
-{
-	m_ready = false;	
+{	
 	if (!Core::CoreSystem::IsInitialized())
 	{
 		std::cerr << "CMeshComponent: CoreSystem is not initialized" << std::endl;
@@ -37,14 +41,6 @@ bool CMeshComponent::OnInitialize()
 
 void CMeshComponent::OnUpdate(double /*deltaTime*/)
 {	
-	// Wait for loaded before setting ready.
-	if (!m_ready)
-	{			
-		if (IsLoaded())
-		{
-			m_ready = true;
-		}		
-	}
 }
 
 void CMeshComponent::OnShutdown()
@@ -67,10 +63,11 @@ void CMeshComponent::OnShutdown()
 	m_materialColor = BGFX_INVALID_HANDLE;
 	m_meshStateInitialized = false;
 }
-void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx)
+void CMeshComponent::Render(bgfx::ViewId viewId)
 {
-	if (IsReady())
+	if (IsLoaded())
 	{
+	
 		if (m_meshStateInitialized == false)
 		{
 			// set uniform values (adjust values as needed)
@@ -120,10 +117,11 @@ void CMeshComponent::Render(bgfx::ViewId viewId, const float* mtx)
 			const MeshState* statePtr = &m_meshState;
             if (matshRes->GetMesh())
 			{
-				matshRes->GetMesh()->submit(&statePtr, 1, mtx, 1);
+				matshRes->GetMesh()->submit(&statePtr, 1, GetModelMatrix().GetData().data(), 1);
 			}
 		}
 	}
+
 }
 
 bool CMeshComponent::IsLoaded() const

@@ -1,0 +1,107 @@
+{
+    "RootObject": {
+        "m_name": {
+            "Value": "",
+            "Type": 3,
+            "Size": 32
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CLevelComponent",
+            "Elements": [
+                {
+                    "Value": "CEntityInstance",
+                    "m_name": {
+                        "Value": "BillyTheBunny",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CEntityInstance",
+                        "Elements": [
+                            {
+                                "Value": "CMeshComponent",
+                                "m_meshResource": {
+                                    "Value": "CStaticMeshResourceReference",
+                                    "m_resourceFileName": {
+                                        "Value": "./assets/staticmeshes/bunny.smesh.obj.json",
+                                        "Type": 3,
+                                        "Size": 32
+                                    },
+                                    "Type": 4,
+                                    "Size": 56
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CMeshComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_rotation": {
+                                                "Value": [
+                                                    0.0,
+                                                    0.0,
+                                                    0.0
+                                                ],
+                                                "Type": 13,
+                                                "Size": 12
+                                            },
+                                            "m_translation": {
+                                                "Value": [
+                                                    0.0,
+                                                    0.0,
+                                                    0.0
+                                                ],
+                                                "Type": 13,
+                                                "Size": 12
+                                            },
+                                            "m_scale": {
+                                                "Value": [
+                                                    0.0,
+                                                    0.0,
+                                                    0.0
+                                                ],
+                                                "Type": 13,
+                                                "Size": 12
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 19,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 19,
+                                    "Size": 24
+                                }
+                            }
+                        ],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                }
+            ],
+            "Type": 19,
+            "Size": 24
+        }
+    }
+}

@@ -864,7 +864,8 @@ void AssetBrowser::OpenRenameAssetDialog(const AssetEntry& asset)
         }
     }
 
-    std::strncpy(m_renameAssetNameBuffer, nameWithoutExt.c_str(), sizeof(m_renameAssetNameBuffer) - 1);
+    strncpy_s(m_renameAssetNameBuffer, sizeof(m_renameAssetNameBuffer), nameWithoutExt.c_str(), _TRUNCATE);
+
     m_renameAssetNameBuffer[sizeof(m_renameAssetNameBuffer) - 1] = '\0';
 }
 

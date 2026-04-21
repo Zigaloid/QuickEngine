@@ -5,6 +5,8 @@
 #include "ObjJsonEditor.h"
 #include "MessageSystem/MessageBus.h"
 
+#include "CoreSystem/CoreSystem.h"
+
 #include "imgui/imgui.h"
 #include <string>
 
@@ -34,7 +36,7 @@ public:
                     const std::string& filePath = msg.str;
                     if (filePath == m_editor.GetFilePath()) 
                     {
-                        m_view.LoadMesh(m_editor.GetFilePath());
+                        AttachMeshFromPath(m_editor.GetFilePath());
                     }
                 }
             });
@@ -42,6 +44,7 @@ public:
 
     void Shutdown() override
     {
+        // Delegate mesh cleanup to derived classes
         m_view.Shutdown();
         m_editor.Close();
     }
@@ -50,6 +53,7 @@ public:
     {
         m_view.Update(deltaTime);
     }
+
     static std::string MakeDocumentKey(const std::string& filePath)
     {
         return "MeshComponentEditor:" + filePath;
@@ -114,15 +118,28 @@ public:
     bool OpenObjectFile(const std::string& filePath, const std::string& className)
     {
         m_fileName = filePath;
-        return m_editor.Open(filePath, className);
+        bool opened = m_editor.Open(filePath, className);
+        if (opened)
+        {
+            AttachMeshFromPath(filePath);
+        }
+        return opened;
     }
     bool SaveObjectFile() { return m_editor.Save(); }
-    void CloseObject() { m_editor.Close(); }
+
+    void CloseObject() 
+    { 
+        // Let derived class release any created mesh component
+        m_editor.Close(); 
+    }
 
     ImGui3DViewVisualizer& Get3DView() { return m_view; }
     ObjJsonEditor& GetEditor() { return m_editor; }
 
-private:
+protected:
+    // Derived classes MUST implement mesh/component creation and attach logic.
+    virtual bool AttachMeshFromPath(const std::string& meshPath) = 0; 
+
     std::string m_fileName;
     std::string m_windowName;
     ImGui3DViewVisualizer m_view;

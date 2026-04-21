@@ -115,10 +115,20 @@ void ImGuiVisualizerManager::Update(float deltaTime)
 
 void ImGuiVisualizerManager::RenderAll()
 {
+    // Get the dockspace ID for the main dock. If the host window created the dockspace
+    // with the same name ("MainDockSpace"), this will return a non-zero ImGuiID.
+    ImGuiID mainDockId = ImGui::GetID("MainDockSpace");
+
     for (auto& entry : m_entries)
     {
-        if (entry.visible && entry.initialized)
+        if (entry.visible && entry.initialized) {
+            // Request docking into the main dockspace on first use.
+            // Using ImGuiCond_FirstUseEver lets the user rearrange later.
+            if (mainDockId != 0) {
+                ImGui::SetNextWindowDockID(mainDockId, ImGuiCond_FirstUseEver);
+            }
             entry.visualizer->Render(&entry.visible);
+        }
     }
 }
 

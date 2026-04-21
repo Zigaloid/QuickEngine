@@ -114,6 +114,8 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ObjJsonEditor.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyInspector.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.h" />
@@ -195,6 +197,7 @@
     <ClInclude Include="..\Shared\utils\FbxMeshConverter.h" />
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
     <ClInclude Include="AssetBrowser.h" />
+    <ClInclude Include="AssetClasses\EntityInstance.h" />
     <ClInclude Include="QuickEdit.h" />
   </ItemGroup>
   <ItemGroup>
@@ -234,6 +237,8 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapEditor.cpp" />
