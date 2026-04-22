@@ -69,6 +69,12 @@ void CMaterialResource::Finalize()
 		return;
 	}
 
+	for (auto &texture : m_textureResources)
+	{
+		if (!texture->GetResourceAs<CTextureResource>()->IsFinalized())
+			return;
+	}
+
 	// Create program on main thread
 	m_shader = bgfx::createProgram(vert->GetShaderHandle(), frag->GetShaderHandle(), false);
 	if (!bgfx::isValid(m_shader))

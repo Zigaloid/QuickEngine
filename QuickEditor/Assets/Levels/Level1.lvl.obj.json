@@ -3,7 +3,7 @@
         "m_name": {
             "Value": "",
             "Type": 3,
-            "Size": 32
+            "Size": 40
         },
         "m_active": {
             "Value": true,
@@ -18,7 +18,7 @@
                     "m_name": {
                         "Value": "BillyTheBunny",
                         "Type": 3,
-                        "Size": 32
+                        "Size": 40
                     },
                     "m_active": {
                         "Value": true,
@@ -35,10 +35,32 @@
                                     "m_resourceFileName": {
                                         "Value": "./assets/staticmeshes/bunny.smesh.obj.json",
                                         "Type": 3,
-                                        "Size": 32
+                                        "Size": 40
                                     },
                                     "Type": 4,
-                                    "Size": 56
+                                    "Size": 64
+                                },
+                                "m_modelMatrix": {
+                                    "Value": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        3.0,
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "Type": 8,
+                                    "Size": 64
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -86,22 +108,88 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 24
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 24
+                                    "Size": 32
                                 }
                             }
                         ],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CEntityInstance",
+                    "m_name": {
+                        "Value": "Tree",
+                        "Type": 3,
+                        "Size": 40
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CEntityInstance",
+                        "Elements": [
+                            {
+                                "Value": "CMeshComponent",
+                                "m_meshResource": {
+                                    "Value": "CStaticMeshResourceReference",
+                                    "m_resourceFileName": {
+                                        "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 64
+                                },
+                                "m_modelMatrix": {
+                                    "Value": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "Type": 8,
+                                    "Size": 64
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CMeshComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 32
+                                }
+                            }
+                        ],
+                        "Type": 19,
+                        "Size": 32
                     }
                 }
             ],
             "Type": 19,
-            "Size": 24
+            "Size": 32
         }
     }
 }

@@ -66,8 +66,7 @@ void CMeshComponent::OnShutdown()
 void CMeshComponent::Render(bgfx::ViewId viewId)
 {
 	if (IsLoaded())
-	{
-	
+	{	
 		if (m_meshStateInitialized == false)
 		{
 			// set uniform values (adjust values as needed)
@@ -95,6 +94,7 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 			{
 				m_texture[i].m_texture = matRes->GetTexture(i);
 				m_texture[i].m_flags = 0;
+				m_texture[i].m_stage = i;
                 m_texture[i].m_sampler = m_samplers[i];
 				m_meshState.m_textures[i] = m_texture[i];
 			}

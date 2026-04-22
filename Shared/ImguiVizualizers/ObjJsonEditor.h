@@ -49,7 +49,8 @@ namespace ImGuiVisualizers {
 			std::string title;
 			if (m_object) {
 				title = "Object Editor - " + m_displayName + m_imguiId;
-			} else {
+			}
+			else {
 				title = "Object Editor" + m_imguiId;
 			}
 
@@ -83,8 +84,8 @@ namespace ImGuiVisualizers {
 			}
 
 			static char* buffer = new char[200];
-			buffer[0] = '\0';			
-			
+			buffer[0] = '\0';
+
 			// Toolbar (render via UnifiedActionManager)
 			m_actionManager.RenderToolbar();
 
@@ -113,15 +114,17 @@ namespace ImGuiVisualizers {
 		const char* GetShortcut() const override { return nullptr; }
 		const char* GetMenuCategory() const override { return "Show"; }
 
-		// ── Public API ──────────────────────────────────────────────────────
+		CReflectedBase* GetObject() const { return m_object.get(); }
+
+			// ── Public API ──────────────────────────────────────────────────────
 
 		/**
-		 * @brief Open a .obj.json file using the reflection system.
-		 * @param filePath   Full path to the .obj.json file.
-		 * @param className  Reflected class name to instantiate via ClassFactory
-		 *                   (e.g. "CEntityDefinition").
-		 * @return true if the object was created and loaded successfully.
-		 */
+			* @brief Open a .obj.json file using the reflection system.
+			* @param filePath   Full path to the .obj.json file.
+			* @param className  Reflected class name to instantiate via ClassFactory
+			*                   (e.g. "CEntityDefinition").
+			* @return true if the object was created and loaded successfully.
+			*/
 		bool Open(const std::string& filePath, const std::string& className)
 		{
 			Close();
@@ -208,7 +211,7 @@ namespace ImGuiVisualizers {
 			m_object.reset();
 			m_statusMessage.clear();
 			m_statusIsError = false;
-			m_displayName = "Object Editor";			
+			m_displayName = "Object Editor";
 		}
 
 		/**
@@ -281,7 +284,7 @@ namespace ImGuiVisualizers {
 			m_actionManager.UnregisterAction(prefix + ".Reload");
 			m_actionManager.UnregisterAction(prefix + ".Close");
 		}
-		
+
 	private:
 		static inline int s_nextInstanceId = 0;
 		int               m_instanceId = 0;
