@@ -9,10 +9,8 @@
 /** @brief 4-component float vector for 3D math operations (including homogeneous coordinates). */
 class Vector4f
 {
-private:
-    float x, y, z, w;
-
 public:
+    float x, y, z, w;
     // ── Constructors ─────────────────────────────────────────────────────────
 
     Vector4f() : x(0.0f), y(0.0f), z(0.0f), w(0.0f) {}

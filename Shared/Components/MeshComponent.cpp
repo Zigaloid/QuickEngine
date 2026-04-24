@@ -4,6 +4,7 @@
 #include "ComponentSystem/ComponentSystem.h"
 #include "ShaderResource.h"
 #include "MeshResource.h"
+#include <bx/bounds.h>
 
 // ── CMeshComponent ─────────────────────────────────────────────────
 REGISTER_COMPONENT(CRenderComponent, "RenComp", "Graphics");
@@ -63,6 +64,7 @@ void CMeshComponent::OnShutdown()
 	m_materialColor = BGFX_INVALID_HANDLE;
 	m_meshStateInitialized = false;
 }
+
 void CMeshComponent::Render(bgfx::ViewId viewId)
 {
 	if (IsLoaded())
@@ -109,6 +111,42 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 			m_meshState.m_program = matRes->GetShaderProgram();
 			m_meshState.m_viewId = viewId;
 			m_meshStateInitialized = true;
+
+            auto staticMeshRes = m_meshResource.GetResourceAs<CStaticMeshResource>();
+            auto meshRes = staticMeshRes->GetMeshResource();
+            const Mesh* mesh = meshRes->GetMesh();
+
+			// Seed with the first group's sphere, then expand to enclose each subsequent one.
+            bx::Sphere result = mesh->m_groups[0].m_sphere;
+
+            for (uint32_t i = 1; i < mesh->m_groups.size(); ++i)
+            {
+                const bx::Sphere& s = mesh->m_groups[i].m_sphere;
+
+                const bx::Vec3 diff = bx::sub(s.center, result.center);
+                const float dist = bx::length(diff);
+
+                // Check if 's' is already contained within 'result'.
+                if (dist + s.radius <= result.radius)
+                    continue;
+
+                // Check if 'result' is fully inside 's'.
+                if (dist + result.radius <= s.radius)
+                {
+                    result = s;
+                    continue;
+                }
+
+                // Merge: new radius spans both spheres along their axis.
+                const float newRadius = (dist + result.radius + s.radius) * 0.5f;
+                const float t = (newRadius - result.radius) / dist;
+                result.center = bx::mad(diff, t, result.center);
+                result.radius = newRadius;
+            }
+
+            // Set and return the sphere. This is shitty. We should cache this.
+            *CRenderComponent::GetBoundingSphere() = Vector4f(result.center.x, result.center.y, result.center.z, result.radius);
+
 		}
 		
 		if (m_meshStateInitialized)
@@ -117,7 +155,7 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 			const MeshState* statePtr = &m_meshState;
             if (matshRes->GetMesh())
 			{
-				matshRes->GetMesh()->submit(&statePtr, 1, GetModelMatrix().GetData().data(), 1);
+				matshRes->GetMesh()->submit(&statePtr, 1, GetModelMatrix()->GetData().data(), 1);
 			}
 		}
 	}
@@ -129,4 +167,9 @@ bool CMeshComponent::IsLoaded() const
 	if (!m_meshResource.GetResource()) return false;
 	if (!m_meshResource.GetResourceAs<CStaticMeshResource>()->IsFinalized()) return false;
 	return true;
+}
+
+std::shared_ptr<Vector4f> CMeshComponent::GetBoundingSphere() const
+{
+	return CRenderComponent::GetBoundingSphere();
 }

@@ -65,6 +65,13 @@ public:
     }
     void identity() { Identity(); } // backward compat
 
+    static Matrix4f GetIdentity()
+    {
+        Matrix4f result;
+        result.Identity();
+        return result;
+    }
+
     void Zero()  { m_matrix.fill(0.0f); }
     void zero()  { Zero(); } // backward compat
 

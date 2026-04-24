@@ -21,7 +21,5 @@ public:
 	void OnShutdown() override;
 		
 private:
-	std::string m_name;    
-    
-
+	std::string m_name;   
 };

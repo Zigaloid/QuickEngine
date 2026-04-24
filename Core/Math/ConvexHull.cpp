@@ -9,7 +9,6 @@
 namespace Geometry {
 
 // ── GenerateFromVertices ──────────────────────────────────────────────────────
-
 std::unique_ptr<ConvexHull> ConvexHullGenerator::GenerateFromVertices(const std::vector<float>& vertices)
 {
     if (vertices.size() < 9)

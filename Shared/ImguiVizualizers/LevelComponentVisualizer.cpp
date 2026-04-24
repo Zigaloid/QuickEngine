@@ -1,8 +1,10 @@
-#include "LevelComponentVisualizer.h"
+﻿#include "LevelComponentVisualizer.h"
 #include "CoreSystem/CoreSystem.h"
 #include "FileSystem/FileSystemManager.h"
 #include "EntityComponent.h"
+#include <bx/bounds.h>
 #include <algorithm>
+#include <cfloat>
 
 namespace ImGuiVisualizers {
 
@@ -19,11 +21,14 @@ namespace ImGuiVisualizers {
 			return false;
 		}
 
-		Get3DView().SetRenderCallback([this](bgfx::ViewId viewId, BgfxRenderPrimitives& /*prims*/) {
+		Get3DView().SetRenderCallback([this](bgfx::ViewId viewId, BgfxRenderPrimitives& prims) {
 			if (!m_levelComp) return;
 			if (!m_levelComp->IsReady()) return;
-			RenderComponentHierarchy(viewId, m_levelComp);
+			RenderComponentHierarchy(viewId, m_levelComp);			
+			m_selectionManager.RenderSelectionGizmo(viewId, m_gizmoMode, 2.0f);
 			});
+
+		RegisterRenderComponents(m_levelComp);
 
 		// Trigger entity asset refresh
 		m_entityAssetsNeedRefresh = true;
@@ -35,6 +40,56 @@ namespace ImGuiVisualizers {
 	{
 		// Clear render callback to avoid stale calls
 		Get3DView().SetRenderCallback(nullptr);
+		m_selectionManager.ClearSelectables();
+		m_componentSelectables.clear();
+	}
+
+	void LevelComponentVisualizer::RegisterLevelActions()
+	{
+		auto& am = m_editor.GetActionManager();
+
+		am.RegisterAction({
+			.path        = "View.GizmoMode.Translate",
+			.description = "Set gizmo to Translate mode",
+			.targets     = UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback    = [this]() { m_gizmoMode = GizmoMode::Translate; },
+			.isEnabled   = [this]() { return m_levelComp != nullptr; },
+			.isChecked   = [this]() { return m_gizmoMode == GizmoMode::Translate; },
+			.sortPriority = 10
+			});
+
+		am.RegisterAction({
+			.path        = "View.GizmoMode.Scale",
+			.description = "Set gizmo to Scale mode",
+			.targets     = UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback    = [this]() { m_gizmoMode = GizmoMode::Scale; },
+			.isEnabled   = [this]() { return m_levelComp != nullptr; },
+			.isChecked   = [this]() { return m_gizmoMode == GizmoMode::Scale; },
+			.sortPriority = 20
+			});
+
+		am.RegisterAction({
+			.path        = "View.GizmoMode.Rotate",
+			.description = "Set gizmo to Rotate mode",
+			.targets     = UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback    = [this]() { m_gizmoMode = GizmoMode::Rotate; },
+			.isEnabled   = [this]() { return m_levelComp != nullptr; },
+			.isChecked   = [this]() { return m_gizmoMode == GizmoMode::Rotate; },
+			.sortPriority = 30
+			});
+	}
+
+	void LevelComponentVisualizer::RegisterRenderComponents(ComponentSystem::Component* root)
+	{
+		std::vector<CRenderComponent*> renderComps;
+		CollectRenderComponents(root, renderComps);
+
+		for (CRenderComponent* rc : renderComps)
+		{
+			auto selectable = std::make_shared<CRenderComponentSelectable>(rc);
+			m_componentSelectables.push_back(selectable);
+			m_selectionManager.AddSelectable(selectable);
+		}
 	}
 
 	void LevelComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, ComponentSystem::Component* comp)
@@ -55,6 +110,63 @@ namespace ImGuiVisualizers {
 		}
 	}
 
+	void LevelComponentVisualizer::CollectRenderComponents(ComponentSystem::Component* comp,
+	                                                       std::vector<CRenderComponent*>& out)
+	{
+		if (!comp) return;
+
+		if (auto* rc = dynamic_cast<CRenderComponent*>(comp))
+		{
+			out.push_back(rc);
+		}
+
+		for (auto* child : comp->GetChildren())
+		{
+			CollectRenderComponents(child, out);
+		}
+	}
+
+	void LevelComponentVisualizer::RenderSelectionHighlight(bgfx::ViewId viewId,
+	                                                         BgfxRenderPrimitives& prims)
+	{
+		const auto& allSelected = m_selectionManager.GetAllSelected();
+		if (allSelected.empty()) return;
+
+		const std::shared_ptr<CSelectable> lastSelected = m_selectionManager.GetSelected();
+
+		for (const auto& selectable : allSelected)
+		{
+			auto rc = std::dynamic_pointer_cast<CRenderComponentSelectable>(selectable);
+			if (!rc) continue;
+
+			CRenderComponent* comp = rc->GetComponent();
+			if (!comp || !comp->IsActive()) continue;
+
+			const Vector4f bs = *comp->GetBoundingSphere();
+			const float*   m  = comp->GetModelMatrix()->data();
+
+			const float cx = m[0] * bs.x + m[4] * bs.y + m[8] * bs.z + m[12];
+			const float cy = m[1] * bs.x + m[5] * bs.y + m[9] * bs.z + m[13];
+			const float cz = m[2] * bs.x + m[6] * bs.y + m[10] * bs.z + m[14];
+
+			const float sx = bx::sqrt(m[0] * m[0] + m[1] * m[1] + m[2] * m[2]);
+			const float sy = bx::sqrt(m[4] * m[4] + m[5] * m[5] + m[6] * m[6]);
+			const float sz = bx::sqrt(m[8] * m[8] + m[9] * m[9] + m[10] * m[10]);
+			const float radius = bs.w * bx::max(sx, bx::max(sy, sz));
+			const float r = radius > 0.0f ? radius : 0.5f;
+
+			float highlightMtx[16];
+			bx::mtxSRT(highlightMtx, r, r, r, 0.0f, 0.0f, 0.0f, cx, cy, cz);
+
+			// Most-recently-picked object renders in yellow; others in white
+			const uint32_t color = (selectable == lastSelected)
+			    ? 0xff00ffff   // yellow (ABGR)
+			    : 0xffffffff;  // white  (ABGR)
+
+			prims.RenderSphere(viewId, highlightMtx, color);
+		}
+	}
+
 	bool LevelComponentVisualizer::Render(bool* isOpen)
 	{
 		// Build window title
@@ -68,7 +180,7 @@ namespace ImGuiVisualizers {
 			return false;
 		}
 
-		// Render menu bar
+		// Render menu bar (includes View > GizmoMode submenu)
 		if (ImGui::BeginMenuBar())
 		{
 			m_editor.GetActionManager().RenderMenuBar();
@@ -77,6 +189,20 @@ namespace ImGuiVisualizers {
 
 		// Toolbar
 		m_editor.GetActionManager().RenderToolbar();
+
+		// Gizmo mode combo — rendered inline on the same toolbar row
+		ImGui::SameLine();
+		ImGui::SetNextItemWidth(110.0f);
+		static constexpr const char* k_gizmoModeLabels[] = { "Translate", "Scale", "Rotate" };
+		int gizmoModeIdx = static_cast<int>(m_gizmoMode);
+		if (ImGui::Combo("##GizmoMode", &gizmoModeIdx, k_gizmoModeLabels, 3))
+		{
+			m_gizmoMode = static_cast<GizmoMode>(gizmoModeIdx);
+		}
+		if (ImGui::IsItemHovered())
+		{
+			ImGui::SetTooltip("Gizmo Mode");
+		}
 
 		// Refresh entity assets if needed
 		if (m_entityAssetsNeedRefresh) {
@@ -121,6 +247,28 @@ namespace ImGuiVisualizers {
 		if (leftAvail.y < 1.0f) leftAvail.y = 1.0f;
 
 		m_view.RenderContent(leftAvail);
+
+		// Record the exact screen rect of the rendered image.
+		m_viewportMin  = ImGui::GetItemRectMin();
+		m_viewportSize = ImGui::GetItemRectSize();
+
+		// Update the manager with current view state
+		m_selectionManager.SetViewInfo(Get3DView().GetCamera(), m_viewportMin, m_viewportSize);
+
+		// Left-click inside the viewport (not a drag) → pick
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
+		    !ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+		{
+			const ImVec2 mouse = ImGui::GetMousePos();
+			const bool inViewport = mouse.x >= m_viewportMin.x &&
+			                        mouse.y >= m_viewportMin.y &&
+			                        mouse.x <  m_viewportMin.x + m_viewportSize.x &&
+			                        mouse.y <  m_viewportMin.y + m_viewportSize.y;
+			if (inViewport)
+			{
+				m_selectionManager.PickAtCursor();
+			}
+		}
 
 		// Handle entity drop onto the 3D view
 		HandleEntityDrop();
@@ -227,8 +375,8 @@ namespace ImGuiVisualizers {
 					if (result.IsSuccess()) {
 						std::cout << "Successfully added entity from: " << entityPath << std::endl;
 
-						// The component hierarchy has been modified
-						// You may want to call m_editor.Save() here if auto-save is desired
+						// Register any new render components from the dropped entity
+						RegisterRenderComponents(newEntity);
 					}
 					else {
 						std::cerr << "Failed to load entity from: " << entityPath

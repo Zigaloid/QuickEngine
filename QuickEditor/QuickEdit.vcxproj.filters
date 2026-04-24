@@ -75,9 +75,6 @@
     <ClInclude Include="..\AssetClasses\EntityDefinition.h">
       <Filter>..\AssetClasses</Filter>
     </ClInclude>
-    <ClInclude Include="..\AssetClasses\EntityInstance.h">
-      <Filter>..\AssetClasses</Filter>
-    </ClInclude>
     <ClInclude Include="..\AssetClasses\StaticMeshDefinition.h">
       <Filter>..\AssetClasses</Filter>
     </ClInclude>
@@ -86,9 +83,6 @@
     </ClInclude>
     <ClInclude Include="..\External\ufbx\ufbx.h">
       <Filter>..\External\ufbx</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\EntityComponent.h">
-      <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\FbxMeshComponent.h">
       <Filter>..\Shared\Components</Filter>
@@ -383,12 +377,24 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\EntityComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\CSelectable.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\CSelectionManager.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
-      <Filter>..\AssetClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="..\AssetClasses\EntityInstance.cpp">
       <Filter>..\AssetClasses</Filter>
     </ClCompile>
     <ClCompile Include="..\AssetClasses\StaticMeshDefinition.cpp">
@@ -459,9 +465,6 @@
     </ClCompile>
     <ClCompile Include="..\External\ufbx\ufbx.c">
       <Filter>..\External\ufbx</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\FbxMeshComponent.cpp">
       <Filter>..\Shared\Components</Filter>
@@ -605,6 +608,18 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\CSelectionManager.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
   </ItemGroup>

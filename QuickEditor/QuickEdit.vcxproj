@@ -95,7 +95,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\AssetClasses\EntityDefinition.h" />
-    <ClInclude Include="..\AssetClasses\EntityInstance.h" />
     <ClInclude Include="..\AssetClasses\StaticMeshDefinition.h" />
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\External\ufbx\ufbx.h" />
@@ -106,10 +105,13 @@
     <ClInclude Include="..\Shared\Components\TransformComponent.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxViewIdAllocator.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CombinedObjJson3DVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\CSelectable.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\CSelectionManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\DocumentManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
@@ -123,6 +125,7 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
     <ClInclude Include="..\Shared\KeyboardShortcutManager.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h" />
@@ -202,7 +205,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp" />
-    <ClCompile Include="..\AssetClasses\EntityInstance.cpp" />
     <ClCompile Include="..\AssetClasses\StaticMeshDefinition.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\clusterizer.cpp" />
@@ -232,8 +234,10 @@
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\CSelectionManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
@@ -245,6 +249,7 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp" />
     <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />

@@ -177,40 +177,45 @@ void ImGui3DViewVisualizer::HandleInput(const ImVec2& regionMin,
 
     ImGuiIO& io = ImGui::GetIO();
 
-    // Orbit – left mouse drag (only when our invisible item is active)
-    if (itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Left)) 
+    // Camera movement is only applied when the Alt key is held
+    if (io.KeyAlt)
     {
-        m_orbiting = true;
-        ImVec2 delta = io.MouseDelta;
-        m_camera.Orbit(-delta.x * 0.005f, -delta.y * 0.005f);
-    }
-    else 
-    {
-        m_orbiting = false;
-    }
 
-    // Pan – middle mouse drag (only when our invisible item is active)
-    if (itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Middle)) 
-    {
-        m_panning = true;
-        ImVec2 delta = io.MouseDelta;
-        float panSpeed = m_camera.GetDistance() * 0.002f;
-        m_camera.Pan(-delta.x * panSpeed, delta.y * panSpeed);
-    } 
-    else 
-    {
-        m_panning = false;
-    }
+        // Orbit – left mouse drag (only when our invisible item is active)
+        if ( itemActive && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+        {
+            m_orbiting = true;
+            ImVec2 delta = io.MouseDelta;
+            m_camera.Orbit(-delta.x * 0.005f, -delta.y * 0.005f);
+        }
+        else
+        {
+            m_orbiting = false;
+        }
 
-    // Zoom – scroll wheel, only when hovered (so wheel doesn't scroll parent)
-    if (itemHovered && io.MouseWheel != 0.0f) 
-    {
-        m_camera.Zoom(io.MouseWheel * m_camera.GetDistance() * 0.1f);
+        // Pan – middle mouse drag (only when our invisible item is active)
+        if ((itemHovered || itemActive) && ImGui::IsMouseDragging(ImGuiMouseButton_Middle))
+        {
+            m_panning = true;
+            ImVec2 delta = io.MouseDelta;
+            float panSpeed = m_camera.GetDistance() * 0.002f;
+            m_camera.Pan(-delta.x * panSpeed, delta.y * panSpeed);
+        }
+        else
+        {
+            m_panning = false;
+        }
 
-        // Consume the wheel input so ImGui / parent windows won't also scroll.
-        // Clearing both vertical and horizontal wheel values is defensive.
-        io.MouseWheel = 0.0f;
-        io.MouseWheelH = 0.0f;
+        // Zoom – scroll wheel, only when hovered (so wheel doesn't scroll parent)
+        if ( itemHovered && io.MouseWheel != 0.0f)
+        {
+            m_camera.Zoom(io.MouseWheel * m_camera.GetDistance() * 0.1f);
+
+            // Consume the wheel input so ImGui / parent windows won't also scroll.
+            // Clearing both vertical and horizontal wheel values is defensive.
+            io.MouseWheel = 0.0f;
+            io.MouseWheelH = 0.0f;
+        }
     }
 }
 

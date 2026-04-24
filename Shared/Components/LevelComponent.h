@@ -2,6 +2,7 @@
 #include "ComponentSystem/ComponentSystem.h"
 #include "ResourceManager/ResourceManager.h"
 #include "MaterialResource.h"
+#include "ComponentResource.h"
 
 class CShaderResource;
 class CMeshResource;

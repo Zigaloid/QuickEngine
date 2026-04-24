@@ -12,11 +12,22 @@ public:
 	CRenderComponent()
 	{
         m_modelMatrix.Identity();
+        m_transformPtr = std::shared_ptr<Matrix4f>(&m_modelMatrix, [](Matrix4f*) {});
+        m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
 	};
 
+	virtual std::shared_ptr<Vector4f> GetBoundingSphere() const
+	{
+		return m_boundingSpherePtr;
+	}
+
 	virtual void Render(bgfx::ViewId viewId) {};
-    Matrix4f GetModelMatrix() const { return m_modelMatrix; }
+	std::shared_ptr<Matrix4f> GetModelMatrix() const { return m_transformPtr; }
+	
 private:
+    std::shared_ptr<Matrix4f> m_transformPtr; // Optional shared transform for selection/picking
+    std::shared_ptr<Vector4f> m_boundingSpherePtr; // Optional shared bounding sphere for selection/picking
+	Vector4f m_boundingSphere;
     Matrix4f m_modelMatrix;
 };
 
@@ -38,6 +49,9 @@ public:
 	bool IsLoaded() const;	
 	std::shared_ptr<CMeshResource> GetMeshResource() const { return m_meshResource.GetResourceAs<CMeshResource>(); }
 	void SetMeshResource(const CStaticMeshResourceReference& meshRef) { m_meshResource = meshRef; }
+
+	virtual std::shared_ptr<Vector4f> GetBoundingSphere() const;
+
 private:
 	CStaticMeshResourceReference m_meshResource;
 
