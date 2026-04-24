@@ -47,6 +47,22 @@ public:
         m_matrix[col * 4 + 2] = v.z;
     }
 
+    /// Returns the xyz components of a matrix column (ignores the w row).
+    Vector3f GetColumn(int col) const
+    {
+        return Vector3f(m_matrix[col * 4 + 0],
+                        m_matrix[col * 4 + 1],
+                        m_matrix[col * 4 + 2]);
+    }
+
+    /// Overwrites only the translation components (column 3, rows 0-2).
+    void SetTranslation(const Vector3f& t)
+    {
+        m_matrix[12] = t.x;
+        m_matrix[13] = t.y;
+        m_matrix[14] = t.z;
+    }
+
     const auto& GetData()      const { return m_matrix; }
     auto&       GetWriteData()       { return m_matrix; }
 
@@ -369,6 +385,22 @@ public:
         return LookAt(ex, ey, ez, cx, cy, cz, ux, uy, uz);
     }
     static Matrix4f lookAt(const Vector3f& e, const Vector3f& c, const Vector3f& u) { return LookAt(e, c, u); }
+
+    /// Left-handed look-at matching bx::mtxLookAt default convention,
+    /// for use with bgfx view matrices.
+    static Matrix4f LookAtLH(const Vector3f& eye, const Vector3f& center, const Vector3f& up)
+    {
+        const Vector3f f = (center - eye).Normalized();          // +Z forward (left-handed)
+        const Vector3f r = up.Cross(f).Normalized();             // right
+        const Vector3f u = f.Cross(r);                           // reorthogonalised up
+
+        Matrix4f result;
+        result(0, 0) = r.x;  result(0, 1) = r.y;  result(0, 2) = r.z;  result(0, 3) = -r.Dot(eye);
+        result(1, 0) = u.x;  result(1, 1) = u.y;  result(1, 2) = u.z;  result(1, 3) = -u.Dot(eye);
+        result(2, 0) = f.x;  result(2, 1) = f.y;  result(2, 2) = f.z;  result(2, 3) = -f.Dot(eye);
+        result(3, 0) = 0.0f; result(3, 1) = 0.0f; result(3, 2) = 0.0f; result(3, 3) =  1.0f;
+        return result;
+    }
 
     // ── Projection ────────────────────────────────────────────────────────────
 

@@ -3,13 +3,19 @@
 #include "CSelectable.h"
 #include "Bgfx3DCamera.h"
 #include "BgfxGizmoRenderer.h"
-#include "bx/bounds.h"
 #include "imgui/imgui.h"
 #include <bgfx/bgfx.h>
 #include <memory>
 #include <vector>
 
 namespace ImGuiVisualizers {
+
+/// Lightweight ray used internally by CSelectionManager.
+struct Ray
+{
+    Vector3f pos;
+    Vector3f dir;
+};
 
 /**
  * @brief Manages a set of selectable objects and performs ray-cast picking
@@ -30,7 +36,7 @@ namespace ImGuiVisualizers {
  *   - Plain click on empty space  : clears the selection.
  *
  * Gizmo:
- *   - Single selection  : gizmo inherits the object's full world transform.
+ *   - Single selection  : gizmo inherits the object's world rotation and position (scale stripped).
  *   - Multi-selection   : gizmo is at the centroid, world-aligned.
  *   - Hover             : detected automatically each frame.
  *   - Drag              : left-click + drag on a highlighted axis/plane applies
@@ -93,19 +99,19 @@ public:
 private:
     // ── Internal helpers ───────────────────────────────────────────────
 
-    bx::Ray   BuildPickRay()   const;
+    Ray       BuildPickRay()   const;
     bool      IsMouseInViewport() const;
 
     void      AddToSelection(const std::shared_ptr<CSelectable>& selectable);
     void      RemoveFromSelection(const std::shared_ptr<CSelectable>& selectable);
 
-    GizmoAxis HitTestGizmo(GizmoMode mode, const float* gizmoMtx, float effectiveSize) const;
+    GizmoAxis HitTestGizmo(GizmoMode mode, const Matrix4f& gizmoMtx, float effectiveSize) const;
 
-    void      BeginGizmoDrag(GizmoMode mode, const float* gizmoMtx);
+    void      BeginGizmoDrag(GizmoMode mode, const Matrix4f& gizmoMtx);
     void      ApplyGizmoDrag();
-    void      ApplyTranslateDrag(const bx::Ray& ray);
-    void      ApplyScaleDrag   (const bx::Ray& ray);
-    void      ApplyRotateDrag  (const bx::Ray& ray);
+    void      ApplyTranslateDrag(const Ray& ray);
+    void      ApplyScaleDrag   (const Ray& ray);
+    void      ApplyRotateDrag  (const Ray& ray);
 
     // ── Drag state ─────────────────────────────────────────────────────
 
@@ -115,13 +121,13 @@ private:
         GizmoMode mode        = GizmoMode::Translate;
         GizmoAxis axis        = GizmoAxis::None;
 
-        bx::Vec3  origin      = { 0.0f, 0.0f, 0.0f }; ///< Gizmo world-space origin at drag start.
-        bx::Vec3  axisDir     = { 0.0f, 0.0f, 0.0f }; ///< Primary constrained axis (unit).
-        bx::Vec3  axisDir2    = { 0.0f, 0.0f, 0.0f }; ///< Secondary axis (plane/rotate tangent).
-        bx::Vec3  planeNormal = { 0.0f, 0.0f, 0.0f }; ///< Plane normal (plane translate / rotate ring).
+        Vector3f  origin;                              ///< Gizmo world-space origin at drag start.
+        Vector3f  axisDir;                             ///< Primary constrained axis (unit).
+        Vector3f  axisDir2;                            ///< Secondary axis (plane/rotate tangent).
+        Vector3f  planeNormal;                         ///< Plane normal (plane translate / rotate ring).
 
         float     tStart      = 0.0f;                  ///< Axis parameter at drag start (translate/scale).
-        bx::Vec3  hitStart    = { 0.0f, 0.0f, 0.0f }; ///< World-space hit point at drag start (plane translate).
+        Vector3f  hitStart;                            ///< World-space hit point at drag start (plane translate).
         float     angleStart  = 0.0f;                  ///< Angle in ring plane at drag start (rotate).
 
         std::vector<Matrix4f> startTransforms;          ///< Per-object transform snapshots taken at drag start.

@@ -1,6 +1,5 @@
 ﻿#include "CSelectionManager.h"
 #include <bx/bounds.h>
-#include <bx/math.h>
 #include <cfloat>
 #include <cmath>
 #include <algorithm>
@@ -10,23 +9,28 @@ namespace ImGuiVisualizers {
 
 // ── File-local geometry helpers ───────────────────────────────────────────
 
+/// Converts the internal Ray to a bx::Ray for use with bx::intersect only.
+static bx::Ray ToBxRay(const Ray& r)
+{
+    return bx::Ray{ { r.pos.x, r.pos.y, r.pos.z }, { r.dir.x, r.dir.y, r.dir.z } };
+}
+
 /// Closest perpendicular distance from a ray to a finite line segment.
 /// @p out_tRay receives the parameter along the ray at the nearest point
 /// (negative means the closest point is behind the ray origin).
-static float RaySegmentDist(const bx::Ray&  ray,
-                             const bx::Vec3& segA,
-                             const bx::Vec3& segB,
+static float RaySegmentDist(const Ray&      ray,
+                             const Vector3f& segA,
+                             const Vector3f& segB,
                              float&          out_tRay)
 {
-    const bx::Vec3 u = bx::sub(segB, segA);    // segment direction
-    const bx::Vec3 w = bx::sub(ray.pos, segA);
+    const Vector3f u = segB - segA;
+    const Vector3f w = ray.pos - segA;
 
-    // With |ray.dir| == 1:  a == 1
-    const float b     = bx::dot(ray.dir, u);
-    const float c     = bx::dot(u, u);
-    const float d     = bx::dot(ray.dir, w);
-    const float e     = bx::dot(u, w);
-    const float denom = c - b * b;             // == a*c - b^2, a=1
+    const float b     = ray.dir.Dot(u);
+    const float c     = u.Dot(u);
+    const float d     = ray.dir.Dot(w);
+    const float e     = u.Dot(w);
+    const float denom = c - b * b;     // == a*c - b^2, a=1 (|ray.dir|==1)
 
     float s; // parameter along segment [0,1]
     if (denom < 1e-8f)
@@ -41,62 +45,47 @@ static float RaySegmentDist(const bx::Ray&  ray,
         out_tRay = b * s - d;
     }
 
-    const bx::Vec3 ptOnSeg = bx::add(segA, bx::mul(u, s));
-    const bx::Vec3 ptOnRay = bx::add(ray.pos, bx::mul(ray.dir, out_tRay));
-    return bx::length(bx::sub(ptOnRay, ptOnSeg));
+    const Vector3f ptOnSeg = segA + u * s;
+    const Vector3f ptOnRay = ray.pos + ray.dir * out_tRay;
+    return (ptOnRay - ptOnSeg).Length();
 }
 
 /// Ray-plane intersection.
 /// @return false if the plane is edge-on to the ray or the hit is behind the origin.
-static bool RayPlaneIntersect(const bx::Ray&  ray,
-                               const bx::Vec3& planePoint,
-                               const bx::Vec3& planeNormal,
+static bool RayPlaneIntersect(const Ray&      ray,
+                               const Vector3f& planePoint,
+                               const Vector3f& planeNormal,
                                float&          out_t,
-                               bx::Vec3&       out_hit)
+                               Vector3f&       out_hit)
 {
-    const float denom = bx::dot(ray.dir, planeNormal);
-    if (bx::abs(denom) < 1e-6f)
+    const float denom = ray.dir.Dot(planeNormal);
+    if (std::abs(denom) < 1e-6f)
         return false;
 
-    out_t = bx::dot(bx::sub(planePoint, ray.pos), planeNormal) / denom;
+    out_t = (planePoint - ray.pos).Dot(planeNormal) / denom;
     if (out_t < 0.0f)
         return false;
 
-    out_hit = bx::add(ray.pos, bx::mul(ray.dir, out_t));
+    out_hit = ray.pos + ray.dir * out_t;
     return true;
 }
 
 /// Parameter `t` along the infinite line (lineOrigin + t*lineDir) at the
 /// point closest to the given ray. Assumes ray.dir and lineDir are unit vectors.
-static float RayLineClosestT(const bx::Ray&  ray,
-                              const bx::Vec3& lineOrigin,
-                              const bx::Vec3& lineDir)
+static float RayLineClosestT(const Ray&      ray,
+                              const Vector3f& lineOrigin,
+                              const Vector3f& lineDir)
 {
-    const bx::Vec3 w     = bx::sub(ray.pos, lineOrigin);
-    const float    b     = bx::dot(ray.dir, lineDir);
-    const float    d     = bx::dot(ray.dir, w);
-    const float    e     = bx::dot(lineDir, w);
+    const Vector3f w     = ray.pos - lineOrigin;
+    const float    b     = ray.dir.Dot(lineDir);
+    const float    d     = ray.dir.Dot(w);
+    const float    e     = lineDir.Dot(w);
     const float    denom = 1.0f - b * b;   // |ray.dir|=1, |lineDir|=1
 
     if (denom < 1e-8f)
         return 0.0f;
 
     return (e - b * d) / denom;
-}
-
-/// Builds a column-major 4×4 rotation matrix for @p angle radians
-/// around the unit vector @p axis using Rodrigues' formula.
-static void BuildRotationMatrix(float* out16, const bx::Vec3& axis, float angle)
-{
-    const float c = bx::cos(angle);
-    const float s = bx::sin(angle);
-    const float t = 1.0f - c;
-    const float x = axis.x, y = axis.y, z = axis.z;
-
-    out16[0]  = t*x*x + c;    out16[4]  = t*x*y - s*z; out16[8]  = t*x*z + s*y; out16[12] = 0.0f;
-    out16[1]  = t*x*y + s*z;  out16[5]  = t*y*y + c;   out16[9]  = t*y*z - s*x; out16[13] = 0.0f;
-    out16[2]  = t*x*z - s*y;  out16[6]  = t*y*z + s*x; out16[10] = t*z*z + c;   out16[14] = 0.0f;
-    out16[3]  = 0.0f;          out16[7]  = 0.0f;         out16[11] = 0.0f;         out16[15] = 1.0f;
 }
 
 // ── CSelectionManager ─────────────────────────────────────────────────────
@@ -175,22 +164,30 @@ void CSelectionManager::RemoveFromSelection(const std::shared_ptr<CSelectable>& 
         m_selection.erase(it);
 }
 
-bx::Ray CSelectionManager::BuildPickRay() const
+Ray CSelectionManager::BuildPickRay() const
 {
     const ImVec2 mouse = ImGui::GetMousePos();
-    const float ndcX =  ((mouse.x - m_viewportMin.x) / m_viewportSize.x) * 2.0f - 1.0f;
-    const float ndcY = 1.0f - ((mouse.y - m_viewportMin.y) / m_viewportSize.y) * 2.0f;
+    const float  ndcX = ((mouse.x - m_viewportMin.x) / m_viewportSize.x) * 2.0f - 1.0f;
+    const float  ndcY = 1.0f - ((mouse.y - m_viewportMin.y) / m_viewportSize.y) * 2.0f;
 
     const float aspect = m_viewportSize.x / m_viewportSize.y;
-    float view[16], proj[16], VP[16], invVP[16];
-    m_camera->GetViewMatrix(view);
-    m_camera->GetProjectionMatrix(proj, aspect);
-    bx::mtxMul(VP, view, proj);
-    bx::mtxInverse(invVP, VP);
 
-    return bx::makeRay(ndcX, ndcY, invVP);
+    Matrix4f view, proj;
+    m_camera->GetViewMatrix(view.data());
+    m_camera->GetProjectionMatrix(proj.data(), aspect);
+
+    // bx is row-major; Matrix4f is column-major. Loading the same float[16]
+    // makes each matrix appear as its transpose. To cancel this out, the
+    // multiplication order must be reversed: (A*B)^T = B^T * A^T.
+    // Also handle bgfx NDC depth: 0..1 (DX/Vulkan) vs -1..1 (GL).
+    const Matrix4f invVP = (proj * view).Inverse();
+
+    const float    nearZ = bgfx::getCaps()->homogeneousDepth ? -1.0f : 0.0f;
+    const Vector3f nearPt = invVP.TransformPoint(Vector3f(ndcX, ndcY, nearZ));
+    const Vector3f farPt = invVP.TransformPoint(Vector3f(ndcX, ndcY, 1.0f));
+
+    return Ray{ nearPt, (farPt - nearPt).Normalized() };
 }
-
 std::shared_ptr<CSelectable> CSelectionManager::PickAtCursor()
 {
     if (!m_camera || m_viewportSize.x < 1.0f || m_viewportSize.y < 1.0f)
@@ -203,8 +200,8 @@ std::shared_ptr<CSelectable> CSelectionManager::PickAtCursor()
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && m_hoveredGizmoAxis != GizmoAxis::None)
         return nullptr;
 
-    const bx::Ray ray = BuildPickRay();
-    const bool    shiftHeld = ImGui::GetIO().KeyShift;
+    const Ray  ray       = BuildPickRay();
+    const bool shiftHeld = ImGui::GetIO().KeyShift;
 
     std::shared_ptr<CSelectable> nearest;
     float nearestDistSq = FLT_MAX;
@@ -213,32 +210,25 @@ std::shared_ptr<CSelectable> CSelectionManager::PickAtCursor()
     {
         if (!selectable) continue;
 
-        const Vector4f bs = selectable->GetBoundingSphere();
-        const float*   m  = selectable->GetTransform().data(); // column-major
+        const Vector4f    bs     = selectable->GetBoundingSphere();
+        const Matrix4f&   mtx    = selectable->GetTransform();
 
-        // Transform sphere centre into world space
-        const float cx = m[0]*bs.x + m[4]*bs.y + m[8] *bs.z + m[12];
-        const float cy = m[1]*bs.x + m[5]*bs.y + m[9] *bs.z + m[13];
-        const float cz = m[2]*bs.x + m[6]*bs.y + m[10]*bs.z + m[14];
+        // Transform sphere centre into world space using the full TRS matrix.
+        const Vector3f worldCentre = mtx.TransformPoint(Vector3f(bs.x, bs.y, bs.z));
 
-        // World-space radius (largest column scale * local radius)
-        const float sx = bx::sqrt(m[0]*m[0] + m[1]*m[1] + m[2]*m[2]);
-        const float sy = bx::sqrt(m[4]*m[4] + m[5]*m[5] + m[6]*m[6]);
-        const float sz = bx::sqrt(m[8]*m[8] + m[9]*m[9] + m[10]*m[10]);
-        const float radius = bs.w * bx::max(sx, bx::max(sy, sz));
+        // World-space radius: local radius scaled by the largest column magnitude.
+        const Vector3f scale  = mtx.ExtractScale();
+        const float    radius = bs.w * std::max({ scale.x, scale.y, scale.z });
 
         bx::Sphere sphere;
-        sphere.center = { cx, cy, cz };
+        sphere.center = { worldCentre.x, worldCentre.y, worldCentre.z };
         sphere.radius = radius > 0.0f ? radius : 0.5f;
 
         bx::Hit hit;
-        if (!bx::intersect(ray, sphere, &hit)) continue;
+        if (!bx::intersect(ToBxRay(ray), sphere, &hit)) continue;
 
-        // Rank by squared   distance from ray origin to the object's world origin
-        const float dx = m[12] - ray.pos.x;
-        const float dy = m[13] - ray.pos.y;
-        const float dz = m[14] - ray.pos.z;
-        const float distSq = dx*dx + dy*dy + dz*dz;
+        // Rank by squared distance from ray origin to the object's world origin.
+        const float distSq = mtx.ExtractTranslation().DistanceSquaredTo(ray.pos);
 
         if (distSq < nearestDistSq)
         {
@@ -277,22 +267,22 @@ std::shared_ptr<CSelectable> CSelectionManager::PickAtCursor()
 
 // ── Gizmo hover detection ─────────────────────────────────────────────────
 
-GizmoAxis CSelectionManager::HitTestGizmo(GizmoMode    mode,
-                                            const float* gizmoMtx,
-                                            float        effectiveSize) const
+GizmoAxis CSelectionManager::HitTestGizmo(GizmoMode       mode,
+                                            const Matrix4f& gizmoMtx,
+                                            float           effectiveSize) const
 {
     if (!m_camera)
         return GizmoAxis::None;
 
-    const bx::Ray  ray    = BuildPickRay();
-    const bx::Vec3 origin = { gizmoMtx[12], gizmoMtx[13], gizmoMtx[14] };
+    const Ray      ray    = BuildPickRay();
+    const Vector3f origin = gizmoMtx.ExtractTranslation();
 
     // Normalise the matrix columns to get pure world-space direction vectors,
     // regardless of any scale baked into the gizmo transform.
-    const bx::Vec3 axes[3] = {
-        bx::normalize(bx::Vec3{ gizmoMtx[0], gizmoMtx[1], gizmoMtx[2]  }),
-        bx::normalize(bx::Vec3{ gizmoMtx[4], gizmoMtx[5], gizmoMtx[6]  }),
-        bx::normalize(bx::Vec3{ gizmoMtx[8], gizmoMtx[9], gizmoMtx[10] }),
+    const Vector3f axes[3] = {
+        gizmoMtx.GetColumn(0).Normalized(),
+        gizmoMtx.GetColumn(1).Normalized(),
+        gizmoMtx.GetColumn(2).Normalized(),
     };
 
     // ── Rotate: ring band test ────────────────────────────────────────
@@ -307,12 +297,12 @@ GizmoAxis CSelectionManager::HitTestGizmo(GizmoMode    mode,
         for (int i = 0; i < 3; ++i)
         {
             float    tHit;
-            bx::Vec3 hitPt = { 0.0f, 0.0f, 0.0f };
+            Vector3f hitPt;
             if (!RayPlaneIntersect(ray, origin, axes[i], tHit, hitPt))
                 continue;
 
-            const float distFromCenter = bx::length(bx::sub(hitPt, origin));
-            const float delta          = bx::abs(distFromCenter - effectiveSize);
+            const float distFromCenter = (hitPt - origin).Length();
+            const float delta          = std::abs(distFromCenter - effectiveSize);
 
             if (delta < effectiveSize * kRingHalfWidth && tHit < bestT)
             {
@@ -346,13 +336,13 @@ GizmoAxis CSelectionManager::HitTestGizmo(GizmoMode    mode,
         for (int i = 0; i < 3; ++i)
         {
             float    tHit;
-            bx::Vec3 hitPt = { 0.0f, 0.0f, 0.0f };
+            Vector3f hitPt;
             if (!RayPlaneIntersect(ray, origin, axes[kNormal[i]], tHit, hitPt))
                 continue;
 
-            const bx::Vec3 rel = bx::sub(hitPt, origin);
-            const float    u   = bx::dot(rel, axes[kTangentA[i]]);
-            const float    v   = bx::dot(rel, axes[kTangentB[i]]);
+            const Vector3f rel = hitPt - origin;
+            const float    u   = rel.Dot(axes[kTangentA[i]]);
+            const float    v   = rel.Dot(axes[kTangentB[i]]);
 
             if (u >= planeMin && u <= planeMax && v >= planeMin && v <= planeMax)
             {
@@ -364,7 +354,6 @@ GizmoAxis CSelectionManager::HitTestGizmo(GizmoMode    mode,
             }
         }
 
-        // Plane handles take priority — return immediately if any are hit.
         if (bestAxis != GizmoAxis::None)
             return bestAxis;
     }
@@ -374,12 +363,11 @@ GizmoAxis CSelectionManager::HitTestGizmo(GizmoMode    mode,
 
     for (int i = 0; i < 3; ++i)
     {
-        const bx::Vec3 segEnd = bx::add(origin, bx::mul(axes[i], shaftEnd));
+        const Vector3f segEnd = origin + axes[i] * shaftEnd;
 
         float tRay;
         const float dist = RaySegmentDist(ray, origin, segEnd, tRay);
 
-        // Ignore hits behind the camera and those outside the hit radius.
         if (tRay > 0.0f && dist < hitRadius && dist < bestDist)
         {
             bestDist = dist;
@@ -392,18 +380,18 @@ GizmoAxis CSelectionManager::HitTestGizmo(GizmoMode    mode,
 
 // ── Gizmo drag ────────────────────────────────────────────────────────────
 
-void CSelectionManager::BeginGizmoDrag(GizmoMode mode, const float* gizmoMtx)
+void CSelectionManager::BeginGizmoDrag(GizmoMode mode, const Matrix4f& gizmoMtx)
 {
     if (m_selection.empty())
         return;
 
-    const bx::Ray  ray    = BuildPickRay();
-    const bx::Vec3 origin = { gizmoMtx[12], gizmoMtx[13], gizmoMtx[14] };
+    const Ray      ray    = BuildPickRay();
+    const Vector3f origin = gizmoMtx.ExtractTranslation();
 
-    const bx::Vec3 axes[3] = {
-        bx::normalize(bx::Vec3{ gizmoMtx[0], gizmoMtx[1], gizmoMtx[2]  }),
-        bx::normalize(bx::Vec3{ gizmoMtx[4], gizmoMtx[5], gizmoMtx[6]  }),
-        bx::normalize(bx::Vec3{ gizmoMtx[8], gizmoMtx[9], gizmoMtx[10] }),
+    const Vector3f axes[3] = {
+        gizmoMtx.GetColumn(0).Normalized(),
+        gizmoMtx.GetColumn(1).Normalized(),
+        gizmoMtx.GetColumn(2).Normalized(),
     };
 
     m_drag.active = true;
@@ -460,8 +448,6 @@ void CSelectionManager::BeginGizmoDrag(GizmoMode mode, const float* gizmoMtx)
 
     case GizmoMode::Rotate:
     {
-        // The ring normal is the axis the ring is perpendicular to.
-        // axisDir / axisDir2 are its two tangent axes (used to measure angle).
         switch (m_hoveredGizmoAxis)
         {
         case GizmoAxis::X:
@@ -483,12 +469,11 @@ void CSelectionManager::BeginGizmoDrag(GizmoMode mode, const float* gizmoMtx)
         }
 
         float    tHit;
-        bx::Vec3 hitPt = { 0.0f, 0.0f, 0.0f };
+        Vector3f hitPt;
         RayPlaneIntersect(ray, origin, m_drag.planeNormal, tHit, hitPt);
 
-        const bx::Vec3 rel = bx::sub(hitPt, origin);
-        m_drag.angleStart  = std::atan2(bx::dot(rel, m_drag.axisDir2),
-                                        bx::dot(rel, m_drag.axisDir));
+        const Vector3f rel = hitPt - origin;
+        m_drag.angleStart  = std::atan2(rel.Dot(m_drag.axisDir2), rel.Dot(m_drag.axisDir));
         break;
     }
     }
@@ -499,7 +484,7 @@ void CSelectionManager::ApplyGizmoDrag()
     if (!m_drag.active || m_selection.empty())
         return;
 
-    const bx::Ray ray = BuildPickRay();
+    const Ray ray = BuildPickRay();
 
     switch (m_drag.mode)
     {
@@ -509,9 +494,9 @@ void CSelectionManager::ApplyGizmoDrag()
     }
 }
 
-void CSelectionManager::ApplyTranslateDrag(const bx::Ray& ray)
+void CSelectionManager::ApplyTranslateDrag(const Ray& ray)
 {
-    bx::Vec3 delta = { 0.0f, 0.0f, 0.0f };
+    Vector3f delta;
 
     const bool isSingleAxis = (m_drag.axis == GizmoAxis::X ||
                                 m_drag.axis == GizmoAxis::Y ||
@@ -520,15 +505,15 @@ void CSelectionManager::ApplyTranslateDrag(const bx::Ray& ray)
     if (isSingleAxis)
     {
         const float tCurrent = RayLineClosestT(ray, m_drag.origin, m_drag.axisDir);
-        delta = bx::mul(m_drag.axisDir, tCurrent - m_drag.tStart);
+        delta = m_drag.axisDir * (tCurrent - m_drag.tStart);
     }
     else
     {
         float    tHit;
-        bx::Vec3 hitPt = { 0.0f, 0.0f, 0.0f };
+        Vector3f hitPt;
         if (!RayPlaneIntersect(ray, m_drag.origin, m_drag.planeNormal, tHit, hitPt))
             return;
-        delta = bx::sub(hitPt, m_drag.hitStart);
+        delta = hitPt - m_drag.hitStart;
     }
 
     for (size_t i = 0; i < m_selection.size(); ++i)
@@ -536,18 +521,15 @@ void CSelectionManager::ApplyTranslateDrag(const bx::Ray& ray)
         Matrix4f* transform = m_selection[i]->GetTransformMutable();
         if (!transform) continue;
 
-        const Matrix4f& start = m_drag.startTransforms[i];
-        *transform = start;
-        transform->data()[12] = start.data()[12] + delta.x;
-        transform->data()[13] = start.data()[13] + delta.y;
-        transform->data()[14] = start.data()[14] + delta.z;
+        *transform = m_drag.startTransforms[i];
+        transform->SetTranslation(m_drag.startTransforms[i].ExtractTranslation() + delta);
     }
 }
 
-void CSelectionManager::ApplyScaleDrag(const bx::Ray& ray)
+void CSelectionManager::ApplyScaleDrag(const Ray& ray)
 {
     const float tCurrent = RayLineClosestT(ray, m_drag.origin, m_drag.axisDir);
-    const float absStart = bx::abs(m_drag.tStart);
+    const float absStart = std::abs(m_drag.tStart);
     if (absStart < 1e-6f)
         return;
 
@@ -565,59 +547,33 @@ void CSelectionManager::ApplyScaleDrag(const bx::Ray& ray)
         Matrix4f* transform = m_selection[i]->GetTransformMutable();
         if (!transform) continue;
 
-        const Matrix4f& start = m_drag.startTransforms[i];
-        *transform = start;
-
-        // Scale the chosen axis column (which holds scale × direction).
-        const int base = axisCol * 4;
-        transform->data()[base + 0] = start.data()[base + 0] * factor;
-        transform->data()[base + 1] = start.data()[base + 1] * factor;
-        transform->data()[base + 2] = start.data()[base + 2] * factor;
+        *transform = m_drag.startTransforms[i];
+        transform->SetColumn(axisCol, m_drag.startTransforms[i].GetColumn(axisCol) * factor);
     }
 }
 
-void CSelectionManager::ApplyRotateDrag(const bx::Ray& ray)
+void CSelectionManager::ApplyRotateDrag(const Ray& ray)
 {
     float    tHit;
-    bx::Vec3 hitPt = { 0.0f, 0.0f, 0.0f };
+    Vector3f hitPt;
     if (!RayPlaneIntersect(ray, m_drag.origin, m_drag.planeNormal, tHit, hitPt))
         return;
 
-    const bx::Vec3 rel        = bx::sub(hitPt, m_drag.origin);
-    const float    angleCur   = std::atan2(bx::dot(rel, m_drag.axisDir2),
-                                            bx::dot(rel, m_drag.axisDir));
+    const Vector3f rel        = hitPt - m_drag.origin;
+    const float    angleCur   = std::atan2(rel.Dot(m_drag.axisDir2), rel.Dot(m_drag.axisDir));
     const float    deltaAngle = angleCur - m_drag.angleStart;
 
-    float rotMtx[16];
-    BuildRotationMatrix(rotMtx, m_drag.planeNormal, deltaAngle);
+    // Rotate around the gizmo origin: T(origin) * R * T(-origin) * startTransform
+    const Matrix4f R          = Matrix4f::Rotation(m_drag.planeNormal, deltaAngle);
+    const Matrix4f fromOrigin = Matrix4f::Translation( m_drag.origin);
+    const Matrix4f toOrigin   = Matrix4f::Translation(-m_drag.origin);
 
     for (size_t i = 0; i < m_selection.size(); ++i)
     {
         Matrix4f* transform = m_selection[i]->GetTransformMutable();
         if (!transform) continue;
 
-        const Matrix4f& start = m_drag.startTransforms[i];
-
-        // Rotate the object's position around the gizmo origin.
-        const float px = start.data()[12] - m_drag.origin.x;
-        const float py = start.data()[13] - m_drag.origin.y;
-        const float pz = start.data()[14] - m_drag.origin.z;
-
-        *transform = start;
-        transform->data()[12] = rotMtx[0]*px + rotMtx[4]*py + rotMtx[8] *pz + m_drag.origin.x;
-        transform->data()[13] = rotMtx[1]*px + rotMtx[5]*py + rotMtx[9] *pz + m_drag.origin.y;
-        transform->data()[14] = rotMtx[2]*px + rotMtx[6]*py + rotMtx[10]*pz + m_drag.origin.z;
-
-        // Rotate the upper-left 3×3 (orientation + scale columns).
-        for (int col = 0; col < 3; ++col)
-        {
-            const float cx = start.data()[col*4 + 0];
-            const float cy = start.data()[col*4 + 1];
-            const float cz = start.data()[col*4 + 2];
-            transform->data()[col*4 + 0] = rotMtx[0]*cx + rotMtx[4]*cy + rotMtx[8] *cz;
-            transform->data()[col*4 + 1] = rotMtx[1]*cx + rotMtx[5]*cy + rotMtx[9] *cz;
-            transform->data()[col*4 + 2] = rotMtx[2]*cx + rotMtx[6]*cy + rotMtx[10]*cz;
-        }
+        *transform = fromOrigin * R * toOrigin * m_drag.startTransforms[i];
     }
 }
 
@@ -651,41 +607,35 @@ void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
         }
     }
 
-    // ── 2. Build gizmo matrix from current (possibly just-updated) transforms
-    float gizmoMtx[16];
+    // ── 2. Build gizmo matrix from current (possibly just-updated) transforms ─
+    Matrix4f gizmo;
 
     if (m_selection.size() == 1)
     {
-        const float* m = m_selection.front()->GetTransform().data();
+        const Matrix4f& objMtx = m_selection.front()->GetTransform();
+        const Vector3f  scale  = objMtx.ExtractScale();
 
-        // Strip scale: normalize each rotation column so the gizmo is
-        // rendered at a uniform size regardless of the object's scale.
-        const float scaleX = bx::sqrt(m[0]*m[0] + m[1]*m[1] + m[2]*m[2]);
-        const float scaleY = bx::sqrt(m[4]*m[4] + m[5]*m[5] + m[6]*m[6]);
-        const float scaleZ = bx::sqrt(m[8]*m[8] + m[9]*m[9] + m[10]*m[10]);
+        // Strip scale: normalize each rotation column so the gizmo renders
+        // at a uniform size regardless of the object's scale.
+        const float invX = scale.x > 1e-8f ? 1.0f / scale.x : 0.0f;
+        const float invY = scale.y > 1e-8f ? 1.0f / scale.y : 0.0f;
+        const float invZ = scale.z > 1e-8f ? 1.0f / scale.z : 0.0f;
 
-        const float invX = scaleX > 1e-8f ? 1.0f / scaleX : 0.0f;
-        const float invY = scaleY > 1e-8f ? 1.0f / scaleY : 0.0f;
-        const float invZ = scaleZ > 1e-8f ? 1.0f / scaleZ : 0.0f;
-
-        gizmoMtx[0]  = m[0]  * invX;  gizmoMtx[1]  = m[1]  * invX;  gizmoMtx[2]  = m[2]  * invX;  gizmoMtx[3]  = 0.0f;
-        gizmoMtx[4]  = m[4]  * invY;  gizmoMtx[5]  = m[5]  * invY;  gizmoMtx[6]  = m[6]  * invY;  gizmoMtx[7]  = 0.0f;
-        gizmoMtx[8]  = m[8]  * invZ;  gizmoMtx[9]  = m[9]  * invZ;  gizmoMtx[10] = m[10] * invZ;  gizmoMtx[11] = 0.0f;
-        gizmoMtx[12] = m[12];          gizmoMtx[13] = m[13];          gizmoMtx[14] = m[14];          gizmoMtx[15] = 1.0f;
+        gizmo.SetColumn(0, objMtx.GetColumn(0) * invX);
+        gizmo.SetColumn(1, objMtx.GetColumn(1) * invY);
+        gizmo.SetColumn(2, objMtx.GetColumn(2) * invZ);
+        gizmo.SetTranslation(objMtx.ExtractTranslation());
     }
     else
     {
-        float cx = 0.0f, cy = 0.0f, cz = 0.0f;
+        // Multi-selection: identity rotation at centroid of all selected objects.
+        Vector3f centroid;
         for (const auto& sel : m_selection)
-        {
-            const float* m = sel->GetTransform().data();
-            cx += m[12]; cy += m[13]; cz += m[14];
-        }
-        const float inv = 1.0f / static_cast<float>(m_selection.size());
-        bx::mtxIdentity(gizmoMtx);
-        gizmoMtx[12] = cx * inv;
-        gizmoMtx[13] = cy * inv;
-        gizmoMtx[14] = cz * inv;
+            centroid += sel->GetTransform().ExtractTranslation();
+        centroid = centroid * (1.0f / static_cast<float>(m_selection.size()));
+
+        // gizmo is already identity from default constructor
+        gizmo.SetTranslation(centroid);
     }
 
     // ── 3. Constant screen-size scaling ───────────────────────────────
@@ -694,25 +644,21 @@ void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
     float eye[3];
     m_camera->GetEyePosition(eye);
 
-    const float dx   = gizmoMtx[12] - eye[0];
-    const float dy   = gizmoMtx[13] - eye[1];
-    const float dz   = gizmoMtx[14] - eye[2];
-    const float dist = bx::sqrt(dx*dx + dy*dy + dz*dz);
-
-    const float fovRad        = m_camera->GetFov() * bx::kPi / 180.0f;
-    const float effectiveSize = size * dist * bx::tan(fovRad * 0.5f) * kScreenFraction;
+    const float dist          = gizmo.ExtractTranslation().DistanceTo(Vector3f(eye[0], eye[1], eye[2]));
+    const float fovRad        = m_camera->GetFov() * static_cast<float>(M_PI) / 180.0f;
+    const float effectiveSize = size * dist * std::tan(fovRad * 0.5f) * kScreenFraction;
 
     // ── 4. Hover detection and drag initiation (idle only) ────────────
     if (!m_drag.active)
     {
-        m_hoveredGizmoAxis = HitTestGizmo(mode, gizmoMtx, effectiveSize);
+        m_hoveredGizmoAxis = HitTestGizmo(mode, gizmo, effectiveSize);
 
         if (mousePressed && m_hoveredGizmoAxis != GizmoAxis::None && IsMouseInViewport())
-            BeginGizmoDrag(mode, gizmoMtx);
+            BeginGizmoDrag(mode, gizmo);
     }
 
     // ── 5. Render ─────────────────────────────────────────────────────
-    m_gizmoRenderer.RenderGizmo(viewId, gizmoMtx, mode, m_hoveredGizmoAxis, effectiveSize);
+    m_gizmoRenderer.RenderGizmo(viewId, gizmo.data(), mode, m_hoveredGizmoAxis, effectiveSize);
 }
 
 } // namespace ImGuiVisualizers
