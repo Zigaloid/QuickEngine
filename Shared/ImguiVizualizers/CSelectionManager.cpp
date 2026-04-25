@@ -1,92 +1,12 @@
 ﻿#include "CSelectionManager.h"
-#include <bx/bounds.h>
+#include "CTransformCommand.h"
+#include "../Utils/MathUtils.h"
 #include <cfloat>
 #include <cmath>
 #include <algorithm>
 #include <imgui/imgui.h>
 
 namespace ImGuiVisualizers {
-
-// ── File-local geometry helpers ───────────────────────────────────────────
-
-/// Converts the internal Ray to a bx::Ray for use with bx::intersect only.
-static bx::Ray ToBxRay(const Ray& r)
-{
-    return bx::Ray{ { r.pos.x, r.pos.y, r.pos.z }, { r.dir.x, r.dir.y, r.dir.z } };
-}
-
-/// Closest perpendicular distance from a ray to a finite line segment.
-/// @p out_tRay receives the parameter along the ray at the nearest point
-/// (negative means the closest point is behind the ray origin).
-static float RaySegmentDist(const Ray&      ray,
-                             const Vector3f& segA,
-                             const Vector3f& segB,
-                             float&          out_tRay)
-{
-    const Vector3f u = segB - segA;
-    const Vector3f w = ray.pos - segA;
-
-    const float b     = ray.dir.Dot(u);
-    const float c     = u.Dot(u);
-    const float d     = ray.dir.Dot(w);
-    const float e     = u.Dot(w);
-    const float denom = c - b * b;     // == a*c - b^2, a=1 (|ray.dir|==1)
-
-    float s; // parameter along segment [0,1]
-    if (denom < 1e-8f)
-    {
-        // Ray and segment are parallel
-        s        = 0.0f;
-        out_tRay = d;
-    }
-    else
-    {
-        s        = std::clamp((e - b * d) / denom, 0.0f, 1.0f);
-        out_tRay = b * s - d;
-    }
-
-    const Vector3f ptOnSeg = segA + u * s;
-    const Vector3f ptOnRay = ray.pos + ray.dir * out_tRay;
-    return (ptOnRay - ptOnSeg).Length();
-}
-
-/// Ray-plane intersection.
-/// @return false if the plane is edge-on to the ray or the hit is behind the origin.
-static bool RayPlaneIntersect(const Ray&      ray,
-                               const Vector3f& planePoint,
-                               const Vector3f& planeNormal,
-                               float&          out_t,
-                               Vector3f&       out_hit)
-{
-    const float denom = ray.dir.Dot(planeNormal);
-    if (std::abs(denom) < 1e-6f)
-        return false;
-
-    out_t = (planePoint - ray.pos).Dot(planeNormal) / denom;
-    if (out_t < 0.0f)
-        return false;
-
-    out_hit = ray.pos + ray.dir * out_t;
-    return true;
-}
-
-/// Parameter `t` along the infinite line (lineOrigin + t*lineDir) at the
-/// point closest to the given ray. Assumes ray.dir and lineDir are unit vectors.
-static float RayLineClosestT(const Ray&      ray,
-                              const Vector3f& lineOrigin,
-                              const Vector3f& lineDir)
-{
-    const Vector3f w     = ray.pos - lineOrigin;
-    const float    b     = ray.dir.Dot(lineDir);
-    const float    d     = ray.dir.Dot(w);
-    const float    e     = lineDir.Dot(w);
-    const float    denom = 1.0f - b * b;   // |ray.dir|=1, |lineDir|=1
-
-    if (denom < 1e-8f)
-        return 0.0f;
-
-    return (e - b * d) / denom;
-}
 
 // ── CSelectionManager ─────────────────────────────────────────────────────
 
@@ -200,39 +120,88 @@ std::shared_ptr<CSelectable> CSelectionManager::PickAtCursor()
     if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && m_hoveredGizmoAxis != GizmoAxis::None)
         return nullptr;
 
-    const Ray  ray       = BuildPickRay();
     const bool shiftHeld = ImGui::GetIO().KeyShift;
 
+    // ── Build view-projection matrix ──────────────────────────────────
+    const float aspect = m_viewportSize.x / m_viewportSize.y;
+
+    Matrix4f view, proj;
+    m_camera->GetViewMatrix(view.data());
+    m_camera->GetProjectionMatrix(proj.data(), aspect);
+
+    const Matrix4f viewProj = proj * view;
+
+    // Helper: projects a world-space point to viewport pixel coordinates.
+    // Performs the full homogeneous multiply without the automatic perspective
+    // divide so that we can inspect w and detect behind-camera points.
+    // Returns false when the point is behind the camera (w <= 0).
+    auto WorldToScreen = [&](const Vector3f& worldPt, ImVec2& outScreen) -> bool
+    {
+        const float x  = worldPt.x, y = worldPt.y, z = worldPt.z;
+        const float cx = viewProj(0, 0) * x + viewProj(0, 1) * y + viewProj(0, 2) * z + viewProj(0, 3);
+        const float cy = viewProj(1, 0) * x + viewProj(1, 1) * y + viewProj(1, 2) * z + viewProj(1, 3);
+        const float cw = viewProj(3, 0) * x + viewProj(3, 1) * y + viewProj(3, 2) * z + viewProj(3, 3);
+
+        if (cw <= 0.0f)
+            return false;
+
+        const float ndcX = cx / cw;
+        const float ndcY = cy / cw;
+
+        outScreen.x = ( ndcX * 0.5f + 0.5f) * m_viewportSize.x + m_viewportMin.x;
+        outScreen.y = (0.5f - ndcY * 0.5f)  * m_viewportSize.y + m_viewportMin.y;
+        return true;
+    };
+
+    // ── Pick by 2D screen-space distance to object centre ─────────────
+    const ImVec2 mouse = ImGui::GetMousePos();
+
     std::shared_ptr<CSelectable> nearest;
-    float nearestDistSq = FLT_MAX;
+    float nearestDist2D = FLT_MAX;
 
     for (const auto& selectable : m_selectables)
     {
         if (!selectable) continue;
 
-        const Vector4f    bs     = selectable->GetBoundingSphere();
-        const Matrix4f&   mtx    = selectable->GetTransform();
+        const Vector4f  bs          = selectable->GetBoundingSphere();
+        const Matrix4f& mtx         = selectable->GetTransform();
+        const Vector3f  worldCentre = mtx.TransformPoint(Vector3f(bs.x, bs.y, bs.z));
 
-        // Transform sphere centre into world space using the full TRS matrix.
-        const Vector3f worldCentre = mtx.TransformPoint(Vector3f(bs.x, bs.y, bs.z));
+        // Project the object centre into screen space.
+        ImVec2 screenCentre;
+        if (!WorldToScreen(worldCentre, screenCentre))
+            continue;   // Behind the camera – skip.
 
-        // World-space radius: local radius scaled by the largest column magnitude.
-        const Vector3f scale  = mtx.ExtractScale();
-        const float    radius = bs.w * std::max({ scale.x, scale.y, scale.z });
+        // Estimate the screen-space radius by projecting a point displaced by
+        // the world-space radius along the camera's right axis (view matrix row 0).
+        const Vector3f  scale       = mtx.ExtractScale();
+        const float     worldRadius = bs.w * std::max({ scale.x, scale.y, scale.z, 0.5f });
 
-        bx::Sphere sphere;
-        sphere.center = { worldCentre.x, worldCentre.y, worldCentre.z };
-        sphere.radius = radius > 0.0f ? radius : 0.5f;
-
-        bx::Hit hit;
-        if (!bx::intersect(ToBxRay(ray), sphere, &hit)) continue;
-
-        // Rank by squared distance from ray origin to the object's world origin.
-        const float distSq = mtx.ExtractTranslation().DistanceSquaredTo(ray.pos);
-
-        if (distSq < nearestDistSq)
+        const Vector3f  camRight    = Vector3f(view(0, 0), view(0, 1), view(0, 2)).Normalized();
+        ImVec2          screenEdge;
+        const float     screenRadius = [&]() -> float
         {
-            nearestDistSq = distSq;
+            if (WorldToScreen(worldCentre + camRight * worldRadius, screenEdge))
+            {
+                const float dx = screenEdge.x - screenCentre.x;
+                const float dy = screenEdge.y - screenCentre.y;
+                return std::sqrt(dx * dx + dy * dy);
+            }
+            return 20.0f;   // Fallback when the edge point is off-screen.
+        }();
+
+        // 2D pixel distance from cursor to the projected object centre.
+        const float dx     = mouse.x - screenCentre.x;
+        const float dy     = mouse.y - screenCentre.y;
+        const float dist2D = std::sqrt(dx * dx + dy * dy);
+
+        // Only consider objects whose screen-space sphere contains the cursor.
+        if (dist2D > screenRadius)
+            continue;
+
+        if (dist2D < nearestDist2D)
+        {
+            nearestDist2D = dist2D;
             nearest       = selectable;
         }
     }
@@ -579,6 +548,43 @@ void CSelectionManager::ApplyRotateDrag(const Ray& ray)
 
 // ── RenderSelectionGizmo ──────────────────────────────────────────────────
 
+void CSelectionManager::EndGizmoDrag()
+{
+    if (!m_drag.active)
+        return;
+
+    // Record undo/redo command if a history was provided.
+    if (m_commandHistory && !m_selection.empty())
+    {
+        std::vector<CTransformCommand::Entry> entries;
+        entries.reserve(m_selection.size());
+
+        for (size_t i = 0; i < m_selection.size(); ++i)
+        {
+            CTransformCommand::Entry e;
+            e.selectable = m_selection[i];
+            e.before     = m_drag.startTransforms[i];
+            e.after      = m_selection[i]->GetTransform();  // current = result of drag
+            entries.push_back(std::move(e));
+        }
+
+        // Push without re-executing — the drag already applied the final state.
+        // We bypass Push() to avoid a redundant Execute() call by directly
+        // inserting the command in its already-applied state.
+        // Instead, wrap: temporarily make Execute() a no-op on first call.
+        // Simplest: just call the history's internals — but since we own the
+        // abstraction, we expose a PushAlreadyExecuted() helper below.
+        m_commandHistory->PushAlreadyExecuted(
+            std::make_unique<CTransformCommand>(std::move(entries),
+                m_drag.mode == GizmoMode::Translate ? "Move"
+              : m_drag.mode == GizmoMode::Scale     ? "Scale"
+              :                                       "Rotate"));
+    }
+
+    m_drag.active = false;
+    m_drag.startTransforms.clear();
+}
+
 void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
                                               GizmoMode    mode,
                                               float        size)
@@ -598,8 +604,8 @@ void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
     {
         if (mouseReleased)
         {
-            m_drag.active = false;
-            m_drag.startTransforms.clear();
+            ApplyGizmoDrag();   // apply final position before snapshotting
+            EndGizmoDrag();     // ← commit to history, clear drag state
         }
         else if (mouseDown)
         {
@@ -615,8 +621,6 @@ void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
         const Matrix4f& objMtx = m_selection.front()->GetTransform();
         const Vector3f  scale  = objMtx.ExtractScale();
 
-        // Strip scale: normalize each rotation column so the gizmo renders
-        // at a uniform size regardless of the object's scale.
         const float invX = scale.x > 1e-8f ? 1.0f / scale.x : 0.0f;
         const float invY = scale.y > 1e-8f ? 1.0f / scale.y : 0.0f;
         const float invZ = scale.z > 1e-8f ? 1.0f / scale.z : 0.0f;

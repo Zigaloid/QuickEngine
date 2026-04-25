@@ -198,6 +198,7 @@
     <ClInclude Include="..\Shared\bgfx_common\ps\vs_particle.bin.h" />
     <ClInclude Include="..\Shared\utils\BgfxBinaryMeshWriter.h" />
     <ClInclude Include="..\Shared\utils\FbxMeshConverter.h" />
+    <ClInclude Include="..\Shared\Utils\MathUtils.h" />
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="AssetClasses\EntityInstance.h" />
@@ -236,6 +237,7 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\CCommandHistory.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CSelectionManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
@@ -281,6 +283,7 @@
     <ClCompile Include="..\Shared\bgfx_common\nanovg\nanovg.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\nanovg\nanovg_bgfx.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\ps\particle_system.cpp" />
+    <ClCompile Include="..\Shared\Utils\MathUtils.cpp" />
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />

@@ -2,6 +2,7 @@
 #include "CoreSystem/CoreSystem.h"
 #include "FileSystem/FileSystemManager.h"
 #include "EntityComponent.h"
+#include "CDeleteEntityCommand.h"
 #include <bx/bounds.h>
 #include <algorithm>
 #include <cfloat>
@@ -24,7 +25,7 @@ namespace ImGuiVisualizers {
 		Get3DView().SetRenderCallback([this](bgfx::ViewId viewId, BgfxRenderPrimitives& prims) {
 			if (!m_levelComp) return;
 			if (!m_levelComp->IsReady()) return;
-			RenderComponentHierarchy(viewId, m_levelComp);			
+			RenderComponentHierarchy(viewId, m_levelComp);
 			m_selectionManager.RenderSelectionGizmo(viewId, m_gizmoMode, 2.0f);
 			});
 
@@ -40,8 +41,26 @@ namespace ImGuiVisualizers {
 	{
 		// Clear render callback to avoid stale calls
 		Get3DView().SetRenderCallback(nullptr);
+
+		// Ensure gizmo renderer releases its GPU resources promptly.
+		m_selectionManager.ShutdownGizmo();
+
+		// Clear selectable registry and our local references
 		m_selectionManager.ClearSelectables();
 		m_componentSelectables.clear();
+
+		if (m_levelComp)
+		{
+			// Only call Shutdown() if the ComponentManager is still alive.
+			// If CoreSystem has already shut it down, the component memory has been
+			// freed and m_levelComp is a dangling pointer – do not touch it.
+			auto* manager = Core::CoreSystem::GetComponentManager();
+			if (manager && manager->IsInitialized() && m_levelComp->IsInitialized())
+			{
+				m_levelComp->Shutdown();
+			}
+			m_levelComp = nullptr;
+		}
 	}
 
 	void LevelComponentVisualizer::RegisterLevelActions()
@@ -49,32 +68,32 @@ namespace ImGuiVisualizers {
 		auto& am = m_editor.GetActionManager();
 
 		am.RegisterAction({
-			.path        = "View.GizmoMode.Translate",
+			.path = "View.GizmoMode.Translate",
 			.description = "Set gizmo to Translate mode",
-			.targets     = UI::ActionTarget::Menu | UI::ActionTarget::Console,
-			.callback    = [this]() { m_gizmoMode = GizmoMode::Translate; },
-			.isEnabled   = [this]() { return m_levelComp != nullptr; },
-			.isChecked   = [this]() { return m_gizmoMode == GizmoMode::Translate; },
+			.targets = UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback = [this]() { m_gizmoMode = GizmoMode::Translate; },
+			.isEnabled = [this]() { return m_levelComp != nullptr; },
+			.isChecked = [this]() { return m_gizmoMode == GizmoMode::Translate; },
 			.sortPriority = 10
 			});
 
 		am.RegisterAction({
-			.path        = "View.GizmoMode.Scale",
+			.path = "View.GizmoMode.Scale",
 			.description = "Set gizmo to Scale mode",
-			.targets     = UI::ActionTarget::Menu | UI::ActionTarget::Console,
-			.callback    = [this]() { m_gizmoMode = GizmoMode::Scale; },
-			.isEnabled   = [this]() { return m_levelComp != nullptr; },
-			.isChecked   = [this]() { return m_gizmoMode == GizmoMode::Scale; },
+			.targets = UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback = [this]() { m_gizmoMode = GizmoMode::Scale; },
+			.isEnabled = [this]() { return m_levelComp != nullptr; },
+			.isChecked = [this]() { return m_gizmoMode == GizmoMode::Scale; },
 			.sortPriority = 20
 			});
 
 		am.RegisterAction({
-			.path        = "View.GizmoMode.Rotate",
+			.path = "View.GizmoMode.Rotate",
 			.description = "Set gizmo to Rotate mode",
-			.targets     = UI::ActionTarget::Menu | UI::ActionTarget::Console,
-			.callback    = [this]() { m_gizmoMode = GizmoMode::Rotate; },
-			.isEnabled   = [this]() { return m_levelComp != nullptr; },
-			.isChecked   = [this]() { return m_gizmoMode == GizmoMode::Rotate; },
+			.targets = UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback = [this]() { m_gizmoMode = GizmoMode::Rotate; },
+			.isEnabled = [this]() { return m_levelComp != nullptr; },
+			.isChecked = [this]() { return m_gizmoMode == GizmoMode::Rotate; },
 			.sortPriority = 30
 			});
 	}
@@ -111,7 +130,7 @@ namespace ImGuiVisualizers {
 	}
 
 	void LevelComponentVisualizer::CollectRenderComponents(ComponentSystem::Component* comp,
-	                                                       std::vector<CRenderComponent*>& out)
+		std::vector<CRenderComponent*>& out)
 	{
 		if (!comp) return;
 
@@ -127,7 +146,7 @@ namespace ImGuiVisualizers {
 	}
 
 	void LevelComponentVisualizer::RenderSelectionHighlight(bgfx::ViewId viewId,
-	                                                         BgfxRenderPrimitives& prims)
+		BgfxRenderPrimitives& prims)
 	{
 		const auto& allSelected = m_selectionManager.GetAllSelected();
 		if (allSelected.empty()) return;
@@ -143,7 +162,7 @@ namespace ImGuiVisualizers {
 			if (!comp || !comp->IsActive()) continue;
 
 			const Vector4f bs = *comp->GetBoundingSphere();
-			const float*   m  = comp->GetModelMatrix()->data();
+			const float* m = comp->GetModelMatrix()->data();
 
 			const float cx = m[0] * bs.x + m[4] * bs.y + m[8] * bs.z + m[12];
 			const float cy = m[1] * bs.x + m[5] * bs.y + m[9] * bs.z + m[13];
@@ -160,15 +179,93 @@ namespace ImGuiVisualizers {
 
 			// Most-recently-picked object renders in yellow; others in white
 			const uint32_t color = (selectable == lastSelected)
-			    ? 0xff00ffff   // yellow (ABGR)
-			    : 0xffffffff;  // white  (ABGR)
+				? 0xff00ffff   // yellow (ABGR)
+				: 0xffffffff;  // white  (ABGR)
 
 			prims.RenderSphere(viewId, highlightMtx, color);
 		}
 	}
 
+	void LevelComponentVisualizer::DeregisterEntitySelectables(CEntityComponent* entity)
+	{
+		if (!entity)
+			return;
+
+		// Remove every selectable whose owning entity matches the one being deleted.
+		// Walk a copy so we can safely erase from m_componentSelectables mid-loop.
+		auto it = m_componentSelectables.begin();
+		while (it != m_componentSelectables.end())
+		{
+			const auto& sel = *it;
+
+			// Walk up the component hierarchy to find the owning CEntityComponent.
+			ComponentSystem::Component* current =
+				sel->GetComponent() ? sel->GetComponent()->GetParent() : nullptr;
+
+			bool belongsToEntity = false;
+			while (current)
+			{
+				if (current == entity) { belongsToEntity = true; break; }
+				current = current->GetParent();
+			}
+
+			if (belongsToEntity)
+			{
+				m_selectionManager.RemoveSelectable(*it);
+				it = m_componentSelectables.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+
+	void LevelComponentVisualizer::DeleteSelectedEntities()
+	{
+		if (!m_levelComp)
+			return;
+
+		// Collect the unique CEntityComponent owners from the current selection.
+		// Multiple selected render components may share the same entity.
+		std::vector<CEntityComponent*> toDelete;
+		for (const auto& sel : m_selectionManager.GetAllSelected())
+		{
+			auto* owner = dynamic_cast<CEntityComponent*>(sel->GetOwner());
+			if (!owner)
+				continue;
+			if (std::find(toDelete.begin(), toDelete.end(), owner) == toDelete.end())
+				toDelete.push_back(owner);
+		}
+
+		if (toDelete.empty())
+			return;
+
+		for (CEntityComponent* entity : toDelete)
+		{
+			auto cmd = std::make_unique<CDeleteEntityCommand>(
+				m_levelComp,
+				entity,
+				&m_selectionManager,
+				[this](ComponentSystem::Component* root) { RegisterRenderComponents(root); },
+				[this](CEntityComponent* e) { DeregisterEntitySelectables(e); });
+
+			m_history.Push(std::move(cmd));
+		}
+	}
+
 	bool LevelComponentVisualizer::Render(bool* isOpen)
 	{
+		if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Z)) m_history.Undo();
+		if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Y)) m_history.Redo();
+
+		// Delete selected entities when the Delete key is pressed inside the viewport.
+		if (ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
+			m_levelComp && !m_selectionManager.IsGizmoDragging())
+		{
+			DeleteSelectedEntities();
+		}
+
 		// Build window title
 		std::string title = m_windowName;
 		if (!m_fileName.empty()) {
@@ -249,7 +346,7 @@ namespace ImGuiVisualizers {
 		m_view.RenderContent(leftAvail);
 
 		// Record the exact screen rect of the rendered image.
-		m_viewportMin  = ImGui::GetItemRectMin();
+		m_viewportMin = ImGui::GetItemRectMin();
 		m_viewportSize = ImGui::GetItemRectSize();
 
 		// Update the manager with current view state
@@ -257,13 +354,13 @@ namespace ImGuiVisualizers {
 
 		// Left-click inside the viewport (not a drag) → pick
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
-		    !ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+			!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
 		{
 			const ImVec2 mouse = ImGui::GetMousePos();
 			const bool inViewport = mouse.x >= m_viewportMin.x &&
-			                        mouse.y >= m_viewportMin.y &&
-			                        mouse.x <  m_viewportMin.x + m_viewportSize.x &&
-			                        mouse.y <  m_viewportMin.y + m_viewportSize.y;
+				mouse.y >= m_viewportMin.y &&
+				mouse.x < m_viewportMin.x + m_viewportSize.x &&
+				mouse.y < m_viewportMin.y + m_viewportSize.y;
 			if (inViewport)
 			{
 				m_selectionManager.PickAtCursor();

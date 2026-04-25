@@ -26,27 +26,33 @@ void Component::RemoveChild(Component* child)
 
 void Component::Shutdown()
 {
-	auto* manager = Core::CoreSystem::GetComponentManager();
-	if (m_initialized)
-	{
-		m_active = false;
-		m_parent = nullptr;
+    auto* manager = Core::CoreSystem::GetComponentManager();
+    if (m_initialized)
+    {
+        m_active = false;
+        m_parent = nullptr;
 
-		for (auto& child : m_children)
-		{
-			if (child)
-			{
-				child->Shutdown();
-				if (manager)
-				{
-					manager->ReleaseComponent(child);
-				}
-			}
-		}
-		m_children.clear();
+        for (auto& child : m_children)
+        {
+            if (child)
+            {
+                child->Shutdown();
+                if (manager)
+                {
+                    manager->ReleaseComponent(child);
+                }
+            }
+        }
+        m_children.clear();
 
-		OnShutdown();
-		m_initialized = false;
-		manager->ReleaseComponent(this);
-	}
+        OnShutdown();
+        m_initialized = false;
+
+        // Guard matches the child-release guard above – manager may be null
+        // if CoreSystem has already been torn down.
+        if (manager)
+        {
+            manager->ReleaseComponent(this);
+        }
+    }
 }

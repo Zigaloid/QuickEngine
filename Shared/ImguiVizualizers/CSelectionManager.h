@@ -3,149 +3,150 @@
 #include "CSelectable.h"
 #include "Bgfx3DCamera.h"
 #include "BgfxGizmoRenderer.h"
+#include "CCommandHistory.h"
 #include "imgui/imgui.h"
 #include <bgfx/bgfx.h>
 #include <memory>
 #include <vector>
 
+// Include the shared math utilities (Ray + helpers)
+#include "../Utils/MathUtils.h"
+
 namespace ImGuiVisualizers {
 
-/// Lightweight ray used internally by CSelectionManager.
-struct Ray
-{
-    Vector3f pos;
-    Vector3f dir;
-};
+	/**
+	 * @brief Manages a set of selectable objects and performs ray-cast picking
+	 *        against them using view/projection information from a Bgfx3DCamera.
+	 *
+	 * Usage:
+	 *   1. Call SetViewInfo() each frame before picking.
+	 *   2. Register objects via AddSelectable() / RemoveSelectable().
+	 *   3. Call PickAtCursor() to update the current selection (no-op during gizmo drag).
+	 *   4. Call RenderSelectionGizmo() each frame to draw the manipulator and drive
+	 *      hover detection and drag-based transform manipulation.
+	 *   5. Read results with GetSelected() or GetAllSelected().
+	 *
+	 * Multi-select:
+	 *   - Plain click      : replaces the selection with the hit object.
+	 *   - Shift+click hit  : adds the hit object to the selection.
+	 *   - Shift+click selected object : removes it from the selection.
+	 *   - Plain click on empty space  : clears the selection.
+	 *
+	 * Gizmo:
+	 *   - Single selection  : gizmo inherits the object's world rotation and position (scale stripped).
+	 *   - Multi-selection   : gizmo is at the centroid, world-aligned.
+	 *   - Hover             : detected automatically each frame.
+	 *   - Drag              : left-click + drag on a highlighted axis/plane applies
+	 *                         the corresponding translate / scale / rotate operation
+	 *                         to all selected objects in real time.
+	 */
+	class CSelectionManager
+	{
+	public:
+		CSelectionManager() = default;
 
-/**
- * @brief Manages a set of selectable objects and performs ray-cast picking
- *        against them using view/projection information from a Bgfx3DCamera.
- *
- * Usage:
- *   1. Call SetViewInfo() each frame before picking.
- *   2. Register objects via AddSelectable() / RemoveSelectable().
- *   3. Call PickAtCursor() to update the current selection (no-op during gizmo drag).
- *   4. Call RenderSelectionGizmo() each frame to draw the manipulator and drive
- *      hover detection and drag-based transform manipulation.
- *   5. Read results with GetSelected() or GetAllSelected().
- *
- * Multi-select:
- *   - Plain click      : replaces the selection with the hit object.
- *   - Shift+click hit  : adds the hit object to the selection.
- *   - Shift+click selected object : removes it from the selection.
- *   - Plain click on empty space  : clears the selection.
- *
- * Gizmo:
- *   - Single selection  : gizmo inherits the object's world rotation and position (scale stripped).
- *   - Multi-selection   : gizmo is at the centroid, world-aligned.
- *   - Hover             : detected automatically each frame.
- *   - Drag              : left-click + drag on a highlighted axis/plane applies
- *                         the corresponding translate / scale / rotate operation
- *                         to all selected objects in real time.
- */
-class CSelectionManager
-{
-public:
-    CSelectionManager() = default;
+		// ── View setup ─────────────────────────────────────────────────────
 
-    // ── View setup ─────────────────────────────────────────────────────
+		void SetViewInfo(Bgfx3DCamera& camera,
+			const ImVec2& viewportMin,
+			const ImVec2& viewportSize);
 
-    void SetViewInfo(Bgfx3DCamera& camera,
-                     const ImVec2& viewportMin,
-                     const ImVec2& viewportSize);
+		// ── Undo/redo integration ──────────────────────────────────────────
 
-    // ── Selectable registry ────────────────────────────────────────────
+		/// Provide an external CCommandHistory so gizmo drags (and future
+		/// operations) are automatically recorded. Pass nullptr to disable.
+		void SetCommandHistory(CCommandHistory* history) { m_commandHistory = history; }
 
-    void AddSelectable(std::shared_ptr<CSelectable> selectable);
-    void RemoveSelectable(const std::shared_ptr<CSelectable>& selectable);
-    void ClearSelectables();
+		// ── Selectable registry ────────────────────────────────────────────
 
-    // ── Picking ────────────────────────────────────────────────────────
+		void AddSelectable(std::shared_ptr<CSelectable> selectable);
+		void RemoveSelectable(const std::shared_ptr<CSelectable>& selectable);
+		void ClearSelectables();
 
-    /// Casts a ray through the current mouse position and updates the selection.
-    /// Returns nullptr (and does nothing) while a gizmo drag is in progress.
-    std::shared_ptr<CSelectable> PickAtCursor();
+		// ── Picking ────────────────────────────────────────────────────────
 
-    // ── Selection state ────────────────────────────────────────────────
+		/// Casts a ray through the current mouse position and updates the selection.
+		/// Returns nullptr (and does nothing) while a gizmo drag is in progress.
+		std::shared_ptr<CSelectable> PickAtCursor();
 
-    std::shared_ptr<CSelectable>                     GetSelected()    const { return m_lastSelected; }
-    const std::vector<std::shared_ptr<CSelectable>>& GetAllSelected() const { return m_selection; }
+		// ── Selection state ────────────────────────────────────────────────
 
-    bool IsSelected(const std::shared_ptr<CSelectable>& selectable) const;
-    void ClearSelection();
-    void SetSelected(std::shared_ptr<CSelectable> selectable);
+		std::shared_ptr<CSelectable>                     GetSelected()    const { return m_lastSelected; }
+		const std::vector<std::shared_ptr<CSelectable>>& GetAllSelected() const { return m_selection; }
 
-    // ── Gizmo ──────────────────────────────────────────────────────────
+		bool IsSelected(const std::shared_ptr<CSelectable>& selectable) const;
+		void ClearSelection();
+		void SetSelected(std::shared_ptr<CSelectable> selectable);
 
-    bool InitializeGizmo() { return m_gizmoRenderer.Initialize(); }
-    void ShutdownGizmo()   { m_gizmoRenderer.Shutdown(); }
+		// ── Gizmo ──────────────────────────────────────────────────────────
 
-    /// Renders the gizmo, detects hover, and drives click-drag manipulation.
-    /// Call once per frame inside your render callback.
-    ///
-    /// @param viewId  BGFX view to submit into.
-    /// @param mode    GizmoMode::Translate, Scale, or Rotate.
-    /// @param size    Normalised screen-space size (scales with camera distance).
-    void RenderSelectionGizmo(bgfx::ViewId viewId,
-                               GizmoMode    mode = GizmoMode::Translate,
-                               float        size = 1.0f);
+		bool InitializeGizmo() { return m_gizmoRenderer.Initialize(); }
+		void ShutdownGizmo() { m_gizmoRenderer.Shutdown(); }
 
-    /// The gizmo axis/plane the mouse is currently over. GizmoAxis::None when idle.
-    GizmoAxis GetHoveredGizmoAxis() const { return m_hoveredGizmoAxis; }
+		/// Renders the gizmo, detects hover, and drives click-drag manipulation.
+		/// Call once per frame inside your render callback.
+		///
+		/// @param viewId  BGFX view to submit into.
+		/// @param mode    GizmoMode::Translate, Scale, or Rotate.
+		/// @param size    Normalised screen-space size (scales with camera distance).
+		void RenderSelectionGizmo(bgfx::ViewId viewId,
+			GizmoMode    mode = GizmoMode::Translate,
+			float        size = 1.0f);
 
-    /// True while the user is actively dragging a gizmo handle.
-    bool IsGizmoDragging() const { return m_drag.active; }
+		/// The gizmo axis/plane the mouse is currently over. GizmoAxis::None when idle.
+		GizmoAxis GetHoveredGizmoAxis() const { return m_hoveredGizmoAxis; }
 
-private:
-    // ── Internal helpers ───────────────────────────────────────────────
+		/// True while the user is actively dragging a gizmo handle.
+		bool IsGizmoDragging() const { return m_drag.active; }
 
-    Ray       BuildPickRay()   const;
-    bool      IsMouseInViewport() const;
+	private:
+		// ── Internal helpers ───────────────────────────────────────────────
 
-    void      AddToSelection(const std::shared_ptr<CSelectable>& selectable);
-    void      RemoveFromSelection(const std::shared_ptr<CSelectable>& selectable);
+		Ray       BuildPickRay()   const;
+		bool      IsMouseInViewport() const;
 
-    GizmoAxis HitTestGizmo(GizmoMode mode, const Matrix4f& gizmoMtx, float effectiveSize) const;
+		void      AddToSelection(const std::shared_ptr<CSelectable>& selectable);
+		void      RemoveFromSelection(const std::shared_ptr<CSelectable>& selectable);
 
-    void      BeginGizmoDrag(GizmoMode mode, const Matrix4f& gizmoMtx);
-    void      ApplyGizmoDrag();
-    void      ApplyTranslateDrag(const Ray& ray);
-    void      ApplyScaleDrag   (const Ray& ray);
-    void      ApplyRotateDrag  (const Ray& ray);
+		GizmoAxis HitTestGizmo(GizmoMode mode, const Matrix4f& gizmoMtx, float effectiveSize) const;
 
-    // ── Drag state ─────────────────────────────────────────────────────
+		void      BeginGizmoDrag(GizmoMode mode, const Matrix4f& gizmoMtx);
+		void      EndGizmoDrag();   // ← new: commits the command
+		void      ApplyGizmoDrag();
+		void      ApplyTranslateDrag(const Ray& ray);
+		void      ApplyScaleDrag(const Ray& ray);
+		void      ApplyRotateDrag(const Ray& ray);
 
-    struct GizmoDragInfo
-    {
-        bool      active      = false;
-        GizmoMode mode        = GizmoMode::Translate;
-        GizmoAxis axis        = GizmoAxis::None;
+		// ── Data members ───────────────────────────────────────────────────
 
-        Vector3f  origin;                              ///< Gizmo world-space origin at drag start.
-        Vector3f  axisDir;                             ///< Primary constrained axis (unit).
-        Vector3f  axisDir2;                            ///< Secondary axis (plane/rotate tangent).
-        Vector3f  planeNormal;                         ///< Plane normal (plane translate / rotate ring).
+		Bgfx3DCamera* m_camera = nullptr;
+		ImVec2        m_viewportMin = { 0.0f, 0.0f };
+		ImVec2        m_viewportSize = { 1.0f, 1.0f };
 
-        float     tStart      = 0.0f;                  ///< Axis parameter at drag start (translate/scale).
-        Vector3f  hitStart;                            ///< World-space hit point at drag start (plane translate).
-        float     angleStart  = 0.0f;                  ///< Angle in ring plane at drag start (rotate).
+		std::vector<std::shared_ptr<CSelectable>> m_selectables;
+		std::vector<std::shared_ptr<CSelectable>> m_selection;
+		std::shared_ptr<CSelectable>              m_lastSelected;
 
-        std::vector<Matrix4f> startTransforms;          ///< Per-object transform snapshots taken at drag start.
-    };
+		BgfxGizmoRenderer m_gizmoRenderer;
+		GizmoAxis         m_hoveredGizmoAxis = GizmoAxis::None;
 
-    // ── Data members ───────────────────────────────────────────────────
+		struct DragState
+		{
+			bool                    active = false;
+			GizmoMode               mode = GizmoMode::Translate;
+			GizmoAxis               axis = GizmoAxis::None;
+			Vector3f                origin;
+			Vector3f                axisDir;
+			Vector3f                axisDir2;
+			Vector3f                planeNormal;
+			Vector3f                hitStart;
+			float                   tStart = 0.0f;
+			float                   angleStart = 0.0f;
+			std::vector<Matrix4f>   startTransforms;
+		};
 
-    Bgfx3DCamera* m_camera       = nullptr;
-    ImVec2        m_viewportMin  = { 0.0f, 0.0f };
-    ImVec2        m_viewportSize = { 1.0f, 1.0f };
-
-    std::vector<std::shared_ptr<CSelectable>> m_selectables;
-    std::vector<std::shared_ptr<CSelectable>> m_selection;
-    std::shared_ptr<CSelectable>              m_lastSelected;
-
-    BgfxGizmoRenderer m_gizmoRenderer;
-    GizmoAxis         m_hoveredGizmoAxis = GizmoAxis::None;
-    GizmoDragInfo     m_drag;
-};
+		DragState        m_drag;
+		CCommandHistory* m_commandHistory = nullptr;   // ← new: non-owning
+	};
 
 } // namespace ImGuiVisualizers

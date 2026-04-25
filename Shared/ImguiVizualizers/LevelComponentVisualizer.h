@@ -1,10 +1,12 @@
-#pragma once
+﻿#pragma once
 #include "CombinedObjJson3DVisualizer.h"
 #include "CSelectionManager.h"
 #include "CRenderComponentSelectable.h"
 #include "LevelComponent.h"
 #include "MeshComponent.h"
 #include "BgfxGizmoRenderer.h"
+#include "CCommandHistory.h"
+#include "CDeleteEntityCommand.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -32,16 +34,21 @@ public:
     {
         ReleaseLevelComponent();
     }
+
     void Initialize() override
     {
-        // Once, after bgfx init:
         m_selectionManager.InitializeGizmo();
-
-        // Each frame, after submitting scene geometry:        
+        m_selectionManager.SetCommandHistory(&m_history);
         CombinedObjJson3DVisualizer::Initialize();
-
         RegisterLevelActions();
     }
+
+    void Shutdown() override
+    {
+        ReleaseLevelComponent();
+        CombinedObjJson3DVisualizer::Shutdown();
+    }
+
     bool Render(bool* isOpen) override;
 
 protected:
@@ -49,29 +56,23 @@ protected:
 
 private:
     void ReleaseLevelComponent();
-
-    /// Registers gizmo-mode actions into the editor's action manager.
     void RegisterLevelActions();
-
-    /// Recursively walks the component hierarchy and calls Render() on any
-    /// CRenderComponent-derived component that is active.
     void RenderComponentHierarchy(bgfx::ViewId viewId, ComponentSystem::Component* comp);
-
-    /// Collects all CRenderComponent-derived components in the hierarchy.
     void CollectRenderComponents(ComponentSystem::Component* comp,
                                  std::vector<CRenderComponent*>& out);
-
-    /// Builds CRenderComponentSelectable entries for all render components
-    /// under the given root and registers them with m_selectionManager.
     void RegisterRenderComponents(ComponentSystem::Component* root);
-
-    /// Renders a wireframe bounding-sphere highlight around the selected component.
     void RenderSelectionHighlight(bgfx::ViewId viewId, BgfxRenderPrimitives& prims);
-
-    // Entity asset browser panel
     void RenderEntityAssetPanel();
     void RefreshEntityAssets();
     void HandleEntityDrop();
+
+    /// Removes all selectables belonging to @p entity from the manager and
+    /// the local m_componentSelectables list.
+    void DeregisterEntitySelectables(CEntityComponent* entity);
+
+    /// Pushes a CDeleteEntityCommand onto the history for each currently
+    /// selected entity. Clears the selection when done.
+    void DeleteSelectedEntities();
 
     struct EntityAssetEntry {
         std::string fileName;
@@ -79,24 +80,18 @@ private:
     };
 
     CLevelComponent*   m_levelComp;
-
     CSelectionManager  m_selectionManager;
-
-    /// Active gizmo manipulation mode (Translate / Scale / Rotate).
     GizmoMode          m_gizmoMode;
 
-    /// Parallel list kept so we can call SyncFromComponent() and
-    /// dynamic_cast back to CRenderComponent* after picking.
     std::vector<std::shared_ptr<CRenderComponentSelectable>> m_componentSelectables;
 
-    // Viewport rect recorded each frame for picking
     ImVec2 m_viewportMin  = { 0.0f, 0.0f };
     ImVec2 m_viewportSize = { 1.0f, 1.0f };
 
-    // Entity asset browser state
     std::vector<EntityAssetEntry> m_entityAssets;
     bool  m_entityAssetsNeedRefresh = true;
     float m_entityPanelWidth;
+    CCommandHistory m_history{ 100 };
 };
 
 } // namespace ImGuiVisualizers
