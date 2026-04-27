@@ -95,6 +95,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\AssetClasses\EntityDefinition.h" />
+    <ClInclude Include="..\AssetClasses\EntityInstance.h" />
     <ClInclude Include="..\AssetClasses\StaticMeshDefinition.h" />
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\External\ufbx\ufbx.h" />
@@ -110,8 +111,8 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxViewIdAllocator.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CombinedObjJson3DVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h" />
-    <ClInclude Include="..\Shared\ImguiVizualizers\CSelectable.h" />
-    <ClInclude Include="..\Shared\ImguiVizualizers\CSelectionManager.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\CommandHistory.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\DeleteEntityCommand.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\DocumentManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
@@ -123,6 +124,10 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMapEditor.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\RenderComponentSelectable.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\Selectable.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\SelectionManager.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\TransformCommand.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
     <ClInclude Include="..\Shared\KeyboardShortcutManager.h" />
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h" />
@@ -198,7 +203,7 @@
     <ClInclude Include="..\Shared\bgfx_common\ps\vs_particle.bin.h" />
     <ClInclude Include="..\Shared\utils\BgfxBinaryMeshWriter.h" />
     <ClInclude Include="..\Shared\utils\FbxMeshConverter.h" />
-    <ClInclude Include="..\Shared\Utils\MathUtils.h" />
+    <ClInclude Include="..\Shared\utils\MathUtils.h" />
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="AssetClasses\EntityInstance.h" />
@@ -206,6 +211,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp" />
+    <ClCompile Include="..\AssetClasses\EntityInstance.cpp" />
     <ClCompile Include="..\AssetClasses\StaticMeshDefinition.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\clusterizer.cpp" />
@@ -237,18 +243,19 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.cpp" />
-    <ClCompile Include="..\Shared\ImguiVizualizers\CCommandHistory.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp" />
-    <ClCompile Include="..\Shared\ImguiVizualizers\CSelectionManager.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\CommandHistory.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector_TypeRenderers.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapEditor.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\SelectionManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp" />
     <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp" />
@@ -283,7 +290,7 @@
     <ClCompile Include="..\Shared\bgfx_common\nanovg\nanovg.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\nanovg\nanovg_bgfx.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\ps\particle_system.cpp" />
-    <ClCompile Include="..\Shared\Utils\MathUtils.cpp" />
+    <ClCompile Include="..\Shared\utils\MathUtils.cpp" />
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />

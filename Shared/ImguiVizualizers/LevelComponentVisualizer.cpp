@@ -2,7 +2,7 @@
 #include "CoreSystem/CoreSystem.h"
 #include "FileSystem/FileSystemManager.h"
 #include "EntityComponent.h"
-#include "CDeleteEntityCommand.h"
+#include "DeleteEntityCommand.h"
 #include <bx/bounds.h>
 #include <algorithm>
 #include <cfloat>

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "ICommand.h"
-#include "CSelectionManager.h"
+#include "SelectionManager.h"
 #include "LevelComponent.h"
 #include "EntityComponent.h"
 #include <functional>

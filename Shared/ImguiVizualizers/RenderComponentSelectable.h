@@ -1,6 +1,6 @@
 #pragma once
 
-#include "CSelectable.h"
+#include "Selectable.h"
 #include "../Components/MeshComponent.h"
 #include "../Components/EntityComponent.h"
 

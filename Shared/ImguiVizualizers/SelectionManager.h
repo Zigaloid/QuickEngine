@@ -1,9 +1,9 @@
 ﻿#pragma once
 
-#include "CSelectable.h"
+#include "Selectable.h"
 #include "Bgfx3DCamera.h"
 #include "BgfxGizmoRenderer.h"
-#include "CCommandHistory.h"
+#include "CommandHistory.h"
 #include "imgui/imgui.h"
 #include <bgfx/bgfx.h>
 #include <memory>

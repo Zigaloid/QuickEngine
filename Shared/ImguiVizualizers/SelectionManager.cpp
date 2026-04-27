@@ -1,5 +1,5 @@
-﻿#include "CSelectionManager.h"
-#include "CTransformCommand.h"
+﻿#include "SelectionManager.h"
+#include "TransformCommand.h"
 #include "../Utils/MathUtils.h"
 #include <cfloat>
 #include <cmath>

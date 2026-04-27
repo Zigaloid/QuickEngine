@@ -1,6 +1,6 @@
 #pragma once
 #include "ICommand.h"
-#include "CSelectable.h"
+#include "Selectable.h"
 #include "../Core/Math/Matrix4f.h"
 #include <memory>
 #include <vector>

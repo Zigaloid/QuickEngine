@@ -1,4 +1,4 @@
-#include "CCommandHistory.h"
+#include "CommandHistory.h"
 #include <cassert>
 
 namespace ImGuiVisualizers {

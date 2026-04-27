@@ -92,8 +92,23 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/CommandConsole.h" }
 	files { "../Shared/ImguiVizualizers/PropertyInspector.cpp" }
 	files { "../Shared/ImguiVizualizers/PropertyInspector.h" }
+	files { "../Shared/ImguiVizualizers/PropertyInspector_TypeRenderers.cpp" }	
 	files { "../Shared/ImguiVizualizers/ImGui3DViewVisualizer.cpp" }
 	files { "../Shared/ImguiVizualizers/ImGui3DViewVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/LevelComponentVisualizer.cpp" }
+	files { "../Shared/ImguiVizualizers/LevelComponentVisualizer.h" }
+		
+	files { "../Shared/ImguiVizualizers/CommandHistory.cpp" }
+	files { "../Shared/ImguiVizualizers/CommandHistory.h" }
+	files { "../Shared/ImguiVizualizers/DeleteEntityCommand.h" }
+		
+	files { "../Shared/ImguiVizualizers/Selectable.h" }
+	files { "../Shared/ImguiVizualizers/RenderComponentSelectable.h" }		
+	files { "../Shared/ImguiVizualizers/SelectionManager.cpp" }		
+	files { "../Shared/ImguiVizualizers/SelectionManager.h" }		
+	files { "../Shared/ImguiVizualizers/TransformCommand.h" }		
+
+		
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMap.cpp" }
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMap.h" }
 	files { "../Shared/ImguiVizualizers/bgfx*.h" }

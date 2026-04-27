@@ -1,12 +1,12 @@
 ﻿#pragma once
 #include "CombinedObjJson3DVisualizer.h"
-#include "CSelectionManager.h"
-#include "CRenderComponentSelectable.h"
+#include "SelectionManager.h"
+#include "RenderComponentSelectable.h"
 #include "LevelComponent.h"
 #include "MeshComponent.h"
 #include "BgfxGizmoRenderer.h"
-#include "CCommandHistory.h"
-#include "CDeleteEntityCommand.h"
+#include "CommandHistory.h"
+#include "DeleteEntityCommand.h"
 #include "PropertyInspector.h"
 #include <vector>
 #include <string>
