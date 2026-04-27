@@ -19,19 +19,9 @@ namespace ImGuiVisualizers {
 
     PropertyWidgetMapRegistry::PropertyWidgetMapRegistry()
     {
+        // OnLoaded() is invoked automatically by SafeRead after deserialization,
+        // so m_ownedMaps is populated there — no duplication needed here.
         this->SafeRead("./Assets/Editor/ClassWidgetRegistry.widgets.obj.json");
-
-        // Create owned shared_ptr copies from the deserialized unique_ptrs so
-        // the registry holds ownership while preserving m_classWidgets for serialization.
-        m_ownedMaps.reserve(m_classWidgets.size());
-        for (const auto& w : m_classWidgets) {
-            if (w) {
-                m_ownedMaps.push_back(std::shared_ptr<PropertyWidgetMap>(w->Clone().release()));
-            }
-            else {
-                m_ownedMaps.push_back(nullptr);
-            }
-        }
     }
 
     void PropertyWidgetMapRegistry::Register(const std::string& className, std::shared_ptr<PropertyWidgetMap> map)
@@ -94,6 +84,22 @@ namespace ImGuiVisualizers {
             if (m_ownedMaps[i].get() == map) return m_classNames[i];
         }
         return std::string();
+    }
+
+    // Called by CReflectedBase::SafeRead after every successful deserialization.
+    // Rebuilds m_ownedMaps so that Get() always reflects the freshly-loaded data.
+    void PropertyWidgetMapRegistry::OnLoaded()
+    {
+        m_ownedMaps.clear();
+        m_ownedMaps.reserve(m_classWidgets.size());
+        for (const auto& w : m_classWidgets) {
+            if (w) {
+                m_ownedMaps.push_back(std::shared_ptr<PropertyWidgetMap>(w->Clone().release()));
+            }
+            else {
+                m_ownedMaps.push_back(nullptr);
+            }
+        }
     }
 
 } // namespace ImGuiVisualizers

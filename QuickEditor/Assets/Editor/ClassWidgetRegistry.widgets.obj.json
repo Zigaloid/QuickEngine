@@ -15,6 +15,16 @@
                                     "Type": 1,
                                     "Size": 4
                                 },
+                                "displayName": {
+                                    "Value": "",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
                                 "hasConfig": {
                                     "Value": false,
                                     "Type": 12,
@@ -80,6 +90,16 @@
                                     "Type": 1,
                                     "Size": 4
                                 },
+                                "displayName": {
+                                    "Value": "",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
                                 "hasConfig": {
                                     "Value": false,
                                     "Type": 12,
@@ -145,6 +165,16 @@
                                     "Type": 1,
                                     "Size": 4
                                 },
+                                "displayName": {
+                                    "Value": "",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
                                 "hasConfig": {
                                     "Value": false,
                                     "Type": 12,
@@ -209,6 +239,16 @@
                                     "Value": 4,
                                     "Type": 1,
                                     "Size": 4
+                                },
+                                "displayName": {
+                                    "Value": "",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
                                 },
                                 "hasConfig": {
                                     "Value": false,
@@ -257,6 +297,16 @@
                                     "Value": 4,
                                     "Type": 1,
                                     "Size": 4
+                                },
+                                "displayName": {
+                                    "Value": "",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
                                 },
                                 "hasConfig": {
                                     "Value": false,
@@ -324,6 +374,16 @@
                                     "Type": 1,
                                     "Size": 4
                                 },
+                                "displayName": {
+                                    "Value": "",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
                                 "hasConfig": {
                                     "Value": false,
                                     "Type": 12,
@@ -371,6 +431,16 @@
                                     "Value": 4,
                                     "Type": 1,
                                     "Size": 4
+                                },
+                                "displayName": {
+                                    "Value": "",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
                                 },
                                 "hasConfig": {
                                     "Value": false,
@@ -437,6 +507,16 @@
                                     "Value": 8,
                                     "Type": 1,
                                     "Size": 4
+                                },
+                                "displayName": {
+                                    "Value": "Texture File",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
                                 },
                                 "hasConfig": {
                                     "Value": true,
@@ -503,6 +583,16 @@
                                     "Type": 1,
                                     "Size": 4
                                 },
+                                "displayName": {
+                                    "Value": "Mesh File",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
                                 "hasConfig": {
                                     "Value": true,
                                     "Type": 12,
@@ -567,6 +657,16 @@
                                     "Value": 8,
                                     "Type": 1,
                                     "Size": 4
+                                },
+                                "displayName": {
+                                    "Value": "Static Mesh File",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
                                 },
                                 "hasConfig": {
                                     "Value": true,
@@ -633,6 +733,16 @@
                                     "Type": 1,
                                     "Size": 4
                                 },
+                                "displayName": {
+                                    "Value": "Shader File",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
                                 "hasConfig": {
                                     "Value": true,
                                     "Type": 12,
@@ -698,6 +808,16 @@
                                     "Type": 1,
                                     "Size": 4
                                 },
+                                "displayName": {
+                                    "Value": "Material File",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
                                 "hasConfig": {
                                     "Value": true,
                                     "Type": 12,
@@ -750,6 +870,243 @@
                         "Type": 17,
                         "Size": 32
                     }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [],
+                        "Type": 17,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 0,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "displayName": {
+                                    "Value": "Is Active",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "hasConfig": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            },
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 0,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "displayName": {
+                                    "Value": "Child Components",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "hasConfig": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            }
+                        ],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [
+                            "m_active",
+                            "m_children"
+                        ],
+                        "Type": 17,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [
+                            {
+                                "Value": "WidgetEntry",
+                                "type": {
+                                    "Value": 0,
+                                    "Type": 1,
+                                    "Size": 4
+                                },
+                                "displayName": {
+                                    "Value": "Is Active",
+                                    "Type": 3,
+                                    "Size": 40
+                                },
+                                "isAdvanced": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "hasConfig": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "config": {
+                                    "Value": "WidgetConfig",
+                                    "minValue": {
+                                        "Value": 0.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "maxValue": {
+                                        "Value": 1.0,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "step": {
+                                        "Value": 0.009999999776482582,
+                                        "Type": 2,
+                                        "Size": 4
+                                    },
+                                    "dropdownOptions": {
+                                        "Value": [],
+                                        "Type": 17,
+                                        "Size": 32
+                                    },
+                                    "fileFilter": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "defaultFolder": {
+                                        "Value": "",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 136
+                                }
+                            }
+                        ],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [
+                            "m_active"
+                        ],
+                        "Type": 17,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "PropertyWidgetMap",
+                    "m_MemberWidgets": {
+                        "Value": "PropertyWidgetMap",
+                        "Elements": [],
+                        "Type": 6,
+                        "Size": 32
+                    },
+                    "m_MemberNames": {
+                        "Value": [],
+                        "Type": 17,
+                        "Size": 32
+                    }
                 }
             ],
             "Type": 6,
@@ -766,7 +1123,11 @@
                 "CMeshResourceReference",
                 "CStaticMeshResourceReference",
                 "CShaderResourceReference",
-                "CMaterialResourceReference"
+                "CMaterialResourceReference",
+                "CMeshComponent",
+                "Component",
+                "CRenderComponent",
+                "CStaticMeshResource"
             ],
             "Type": 17,
             "Size": 32

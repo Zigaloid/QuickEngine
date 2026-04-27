@@ -30,16 +30,17 @@ namespace ImGuiVisualizers {
 		float minValue = 0.0f;
 		float maxValue = 1.0f;
 		float step = 0.01f;
-		std::vector<std::string> dropdownOptions;  // for Dropdown type
+		std::vector<std::string> dropdownOptions;	// for Dropdown type
 		std::string fileFilter;                     // for FilePicker type (e.g. "*.png;*.jpg")
-		std::string defaultFolder;                     // for FilePicker type (e.g. "*.png;*.jpg")
+		std::string defaultFolder;                  // for FilePicker type (e.g. "*.png;*.jpg")
 	};
 	class WidgetEntry : public CReflectedBase
 	{
 	public:
 		REFL_DECLARE_OBJECT(WidgetEntry, CReflectedBase);
-
 		EditorWidgetType type = EditorWidgetType::Default;
+		std::string displayName;                    // Name that shows in the inspector instead of the member name (optional)
+		bool isAdvanced = false;                    // can be used to hide complex config options behind an "Advanced" toggle in the UI	
 		bool hasConfig = false;
 		WidgetConfig config;
 	};
@@ -85,6 +86,12 @@ namespace ImGuiVisualizers {
 			m_MemberWidgets.push_back(std::move(entry));
 		}
 
+		// Set widget and also configure displayName/isAdvanced (no config)
+		void SetWidget(const std::string& memberName, EditorWidgetType widgetType, const std::string& displayName, bool isAdvanced);
+
+		// Set widget with config and also configure displayName/isAdvanced
+		void SetWidget(const std::string& memberName, EditorWidgetType widgetType, const WidgetConfig& config, const std::string& displayName, bool isAdvanced);
+
 		// Remove a custom widget mapping for a member. Returns true if removed.
 		bool RemoveWidget(const std::string& memberName)
 		{
@@ -108,6 +115,19 @@ namespace ImGuiVisualizers {
 		{
 			return FindIndex(memberName) >= 0;
 		}
+
+		// Return local display name for a member if configured, otherwise empty string.
+		// This exposes the WidgetEntry::displayName without exposing internal vectors.
+		std::string GetEntryDisplayNameLocal(const std::string& memberName) const;
+
+		// Return display name for a member, walking the reflection hierarchy if not found locally.
+		std::string GetEntryDisplayName(const std::string& memberName) const;
+
+		// Return local isAdvanced flag for a member if configured, otherwise false.
+		bool GetEntryIsAdvancedLocal(const std::string& memberName) const;
+
+		// Return isAdvanced flag for a member, walking the reflection hierarchy if not found locally.
+		bool GetEntryIsAdvanced(const std::string& memberName) const;
 
 		// Bulk set from initializer list
 		void SetWidgets(std::initializer_list<std::pair<std::string, EditorWidgetType>> mappings)

@@ -70,6 +70,8 @@ namespace ImGuiVisualizers {
 		m_editWidgetType = EditorWidgetType::Default;
 		m_editHasConfig = false;
 		m_editConfig = WidgetConfig();
+		m_editDisplayName.clear();
+		m_editIsAdvanced = false;
 		m_mappingIsInherited = false;
 		m_mappingOriginClass.clear();
 	}
@@ -119,6 +121,10 @@ namespace ImGuiVisualizers {
 			REFL_ERROR(Reflection::ErrorCategory::FileIO, "No path set for Save()", "Call SetPath(...) before Save()");
 			return false;
 		}
+
+		// Flush any pending UI edits into the registry before persisting to disk.
+		// Without this, displayName/isAdvanced set in the UI but not yet Applied would be lost.
+		ApplySelectedMemberMapping();
 
 		auto result = PropertyWidgetMapRegistry::Instance().SafeWrite(m_currentPath);
 		if (result.IsSuccess()) {
@@ -177,6 +183,8 @@ namespace ImGuiVisualizers {
 		m_editWidgetType = EditorWidgetType::Default;
 		m_editHasConfig = false;
 		m_editConfig = WidgetConfig();
+		m_editDisplayName.clear();
+		m_editIsAdvanced = false;
 		m_mappingIsInherited = false;
 		m_mappingOriginClass.clear();
 
@@ -185,7 +193,32 @@ namespace ImGuiVisualizers {
 		const std::string& member = m_memberNames[m_selectedMemberIndex];
 
 		auto map = PropertyWidgetMapRegistry::Instance().Get(cls);
-		if (!map) return;
+		if (!map) {
+			// If no local map, try to find inherited mapping
+			EditorWidgetType foundType = EditorWidgetType::Default;
+			WidgetConfig foundCfg;
+			std::string origin;
+			if (PropertyWidgetMap::FindWidgetInHierarchy(cls, member, foundType, &foundCfg, &origin)) {
+				m_editWidgetType = foundType;
+				const auto originMap = PropertyWidgetMapRegistry::Instance().Get(origin);
+				if (originMap && originMap->HasCustomWidget(member) && originMap->GetConfig(member)) {
+					m_editHasConfig = true;
+					m_editConfig = foundCfg;
+				}
+				else {
+					m_editHasConfig = false;
+					m_editConfig = WidgetConfig();
+				}
+				// inherit display name / advanced flag from origin map if present
+				if (originMap) {
+					m_editDisplayName = originMap->GetEntryDisplayNameLocal(member);
+					m_editIsAdvanced = originMap->GetEntryIsAdvancedLocal(member);
+				}
+				m_mappingIsInherited = true;
+				m_mappingOriginClass = origin;
+			}
+			return;
+		}
 
 		// Prefer local mapping on this class.
 		if (map->HasCustomWidget(member)) {
@@ -199,6 +232,9 @@ namespace ImGuiVisualizers {
 				m_editHasConfig = false;
 				m_editConfig = WidgetConfig();
 			}
+			// load local display name / advanced flag
+			m_editDisplayName = map->GetEntryDisplayNameLocal(member);
+			m_editIsAdvanced = map->GetEntryIsAdvancedLocal(member);
 			m_mappingIsInherited = false;
 			m_mappingOriginClass.clear();
 			return;
@@ -220,6 +256,15 @@ namespace ImGuiVisualizers {
 				m_editHasConfig = false;
 				m_editConfig = WidgetConfig();
 			}
+			// inherit display name / advanced flag from origin map if present
+			if (originMap) {
+				m_editDisplayName = originMap->GetEntryDisplayNameLocal(member);
+				m_editIsAdvanced = originMap->GetEntryIsAdvancedLocal(member);
+			}
+			else {
+				m_editDisplayName.clear();
+				m_editIsAdvanced = false;
+			}
 			m_mappingIsInherited = true;
 			m_mappingOriginClass = origin;
 		}
@@ -228,6 +273,8 @@ namespace ImGuiVisualizers {
 			m_editWidgetType = EditorWidgetType::Default;
 			m_editHasConfig = false;
 			m_editConfig = WidgetConfig();
+			m_editDisplayName.clear();
+			m_editIsAdvanced = false;
 			m_mappingIsInherited = false;
 			m_mappingOriginClass.clear();
 		}
@@ -249,19 +296,24 @@ namespace ImGuiVisualizers {
 			existing = newMap;
 		}
 
-		// If Default chosen, remove mapping to fall back to default behavior
-		if (m_editWidgetType == EditorWidgetType::Default) {
+		// If Default widget type is chosen, only remove the entry if there is no
+		// metadata worth keeping (displayName / isAdvanced). If there IS metadata,
+		// fall through and store the entry so it survives the round-trip.
+		if (m_editWidgetType == EditorWidgetType::Default
+			&& m_editDisplayName.empty()
+			&& !m_editIsAdvanced)
+		{
 			existing->RemoveWidget(member);
-			// update the serialized clone so Save() picks up the change
 			PropertyWidgetMapRegistry::Instance().Register(cls, existing);
 			return;
 		}
 
+		// Use overloads that also set displayName / isAdvanced
 		if (m_editHasConfig) {
-			existing->SetWidget(member, m_editWidgetType, m_editConfig);
+			existing->SetWidget(member, m_editWidgetType, m_editConfig, m_editDisplayName, m_editIsAdvanced);
 		}
 		else {
-			existing->SetWidget(member, m_editWidgetType);
+			existing->SetWidget(member, m_editWidgetType, m_editDisplayName, m_editIsAdvanced);
 		}
 
 		// update the serialized clone so Save() picks up the change
@@ -354,6 +406,8 @@ namespace ImGuiVisualizers {
 			bool selected = (static_cast<int>(i) == m_selectedClassIndex);
 			if (ImGui::Selectable(m_classNames[i].c_str(), selected)) {
 				if (!selected) {
+					// Persist any pending edits before switching to a different class.
+					ApplySelectedMemberMapping();
 					m_selectedClassIndex = static_cast<int>(i);
 					m_selectedClassName = cls;
 					PopulateMemberList(cls);
@@ -362,6 +416,8 @@ namespace ImGuiVisualizers {
 					m_editWidgetType = EditorWidgetType::Default;
 					m_editHasConfig = false;
 					m_editConfig = WidgetConfig();
+					m_editDisplayName.clear();
+					m_editIsAdvanced = false;
 				}
 			}
 		}
@@ -384,6 +440,9 @@ namespace ImGuiVisualizers {
 				for (size_t i = 0; i < m_memberNames.size(); ++i) {
 					bool sel = (static_cast<int>(i) == m_selectedMemberIndex);
 					if (ImGui::Selectable(m_memberNames[i].c_str(), sel)) {
+						// Persist any pending edits for the previously selected member
+						// before loading the new selection, so changes aren't silently lost.
+						ApplySelectedMemberMapping();
 						m_selectedMemberIndex = static_cast<int>(i);
 						LoadSelectedMemberMapping();
 					}
@@ -418,6 +477,21 @@ namespace ImGuiVisualizers {
 						}
 					}
 
+					// Display name
+					{
+						char displayBuf[256] = { 0 };
+						if (!m_editDisplayName.empty()) {
+							strncpy_s(displayBuf, sizeof(displayBuf), m_editDisplayName.c_str(), sizeof(displayBuf) - 1);
+							displayBuf[sizeof(displayBuf) - 1] = '\0';
+						}
+						if (ImGui::InputText("Display Name", displayBuf, sizeof(displayBuf))) {
+							m_editDisplayName = std::string(displayBuf);
+						}
+					}
+
+					// Advanced flag
+					ImGui::Checkbox("Is Advanced", &m_editIsAdvanced);
+
 					// Config toggle for types that support config
 					if (m_editWidgetType == EditorWidgetType::Slider ||
 						m_editWidgetType == EditorWidgetType::Dropdown ||
@@ -442,7 +516,7 @@ namespace ImGuiVisualizers {
 										if (i) joined += ",";
 										joined += m_editConfig.dropdownOptions[i];
 									}
-									strncpy(optionsBuf, joined.c_str(), sizeof(optionsBuf) - 1);
+									strncpy_s(optionsBuf, joined.c_str(), sizeof(optionsBuf) - 1);
 									optionsBuf[sizeof(optionsBuf) - 1] = '\0';
 								}
 								ImGui::InputTextMultiline("Options (comma separated)", optionsBuf, sizeof(optionsBuf), ImVec2(-1, 80));
@@ -468,17 +542,17 @@ namespace ImGuiVisualizers {
 							}
 
 							// File picker filter
-							if (m_editWidgetType == EditorWidgetType::FilePicker) 
+							if (m_editWidgetType == EditorWidgetType::FilePicker)
 							{
 								char buf[256];
-								strncpy(buf, m_editConfig.fileFilter.c_str(), sizeof(buf) - 1);
+								strncpy_s(buf, sizeof(buf), m_editConfig.fileFilter.c_str(), sizeof(buf) - 1);
 								buf[sizeof(buf) - 1] = '\0';
 								if (ImGui::InputText("File Filter", buf, sizeof(buf))) {
 									m_editConfig.fileFilter = std::string(buf);
 								}
 
 								char folderBuffer[256];
-								strncpy(folderBuffer, m_editConfig.defaultFolder.c_str(), sizeof(folderBuffer) - 1);
+								strncpy_s(folderBuffer, sizeof(folderBuffer), m_editConfig.defaultFolder.c_str(), sizeof(folderBuffer) - 1);
 								buf[sizeof(folderBuffer) - 1] = '\0';
 								if (ImGui::InputText("Default Folder", folderBuffer, sizeof(folderBuffer))) {
 									m_editConfig.defaultFolder = std::string(folderBuffer);
@@ -504,6 +578,8 @@ namespace ImGuiVisualizers {
 						m_editWidgetType = EditorWidgetType::Default;
 						m_editHasConfig = false;
 						m_editConfig = WidgetConfig();
+						m_editDisplayName.clear();
+						m_editIsAdvanced = false;
 					}
 				}
 				ImGui::EndChild();

@@ -9,40 +9,33 @@
 
 namespace ImGuiVisualizers {
 
-    class PropertyWidgetMapRegistry : public CReflectedBase
-    {
-    public:        
-        REFL_DECLARE_OBJECT(PropertyWidgetMapRegistry, CReflectedBase);
-        PropertyWidgetMapRegistry();
+	class PropertyWidgetMapRegistry : public CReflectedBase
+	{
+	public:
+		REFL_DECLARE_OBJECT(PropertyWidgetMapRegistry, CReflectedBase);
+		PropertyWidgetMapRegistry();
 
-        static PropertyWidgetMapRegistry& Instance();
+		static PropertyWidgetMapRegistry& Instance();
 
-        // Register a widget map for a reflected class name. Ownership is held by the registry.
-        void Register(const std::string& className, std::shared_ptr<PropertyWidgetMap> map);
+		void Register(const std::string& className, std::shared_ptr<PropertyWidgetMap> map);
+		std::shared_ptr<PropertyWidgetMap> Get(const std::string& className) const;
+		void Unregister(const std::string& className);
+		std::string FindClassNameForMap(const PropertyWidgetMap* map) const;
 
-        // Get the widget map for a class name, or nullptr if none registered.
-        std::shared_ptr<PropertyWidgetMap> Get(const std::string& className) const;
+	protected:
+		void OnLoaded() override;
 
-        // Unregister a widget map.
-        void Unregister(const std::string& className);
+	private:
+		~PropertyWidgetMapRegistry() = default;
+		PropertyWidgetMapRegistry(const PropertyWidgetMapRegistry&) = delete;
+		PropertyWidgetMapRegistry& operator=(const PropertyWidgetMapRegistry&) = delete;
 
-        // Find the class name associated with a given map pointer (by identity).
-        // Returns empty string if not found.
-        std::string FindClassNameForMap(const PropertyWidgetMap* map) const;
+		mutable std::mutex m_Mutex;
 
-    private:        
-        ~PropertyWidgetMapRegistry() = default;
-        PropertyWidgetMapRegistry(const PropertyWidgetMapRegistry&) = delete;
-        PropertyWidgetMapRegistry& operator=(const PropertyWidgetMapRegistry&) = delete;
+		std::vector<std::shared_ptr<PropertyWidgetMap>> m_ownedMaps;
 
-        mutable std::mutex m_Mutex;
-
-        // Ownership storage for registered maps (keeps them alive)
-        std::vector<std::shared_ptr<PropertyWidgetMap>> m_ownedMaps;
-
-        // Parallel vectors used for serialization / iteration
-        std::vector<std::unique_ptr<PropertyWidgetMap>> m_classWidgets;
-        std::vector<std::string> m_classNames; 
-    };
+		std::vector<std::unique_ptr<PropertyWidgetMap>> m_classWidgets;
+		std::vector<std::string> m_classNames;
+	};
 
 } // namespace ImGuiVisualizers

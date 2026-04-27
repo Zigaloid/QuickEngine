@@ -1,3 +1,4 @@
+#pragma once
 #include "imgui.h"
 #include "Reflection/ReflectionBase.h"
 #include "Reflection/ReflectionMap.h"
@@ -15,8 +16,8 @@
 namespace ImGuiVisualizers {
 
 	enum class PropertyDisplayMode {
-		FlatList,
-		Hierarchy
+		Basic,
+		Advanced,
 	};
 
 	class PropertyInspector
@@ -115,7 +116,12 @@ namespace ImGuiVisualizers {
 		void UpdateExpandedState(const std::string& nodeId, bool expanded);
 		const char* GetTypeDisplayName(RFL_Type type);
 		ImVec4 GetTypeColor(RFL_Type type);
+
+		// Display-name aware label helpers
 		void RenderPropertyLabel(const std::string& name, RFL_Type type);
+		void RenderPropertyLabel(const CPropertyBase& property, CReflectedBase* ownerObject);
+		std::string GetDisplayName(const CPropertyBase& property, CReflectedBase* ownerObject = nullptr) const;
+
 		void RenderNullPointer(const std::string& name);
 
 		// Validation helpers

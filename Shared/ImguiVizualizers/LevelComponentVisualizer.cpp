@@ -11,17 +11,39 @@ namespace ImGuiVisualizers {
 
 	bool LevelComponentVisualizer::AttachMeshFromPath(const std::string& levelPath)
 	{
-		ReleaseLevelComponent();
-
-		m_levelComp = dynamic_cast<CLevelComponent*>(GetEditor().GetObject());
-		m_levelComp->Initialize();
-
-		if (!m_levelComp)
+		// Get the object currently held by the editor first (may be the same instance we already have)
+		CLevelComponent* newLevel = dynamic_cast<CLevelComponent*>(GetEditor().GetObject());
+		if (!newLevel)
 		{
 			std::cerr << "LevelComponentVisualizer: Failed to cast loaded object to CLevelComponent" << std::endl;
 			return false;
 		}
 
+		// If the editor returned a different instance than our current one, release the old one.
+		// Do NOT call Shutdown() on the editor-owned instance (newLevel) — ReleaseLevelComponent()
+		// will only Shutdown the existing m_levelComp if it is different. This avoids destroying
+		// children on the editor's in-memory object when Save triggers a re-attach.
+		if (newLevel != m_levelComp)
+		{
+			ReleaseLevelComponent();
+			m_levelComp = newLevel;
+
+			// Initialize only if not already initialized
+			if (!m_levelComp->IsInitialized())
+			{
+				m_levelComp->Initialize();
+			}
+		}
+		else
+		{
+			// Same instance: clear selection/render state but do not Shutdown the component,
+			// which would clear its children.
+			m_selectionManager.ClearSelectables();
+			m_componentSelectables.clear();
+			// Re-register render callback below (keeps rendering / gizmo state consistent).
+		}
+
+		// Install render callback and register render components for the (re)attached level
 		Get3DView().SetRenderCallback([this](bgfx::ViewId viewId, BgfxRenderPrimitives& prims) {
 			if (!m_levelComp) return;
 			if (!m_levelComp->IsReady()) return;
@@ -353,17 +375,21 @@ namespace ImGuiVisualizers {
 		m_selectionManager.SetViewInfo(Get3DView().GetCamera(), m_viewportMin, m_viewportSize);
 
 		// Left-click inside the viewport (not a drag) → pick
-		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
-			!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+		// Camera movement is only applied when the Alt key is held
+		if (!ImGui::GetIO().KeyAlt)
 		{
-			const ImVec2 mouse = ImGui::GetMousePos();
-			const bool inViewport = mouse.x >= m_viewportMin.x &&
-				mouse.y >= m_viewportMin.y &&
-				mouse.x < m_viewportMin.x + m_viewportSize.x &&
-				mouse.y < m_viewportMin.y + m_viewportSize.y;
-			if (inViewport)
+			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
+				!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
 			{
-				m_selectionManager.PickAtCursor();
+				const ImVec2 mouse = ImGui::GetMousePos();
+				const bool inViewport = mouse.x >= m_viewportMin.x &&
+					mouse.y >= m_viewportMin.y &&
+					mouse.x < m_viewportMin.x + m_viewportSize.x &&
+					mouse.y < m_viewportMin.y + m_viewportSize.y;
+				if (inViewport)
+				{
+					m_selectionManager.PickAtCursor();
+				}
 			}
 		}
 
@@ -376,12 +402,7 @@ namespace ImGuiVisualizers {
 
 		// Inspector on the right
 		ImGui::BeginChild("##RightInspector", ImVec2(rightW, 0), false);
-		if (!m_editor.IsLoaded()) {
-			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No level loaded");
-		}
-		else {
-			m_editor.RenderInspectorInline();
-		}
+		RenderInspectorPanel();
 		ImGui::EndChild();
 
 		ImGui::EndChild(); // ContentArea
@@ -482,6 +503,42 @@ namespace ImGuiVisualizers {
 				}
 			}
 			ImGui::EndDragDropTarget();
+		}
+	}
+
+	void LevelComponentVisualizer::RenderInspectorPanel()
+	{
+		if (!m_editor.IsLoaded())
+		{
+			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No level loaded");
+			return;
+		}
+
+		// Sync the property inspector to the most-recently selected object.
+		const auto& lastSelected = m_selectionManager.GetSelected();
+		CReflectedBase* owner = lastSelected ? lastSelected->GetOwner() : nullptr;
+		if (owner != m_propertyInspector.GetObject())
+			m_propertyInspector.SetObject(owner);
+
+		if (ImGui::BeginTabBar("##InspectorTabs"))
+		{
+
+			if (ImGui::BeginTabItem("Properties"))
+			{
+				if (owner)
+					m_propertyInspector.RenderContent();
+				else
+					ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "No object selected");
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("Object"))
+			{
+				m_editor.RenderInspectorInline();
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
 		}
 	}
 

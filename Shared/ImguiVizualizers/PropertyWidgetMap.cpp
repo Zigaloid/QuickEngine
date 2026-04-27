@@ -22,6 +22,8 @@ namespace ImGuiVisualizers {
 
         REFL_DEFINE_OBJECT(WidgetEntry)
         REFL_DEFINE_INT_MEMBER(WidgetEntry, type),
+        REFL_DEFINE_STRING_MEMBER(WidgetEntry, displayName),
+        REFL_DEFINE_BOOL_MEMBER(WidgetEntry, isAdvanced),                
         REFL_DEFINE_BOOL_MEMBER(WidgetEntry, hasConfig),
         REFL_DEFINE_OBJECT_MEMBER(WidgetEntry, config)
         REFL_DEFINE_END
@@ -39,6 +41,8 @@ namespace ImGuiVisualizers {
             }
             auto newEntry = std::make_unique<WidgetEntry>();
             newEntry->type = e->type;
+            newEntry->displayName = e->displayName;
+            newEntry->isAdvanced = e->isAdvanced;
             newEntry->hasConfig = e->hasConfig;
             newEntry->config = e->config; // WidgetConfig is copyable
             copy->m_MemberWidgets.push_back(std::move(newEntry));
@@ -145,6 +149,112 @@ namespace ImGuiVisualizers {
         }
 
         return nullptr;
+    }
+
+    // Return the locally-configured display name for a member, or empty string if none.
+    std::string PropertyWidgetMap::GetEntryDisplayNameLocal(const std::string& memberName) const
+    {
+        int idx = FindIndex(memberName);
+        if (idx >= 0 && m_MemberWidgets[idx]) {
+            return m_MemberWidgets[idx]->displayName;
+        }
+        return std::string();
+    }
+
+    std::string PropertyWidgetMap::GetEntryDisplayName(const std::string& memberName) const
+    {
+        // Prefer a locally-set display name, even if it is empty — an explicit
+        // empty string means "no override", so only skip it when the entry is absent.
+        int idx = FindIndex(memberName);
+        if (idx >= 0 && m_MemberWidgets[idx] && !m_MemberWidgets[idx]->displayName.empty()) {
+            return m_MemberWidgets[idx]->displayName;
+        }
+
+        std::string ownerClass = PropertyWidgetMapRegistry::Instance().FindClassNameForMap(this);
+        if (ownerClass.empty()) return std::string();
+
+        EditorWidgetType tmpType = EditorWidgetType::Default;
+        std::string origin;
+        if (FindWidgetInHierarchy(ownerClass, memberName, tmpType, nullptr, &origin)) {
+            auto originMap = PropertyWidgetMapRegistry::Instance().Get(origin);
+            if (originMap) {
+                return originMap->GetEntryDisplayNameLocal(memberName);
+            }
+        }
+        return std::string();
+    }
+
+    // Return the locally-configured isAdvanced flag for a member, or false if none.
+    bool PropertyWidgetMap::GetEntryIsAdvancedLocal(const std::string& memberName) const
+    {
+        int idx = FindIndex(memberName);
+        if (idx >= 0 && m_MemberWidgets[idx]) {
+            return m_MemberWidgets[idx]->isAdvanced;
+        }
+        return false;
+    }
+
+    bool PropertyWidgetMap::GetEntryIsAdvanced(const std::string& memberName) const
+    {
+        // A local false could mean "explicitly not advanced" or "not set".
+        // Only treat it as authoritative when the entry itself exists locally.
+        int idx = FindIndex(memberName);
+        if (idx >= 0 && m_MemberWidgets[idx]) {
+            return m_MemberWidgets[idx]->isAdvanced;
+        }
+
+        std::string ownerClass = PropertyWidgetMapRegistry::Instance().FindClassNameForMap(this);
+        if (ownerClass.empty()) return false;
+
+        EditorWidgetType tmpType = EditorWidgetType::Default;
+        std::string origin;
+        if (FindWidgetInHierarchy(ownerClass, memberName, tmpType, nullptr, &origin)) {
+            auto originMap = PropertyWidgetMapRegistry::Instance().Get(origin);
+            if (originMap) {
+                return originMap->GetEntryIsAdvancedLocal(memberName);
+            }
+        }
+        return false;
+    }
+
+    // New overloads for setting displayName/isAdvanced
+    void PropertyWidgetMap::SetWidget(const std::string& memberName, EditorWidgetType widgetType, const std::string& displayName, bool isAdvanced)
+    {
+        int idx = FindIndex(memberName);
+        if (idx >= 0) {
+            m_MemberWidgets[idx]->type = widgetType;
+            m_MemberWidgets[idx]->hasConfig = false;
+            m_MemberWidgets[idx]->displayName = displayName;
+            m_MemberWidgets[idx]->isAdvanced = isAdvanced;
+            return;
+        }
+        m_MemberNames.push_back(memberName);
+        auto entry = std::make_unique<WidgetEntry>();
+        entry->type = widgetType;
+        entry->displayName = displayName;
+        entry->isAdvanced = isAdvanced;
+        m_MemberWidgets.push_back(std::move(entry));
+    }
+
+    void PropertyWidgetMap::SetWidget(const std::string& memberName, EditorWidgetType widgetType, const WidgetConfig& config, const std::string& displayName, bool isAdvanced)
+    {
+        int idx = FindIndex(memberName);
+        if (idx >= 0) {
+            m_MemberWidgets[idx]->type = widgetType;
+            m_MemberWidgets[idx]->config = config;
+            m_MemberWidgets[idx]->hasConfig = true;
+            m_MemberWidgets[idx]->displayName = displayName;
+            m_MemberWidgets[idx]->isAdvanced = isAdvanced;
+            return;
+        }
+        m_MemberNames.push_back(memberName);
+        auto entry = std::make_unique<WidgetEntry>();
+        entry->type = widgetType;
+        entry->config = config;
+        entry->hasConfig = true;
+        entry->displayName = displayName;
+        entry->isAdvanced = isAdvanced;
+        m_MemberWidgets.push_back(std::move(entry));
     }
 
 } // namespace ImGuiVisualizers

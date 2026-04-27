@@ -26,7 +26,7 @@
 #include <commdlg.h>
 #endif
 
-namespace ImGuiVisualizers 
+namespace ImGuiVisualizers
 {
 	// ═════════════════════════════════════════════════════════════════════════════
 	// PropertyInspector
@@ -40,7 +40,7 @@ namespace ImGuiVisualizers
 	static const ImVec4 COLOR_TYPE_COMPONENT = ImVec4(0.9f, 0.7f, 0.9f, 1.0f);
 
 	// helper that sets next item width to the available content region on the current line
-	static void SetNextItemWidthToContentRegionAvail( float scaler = 0.75f)
+	static void SetNextItemWidthToContentRegionAvail(float scaler = 0.75f)
 	{
 		float avail = ImGui::GetContentRegionAvail().x;
 		if (avail <= 0.0f) {
@@ -48,7 +48,7 @@ namespace ImGuiVisualizers
 			float winWidth = ImGui::GetWindowWidth();
 			float cursorX = ImGui::GetCursorPosX();
 			const ImGuiStyle& style = ImGui::GetStyle();
-			avail = winWidth - cursorX - style.ItemSpacing.x * 2.0f;			
+			avail = winWidth - cursorX - style.ItemSpacing.x * 2.0f;
 			if (avail < 0.0f) avail = 0.0f;
 		}
 		avail = avail * scaler;
@@ -82,7 +82,7 @@ namespace ImGuiVisualizers
 		, m_readOnly(false)
 		, m_showInternalData(true)
 		, m_expandByDefault(true)
-		, m_displayMode(PropertyDisplayMode::Hierarchy)
+		, m_displayMode(PropertyDisplayMode::Basic)
 		, m_firstRender(true)
 		, m_floatBuffer(0.0f)
 		, m_intBuffer(0)
@@ -110,6 +110,13 @@ namespace ImGuiVisualizers
 		if (ImGui::Button("Clear")) {
 			ClearObject();
 		}
+		// Display mode selection
+		ImGui::SameLine();
+		if (ImGui::Button(m_displayMode == PropertyDisplayMode::Advanced ? "Basic View" : "Advanced View")) {
+			m_displayMode = (m_displayMode == PropertyDisplayMode::Advanced) ?
+				PropertyDisplayMode::Basic : PropertyDisplayMode::Advanced;
+		}
+
 		ImGui::SameLine();
 		ImGui::Checkbox("Read Only", &m_readOnly);
 		ImGui::SameLine();
@@ -117,31 +124,21 @@ namespace ImGuiVisualizers
 		ImGui::SameLine();
 		ImGui::Checkbox("Expand by Default", &m_expandByDefault);
 
-		// Display mode selection
-		ImGui::SameLine();
-		if (ImGui::Button(m_displayMode == PropertyDisplayMode::Hierarchy ? "Hierarchy" : "Flat List")) {
-			m_displayMode = (m_displayMode == PropertyDisplayMode::Hierarchy) ?
-				PropertyDisplayMode::FlatList : PropertyDisplayMode::Hierarchy;
-		}
 
 		ImGui::Separator();
 
 		// Content
 		if (m_object) {
-			ImGui::Text("Object: %s", m_object->GetRflClassName() ? m_object->GetRflClassName() : "Unknown");
-			ImGui::Text("Address: %p", m_object);
-			ImGui::Separator();
-
 			RenderObjectProperties(m_object, m_object->GetRflClassName() ? m_object->GetRflClassName() : "Root");
 		}
 		else {
-				ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No object selected");
-			}
+			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No object selected");
+		}
 
-			// Process any pending component deletions after rendering
-			ProcessPendingDeletions();
+		// Process any pending component deletions after rendering
+		ProcessPendingDeletions();
 
-			m_firstRender = false;
+		m_firstRender = false;
 	}
 
 	void PropertyInspector::SetObject(CReflectedBase* object)
@@ -181,7 +178,7 @@ namespace ImGuiVisualizers
 			return;
 		}
 
-		if (m_displayMode == PropertyDisplayMode::FlatList) {
+		if (m_displayMode == PropertyDisplayMode::Basic) {
 			RenderObjectPropertiesFlat(object);
 		}
 		else {
@@ -207,13 +204,6 @@ namespace ImGuiVisualizers
 
 			if (!reflectionMap || reflectionMap->empty()) {
 				continue;
-			}
-
-			// Add a subtle header for the class name in flat mode
-			if (className) {
-				ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.8f, 0.8f, 0.8f, 0.7f));
-				ImGui::Text("// %s", className);
-				ImGui::PopStyleColor();
 			}
 
 			// Render each property
@@ -314,6 +304,13 @@ namespace ImGuiVisualizers
 			return;
 		}
 
+
+		// If in Basic display mode, skip properties that are locally marked as "advanced" in the widget map.
+		// Uses the local-only query so inherited mappings do not affect this basic/advanced toggle.
+		if (m_displayMode == PropertyDisplayMode::Basic && m_widgetMap && m_widgetMap->GetEntryIsAdvanced(property.GetName())) {
+			return;
+		}
+
 		// Check widget map for a custom widget override
 		if (m_widgetMap && m_widgetMap->HasCustomWidget(property.GetName())) {
 			EditorWidgetType widgetType = m_widgetMap->GetWidget(property.GetName());
@@ -381,30 +378,72 @@ namespace ImGuiVisualizers
 		}
 	}
 
+	// New helper: resolve display name from widget config (map or hierarchy). Falls back to actual member name.
+	std::string PropertyInspector::GetDisplayName(const CPropertyBase& property, CReflectedBase* ownerObject) const
+	{
+		// Local map override (widget map currently set for the parent / context)
+		if (m_widgetMap) {
+			std::string localName = m_widgetMap->GetEntryDisplayNameLocal(property.GetName());
+			if (!localName.empty()) return localName;
+		}
+
+		// Try to find an inherited mapping in the registry/hierarchy for the owner object's class.
+		if (ownerObject) {
+			const char* className = ownerObject->GetRflClassName();
+			if (className && className[0] != '\0') {
+				EditorWidgetType tmpType;
+				WidgetConfig tmpCfg;
+				std::string originClass;
+				if (PropertyWidgetMap::FindWidgetInHierarchy(className, property.GetName(), tmpType, &tmpCfg, &originClass)) {
+					if (!originClass.empty()) {
+						auto originMap = PropertyWidgetMapRegistry::Instance().Get(originClass);
+						if (originMap) {
+							std::string inheritedName = originMap->GetEntryDisplayName(property.GetName());
+							if (!inheritedName.empty()) return inheritedName;
+						}
+					}
+				}
+			}
+		}
+
+		// Fallback to the actual member name
+		return property.GetName();
+	}
+
+	// Render property label using resolved display name
+	void PropertyInspector::RenderPropertyLabel(const CPropertyBase& property, CReflectedBase* ownerObject)
+	{
+		std::string display = GetDisplayName(property, ownerObject);
+		ImGui::TextColored(GetTypeColor(property.GetType()), "%s", display.c_str());
+		ImGui::SameLine();
+		ImGui::Text(":");
+		ImGui::SameLine();
+	}
+
 	void PropertyInspector::RenderFloatProperty(const CPropertyBase& property, CReflectedBase* object)
 	{
-    float* value = reinterpret_cast<float*>(property.GetAddress(object));
+		float* value = reinterpret_cast<float*>(property.GetAddress(object));
 
-    RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
-    if (m_readOnly) {
-        ImGui::Text("%.3f", *value);
-    }
-    else {
-        ImGui::PushID(property.GetName().c_str());
-        SetNextItemWidthToContentRegionAvail();
-        if (ImGui::InputFloat("", value, 0.0f, 0.0f, "%.3f")) {
-            // changed
-        }
-        ImGui::PopID();
-    }
-}
+		if (m_readOnly) {
+			ImGui::Text("%.3f", *value);
+		}
+		else {
+			ImGui::PushID(property.GetName().c_str());
+			SetNextItemWidthToContentRegionAvail();
+			if (ImGui::InputFloat("", value, 0.0f, 0.0f, "%.3f")) {
+				// changed
+			}
+			ImGui::PopID();
+		}
+	}
 
 	void PropertyInspector::RenderIntProperty(const CPropertyBase& property, CReflectedBase* object)
 	{
 		int* value = reinterpret_cast<int*>(property.GetAddress(object));
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("%d", *value);
@@ -420,7 +459,7 @@ namespace ImGuiVisualizers
 	{
 		std::string* value = reinterpret_cast<std::string*>(property.GetAddress(object));
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("\"%s\"", value->c_str());
@@ -448,7 +487,7 @@ namespace ImGuiVisualizers
 	{
 		bool* value = reinterpret_cast<bool*>(property.GetAddress(object));
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("%s", *value ? "true" : "false");
@@ -464,7 +503,7 @@ namespace ImGuiVisualizers
 	{
 		Vector3f* value = reinterpret_cast<Vector3f*>(property.GetAddress(object));
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("(%.3f, %.3f, %.3f)", value->getX(), value->getY(), value->getZ());
@@ -486,7 +525,7 @@ namespace ImGuiVisualizers
 	{
 		Vector4f* value = reinterpret_cast<Vector4f*>(property.GetAddress(object));
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("(%.3f, %.3f, %.3f, %.3f)", value->getX(), value->getY(), value->getZ(), value->getW());
@@ -511,7 +550,10 @@ namespace ImGuiVisualizers
 		const std::string nodeId = GenerateTreeNodeId(property.GetName(), value);
 		bool expanded = ShouldExpandNode(nodeId);
 
-		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
+		// Use display name for the visible label, but keep nodeId tied to actual member name/address
+		std::string display = GetDisplayName(property, object);
+
+		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", display.c_str())) {
 			UpdateExpandedState(nodeId, true);
 
 			ImGui::SameLine();
@@ -561,7 +603,10 @@ namespace ImGuiVisualizers
 		const std::string nodeId = GenerateTreeNodeId(property.GetName(), idSource);
 		bool expanded = ShouldExpandNode(nodeId);
 
-		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
+		// Resolve visible label from widget config for the parent-owner (m_widgetMap should point to parent map here)
+		std::string display = GetDisplayName(property, nullptr);
+
+		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", display.c_str())) {
 			UpdateExpandedState(nodeId, true);
 
 			ImGui::SameLine();
@@ -616,7 +661,7 @@ namespace ImGuiVisualizers
 		}
 
 		CReflectedBase* subObject = reinterpret_cast<CReflectedBase*>(addr);
-		RenderReflectedObjectCommon(property, subObject, subObject, "[Object]", true, "Embedded object");
+		RenderReflectedObjectCommon(property, subObject, subObject, "[Object]", false, "Embedded object");
 	}
 
 	void PropertyInspector::RenderObjectPtrProperty(const CPropertyBase& property, CReflectedBase* object)
@@ -636,10 +681,12 @@ namespace ImGuiVisualizers
 		const std::string nodeId = GenerateTreeNodeId(property.GetName(), objectVector);
 		bool expanded = ShouldExpandNode(nodeId);
 
+		std::string display = GetDisplayName(property, object);
+
 		// persistent selection per-property
 		static std::unordered_map<std::string, int> s_objectSelection;
 
-		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
+		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", display.c_str())) {
 			UpdateExpandedState(nodeId, true);
 
 			// Context menu for creating objects (right-click on header)
@@ -662,7 +709,7 @@ namespace ImGuiVisualizers
 					}
 					ImGui::PopID();
 				}
-				else 
+				else
 				{
 					RenderVecAddRemoveButtons(property.GetName() + "##vec_buttons", m_readOnly,
 						[&]() {
@@ -694,7 +741,8 @@ namespace ImGuiVisualizers
 				}
 			}
 
-			ImGui::Text("Size: %zu", objectVector->size());
+			if (objectVector->size())
+				ImGui::Text("Size: %zu", objectVector->size());
 
 			for (size_t i = 0; i < objectVector->size(); ++i) {
 				const std::string elementName = "[" + std::to_string(i) + "]";
@@ -763,7 +811,6 @@ namespace ImGuiVisualizers
 							}
 						});
 					ImGui::SameLine();
-
 					const char* preview = classNames[std::min(selIdx, static_cast<int>(classNames.size() - 1))].c_str();
 					std::string comboId = property.GetName() + "##class_combo_collapsed";
 					SetNextItemWidthToContentRegionAvail();
@@ -792,7 +839,9 @@ namespace ImGuiVisualizers
 		const std::string nodeId = GenerateTreeNodeId(property.GetName(), idSource);
 		bool expanded = ShouldExpandNode(nodeId);
 
-		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
+		std::string display = GetDisplayName(property, nullptr);
+
+		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", display.c_str())) {
 			UpdateExpandedState(nodeId, true);
 
 			ImGui::SameLine();
@@ -852,7 +901,9 @@ namespace ImGuiVisualizers
 		// persistent selection per-property
 		static std::unordered_map<std::string, int> s_componentSelection;
 
-		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
+		std::string display = GetDisplayName(property, object);
+
+		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", display.c_str())) {
 			UpdateExpandedState(nodeId, true);
 
 			// Right-click context menu for adding components (must be called right after TreeNodeEx)
@@ -908,7 +959,8 @@ namespace ImGuiVisualizers
 				}
 			}
 
-			ImGui::Text("Size: %zu", componentVector->size());
+			if(componentVector->size())
+				ImGui::Text("Size: %zu", componentVector->size());
 
 			for (size_t i = 0; i < componentVector->size(); ++i) {
 				const std::string elementName = "[" + std::to_string(i) + "]";
@@ -1203,10 +1255,10 @@ namespace ImGuiVisualizers
 
 
 
-// ═════════════════════════════════════════════════════════════════════════════
-	// ════════════════════════════════════════════════════════════════════════════
-	// Widget-specific rendering methods
-	// ════════════════════════════════════════════════════════════════════════════
+	// ═════════════════════════════════════════════════════════════════════════════
+		// ════════════════════════════════════════════════════════════════════════════
+		// Widget-specific rendering methods
+		// ════════════════════════════════════════════════════════════════════════════
 
 	bool PropertyInspector::RenderWithCustomWidget(const CPropertyBase& property, CReflectedBase* object, EditorWidgetType widgetType)
 	{
@@ -1284,7 +1336,7 @@ namespace ImGuiVisualizers
 		float minVal = config ? config->minValue : 0.0f;
 		float maxVal = config ? config->maxValue : 1.0f;
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("%.3f", *value);
@@ -1302,7 +1354,7 @@ namespace ImGuiVisualizers
 		int minVal = config ? static_cast<int>(config->minValue) : 0;
 		int maxVal = config ? static_cast<int>(config->maxValue) : 100;
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("%d", *value);
@@ -1321,7 +1373,7 @@ namespace ImGuiVisualizers
 		float minVal = config ? config->minValue : -FLT_MAX;
 		float maxVal = config ? config->maxValue : FLT_MAX;
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("%.3f", *value);
@@ -1340,7 +1392,7 @@ namespace ImGuiVisualizers
 		int minVal = config ? static_cast<int>(config->minValue) : INT_MIN;
 		int maxVal = config ? static_cast<int>(config->maxValue) : INT_MAX;
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::Text("%d", *value);
@@ -1357,7 +1409,7 @@ namespace ImGuiVisualizers
 		Vector3f* value = reinterpret_cast<Vector3f*>(property.GetAddress(object));
 		float col[3] = { value->getX(), value->getY(), value->getZ() };
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::ColorButton("##preview", ImVec4(col[0], col[1], col[2], 1.0f));
@@ -1380,7 +1432,7 @@ namespace ImGuiVisualizers
 		Vector4f* value = reinterpret_cast<Vector4f*>(property.GetAddress(object));
 		float col[4] = { value->getX(), value->getY(), value->getZ(), value->getW() };
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::ColorButton("##preview", ImVec4(col[0], col[1], col[2], col[3]));
@@ -1401,7 +1453,7 @@ namespace ImGuiVisualizers
 
 	void PropertyInspector::RenderDropdown(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config)
 	{
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (!config || config->dropdownOptions.empty()) {
 			ImGui::TextColored(ImVec4(1.0f, 0.5f, 0.5f, 1.0f), "(no dropdown options configured)");
@@ -1467,7 +1519,7 @@ namespace ImGuiVisualizers
 	{
 		std::string* value = reinterpret_cast<std::string*>(property.GetAddress(object));
 
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		if (m_readOnly) {
 			ImGui::TextWrapped("%s", value->c_str());
@@ -1492,7 +1544,7 @@ namespace ImGuiVisualizers
 
 	void PropertyInspector::RenderReadOnlyProperty(const CPropertyBase& property, CReflectedBase* object)
 	{
-		RenderPropertyLabel(property.GetName(), property.GetType());
+		RenderPropertyLabel(property, object);
 
 		switch (property.GetType()) {
 		case RT_Float: {
@@ -1546,11 +1598,14 @@ namespace ImGuiVisualizers
 		const std::string nodeId = GenerateTreeNodeId(property.GetName(), vec);
 		bool expanded = ShouldExpandNode(nodeId);
 
-		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", property.GetName().c_str())) {
+		// Use display label for UI while keeping node id stable
+		std::string display = GetDisplayName(property, object);
+
+		if (ImGui::TreeNodeEx(nodeId.c_str(), expanded ? ImGuiTreeNodeFlags_DefaultOpen : 0, "%s", display.c_str())) {
 			UpdateExpandedState(nodeId, true);
 
 			ImGui::SameLine();
-			if( m_showDetails )
+			if (m_showDetails)
 				ImGui::TextColored(GetTypeColor(property.GetType()), "%s", vectorTag);
 
 			// Add / Remove controls (use the existing free function)
@@ -1574,8 +1629,12 @@ namespace ImGuiVisualizers
 					}
 				});
 
-			ImGui::SameLine();
-			ImGui::Text("Size: %zu", vec->size());
+			
+			if (vec->size())
+			{
+				ImGui::SameLine();
+				ImGui::Text("Size: %zu", vec->size());
+			}
 
 			for (size_t i = 0; i < vec->size(); ++i) {
 				ImGui::PushID(static_cast<int>(i));
@@ -1615,8 +1674,12 @@ namespace ImGuiVisualizers
 						vec->pop_back();
 					}
 				});
-			ImGui::SameLine();
-			ImGui::Text("Size: %zu", vec->size());
+
+			if (vec->size())
+			{
+				ImGui::SameLine();
+				ImGui::Text("Size: %zu", vec->size());
+			}
 		}
 	}
 
@@ -1767,191 +1830,191 @@ namespace ImGuiVisualizers
 
 	// Implement component add/remove and item-context helpers
 
-void PropertyInspector::RenderComponentItemContextMenu(const CPropertyBase& property, CReflectedBase* object, size_t index)
-{
-	// Skip if read-only
-	if (m_readOnly) {
-		return;
-	}
-
-	ImGui::PushID(static_cast<int>(index));
-
-	if (ImGui::BeginPopupContextItem("##ComponentItemCtx")) {
-		if (ImGui::MenuItem("Delete Component")) {
-			// Defer deletion to avoid modifying vector during iteration
-			m_PendingDeletions.push_back({ &property, object, index });
-		}
-		ImGui::EndPopup();
-	}
-
-	ImGui::PopID();
-}
-
-bool PropertyInspector::AddComponentToArray(const CPropertyBase& property, CReflectedBase* object, const std::string& componentClassName)
-{
-	std::vector<ComponentSystem::Component*>* componentVector =
-		reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
-
-	if (!componentVector) {
-		return false;
-	}
-
-	// Create the component using ClassFactory
-	CReflectedBase* newObject = ClassFactory::CreateObject(componentClassName.c_str());
-	if (!newObject) {
-		return false;
-	}
-
-	// Ensure it's actually a Component
-	ComponentSystem::Component* newComponent = dynamic_cast<ComponentSystem::Component*>(newObject);
-	if (!newComponent) {
-		delete newObject;
-		return false;
-	}
-
-	// Add to the vector
-	componentVector->push_back(newComponent);
-
-	return true;
-}
-
-bool PropertyInspector::RemoveComponentFromArray(const CPropertyBase& property, CReflectedBase* object, size_t index)
-{
-	std::vector<ComponentSystem::Component*>* componentVector =
-		reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
-
-	// Validate index
-	if (!componentVector || index >= componentVector->size()) {
-		return false;
-	}
-
-	// Get the component to delete
-	ComponentSystem::Component* componentToDelete = (*componentVector)[index];
-
-	// Remove from vector
-	componentVector->erase(componentVector->begin() + index);
-
-	// Delete the component object
-	if (componentToDelete) {
-	 delete componentToDelete;
-	}
-
-	return true;
-}
-
-void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config)
-{
-	std::string* value = reinterpret_cast<std::string*>(property.GetAddress(object));
-
-	RenderPropertyLabel(property.GetName(), property.GetType());
-
-	if (m_readOnly) {
-		ImGui::Text("%s", value->c_str());
-		return;
-	}
-
-	// Use per-property edit buffer (same approach as other string widgets)
-	void* propAddr = property.GetAddress(object);
-	StringEditBuffer& buf = m_StringBuffers[propAddr];
-
-	if (!buf.m_isBeingEdited) {
-		strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
-		buf.data[sizeof(buf.data) - 1] = '\0';
-	}
-
-	ImGui::PushID(property.GetName().c_str());
-
-	// Text input
-	SetNextItemWidthToContentRegionAvail();
-
-	if (ImGui::InputText("", buf.data, sizeof(buf.data))) {
-		*value = buf.data;
-	}
-
-	ImGui::SameLine();
-
-	// Browse button - opens native dialog on Windows
-	if (ImGui::Button("...")) {
-#ifdef _WIN32
-		// Build filter buffer. WidgetConfig::fileFilter is expected as semicolon-separated patterns like "*.png;*.jpg"
-		std::vector<char> filterBuf;
-		auto appendNullTerm = [&](const std::string& s) {
-			filterBuf.insert(filterBuf.end(), s.begin(), s.end());
-			filterBuf.push_back('\0');
-			};
-
-		if (config && !config->fileFilter.empty()) {
-			appendNullTerm("Files");
-			appendNullTerm(config->fileFilter);
-			appendNullTerm("All Files");
-			appendNullTerm("*.*");
-			filterBuf.push_back('\0'); // final double-null terminator
-		}
-		else {
-			const char def[] = "All Files\0*.*\0\0";
-			filterBuf.assign(def, def + sizeof(def));
+	void PropertyInspector::RenderComponentItemContextMenu(const CPropertyBase& property, CReflectedBase* object, size_t index)
+	{
+		// Skip if read-only
+		if (m_readOnly) {
+			return;
 		}
 
-		char filePath[MAX_PATH] = { 0 };
-		OPENFILENAMEA ofn = {};
-		ofn.lStructSize = sizeof(ofn);
-		ofn.hwndOwner = nullptr; // no owner
-		ofn.lpstrFile = filePath;
-		ofn.nMaxFile = MAX_PATH;
-		ofn.lpstrFilter = filterBuf.data();
-		ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+		ImGui::PushID(static_cast<int>(index));
 
-		// Build initial directory: <current working dir>\assets\ + optional WidgetConfig.defaultFolder
-		char initialDirBuf[MAX_PATH] = { 0 };
-		DWORD got = GetCurrentDirectoryA(MAX_PATH, initialDirBuf);
-		std::string initDir;
-		if (got != 0) {
-			initDir = std::string(initialDirBuf);
-		}
-		else {
-			initDir = std::string("."); // fallback
+		if (ImGui::BeginPopupContextItem("##ComponentItemCtx")) {
+			if (ImGui::MenuItem("Delete Component")) {
+				// Defer deletion to avoid modifying vector during iteration
+				m_PendingDeletions.push_back({ &property, object, index });
+			}
+			ImGui::EndPopup();
 		}
 
-		// Normalize trailing slash and append assets
-		if (!initDir.empty() && (initDir.back() == '\\' || initDir.back() == '/')) {
-			initDir.pop_back();
-		}
-		initDir += "\\assets\\";
+		ImGui::PopID();
+	}
 
-		// Append widget-config default folder if provided (strip any leading slashes)
-		if (config && !config->defaultFolder.empty()) {
-			std::string df = config->defaultFolder;
-			while (!df.empty() && (df.front() == '\\' || df.front() == '/')) df.erase(df.begin());
-			// Don't add an extra backslash if defaultFolder already contains it at end
-			initDir += df;
+	bool PropertyInspector::AddComponentToArray(const CPropertyBase& property, CReflectedBase* object, const std::string& componentClassName)
+	{
+		std::vector<ComponentSystem::Component*>* componentVector =
+			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
+
+		if (!componentVector) {
+			return false;
 		}
 
-		// Copy into buffer for OPENFILENAME
-		strcpy_s(initialDirBuf, sizeof(initialDirBuf), initDir.c_str());
-		ofn.lpstrInitialDir = initialDirBuf;
+		// Create the component using ClassFactory
+		CReflectedBase* newObject = ClassFactory::CreateObject(componentClassName.c_str());
+		if (!newObject) {
+			return false;
+		}
 
-		if (GetOpenFileNameA(&ofn)) 
-		{
-            // Strip the path to be relative to the project directory.
-            std::string  fixedFilePath = filePath;			
-			pathSanitize(fixedFilePath);
-			fixedFilePath.erase(0, fixedFilePath.find("assets/"));
-            fixedFilePath = "./" + fixedFilePath; // ensure it starts with ./			
-			
-			*value = fixedFilePath;
+		// Ensure it's actually a Component
+		ComponentSystem::Component* newComponent = dynamic_cast<ComponentSystem::Component*>(newObject);
+		if (!newComponent) {
+			delete newObject;
+			return false;
+		}
+
+		// Add to the vector
+		componentVector->push_back(newComponent);
+
+		return true;
+	}
+
+	bool PropertyInspector::RemoveComponentFromArray(const CPropertyBase& property, CReflectedBase* object, size_t index)
+	{
+		std::vector<ComponentSystem::Component*>* componentVector =
+			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
+
+		// Validate index
+		if (!componentVector || index >= componentVector->size()) {
+			return false;
+		}
+
+		// Get the component to delete
+		ComponentSystem::Component* componentToDelete = (*componentVector)[index];
+
+		// Remove from vector
+		componentVector->erase(componentVector->begin() + index);
+
+		// Delete the component object
+		if (componentToDelete) {
+			delete componentToDelete;
+		}
+
+		return true;
+	}
+
+	void PropertyInspector::RenderFilePicker(const CPropertyBase& property, CReflectedBase* object, const WidgetConfig* config)
+	{
+		std::string* value = reinterpret_cast<std::string*>(property.GetAddress(object));
+
+		RenderPropertyLabel(property, object);
+
+		if (m_readOnly) {
+			ImGui::Text("%s", value->c_str());
+			return;
+		}
+
+		// Use per-property edit buffer (same approach as other string widgets)
+		void* propAddr = property.GetAddress(object);
+		StringEditBuffer& buf = m_StringBuffers[propAddr];
+
+		if (!buf.m_isBeingEdited) {
 			strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
 			buf.data[sizeof(buf.data) - 1] = '\0';
 		}
+
+		ImGui::PushID(property.GetName().c_str());
+
+		// Text input
+		SetNextItemWidthToContentRegionAvail();
+
+		if (ImGui::InputText("", buf.data, sizeof(buf.data))) {
+			*value = buf.data;
+		}
+
+		ImGui::SameLine();
+
+		// Browse button - opens native dialog on Windows
+		if (ImGui::Button("...")) {
+#ifdef _WIN32
+			// Build filter buffer. WidgetConfig::fileFilter is expected as semicolon-separated patterns like "*.png;*.jpg"
+			std::vector<char> filterBuf;
+			auto appendNullTerm = [&](const std::string& s) {
+				filterBuf.insert(filterBuf.end(), s.begin(), s.end());
+				filterBuf.push_back('\0');
+				};
+
+			if (config && !config->fileFilter.empty()) {
+				appendNullTerm("Files");
+				appendNullTerm(config->fileFilter);
+				appendNullTerm("All Files");
+				appendNullTerm("*.*");
+				filterBuf.push_back('\0'); // final double-null terminator
+			}
+			else {
+				const char def[] = "All Files\0*.*\0\0";
+				filterBuf.assign(def, def + sizeof(def));
+			}
+
+			char filePath[MAX_PATH] = { 0 };
+			OPENFILENAMEA ofn = {};
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = nullptr; // no owner
+			ofn.lpstrFile = filePath;
+			ofn.nMaxFile = MAX_PATH;
+			ofn.lpstrFilter = filterBuf.data();
+			ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
+
+			// Build initial directory: <current working dir>\assets\ + optional WidgetConfig.defaultFolder
+			char initialDirBuf[MAX_PATH] = { 0 };
+			DWORD got = GetCurrentDirectoryA(MAX_PATH, initialDirBuf);
+			std::string initDir;
+			if (got != 0) {
+				initDir = std::string(initialDirBuf);
+			}
+			else {
+				initDir = std::string("."); // fallback
+			}
+
+			// Normalize trailing slash and append assets
+			if (!initDir.empty() && (initDir.back() == '\\' || initDir.back() == '/')) {
+				initDir.pop_back();
+			}
+			initDir += "\\assets\\";
+
+			// Append widget-config default folder if provided (strip any leading slashes)
+			if (config && !config->defaultFolder.empty()) {
+				std::string df = config->defaultFolder;
+				while (!df.empty() && (df.front() == '\\' || df.front() == '/')) df.erase(df.begin());
+				// Don't add an extra backslash if defaultFolder already contains it at end
+				initDir += df;
+			}
+
+			// Copy into buffer for OPENFILENAME
+			strcpy_s(initialDirBuf, sizeof(initialDirBuf), initDir.c_str());
+			ofn.lpstrInitialDir = initialDirBuf;
+
+			if (GetOpenFileNameA(&ofn))
+			{
+				// Strip the path to be relative to the project directory.
+				std::string  fixedFilePath = filePath;
+				pathSanitize(fixedFilePath);
+				fixedFilePath.erase(0, fixedFilePath.find("assets/"));
+				fixedFilePath = "./" + fixedFilePath; // ensure it starts with ./			
+
+				*value = fixedFilePath;
+				strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
+				buf.data[sizeof(buf.data) - 1] = '\0';
+			}
 #else
-		// Non-Windows: no native dialog implemented here. You can hook into the project's AssetBrowser or implement a platform file dialog.
-		// For now the user can paste a path into the input box.
+			// Non-Windows: no native dialog implemented here. You can hook into the project's AssetBrowser or implement a platform file dialog.
+			// For now the user can paste a path into the input box.
 #endif
+		}
+
+		// Track whether the text input is active
+		buf.m_isBeingEdited = ImGui::IsItemActive();
+
+		ImGui::PopID();
 	}
-
-	// Track whether the text input is active
-	buf.m_isBeingEdited = ImGui::IsItemActive();
-
-	ImGui::PopID();
-}
 
 }

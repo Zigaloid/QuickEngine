@@ -7,6 +7,7 @@
 #include "BgfxGizmoRenderer.h"
 #include "CCommandHistory.h"
 #include "CDeleteEntityCommand.h"
+#include "PropertyInspector.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -65,6 +66,7 @@ private:
     void RenderEntityAssetPanel();
     void RefreshEntityAssets();
     void HandleEntityDrop();
+    void RenderInspectorPanel();
 
     /// Removes all selectables belonging to @p entity from the manager and
     /// the local m_componentSelectables list.
@@ -91,7 +93,8 @@ private:
     std::vector<EntityAssetEntry> m_entityAssets;
     bool  m_entityAssetsNeedRefresh = true;
     float m_entityPanelWidth;
-    CCommandHistory m_history{ 100 };
+    CCommandHistory  m_history{ 100 };
+    PropertyInspector m_propertyInspector;
 };
 
 } // namespace ImGuiVisualizers

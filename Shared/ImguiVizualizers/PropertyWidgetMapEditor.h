@@ -63,6 +63,8 @@ namespace ImGuiVisualizers {
 		EditorWidgetType m_editWidgetType = EditorWidgetType::Default;
 		bool m_editHasConfig = false;
 		WidgetConfig m_editConfig;
+		std::string m_editDisplayName;
+		bool m_editIsAdvanced = false;
 		// If the loaded mapping is inherited from a parent class, these track that origin.
 		bool m_mappingIsInherited = false;
 		std::string m_mappingOriginClass;

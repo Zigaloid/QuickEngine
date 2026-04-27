@@ -27,7 +27,7 @@ namespace ComponentSystem {
 	/** @brief Base class for all engine components; participates in the ECS lifecycle. */
 	class Component : public CReflectedBase {
 	public:
-		REFL_DECLARE_OBJECT(ComponentSystem::Component, CReflectedBase);
+		REFL_DECLARE_OBJECT(Component, CReflectedBase);
 	private:
 		static ComponentId m_nextId;
 		ComponentId m_id;
