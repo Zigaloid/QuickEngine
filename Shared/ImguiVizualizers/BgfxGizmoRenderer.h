@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "BgfxRenderPrimitives.h"
+#include "BgfxViewIdAllocator.h"
 
 namespace ImGuiVisualizers {
 
@@ -33,11 +34,11 @@ enum class GizmoMode
 
 /**
  * @brief Renders a 3D transform manipulator gizmo (Translate / Scale / Rotate)
- *        into a BGFX view using transient vertex/index buffers.
+ *        into a dedicated BGFX view using transient vertex/index buffers.
  *
- * The renderer is self-contained: it initialises its own shader program and
- * requires only that bgfx itself has been initialised before calling
- * Initialize().
+ * The renderer allocates its own view ID so it always executes after the
+ * scene pass, and clears only the depth buffer each frame so the gizmo
+ * is drawn in front of all scene geometry.
  *
  * Axis colour convention (ABGR): X = red, Y = green, Z = blue.
  * A highlighted axis or plane is drawn in bright yellow.
@@ -46,9 +47,9 @@ enum class GizmoMode
  * @code
  *   BgfxGizmoRenderer gizmo;
  *   gizmo.Initialize();
- *   // ... each frame:
- *   gizmo.RenderGizmo(viewId, worldMtx, GizmoMode::Translate,
- *                     GizmoAxis::X);
+ *   // ... each frame, after scene submission:
+ *   gizmo.BeginFrame(framebufferHandle, viewMtx, projMtx);
+ *   gizmo.RenderGizmo(worldMtx, GizmoMode::Translate, GizmoAxis::X);
  * @endcode
  */
 class BgfxGizmoRenderer
@@ -61,30 +62,48 @@ public:
     BgfxGizmoRenderer& operator=(const BgfxGizmoRenderer&) = delete;
 
     /**
-     * @brief Initialise the shader program and vertex layout.
+     * @brief Initialise the shader program, vertex layout and allocate a view ID.
      * @return true on success; false if the BGFX program failed to compile.
      */
     bool Initialize();
 
     /**
-     * @brief Release all GPU resources.
+     * @brief Release all GPU resources and free the view ID.
      */
     void Shutdown();
+
+    /**
+     * @brief Set up the gizmo view for this frame.
+     *
+     * Must be called once per frame before any RenderGizmo() calls.
+     * Binds @p fbh as the render target, sets the viewport rect, and clears
+     * only the depth buffer, ensuring the gizmo always renders in front of
+     * scene geometry.
+     *
+     * @param fbh      Framebuffer to render into (same as the scene pass).
+     * @param width    Framebuffer width in pixels.
+     * @param height   Framebuffer height in pixels.
+     * @param viewMtx  Camera view matrix (column-major 4x4).
+     * @param projMtx  Camera projection matrix (column-major 4x4).
+     */
+    void BeginFrame(bgfx::FrameBufferHandle fbh,
+                    uint16_t                width,
+                    uint16_t                height,
+                    const float*            viewMtx,
+                    const float*            projMtx);
 
     /**
      * @brief Submit a 3D transform manipulator gizmo at the given world transform.
      *
      * The gizmo is positioned and oriented by @p worldMtx44.  Call once per
-     * selected object after the scene geometry has been submitted.
+     * selected object after BeginFrame() has been called.
      *
-     * @param viewId          BGFX view to submit into.
      * @param worldMtx44      Column-major 4x4 world transform (position + orientation).
      * @param mode            GizmoMode::Translate, Scale, or Rotate.
      * @param highlightedAxis Axis or plane to draw highlighted; GizmoAxis::None for none.
      * @param size            Overall reach of the gizmo in world units.
      */
-    void RenderGizmo(bgfx::ViewId viewId,
-                     const float* worldMtx44,
+    void RenderGizmo(const float* worldMtx44,
                      GizmoMode    mode,
                      GizmoAxis    highlightedAxis = GizmoAxis::None,
                      float        size            = 1.0f);
@@ -93,22 +112,20 @@ public:
 
 private:
     // ── Gizmo sub-renderers ─────────────────────────────────────────────
-    void RenderGizmoTranslate(bgfx::ViewId viewId, const float* worldMtx44,
-                               GizmoAxis highlighted, float size);
-    void RenderGizmoScale    (bgfx::ViewId viewId, const float* worldMtx44,
-                               GizmoAxis highlighted, float size);
-    void RenderGizmoRotate   (bgfx::ViewId viewId, const float* worldMtx44,
-                               GizmoAxis highlighted, float size);
+    void RenderGizmoTranslate(const float* worldMtx44, GizmoAxis highlighted, float size);
+    void RenderGizmoScale    (const float* worldMtx44, GizmoAxis highlighted, float size);
+    void RenderGizmoRotate   (const float* worldMtx44, GizmoAxis highlighted, float size);
 
     // ── Transient-buffer submit helpers ────────────────────────────────
-    void SubmitTransientLines    (bgfx::ViewId viewId, const float* mtx44,
+    void SubmitTransientLines    (const float* mtx44,
                                   const std::vector<PosColorVertex>& verts);
-    void SubmitTransientTriangles(bgfx::ViewId viewId, const float* mtx44,
+    void SubmitTransientTriangles(const float* mtx44,
                                   const std::vector<PosColorVertex>& verts,
                                   const std::vector<uint16_t>&       indices);
 
     bool                m_initialized = false;
     bgfx::ProgramHandle m_program     = BGFX_INVALID_HANDLE;
+    bgfx::ViewId        m_viewId      = BgfxViewIdAllocator::kInvalidViewId;
 };
 
 } // namespace ImGuiVisualizers

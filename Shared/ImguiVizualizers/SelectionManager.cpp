@@ -585,14 +585,26 @@ void CSelectionManager::EndGizmoDrag()
     m_drag.startTransforms.clear();
 }
 
-void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
-                                              GizmoMode    mode,
-                                              float        size)
+void CSelectionManager::RenderSelectionGizmo(bgfx::FrameBufferHandle fbh,
+                                              GizmoMode               mode,
+                                              float                   size)
 {
-    if (m_selection.empty() || !m_camera || !m_gizmoRenderer.IsInitialized())
+    if (m_selection.empty() || !m_camera)
     {
         m_hoveredGizmoAxis = GizmoAxis::None;
         return;
+    }
+
+    // Lazy-initialize the gizmo renderer here so its view ID is always
+    // allocated AFTER the scene viewport's view ID (bgfx renders views in
+    // ascending ID order – a lower gizmo ID would cause the scene to overwrite it).
+    if (!m_gizmoRenderer.IsInitialized())
+    {
+        if (!m_gizmoRenderer.Initialize())
+        {
+            m_hoveredGizmoAxis = GizmoAxis::None;
+            return;
+        }
     }
 
     const bool mouseDown     = ImGui::IsMouseDown    (ImGuiMouseButton_Left);
@@ -604,8 +616,8 @@ void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
     {
         if (mouseReleased)
         {
-            ApplyGizmoDrag();   // apply final position before snapshotting
-            EndGizmoDrag();     // ← commit to history, clear drag state
+            ApplyGizmoDrag();
+            EndGizmoDrag();
         }
         else if (mouseDown)
         {
@@ -632,18 +644,22 @@ void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
     }
     else
     {
-        // Multi-selection: identity rotation at centroid of all selected objects.
         Vector3f centroid;
         for (const auto& sel : m_selection)
             centroid += sel->GetTransform().ExtractTranslation();
         centroid = centroid * (1.0f / static_cast<float>(m_selection.size()));
 
-        // gizmo is already identity from default constructor
         gizmo.SetTranslation(centroid);
     }
 
     // ── 3. Constant screen-size scaling ───────────────────────────────
     constexpr float kScreenFraction = 0.1f;
+
+    const float aspect = m_viewportSize.x / m_viewportSize.y;
+
+    Matrix4f view, proj;
+    m_camera->GetViewMatrix(view.data());
+    m_camera->GetProjectionMatrix(proj.data(), aspect);
 
     float eye[3];
     m_camera->GetEyePosition(eye);
@@ -662,7 +678,12 @@ void CSelectionManager::RenderSelectionGizmo(bgfx::ViewId viewId,
     }
 
     // ── 5. Render ─────────────────────────────────────────────────────
-    m_gizmoRenderer.RenderGizmo(viewId, gizmo.data(), mode, m_hoveredGizmoAxis, effectiveSize);
+    m_gizmoRenderer.BeginFrame(fbh,
+                                static_cast<uint16_t>(m_viewportSize.x),
+                                static_cast<uint16_t>(m_viewportSize.y),
+                                view.data(),
+                                proj.data());
+    m_gizmoRenderer.RenderGizmo(gizmo.data(), mode, m_hoveredGizmoAxis, effectiveSize);
 }
 
 } // namespace ImGuiVisualizers

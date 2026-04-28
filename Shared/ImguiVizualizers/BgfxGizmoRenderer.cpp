@@ -41,6 +41,10 @@ bool BgfxGizmoRenderer::Initialize()
     if (m_initialized)
         return true;
 
+    m_viewId = BgfxViewIdAllocator::Get().Allocate();
+    if (m_viewId == BgfxViewIdAllocator::kInvalidViewId)
+        return false;
+
     // Ensure the shared vertex layout is ready (idempotent).
     PosColorVertex::Init();
 
@@ -51,7 +55,11 @@ bool BgfxGizmoRenderer::Initialize()
         true);
 
     if (!bgfx::isValid(m_program))
+    {
+        BgfxViewIdAllocator::Get().Free(m_viewId);
+        m_viewId = BgfxViewIdAllocator::kInvalidViewId;
         return false;
+    }
 
     m_initialized = true;
     return true;
@@ -68,14 +76,41 @@ void BgfxGizmoRenderer::Shutdown()
         m_program = BGFX_INVALID_HANDLE;
     }
 
+    if (m_viewId != BgfxViewIdAllocator::kInvalidViewId)
+    {
+        BgfxViewIdAllocator::Get().Free(m_viewId);
+        m_viewId = BgfxViewIdAllocator::kInvalidViewId;
+    }
+
     m_initialized = false;
+}
+
+// ── Per-frame view setup ─────────────────────────────────────────────────
+
+void BgfxGizmoRenderer::BeginFrame(bgfx::FrameBufferHandle fbh,
+                                    uint16_t                width,
+                                    uint16_t                height,
+                                    const float*            viewMtx,
+                                    const float*            projMtx)
+{
+    if (!m_initialized)
+        return;
+
+    bgfx::setViewName(m_viewId, "GizmoOverlay");
+    bgfx::setViewFrameBuffer(m_viewId, fbh);
+    bgfx::setViewRect(m_viewId, 0, 0, width, height);
+    bgfx::setViewTransform(m_viewId, viewMtx, projMtx);
+
+    // Clear depth only – colour is preserved from the scene pass.
+    bgfx::setViewClear(m_viewId, BGFX_CLEAR_DEPTH, 0, 1.0f, 0);
+
+    bgfx::touch(m_viewId);
 }
 
 // ── Transient submit helpers ─────────────────────────────────────────────
 
-void BgfxGizmoRenderer::SubmitTransientLines(bgfx::ViewId viewId,
-                                               const float* mtx44,
-                                               const std::vector<PosColorVertex>& verts)
+void BgfxGizmoRenderer::SubmitTransientLines(const float*                        mtx44,
+                                              const std::vector<PosColorVertex>& verts)
 {
     if (verts.empty())
         return;
@@ -96,13 +131,12 @@ void BgfxGizmoRenderer::SubmitTransientLines(bgfx::ViewId viewId,
                  | BGFX_STATE_DEPTH_TEST_LESS
                  | BGFX_STATE_PT_LINES
                  | BGFX_STATE_MSAA);
-    bgfx::submit(viewId, m_program);
+    bgfx::submit(m_viewId, m_program);
 }
 
-void BgfxGizmoRenderer::SubmitTransientTriangles(bgfx::ViewId viewId,
-                                                   const float* mtx44,
-                                                   const std::vector<PosColorVertex>& verts,
-                                                   const std::vector<uint16_t>&       indices)
+void BgfxGizmoRenderer::SubmitTransientTriangles(const float*                        mtx44,
+                                                  const std::vector<PosColorVertex>& verts,
+                                                  const std::vector<uint16_t>&       indices)
 {
     if (verts.empty() || indices.empty())
         return;
@@ -128,13 +162,12 @@ void BgfxGizmoRenderer::SubmitTransientTriangles(bgfx::ViewId viewId,
                  | BGFX_STATE_DEPTH_TEST_LESS
                  | BGFX_STATE_CULL_CW
                  | BGFX_STATE_MSAA);
-    bgfx::submit(viewId, m_program);
+    bgfx::submit(m_viewId, m_program);
 }
 
 // ── RenderGizmo dispatcher ───────────────────────────────────────────────
 
-void BgfxGizmoRenderer::RenderGizmo(bgfx::ViewId viewId,
-                                      const float* worldMtx44,
+void BgfxGizmoRenderer::RenderGizmo(const float* worldMtx44,
                                       GizmoMode    mode,
                                       GizmoAxis    highlightedAxis,
                                       float        size)
@@ -144,9 +177,9 @@ void BgfxGizmoRenderer::RenderGizmo(bgfx::ViewId viewId,
 
     switch (mode)
     {
-        case GizmoMode::Translate: RenderGizmoTranslate(viewId, worldMtx44, highlightedAxis, size); break;
-        case GizmoMode::Scale:     RenderGizmoScale    (viewId, worldMtx44, highlightedAxis, size); break;
-        case GizmoMode::Rotate:    RenderGizmoRotate   (viewId, worldMtx44, highlightedAxis, size); break;
+        case GizmoMode::Translate: RenderGizmoTranslate(worldMtx44, highlightedAxis, size); break;
+        case GizmoMode::Scale:     RenderGizmoScale    (worldMtx44, highlightedAxis, size); break;
+        case GizmoMode::Rotate:    RenderGizmoRotate   (worldMtx44, highlightedAxis, size); break;
     }
 }
 
@@ -156,8 +189,7 @@ void BgfxGizmoRenderer::RenderGizmo(bgfx::ViewId viewId,
 //  Draw 2 – Tris   : 3 arrowhead cones (one per axis)
 //
 
-void BgfxGizmoRenderer::RenderGizmoTranslate(bgfx::ViewId viewId,
-                                               const float* worldMtx44,
+void BgfxGizmoRenderer::RenderGizmoTranslate(const float* worldMtx44,
                                                GizmoAxis    highlighted,
                                                float        size)
 {
@@ -207,7 +239,7 @@ void BgfxGizmoRenderer::RenderGizmoTranslate(bgfx::ViewId viewId,
         lv.push_back({ planeMax, 0.0f, planeMax, cxz }); lv.push_back({ planeMin, 0.0f, planeMax, cxz });
         lv.push_back({ planeMin, 0.0f, planeMax, cxz }); lv.push_back({ planeMin, 0.0f, planeMin, cxz });
 
-        SubmitTransientLines(viewId, worldMtx44, lv);
+        SubmitTransientLines(worldMtx44, lv);
     }
 
     // ── Draw 2 : arrowhead cones (triangles) ─────────────────────────────
@@ -255,7 +287,7 @@ void BgfxGizmoRenderer::RenderGizmoTranslate(bgfx::ViewId viewId,
             }
         }
 
-        SubmitTransientTriangles(viewId, worldMtx44, tv, ti);
+        SubmitTransientTriangles(worldMtx44, tv, ti);
     }
 }
 
@@ -265,8 +297,7 @@ void BgfxGizmoRenderer::RenderGizmoTranslate(bgfx::ViewId viewId,
 //  Draw 2 – Tris   : 3 axis box caps + 1 centre box
 //
 
-void BgfxGizmoRenderer::RenderGizmoScale(bgfx::ViewId viewId,
-                                           const float* worldMtx44,
+void BgfxGizmoRenderer::RenderGizmoScale(const float* worldMtx44,
                                            GizmoAxis    highlighted,
                                            float        size)
 {
@@ -289,7 +320,7 @@ void BgfxGizmoRenderer::RenderGizmoScale(bgfx::ViewId viewId,
             { 0.0f,     0.0f,     0.0f,     cz },
             { 0.0f,     0.0f,     shaftEnd, cz },
         };
-        SubmitTransientLines(viewId, worldMtx44, lv);
+        SubmitTransientLines(worldMtx44, lv);
     }
 
     // ── Draw 2 : box caps + centre box (triangles) ───────────────────────
@@ -304,12 +335,12 @@ void BgfxGizmoRenderer::RenderGizmoScale(bgfx::ViewId viewId,
                              float h, uint32_t col)
         {
             static constexpr uint16_t kBoxFaces[] = {
-                0,1,2, 0,2,3,  // front
-                5,4,7, 5,7,6,  // back
-                4,0,3, 4,3,7,  // left
-                1,5,6, 1,6,2,  // right
-                3,2,6, 3,6,7,  // top
-                4,5,1, 4,1,0,  // bottom
+                0,1,2, 0,2,3,
+                5,4,7, 5,7,6,
+                4,0,3, 4,3,7,
+                1,5,6, 1,6,2,
+                3,2,6, 3,6,7,
+                4,5,1, 4,1,0,
             };
             const uint16_t b = static_cast<uint16_t>(tv.size());
             tv.push_back({ ox-h, oy-h, oz+h, col });
@@ -334,7 +365,7 @@ void BgfxGizmoRenderer::RenderGizmoScale(bgfx::ViewId viewId,
         appendBox(tv, ti, 0.0f,      0.0f,      boxCenter, boxHalf, cz);
         appendBox(tv, ti, 0.0f,      0.0f,      0.0f,      ctrHalf, kColorCenter);
 
-        SubmitTransientTriangles(viewId, worldMtx44, tv, ti);
+        SubmitTransientTriangles(worldMtx44, tv, ti);
     }
 }
 
@@ -346,8 +377,7 @@ void BgfxGizmoRenderer::RenderGizmoScale(bgfx::ViewId viewId,
 //    Z ring : circle in the XY plane  →  (r·cos t,  r·sin t,  0)
 //
 
-void BgfxGizmoRenderer::RenderGizmoRotate(bgfx::ViewId viewId,
-                                            const float* worldMtx44,
+void BgfxGizmoRenderer::RenderGizmoRotate(const float* worldMtx44,
                                             GizmoAxis    highlighted,
                                             float        size)
 {
@@ -384,7 +414,7 @@ void BgfxGizmoRenderer::RenderGizmoRotate(bgfx::ViewId viewId,
         }
     }
 
-    SubmitTransientLines(viewId, worldMtx44, lv);
+    SubmitTransientLines(worldMtx44, lv);
 }
 
 } // namespace ImGuiVisualizers

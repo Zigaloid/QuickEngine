@@ -48,7 +48,7 @@ namespace ImGuiVisualizers {
 			if (!m_levelComp) return;
 			if (!m_levelComp->IsReady()) return;
 			RenderComponentHierarchy(viewId, m_levelComp);
-			m_selectionManager.RenderSelectionGizmo(viewId, m_gizmoMode, 2.0f);
+			m_selectionManager.RenderSelectionGizmo(Get3DView().GetFrameBuffer(), m_gizmoMode, 2.0f);
 			});
 
 		RegisterRenderComponents(m_levelComp);

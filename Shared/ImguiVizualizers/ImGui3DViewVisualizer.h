@@ -58,8 +58,9 @@ public:
 
     void SetRenderCallback(RenderCallback cb) { m_renderCallback = std::move(cb); }
 
-    BgfxRenderPrimitives& GetPrimitives()  { return m_primitives; }
-    Bgfx3DCamera&         GetCamera()      { return m_camera; }
+    BgfxRenderPrimitives&   GetPrimitives()    { return m_primitives; }
+    Bgfx3DCamera&           GetCamera()        { return m_camera; }
+    bgfx::FrameBufferHandle GetFrameBuffer()   const { return m_viewport.GetFrameBuffer(); }
 
     void SetShowGrid(bool v)   { m_showGrid = v; }
     void SetShowAxes(bool v)   { m_showAxes = v; }

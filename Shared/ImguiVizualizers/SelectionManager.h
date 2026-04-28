@@ -84,14 +84,14 @@ namespace ImGuiVisualizers {
 		void ShutdownGizmo() { m_gizmoRenderer.Shutdown(); }
 
 		/// Renders the gizmo, detects hover, and drives click-drag manipulation.
-		/// Call once per frame inside your render callback.
+		/// Call once per frame inside your render callback, after the scene pass.
 		///
-		/// @param viewId  BGFX view to submit into.
-		/// @param mode    GizmoMode::Translate, Scale, or Rotate.
-		/// @param size    Normalised screen-space size (scales with camera distance).
-		void RenderSelectionGizmo(bgfx::ViewId viewId,
-			GizmoMode    mode = GizmoMode::Translate,
-			float        size = 1.0f);
+		/// @param fbh   Framebuffer the scene was rendered into (shared with the gizmo overlay view).
+		/// @param mode  GizmoMode::Translate, Scale, or Rotate.
+		/// @param size  Normalised screen-space size (scales with camera distance).
+		void RenderSelectionGizmo(bgfx::FrameBufferHandle fbh,
+			GizmoMode               mode = GizmoMode::Translate,
+			float                   size = 1.0f);
 
 		/// The gizmo axis/plane the mouse is currently over. GizmoAxis::None when idle.
 		GizmoAxis GetHoveredGizmoAxis() const { return m_hoveredGizmoAxis; }

@@ -5,7 +5,6 @@
 #include "BgfxViewIdAllocator.h"
 
 namespace ImGuiVisualizers {
-
 /**
  * @brief Manages a BGFX offscreen framebuffer (color + depth) and a dedicated
  *        view ID so that 3D content can be rendered to a texture and then
@@ -50,12 +49,12 @@ public:
                     uint32_t clearColor = 0x303030ff);
 
     // ── Accessors ───────────────────────────────────────────────────────
-
-    bgfx::ViewId          GetViewId()       const { return m_viewId; }
-    bgfx::TextureHandle   GetColorTexture() const { return m_colorTex; }
-    uint16_t              GetWidth()        const { return m_width; }
-    uint16_t              GetHeight()       const { return m_height; }
-    bool                  IsValid()         const { return m_initialized; }
+    bgfx::ViewId            GetViewId()       const { return m_viewId; }
+    bgfx::FrameBufferHandle GetFrameBuffer()  const { return m_fbh; }
+    bgfx::TextureHandle     GetColorTexture() const { return m_colorTex; }
+    uint16_t                GetWidth()        const { return m_width; }
+    uint16_t                GetHeight()       const { return m_height; }
+    bool                    IsValid()         const { return m_initialized; }
 
 private:
     void CreateFramebuffer();

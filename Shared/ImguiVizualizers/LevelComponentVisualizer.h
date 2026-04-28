@@ -38,7 +38,6 @@ public:
 
     void Initialize() override
     {
-        m_selectionManager.InitializeGizmo();
         m_selectionManager.SetCommandHistory(&m_history);
         CombinedObjJson3DVisualizer::Initialize();
         RegisterLevelActions();

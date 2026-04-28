@@ -7,6 +7,7 @@
 #include <bx/bounds.h>
 #include <bx/math.h>
 
+#include <cfloat>
 #include <cmath>
 #include <cstring>
 #include <string>
@@ -21,6 +22,11 @@ struct FbxConvertOptions
     bool includeTangents = true;
     /// Global scale applied to every position.
     float scaleFactor    = 1.0f;
+    /// When true and the source mesh has no UV data, spherical UVs are
+    /// generated from each vertex's normalised direction from the mesh centre.
+    bool  generateSphericalUVs = false;
+    /// Uniform scale applied to the generated spherical UV coordinates.
+    float sphericalUVScale     = 1.0f;
 };
 
 // ── Internal helpers ────────────────────────────────────────────────────
@@ -77,6 +83,23 @@ struct VertexEqual
         return std::memcmp(&a, &b, sizeof(PackedVertex)) == 0;
     }
 };
+
+/// Compute spherical UV coordinates for a position relative to a centre.
+/// The result is scaled by @p scale and maps the full sphere to [0,scale].
+inline void ComputeSphericalUV(float px, float py, float pz,
+                                float cx, float cy, float cz,
+                                float scale,
+                                float& outU, float& outV)
+{
+    float dx = px - cx;
+    float dy = py - cy;
+    float dz = pz - cz;
+    const float len = std::sqrt(dx * dx + dy * dy + dz * dz);
+    if (len > 1e-6f) { dx /= len; dy /= len; dz /= len; }
+
+    outU = (0.5f + std::atan2(dz, dx) / (2.0f * bx::kPi)) * scale;
+    outV = (0.5f - std::asin(bx::clamp(dy, -1.0f, 1.0f)) / bx::kPi) * scale;
+}
 
 /// Compute AABB, Sphere, and OBB from a set of positions.
 inline void ComputeBounds(const std::vector<PackedVertex>& verts,
@@ -171,6 +194,28 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
     {
         const ufbx_mesh* fbxMesh = scene->meshes.data[mi];
 
+        // ── Pre-compute mesh AABB centre for spherical UV fallback ───
+        const bool needsSphericalUV = opts.includeUVs
+                                   && opts.generateSphericalUVs
+                                   && !fbxMesh->vertex_uv.exists;
+        float meshCX = 0.0f, meshCY = 0.0f, meshCZ = 0.0f;
+        if (needsSphericalUV && fbxMesh->num_vertices > 0)
+        {
+            float mnx =  FLT_MAX, mny =  FLT_MAX, mnz =  FLT_MAX;
+            float mxx = -FLT_MAX, mxy = -FLT_MAX, mxz = -FLT_MAX;
+            for (size_t vi = 0; vi < fbxMesh->num_vertices; ++vi)
+            {
+                const float vpx = static_cast<float>(fbxMesh->vertices.data[vi].x) * opts.scaleFactor;
+                const float vpy = static_cast<float>(fbxMesh->vertices.data[vi].y) * opts.scaleFactor;
+                const float vpz = static_cast<float>(fbxMesh->vertices.data[vi].z) * opts.scaleFactor;
+                mnx = std::min(mnx, vpx); mny = std::min(mny, vpy); mnz = std::min(mnz, vpz);
+                mxx = std::max(mxx, vpx); mxy = std::max(mxy, vpy); mxz = std::max(mxz, vpz);
+            }
+            meshCX = (mnx + mxx) * 0.5f;
+            meshCY = (mny + mxy) * 0.5f;
+            meshCZ = (mnz + mxz) * 0.5f;
+        }
+
         // Triangulate the mesh.
         size_t maxTriIndices = fbxMesh->max_face_triangles * 3;
         std::vector<uint32_t> triIndices(maxTriIndices);
@@ -210,12 +255,22 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
                     pv.nz = static_cast<float>(n.z);
                 }
 
-                // UV
-                if (opts.includeUVs && fbxMesh->vertex_uv.exists)
+                // UV — use mesh data when available, fall back to spherical projection.
+                if (opts.includeUVs)
                 {
-                    ufbx_vec2 uv = ufbx_get_vertex_vec2(&fbxMesh->vertex_uv, idx);
-                    pv.u = static_cast<float>(uv.x);
-                    pv.v = 1.0f - static_cast<float>(uv.y); // flip V for D3D / bgfx
+                    if (fbxMesh->vertex_uv.exists)
+                    {
+                        ufbx_vec2 uv = ufbx_get_vertex_vec2(&fbxMesh->vertex_uv, idx);
+                        pv.u = static_cast<float>(uv.x);
+                        pv.v = 1.0f - static_cast<float>(uv.y); // flip V for D3D / bgfx
+                    }
+                    else if (opts.generateSphericalUVs)
+                    {
+                        ComputeSphericalUV(pv.px, pv.py, pv.pz,
+                                           meshCX, meshCY, meshCZ,
+                                           opts.sphericalUVScale,
+                                           pv.u, pv.v);
+                    }
                 }
 
                 // Tangent
