@@ -4,6 +4,7 @@
 
 #define NOMINMAX
 #include <Windows.h>
+#include <commctrl.h>
 
 #include <memory>
 #include <string>
@@ -29,8 +30,9 @@ private:
     HWND m_windowHandle   = nullptr;
     RECT m_lockArea       = {};
 
-    bool           m_rawInputEnabled = false;
-    RAWINPUTDEVICE m_rawInputDevice  = {};
+    bool           m_rawInputEnabled    = false;
+    bool           m_subclassed         = false;
+    RAWINPUTDEVICE m_rawInputDevice     = {};
 
     MouseButtonCallback m_buttonCallback;
     MouseMoveCallback   m_moveCallback;
@@ -40,22 +42,22 @@ private:
     std::string m_deviceName;
     MouseButton m_lastPressedButton = MouseButton::Left;
 
-    double m_currentX    = 0.0;
-    double m_currentY    = 0.0;
-    double m_previousX   = 0.0;
-    double m_previousY   = 0.0;
-    float  m_deltaX      = 0.0f;
-    float  m_deltaY      = 0.0f;
+    double m_currentX     = 0.0;
+    double m_currentY     = 0.0;
+    double m_previousX    = 0.0;
+    double m_previousY    = 0.0;
+    float  m_deltaX       = 0.0f;
+    float  m_deltaY       = 0.0f;
     float  m_scrollDeltaX = 0.0f;
     float  m_scrollDeltaY = 0.0f;
 
     static constexpr DWORD BUTTON_MAPPINGS[static_cast<size_t>(MouseButton::COUNT)] =
     {
-        MK_LBUTTON,     // MouseButton::Left
-        MK_RBUTTON,     // MouseButton::Right
-        MK_MBUTTON,     // MouseButton::Middle
-        MK_XBUTTON1,    // MouseButton::X1
-        MK_XBUTTON2     // MouseButton::X2
+        MK_LBUTTON,
+        MK_RBUTTON,
+        MK_MBUTTON,
+        MK_XBUTTON1,
+        MK_XBUTTON2
     };
 
     // ── Private Helpers ──────────────────────────────────────────────────────
@@ -73,11 +75,18 @@ private:
     bool CheckStateChanged() const;
     MouseButton FindPressedButton() const;
 
+    bool InstallScrollHook();
+    void RemoveScrollHook();
+
+    // Old-style WndProc subclassing — no commctrl dependency
+    static LRESULT CALLBACK ScrollWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    WNDPROC m_originalWndProc = nullptr;
+
     static MouseButton GetMouseButtonFromMessage(UINT message, WPARAM wParam);
     static bool        CheckButtonPressed(WPARAM wParam, MouseButton button);
 
 public:
-    explicit WindowsMouse(HWND windowHandle = nullptr);
+    explicit WindowsMouse(HWND windowHandle = nullptr, const MouseConfig& config = MouseConfig{});
     virtual ~WindowsMouse();
 
     // ── IMouse ───────────────────────────────────────────────────────────────

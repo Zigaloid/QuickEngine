@@ -31,7 +31,7 @@ project "FbxToBgfxMesh"
    targetdir "bin/%{cfg.buildcfg}"
    cppdialect "C++20"
    architecture "x86_64"
-   
+      
       defines {         
         "BX_CONFIG_DEBUG",  
 		"ENTRY_CONFIG_IMPLEMENT_MAIN=1",

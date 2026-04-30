@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -57,8 +57,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\bgfx_common;..\Shared\utils;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;JPH_DEBUG_RENDERER;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_USE_AVX2;JPH_USE_AVX;JPH_USE_SSE4_1;JPH_USE_SSE4_2;JPH_USE_LZCNT;JPH_USE_TZCNT;JPH_USE_F16C;JPH_USE_FMADD;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\JoltPhysics-master;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\Physics;..\Shared\bgfx_common;..\Shared\utils;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -75,8 +75,8 @@
     <ClCompile>
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
-      <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\bgfx_common;..\Shared\utils;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;JPH_DEBUG_RENDERER;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_USE_AVX2;JPH_USE_AVX;JPH_USE_SSE4_1;JPH_USE_SSE4_2;JPH_USE_LZCNT;JPH_USE_TZCNT;JPH_USE_F16C;JPH_USE_FMADD;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\JoltPhysics-master;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\Physics;..\Shared\bgfx_common;..\Shared\utils;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -130,11 +130,14 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\TransformCommand.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
     <ClInclude Include="..\Shared\KeyboardShortcutManager.h" />
+    <ClInclude Include="..\Shared\Physics\PhysicsManager.h" />
+    <ClInclude Include="..\Shared\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\TextureResource.h" />
     <ClInclude Include="..\Shared\bgfx_common\args.h" />
@@ -204,6 +207,7 @@
     <ClInclude Include="..\Shared\utils\BgfxBinaryMeshWriter.h" />
     <ClInclude Include="..\Shared\utils\FbxMeshConverter.h" />
     <ClInclude Include="..\Shared\utils\MathUtils.h" />
+    <ClInclude Include="..\Shared\utils\ObjMeshConverter.h" />
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="AssetClasses\EntityInstance.h" />
@@ -258,10 +262,13 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\SelectionManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp" />
     <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp" />
+    <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp" />
+    <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\bgfx_utils.cpp" />
@@ -307,6 +314,9 @@
     </ProjectReference>
     <ProjectReference Include="..\External\bgfx\.build\projects\vs2019\bx.vcxproj">
       <Project>{5F775900-4B03-880B-B4B1-880BA05C880B}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\External\JoltPhysics-master\Build\VS2022_CL\jolt.vcxproj">
+      <Project>{3E16997C-2A4D-9A0D-D339-8010BF4F160F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\External\bgfx\.build\projects\vs2019\bimg_decode.vcxproj">
       <Project>{A7B931CA-136F-AABF-9C63-A4960818A1C3}</Project>

@@ -30,6 +30,11 @@ bool QuickEditApp::Initialize()
 	// App setup component types.
 	RegisterComponents();
 
+	PhysicsManager::Config physicsConfig;
+	physicsConfig.maxBodies = 1024;
+	physicsConfig.gravity   = -9.81f;
+	m_physicsManager.Initialize(physicsConfig);
+
 	return true;
 }
 
@@ -44,6 +49,8 @@ void QuickEditApp::RegisterComponents()
 
 void QuickEditApp::Update(double deltaTime)
 {
+	m_physicsManager.Update(static_cast<float>(deltaTime));
+
 	m_documentManager->ProcessPendingEditors();
 	m_visualizerManager.Update(static_cast<float>(deltaTime));
 	m_documentManager->CleanupClosedEditors();
@@ -100,6 +107,8 @@ void QuickEditApp::ImguiMainMenu()
 
 bool QuickEditApp::Shutdown()
 {
+    m_physicsManager.Shutdown();
+
 	m_documentManager.reset();
 	m_visualizerManager.Shutdown();
 	return true;

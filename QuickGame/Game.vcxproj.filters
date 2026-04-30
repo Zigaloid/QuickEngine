@@ -34,6 +34,21 @@
     <Filter Include="..\Shared">
       <UniqueIdentifier>{67846B3F-D3EE-1FB6-1C2D-D15B88D6FD0A}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\Shared\Components">
+      <UniqueIdentifier>{1C7BC871-080A-523B-B128-66369D9662E1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Shared\ImguiVizualizers">
+      <UniqueIdentifier>{F90243E0-E512-EFB0-4ECC-53CF3AFBDD49}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Shared\Physics">
+      <UniqueIdentifier>{D9FE70EC-4515-6F82-8E8C-FAA3FAE13F0A}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Shared\Rendering">
+      <UniqueIdentifier>{743AE17E-E09B-BE8C-6909-053FD569F54B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="..\Shared\ResourceTypes">
+      <UniqueIdentifier>{33C33C54-9FFA-84EB-A804-E90E14BBABE4}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\Shared\bgfx_common">
       <UniqueIdentifier>{4598CCFA-B104-88F5-7AF8-1F53E623AA5D}</UniqueIdentifier>
     </Filter>
@@ -74,6 +89,63 @@
     </ClInclude>
     <ClInclude Include="..\External\ufbx\ufbx.h">
       <Filter>..\External\ufbx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\EntityComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\FbxMeshComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\LevelComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\MeshComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\TransformComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\KeyboardShortcutManager.h">
+      <Filter>..\Shared</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Physics\PhysicsManager.h">
+      <Filter>..\Shared\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Physics\PhysicsSystem.h">
+      <Filter>..\Shared\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\TextureResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\bgfx_common\args.h">
       <Filter>..\Shared\bgfx_common</Filter>
@@ -273,10 +345,26 @@
     <ClInclude Include="..\Shared\utils\FbxMeshConverter.h">
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\utils\MathUtils.h">
+      <Filter>..\Shared\utils</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\utils\ObjMeshConverter.h">
+      <Filter>..\Shared\utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\utils\StringUtils.h">
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
+    <ClInclude Include="Game.h" />
     <ClInclude Include="logo.h" />
+    <ClInclude Include="..\Shared\Rendering\GameCameraController.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\BgfxGameCamera.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\BgfxRenderPrimitives.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
@@ -354,6 +442,57 @@
     <ClCompile Include="..\External\ufbx\ufbx.c">
       <Filter>..\External\ufbx</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\FbxMeshComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\LevelComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\MeshComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp">
+      <Filter>..\Shared</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp">
+      <Filter>..\Shared\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp">
+      <Filter>..\Shared\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\bgfx_common\bgfx_utils.cpp">
       <Filter>..\Shared\bgfx_common</Filter>
     </ClCompile>
@@ -426,6 +565,13 @@
     <ClCompile Include="..\Shared\bgfx_common\ps\particle_system.cpp">
       <Filter>..\Shared\bgfx_common\ps</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\utils\MathUtils.cpp">
+      <Filter>..\Shared\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

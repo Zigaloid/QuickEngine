@@ -19,10 +19,17 @@ externalproject "bimg_decode"
    location "../External/bgfx/.build/projects/vs2019/"  
    kind "StaticLib"
    language "C++"
+externalproject "jolt"
+   location "../External/JoltPhysics-master/Build/VS2022_CL"  
+   kind "StaticLib"
+   language "C++"
+
 externalproject "bx"
    location "../External/bgfx/.build/projects/vs2019/"  
    kind "StaticLib"
    language "C++"
+   
+   
 project "QuickEdit"  
    kind "ConsoleApp"
    language "C"
@@ -33,7 +40,20 @@ project "QuickEdit"
     defines {         
         "BX_CONFIG_DEBUG",  
 		"ENTRY_CONFIG_IMPLEMENT_MAIN=1",
-		"USE_ENTRY=1"
+		"USE_ENTRY=1",
+		-- Jolt Physics: must match the defines used to compile the Jolt static library
+		"JPH_DEBUG_RENDERER",
+		"JPH_PROFILE_ENABLED",
+		"JPH_OBJECT_STREAM",
+		"JPH_FLOATING_POINT_EXCEPTIONS_ENABLED",
+		"JPH_USE_AVX2",
+		"JPH_USE_AVX",
+		"JPH_USE_SSE4_1",
+		"JPH_USE_SSE4_2",
+		"JPH_USE_LZCNT",
+		"JPH_USE_TZCNT",
+		"JPH_USE_F16C",
+		"JPH_USE_FMADD"
     }
    
     filter "action:vs*"
@@ -47,6 +67,7 @@ project "QuickEdit"
 	includedirs { "../External/bgfx/include/" }   
 	includedirs { "../External/bimg/include/" }   
 	includedirs { "../External/bx/include/" }   
+	includedirs { "../External/JoltPhysics-master/" }   
 	includedirs { "../External/bgfx/"}
 	includedirs { "../External"}
 	includedirs { "../Shared/ImguiVizualizers" }  
@@ -54,6 +75,7 @@ project "QuickEdit"
 	includedirs { "../AssetClasses" }
 	includedirs { "../Shared/ResourceTypes" }  
 	includedirs { "../Shared/Components" } 
+	includedirs { "../Shared/Physics" } 
 	includedirs { "../Shared/bgfx_common" }   
 	includedirs { "../Shared/utils/" }
 
@@ -85,6 +107,8 @@ project "QuickEdit"
 	files { "../Shared/ResourceTypes/**.h" }
 	files { "../Shared/Components/**.cpp" }
 	files { "../Shared/Components/**.h" }
+	files { "../Shared/Physics/**.cpp" }
+	files { "../Shared/Physics/**.h" }
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.cpp" }
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.h" }
 	files { "../Shared/ImguiVizualizers/IImGuiVisualizer.h" }	
@@ -138,6 +162,7 @@ project "QuickEdit"
 	  links { "BGFX" }
 	  links { "bimg" }
 	  links { "bx" }
+	  links { "jolt" }
 	  staticruntime "on" -- Use /MT
 	  links { "bimg_decode" }
 	  
@@ -148,5 +173,6 @@ project "QuickEdit"
 	  links { "BGFX" }
 	  links { "bimg" }
 	  links { "bx" }
+	  links { "jolt" }
 	  staticruntime "on" -- Use /MTd
 	  links { "bimg_decode" }

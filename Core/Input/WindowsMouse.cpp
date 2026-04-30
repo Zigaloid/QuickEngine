@@ -4,17 +4,21 @@
 #include <algorithm>
 #include <cmath>
 
+#pragma comment(lib, "comctl32.lib")
+
 namespace Input {
 
 // ── Constructor / Destructor ──────────────────────────────────────────────────
 
-WindowsMouse::WindowsMouse(HWND windowHandle)
+WindowsMouse::WindowsMouse(HWND windowHandle, const MouseConfig& config)
     : m_windowHandle(windowHandle)
-    , m_sensitivity(1.0f)
-    , m_scrollSensitivity(1.0f)
+    , m_config(config)
+    , m_sensitivity(config.sensitivity)
+    , m_scrollSensitivity(config.scrollSensitivity)
     , m_cursorVisible(true)
     , m_cursorLocked(false)
     , m_rawInputEnabled(false)
+    , m_subclassed(false)
     , m_initialized(false)
     , m_lastPressedButton(MouseButton::Left)
     , m_currentX(0.0)
@@ -29,10 +33,9 @@ WindowsMouse::WindowsMouse(HWND windowHandle)
     , m_moveCallback(nullptr)
     , m_scrollCallback(nullptr)
 {
-    m_currentState  = {};
-    m_previousState = {};
-    m_config        = {};
-    m_lockArea      = {};
+    m_currentState   = {};
+    m_previousState  = {};
+    m_lockArea       = {};
     m_rawInputDevice = {};
 }
 
@@ -67,6 +70,9 @@ bool WindowsMouse::Initialize()
     m_currentState.positionY  = m_currentY;
 
     m_initialized = true;
+
+    InstallScrollHook(); // intercept WM_MOUSEWHEEL without modifying entry code
+
     std::cout << "WindowsMouse initialized successfully" << std::endl;
     return true;
 }
@@ -80,8 +86,8 @@ void WindowsMouse::Update()
     m_previousX     = m_currentX;
     m_previousY     = m_currentY;
 
-    if (!m_windowHandle)
-        UpdateButtonStates();
+    // Always poll button state via GetAsyncKeyState — works regardless of HWND.
+    UpdateButtonStates();
 
     if (!m_rawInputEnabled)
         UpdatePosition();
@@ -96,16 +102,14 @@ void WindowsMouse::Update()
     if (m_config.invertY)
         m_currentState.axes[static_cast<size_t>(MouseAxis::Y)] *= -1.0f;
 
-    if (!m_windowHandle)
-        ProcessButtonCallbacks();
+    // Always process button callbacks via polling path.
+    ProcessButtonCallbacks();
 
     if (m_moveCallback && (std::abs(m_deltaX) > 0.001f || std::abs(m_deltaY) > 0.001f))
         m_moveCallback(m_currentX, m_currentY, m_deltaX, m_deltaY);
 
     if (m_scrollCallback && (std::abs(m_scrollDeltaX) > 0.001f || std::abs(m_scrollDeltaY) > 0.001f))
         m_scrollCallback(m_scrollDeltaX, m_scrollDeltaY);
-
-    ResetScrollDelta();
 }
 
 void WindowsMouse::Shutdown()
@@ -113,6 +117,7 @@ void WindowsMouse::Shutdown()
     if (!m_initialized)
         return;
 
+    RemoveScrollHook();
     CleanupRawInput();
 
     if (!m_cursorVisible)
@@ -400,6 +405,60 @@ void WindowsMouse::SetRawInputEnabled(bool enabled)
                 CleanupRawInput();
         }
     }
+}
+
+// ── Scroll WndProc Hook ───────────────────────────────────────────────────────
+
+bool WindowsMouse::InstallScrollHook()
+{
+    if (!m_windowHandle || m_originalWndProc)
+        return false;
+
+    // Store our instance pointer on the HWND so the static WndProc can find it.
+    SetProp(m_windowHandle, L"WindowsMouse", reinterpret_cast<HANDLE>(this));
+
+    m_originalWndProc = reinterpret_cast<WNDPROC>(
+        SetWindowLongPtr(m_windowHandle, GWLP_WNDPROC,
+                         reinterpret_cast<LONG_PTR>(ScrollWndProc)));
+
+    return m_originalWndProc != nullptr;
+}
+
+void WindowsMouse::RemoveScrollHook()
+{
+    if (m_windowHandle && m_originalWndProc)
+    {
+        SetWindowLongPtr(m_windowHandle, GWLP_WNDPROC,
+                         reinterpret_cast<LONG_PTR>(m_originalWndProc));
+        RemoveProp(m_windowHandle, L"WindowsMouse");
+        m_originalWndProc = nullptr;
+    }
+}
+
+LRESULT CALLBACK WindowsMouse::ScrollWndProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    auto* self = reinterpret_cast<WindowsMouse*>(GetProp(hwnd, L"WindowsMouse"));
+
+    if (self)
+    {
+        if (msg == WM_MOUSEWHEEL)
+        {
+            self->m_scrollDeltaY += GET_WHEEL_DELTA_WPARAM(wParam) / static_cast<float>(WHEEL_DELTA);
+            // Still call the original so entry.cpp also sees the message.
+            return CallWindowProc(self->m_originalWndProc, hwnd, msg, wParam, lParam);
+        }
+        if (msg == WM_MOUSEHWHEEL)
+        {
+            self->m_scrollDeltaX += GET_WHEEL_DELTA_WPARAM(wParam) / static_cast<float>(WHEEL_DELTA);
+            return CallWindowProc(self->m_originalWndProc, hwnd, msg, wParam, lParam);
+        }
+    }
+
+    // For all other messages, find the original proc safely.
+    if (self && self->m_originalWndProc)
+        return CallWindowProc(self->m_originalWndProc, hwnd, msg, wParam, lParam);
+
+    return DefWindowProc(hwnd, msg, wParam, lParam);
 }
 
 // ── Private Helpers ───────────────────────────────────────────────────────────

@@ -40,6 +40,9 @@
     <Filter Include="..\Shared\ImguiVizualizers">
       <UniqueIdentifier>{F90243E0-E512-EFB0-4ECC-53CF3AFBDD49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\Shared\Physics">
+      <UniqueIdentifier>{D9FE70EC-4515-6F82-8E8C-FAA3FAE13F0A}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\Shared\ResourceTypes">
       <UniqueIdentifier>{33C33C54-9FFA-84EB-A804-E90E14BBABE4}</UniqueIdentifier>
     </Filter>
@@ -180,6 +183,12 @@
     <ClInclude Include="..\Shared\KeyboardShortcutManager.h">
       <Filter>..\Shared</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Physics\PhysicsManager.h">
+      <Filter>..\Shared\Physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Physics\PhysicsSystem.h">
+      <Filter>..\Shared\Physics</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
@@ -193,6 +202,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h">
@@ -402,6 +414,9 @@
     <ClInclude Include="..\Shared\utils\MathUtils.h">
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\utils\ObjMeshConverter.h">
+      <Filter>..\Shared\utils</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\utils\StringUtils.h">
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
@@ -556,6 +571,12 @@
     <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp">
       <Filter>..\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp">
+      <Filter>..\Shared\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp">
+      <Filter>..\Shared\Physics</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
@@ -566,6 +587,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp">
