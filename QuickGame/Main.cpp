@@ -122,11 +122,19 @@ namespace
 			// Use debug font to print information about this example.
 			bgfx::dbgTextClear();
 
+			auto* renderFunctionQueue = Core::CoreSystem::GetRenderFunctionQueue();
+			if (renderFunctionQueue)
+			{
+				renderFunctionQueue->ExecuteAll();
+			}
 			theApp.Render(m_deltaTime);
-
+			renderFunctionQueue->Clear();
 			// Advance to next frame. Rendering thread will be kicked to
 			// process submitted rendering primitives.
-			bgfx::frame();
+			{
+				PROFILE_SCOPE("bgfx::frame()");				
+				bgfx::frame();
+			}
 		}
 		void SetupDockspace()
 		{

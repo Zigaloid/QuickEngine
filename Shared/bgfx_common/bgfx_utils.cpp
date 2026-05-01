@@ -20,6 +20,7 @@ namespace stl = tinystl;
 #include <3rdparty/meshoptimizer/src/meshoptimizer.h>
 
 #include "bgfx_utils.h"
+#include "CoreSystem/AppConfig.h"
 
 #include <bimg/decode.h>
 
@@ -98,7 +99,7 @@ static void* loadMem(bx::FileReaderI* _reader, bx::AllocatorI* _allocator, const
 
 static bgfx::ShaderHandle loadShader(bx::FileReaderI* _reader, const bx::StringView& _name)
 {
-	bx::FilePath filePath("./assets/shaders/");
+	bx::FilePath filePath(Core::AppConfig::Instance().ResolvePath("./assets/shaders/").c_str());
 	
 	switch (bgfx::getRendererType() )
 	{

@@ -94,9 +94,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\AssetClasses\EntityDefinition.h" />
-    <ClInclude Include="..\..\AssetClasses\EntityInstance.h" />
-    <ClInclude Include="..\..\AssetClasses\StaticMeshDefinition.h" />
     <ClInclude Include="..\..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\..\External\ufbx\ufbx.h" />
     <ClInclude Include="..\..\Shared\ImguiVizualizers\CommandConsole.h" />
@@ -168,15 +165,12 @@
     <ClInclude Include="..\..\Shared\utils\BgfxBinaryMeshWriter.h" />
     <ClInclude Include="..\..\Shared\utils\FbxMeshConverter.h" />
     <ClInclude Include="..\..\Shared\utils\MathUtils.h" />
-    <ClInclude Include="..\..\Shared\Utils\ObjMeshConverter.h" />
+    <ClInclude Include="..\..\Shared\utils\ObjMeshConverter.h" />
     <ClInclude Include="..\..\Shared\utils\StringUtils.h" />
     <ClInclude Include="FbxToBgfxMesh.h" />
     <ClInclude Include="logo.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\AssetClasses\EntityDefinition.cpp" />
-    <ClCompile Include="..\..\AssetClasses\EntityInstance.cpp" />
-    <ClCompile Include="..\..\AssetClasses\StaticMeshDefinition.cpp" />
     <ClCompile Include="..\..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp" />
     <ClCompile Include="..\..\External\bgfx\3rdparty\meshoptimizer\src\clusterizer.cpp" />
     <ClCompile Include="..\..\External\bgfx\3rdparty\meshoptimizer\src\indexanalyzer.cpp" />

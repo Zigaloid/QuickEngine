@@ -11,6 +11,7 @@
 #include "Math/Vector4f.h"
 #include "Math/Matrix4f.h"
 #include "CoreSystem/CoreSystem.h"
+#include "CoreSystem/AppConfig.h"
 #include "ClassFactory/ClassFactory.h"
 #include "ComponentSystem/ComponentSystem.h"
 #include "ComponentSystem/ComponentRegistry.h"
@@ -948,22 +949,15 @@ namespace ImGuiVisualizers
 			ofn.lpstrFilter = filterBuf.data();
 			ofn.Flags = OFN_FILEMUSTEXIST | OFN_PATHMUSTEXIST | OFN_NOCHANGEDIR;
 
-			// Build initial directory: <current working dir>\assets\ + optional WidgetConfig.defaultFolder
+			// Build initial directory from configured working directory + optional WidgetConfig.defaultFolder
 			char initialDirBuf[MAX_PATH] = { 0 };
-			DWORD got = GetCurrentDirectoryA(MAX_PATH, initialDirBuf);
-			std::string initDir;
-			if (got != 0) {
-				initDir = std::string(initialDirBuf);
-			}
-			else {
-				initDir = std::string("."); // fallback
-			}
+			std::string initDir = Core::AppConfig::Instance().ResolvePath("./Assets");
 
-			// Normalize trailing slash and append assets
+			// Normalize trailing slash
 			if (!initDir.empty() && (initDir.back() == '\\' || initDir.back() == '/')) {
 				initDir.pop_back();
 			}
-			initDir += "\\assets\\";
+			initDir += '\\';
 
 			// Append widget-config default folder if provided (strip any leading slashes)
 			if (config && !config->defaultFolder.empty()) {
@@ -982,9 +976,8 @@ namespace ImGuiVisualizers
 				// Strip the path to be relative to the project directory.
 				std::string  fixedFilePath = filePath;
 				pathSanitize(fixedFilePath);
-				fixedFilePath.erase(0, fixedFilePath.find("assets/"));
-				fixedFilePath = "./" + fixedFilePath; // ensure it starts with ./			
-
+				fixedFilePath.erase(0, fixedFilePath.find("/assets/"));						
+				fixedFilePath = "." + fixedFilePath;
 				*value = fixedFilePath;
 				strncpy_s(buf.data, value->c_str(), sizeof(buf.data) - 1);
 				buf.data[sizeof(buf.data) - 1] = '\0';

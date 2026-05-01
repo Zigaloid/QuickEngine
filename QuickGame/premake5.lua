@@ -27,8 +27,7 @@ externalproject "jolt"
    location "../External/JoltPhysics-master/Build/VS2022_CL"  
    kind "StaticLib"
    language "C++"   
-   
-   
+      
 project "Game"  
    kind "ConsoleApp"
    language "C"

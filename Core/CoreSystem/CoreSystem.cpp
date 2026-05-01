@@ -24,8 +24,9 @@ std::unique_ptr<ComponentSystem::ComponentSystemScheduler> CoreSystem::s_compone
 std::unique_ptr<CThreadSafeLog>                           CoreSystem::s_log = nullptr;
 std::unique_ptr<CNexusClient>                             CoreSystem::s_nexusClient = nullptr;
 
-bool      CoreSystem::s_initialized = false;
-InitFlag  CoreSystem::s_initFlags   = InitFlag::None;
+bool          CoreSystem::s_initialized        = false;
+InitFlag      CoreSystem::s_initFlags          = InitFlag::None;
+FunctionQueue CoreSystem::s_renderFunctionQueue;
 
 // ── Lifecycle ─────────────────────────────────────────────────────────────────
 

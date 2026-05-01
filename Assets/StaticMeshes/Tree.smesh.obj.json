@@ -1,0 +1,24 @@
+{
+    "RootObject": {
+        "m_meshResource": {
+            "Value": "CMeshResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/meshes/tree.mesh.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 64
+        },
+        "m_materialResource": {
+            "Value": "CMaterialResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/materials/bunny.mat.obj.json",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 64
+        }
+    }
+}

@@ -6,6 +6,7 @@
 #include "JobSystem/JobSystem.h"
 #include "DebugChannel/DebugChannel.h"
 #include "CoreSystem/FunctionCallManager.h"
+#include "CoreSystem/FunctionQueue.h"
 #include "Log/ThreadSafeLog.h"
 
 #include <memory>
@@ -80,6 +81,7 @@ private:
     static std::unique_ptr<CNexusClient>                             s_nexusClient;
     static bool                                                       s_initialized;
     static InitFlag                                                   s_initFlags;
+    static FunctionQueue                                              s_renderFunctionQueue;
 
     CoreSystem() = delete;
     ~CoreSystem() = delete;
@@ -142,6 +144,11 @@ public:
     static CNexusClient* GetNexusClient()
     {
         return s_nexusClient.get();
+    }
+
+    static FunctionQueue* GetRenderFunctionQueue()
+    {
+        return &s_renderFunctionQueue;
     }
 
     // ── Component Retrieval ───────────────────────────────────────────────────

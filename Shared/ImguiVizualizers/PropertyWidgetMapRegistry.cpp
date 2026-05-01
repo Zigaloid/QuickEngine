@@ -1,4 +1,5 @@
 #include "PropertyWidgetMapRegistry.h"
+#include "CoreSystem/AppConfig.h"
 #include <algorithm>
 
 namespace ImGuiVisualizers {
@@ -21,7 +22,7 @@ namespace ImGuiVisualizers {
     {
         // OnLoaded() is invoked automatically by SafeRead after deserialization,
         // so m_ownedMaps is populated there — no duplication needed here.
-        this->SafeRead("./Assets/Editor/ClassWidgetRegistry.widgets.obj.json");
+        this->SafeRead(Core::AppConfig::Instance().ResolvePath("./Assets/Editor/ClassWidgetRegistry.widgets.obj.json"));
     }
 
     void PropertyWidgetMapRegistry::Register(const std::string& className, std::shared_ptr<PropertyWidgetMap> map)

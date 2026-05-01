@@ -1,0 +1,67 @@
+{
+    "RootObject": {
+        "m_name": {
+            "Value": "SimpleTree",
+            "Type": 3,
+            "Size": 32
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CEntityComponent",
+            "Elements": [
+                {
+                    "Value": "CMeshComponent",
+                    "m_meshResource": {
+                        "Value": "CStaticMeshResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "Type": 4,
+                        "Size": 56
+                    },
+                    "m_modelMatrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CMeshComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                }
+            ],
+            "Type": 19,
+            "Size": 24
+        }
+    }
+}

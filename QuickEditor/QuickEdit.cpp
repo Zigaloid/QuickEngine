@@ -2,7 +2,6 @@
 #include "CommandConsole.h"
 #include "ImGui3DViewVisualizer.h"
 #include "MessageSystem/MessageBus.h"
-#include "EntityInstance.h"
 #include <iostream>
 #include "PropertyWidgetMapRegistry.h"
 #include "ShaderResource.h"
@@ -10,7 +9,6 @@
 #include "CoreSystem\CoreSystem.h"
 #include "MeshComponent.h"
 #include "imgui.h"
-
 
 std::shared_ptr<CShaderResource> testShader;
 bool QuickEditApp::Initialize()

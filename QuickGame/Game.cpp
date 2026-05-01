@@ -2,22 +2,21 @@
 #include "CommandConsole.h"
 #include "ImGui3DViewVisualizer.h"
 #include "MessageSystem/MessageBus.h"
-#include "EntityInstance.h"
 #include <iostream>
 #include "PropertyWidgetMapRegistry.h"
 #include "ShaderResource.h"
 #include "CoreSystem\CoreDebugChannels.h"
 #include "CoreSystem\CoreSystem.h"
+#include "CoreSystem\AppConfig.h"
 #include "MeshComponent.h"
 #include "Input\MouseManager.h"
 #include "Input\WindowsMouse.h"
 #include "entry\entry.h"
 #include "imgui.h"
 
-
 std::shared_ptr<CShaderResource> testShader;
 bool GameApp::Initialize()
-{
+{	
 	CTextureResourceReference testTextureRef;
 	testTextureRef.OnLoaded();
 
@@ -51,6 +50,12 @@ bool GameApp::Initialize()
 		m_cameraController = std::make_shared<GameCameraController>(m_camera);
 		mouseManager->AddInputHandler(m_cameraController);
 	}
+	auto* componentManager = Core::CoreSystem::GetComponentManager();
+	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
+	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/Level1.lvl.obj.json");
+	m_RootLevel->SafeRead(levelPath);
+
+	componentManager->Initialize();
 
 	return true;
 }
@@ -60,11 +65,17 @@ void GameApp::RegisterComponents()
 	auto* componentManager = Core::CoreSystem::GetComponentManager();
 	auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
 
-	componentManager->RegisterComponentType<CMeshComponent>();
-	scheduler->RegisterComponentType<CMeshComponent>(0, "Mesh");
+	componentManager->RegisterComponentType<CLevelComponent>();
+	scheduler->RegisterComponentType<CLevelComponent>(0, "Level");
 
 	componentManager->RegisterComponentType<Input::MouseManager>();
 	scheduler->RegisterComponentType<Input::MouseManager>(0, "MouseManager");
+
+	componentManager->RegisterComponentType<CEntityComponent>();
+	scheduler->RegisterComponentType<CEntityComponent>(0, "Entity");
+
+	componentManager->RegisterComponentType<CMeshComponent>();
+	scheduler->RegisterComponentType<CMeshComponent>(0, "Mesh");
 
 	// Create and initialize a MouseManager instance so it is discoverable
 	// and receives OnUpdate calls via the scheduler each frame.
@@ -77,17 +88,16 @@ void GameApp::RegisterComponents()
 
 void GameApp::Update(double deltaTime)
 {
+	DECLARE_FUNC_VLOW();
 	m_physicsManager.Update(static_cast<float>(deltaTime));
 	m_visualizerManager.Update(static_cast<float>(deltaTime));
 	Core::MessageSystem::MessageBus::Get().ProcessAll();
 
-	auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
-	scheduler->UpdateAllAsync(static_cast<float>(deltaTime));
-	scheduler->WaitForCompletion();
 }
 
 void GameApp::Render(double deltaTime)
 {
+	DECLARE_FUNC_VLOW();
 	// Apply the game camera to view 0 (the main backbuffer).
 	float viewMtx[16];
 	float projMtx[16];
@@ -122,6 +132,7 @@ bool GameApp::Shutdown()
 	if (mouseManager && m_cameraController)
 		mouseManager->RemoveInputHandler(m_cameraController);
 
+	m_primitives.Shutdown();
 	m_physicsManager.Shutdown();
 	m_visualizerManager.Shutdown();
 	return true;

@@ -4,9 +4,6 @@
     <Filter Include="..">
       <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="..\AssetClasses">
-      <UniqueIdentifier>{3EBD9B7A-AA48-093F-B359-8C331F64653F}</UniqueIdentifier>
-    </Filter>
     <Filter Include="..\External">
       <UniqueIdentifier>{B37FD6D7-1F35-4FCD-A829-49A414DE45D1}</UniqueIdentifier>
     </Filter>
@@ -63,15 +60,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\AssetClasses\EntityDefinition.h">
-      <Filter>..\AssetClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\AssetClasses\EntityInstance.h">
-      <Filter>..\AssetClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\AssetClasses\StaticMeshDefinition.h">
-      <Filter>..\AssetClasses</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
       <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClInclude>
@@ -292,19 +280,10 @@
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
     <ClInclude Include="CodeCompare.h" />
-    <ClInclude Include="logo.h" />
     <ClInclude Include="CodeCompareVisualizer.h" />
+    <ClInclude Include="logo.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\AssetClasses\EntityDefinition.cpp">
-      <Filter>..\AssetClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\AssetClasses\EntityInstance.cpp">
-      <Filter>..\AssetClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\AssetClasses\StaticMeshDefinition.cpp">
-      <Filter>..\AssetClasses</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
       <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
@@ -453,7 +432,7 @@
       <Filter>..\Shared\utils</Filter>
     </ClCompile>
     <ClCompile Include="CodeCompare.cpp" />
-    <ClCompile Include="Main.cpp" />
     <ClCompile Include="CodeCompareVisualizer.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
 </Project>

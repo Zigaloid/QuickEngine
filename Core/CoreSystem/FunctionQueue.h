@@ -42,27 +42,12 @@ public:
     }
 
     /**
-     * @brief Add a function with bound parameters via lambda capture (thread-safe).
-     * @param func Callable to add.
-     * @param name Optional name for debugging purposes.
-     */
-    template<typename Func, typename... Args>
-    void AddFunction(Func&& func, Args&&... args, const std::string& name = "")
-    {
-        std::unique_lock<std::shared_mutex> lock(m_mutex);
-        m_functions.emplace_back([func = std::forward<Func>(func), args...]() mutable
-        {
-            func(args...);
-        });
-        m_names.emplace_back(name);
-    }
-
-    /**
      * @brief Execute all functions in insertion order without clearing the queue (thread-safe).
      * @return Number of functions executed.
      */
     size_t ExecuteAll()
     {
+        DECLARE_FUNC_LOW();
         std::shared_lock<std::shared_mutex> lock(m_mutex);
         size_t executed = 0;
         for (const auto& func : m_functions)

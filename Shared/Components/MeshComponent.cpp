@@ -20,6 +20,7 @@ REFL_DEFINE_END
 
 bool CMeshComponent::OnInitialize()
 {	
+	DECLARE_FUNC_VLOW();
 	if (!Core::CoreSystem::IsInitialized())
 	{
 		std::cerr << "CMeshComponent: CoreSystem is not initialized" << std::endl;
@@ -42,10 +43,20 @@ bool CMeshComponent::OnInitialize()
 
 void CMeshComponent::OnUpdate(double /*deltaTime*/)
 {	
+	DECLARE_FUNC_MEDIUM();
+	auto* renderFunctionQueue = Core::CoreSystem::GetRenderFunctionQueue();
+	if (renderFunctionQueue)
+	{
+		renderFunctionQueue->AddFunction([this]()
+		{
+			Render(0);
+		}, "CMeshComponent::Render");	
+	}
 }
 
 void CMeshComponent::OnShutdown()
 {
+	DECLARE_FUNC_VLOW();
 	// Replace resource references with default-constructed objects to clear stored resource/shared_ptr
 	m_meshResource = CStaticMeshResourceReference();	
 	
@@ -67,6 +78,7 @@ void CMeshComponent::OnShutdown()
 
 void CMeshComponent::Render(bgfx::ViewId viewId)
 {
+	DECLARE_FUNC_MEDIUM();
 	if (IsLoaded())
 	{	
 		if (m_meshStateInitialized == false)

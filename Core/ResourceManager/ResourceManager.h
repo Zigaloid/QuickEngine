@@ -4,6 +4,7 @@
 #include "Profiler/Profiler.h"
 #include "Reflection/ReflectionBase.h"
 #include "CoreSystem/CoreDebugChannels.h"
+#include "CoreSystem/AppConfig.h"
 
 #include <string>
 #include <vector>
@@ -270,9 +271,11 @@ namespace ResourceSystem {
 		std::shared_ptr<T> RequestResource(const std::string& path)
 		{
 			static_assert(std::is_base_of_v<Resource, T>, "T must derive from Resource");
-			ResourceManagerDebug.printf("Requesting resource: %s\n", path.c_str());
 
-			if (!ValidateExtension<T>(path))
+			const std::string resolvedPath = Core::AppConfig::Instance().ResolvePath(path);
+			ResourceManagerDebug.printf("Requesting resource: %s\n", resolvedPath.c_str());
+
+			if (!ValidateExtension<T>(resolvedPath))
 			{
 				// Do not proceed with loading if extension doesn't match the requested resource type.
 				return nullptr;
@@ -280,17 +283,17 @@ namespace ResourceSystem {
 
 			std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
 
-			auto it = m_loadedResources.find(path);
+			auto it = m_loadedResources.find(resolvedPath);
 			if (it != m_loadedResources.end())
 			{
-				ResourceManagerDebug.printf("Return already requested: %s\n", path.c_str());
+				ResourceManagerDebug.printf("Return already requested: %s\n", resolvedPath.c_str());
 				return std::static_pointer_cast<T>(it->second);
 			}
 
-			auto resource = std::make_shared<T>(path);
-			m_loadedResources[path] = resource;
+			auto resource = std::make_shared<T>(resolvedPath);
+			m_loadedResources[resolvedPath] = resource;
 			{
-				ResourceManagerDebug.printf("Enqueueing resource for loading: %s\n", path.c_str());
+				ResourceManagerDebug.printf("Enqueueing resource for loading: %s\n", resolvedPath.c_str());
 				std::lock_guard<std::mutex> queueLock(m_loadingQueueMutex);
 				m_loadingQueue.push(resource);
 			}
@@ -431,10 +434,10 @@ public:
 		return "Resource";
 	}
 
-	void OnLoaded()
+	void OnLoaded() override
 	{
 	}
-	
+
 protected:
 	std::shared_ptr<ResourceSystem::Resource> m_resource;
 private:
@@ -446,7 +449,7 @@ template<typename TResource>
 class CTypedResourceReference : public CResourceReference
 {
 public:
-	void OnLoaded()
+	void OnLoaded() override
 	{
 		const std::string fileName = GetResourceFileName();
 		if (!fileName.empty() && fileName != "undifined")

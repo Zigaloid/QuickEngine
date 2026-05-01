@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -94,9 +94,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\AssetClasses\EntityDefinition.h" />
-    <ClInclude Include="..\AssetClasses\EntityInstance.h" />
-    <ClInclude Include="..\AssetClasses\StaticMeshDefinition.h" />
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\External\ufbx\ufbx.h" />
     <ClInclude Include="..\Shared\Components\EntityComponent.h" />
@@ -136,8 +133,8 @@
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h" />
-    <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\TextureResource.h" />
     <ClInclude Include="..\Shared\bgfx_common\args.h" />
@@ -210,13 +207,9 @@
     <ClInclude Include="..\Shared\utils\ObjMeshConverter.h" />
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
     <ClInclude Include="AssetBrowser.h" />
-    <ClInclude Include="AssetClasses\EntityInstance.h" />
     <ClInclude Include="QuickEdit.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\AssetClasses\EntityDefinition.cpp" />
-    <ClCompile Include="..\AssetClasses\EntityInstance.cpp" />
-    <ClCompile Include="..\AssetClasses\StaticMeshDefinition.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\clusterizer.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\indexanalyzer.cpp" />
@@ -267,8 +260,8 @@
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />
-    <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\bgfx_utils.cpp" />
@@ -321,6 +314,9 @@
     <ProjectReference Include="..\External\bgfx\.build\projects\vs2019\bimg_decode.vcxproj">
       <Project>{A7B931CA-136F-AABF-9C63-A4960818A1C3}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AppConfig.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

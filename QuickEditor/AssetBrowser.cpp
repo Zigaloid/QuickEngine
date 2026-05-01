@@ -1,5 +1,6 @@
 ﻿#include "AssetBrowser.h"
 #include "CoreSystem/CoreSystem.h"
+#include "CoreSystem/AppConfig.h"
 
 #include <sstream>
 #include <iomanip>
@@ -130,12 +131,10 @@ void AssetBrowser::Initialize()
 {
     m_fileSystem = Core::CoreSystem::GetFileSystemManager();
 
-    if (m_rootPath.empty() && m_fileSystem) {
-        auto result = m_fileSystem->GetCurrentDirectory();
-        if (result.IsSuccess()) {
-            m_rootPath = result.GetValue();
-            m_rootPath = m_rootPath + "/assets";
-        }
+    if (m_rootPath.empty()) {
+        m_rootPath = Core::AppConfig::Instance().ResolvePath("./Assets");
+    } else {
+        m_rootPath = Core::AppConfig::Instance().ResolvePath(m_rootPath);
     }
 
     m_selectedFolder    = m_rootPath;

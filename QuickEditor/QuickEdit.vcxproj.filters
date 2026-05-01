@@ -4,9 +4,6 @@
     <Filter Include="..">
       <UniqueIdentifier>{61705900-4DFC-870B-B6AA-880BA255880B}</UniqueIdentifier>
     </Filter>
-    <Filter Include="..\AssetClasses">
-      <UniqueIdentifier>{3EBD9B7A-AA48-093F-B359-8C331F64653F}</UniqueIdentifier>
-    </Filter>
     <Filter Include="..\External">
       <UniqueIdentifier>{B37FD6D7-1F35-4FCD-A829-49A414DE45D1}</UniqueIdentifier>
     </Filter>
@@ -70,20 +67,8 @@
     <Filter Include="..\Shared\utils">
       <UniqueIdentifier>{2707D659-9392-431E-9CA3-C61208AE9F1E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="AssetClasses">
-      <UniqueIdentifier>{137D46AB-FFDF-D54F-A865-0E0694A7A1D2}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\AssetClasses\EntityDefinition.h">
-      <Filter>..\AssetClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="..\AssetClasses\EntityInstance.h">
-      <Filter>..\AssetClasses</Filter>
-    </ClInclude>
-    <ClInclude Include="..\AssetClasses\StaticMeshDefinition.h">
-      <Filter>..\AssetClasses</Filter>
-    </ClInclude>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
       <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClInclude>
@@ -201,10 +186,10 @@
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
+    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
+    <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h">
@@ -421,21 +406,9 @@
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
-    <ClInclude Include="AssetClasses\EntityInstance.h">
-      <Filter>AssetClasses</Filter>
-    </ClInclude>
     <ClInclude Include="QuickEdit.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\AssetClasses\EntityDefinition.cpp">
-      <Filter>..\AssetClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="..\AssetClasses\EntityInstance.cpp">
-      <Filter>..\AssetClasses</Filter>
-    </ClCompile>
-    <ClCompile Include="..\AssetClasses\StaticMeshDefinition.cpp">
-      <Filter>..\AssetClasses</Filter>
-    </ClCompile>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
       <Filter>..\External\bgfx\3rdparty\meshoptimizer\src</Filter>
     </ClCompile>
@@ -586,10 +559,10 @@
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
+    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
+    <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp">
@@ -676,5 +649,8 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="AppConfig.json" />
   </ItemGroup>
 </Project>

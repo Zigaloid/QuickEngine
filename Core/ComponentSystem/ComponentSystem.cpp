@@ -13,6 +13,14 @@ void Component::Update(double deltaTime)
 	if (!m_initialized || !m_active) return;
 
 	OnUpdate(deltaTime);
+
+	for (auto& child : m_children)
+	{
+		if (child)
+		{
+			child->Update(deltaTime);
+		}
+	}
 }
 
 void Component::RemoveChild(Component* child)

@@ -51,6 +51,7 @@ public:
 
 	bool IsReady() const 
 	{ 		
+		return IsLoaded();
 	}
 	bool IsLoaded() const;
 

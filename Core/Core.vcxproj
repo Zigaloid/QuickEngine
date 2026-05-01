@@ -97,6 +97,7 @@
     <ClInclude Include="ComponentSystem\ComponentRegistry.h" />
     <ClInclude Include="ComponentSystem\ComponentSystem.h" />
     <ClInclude Include="ComponentSystem\ComponentSystemScheduler.h" />
+    <ClInclude Include="CoreSystem\AppConfig.h" />
     <ClInclude Include="CoreSystem\CoreDebugChannels.h" />
     <ClInclude Include="CoreSystem\CoreSystem.h" />
     <ClInclude Include="CoreSystem\FunctionCallManager.h" />
@@ -160,6 +161,7 @@
     <ClCompile Include="ComponentSystem\ComponentRegistry.cpp" />
     <ClCompile Include="ComponentSystem\ComponentSystem.cpp" />
     <ClCompile Include="ComponentSystem\ComponentSystemScheduler.cpp" />
+    <ClCompile Include="CoreSystem\AppConfig.cpp" />
     <ClCompile Include="CoreSystem\CoreDebugChannels.cpp" />
     <ClCompile Include="CoreSystem\CoreSystem.cpp" />
     <ClCompile Include="CoreSystem\FunctionCallManager.cpp" />

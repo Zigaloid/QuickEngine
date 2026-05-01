@@ -183,8 +183,29 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
     if (!scene)
         return false;
 
+    // ── Scan all meshes to determine which attributes are actually present.
+    // Attributes requested in opts but absent from the FBX would produce
+    // zero-filled channels in every vertex (e.g. all-zero tangents), which
+    // corrupts tangent-space shading.  Build the layout only from attributes
+    // that are both requested AND available.
+    bool anyNormals  = false;
+    bool anyUVs      = false;
+    bool anyTangents = false;
+    for (size_t mi = 0; mi < scene->meshes.count; ++mi)
+    {
+        const ufbx_mesh* m = scene->meshes.data[mi];
+        if (m->vertex_normal.exists)  anyNormals  = true;
+        if (m->vertex_uv.exists)      anyUVs      = true;
+        if (m->vertex_tangent.exists) anyTangents = true;
+    }
+
+    FbxConvertOptions effectiveOpts = opts;
+    if (opts.includeNormals  && !anyNormals)                                effectiveOpts.includeNormals  = false;
+    if (opts.includeUVs      && !anyUVs && !opts.generateSphericalUVs)      effectiveOpts.includeUVs      = false;
+    if (opts.includeTangents && !anyTangents)                               effectiveOpts.includeTangents = false;
+
     // Build the vertex layout.
-    outMeshData.layout = BuildLayout(opts);
+    outMeshData.layout = BuildLayout(effectiveOpts);
     outMeshData.groups.clear();
 
     const uint16_t stride = outMeshData.layout.getStride();
@@ -195,8 +216,8 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
         const ufbx_mesh* fbxMesh = scene->meshes.data[mi];
 
         // ── Pre-compute mesh AABB centre for spherical UV fallback ───
-        const bool needsSphericalUV = opts.includeUVs
-                                   && opts.generateSphericalUVs
+        const bool needsSphericalUV = effectiveOpts.includeUVs
+                                   && effectiveOpts.generateSphericalUVs
                                    && !fbxMesh->vertex_uv.exists;
         float meshCX = 0.0f, meshCY = 0.0f, meshCZ = 0.0f;
         if (needsSphericalUV && fbxMesh->num_vertices > 0)
@@ -205,9 +226,9 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
             float mxx = -FLT_MAX, mxy = -FLT_MAX, mxz = -FLT_MAX;
             for (size_t vi = 0; vi < fbxMesh->num_vertices; ++vi)
             {
-                const float vpx = static_cast<float>(fbxMesh->vertices.data[vi].x) * opts.scaleFactor;
-                const float vpy = static_cast<float>(fbxMesh->vertices.data[vi].y) * opts.scaleFactor;
-                const float vpz = static_cast<float>(fbxMesh->vertices.data[vi].z) * opts.scaleFactor;
+                const float vpx = static_cast<float>(fbxMesh->vertices.data[vi].x) * effectiveOpts.scaleFactor;
+                const float vpy = static_cast<float>(fbxMesh->vertices.data[vi].y) * effectiveOpts.scaleFactor;
+                const float vpz = static_cast<float>(fbxMesh->vertices.data[vi].z) * effectiveOpts.scaleFactor;
                 mnx = std::min(mnx, vpx); mny = std::min(mny, vpy); mnz = std::min(mnz, vpz);
                 mxx = std::max(mxx, vpx); mxy = std::max(mxy, vpy); mxz = std::max(mxz, vpz);
             }
@@ -242,12 +263,12 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
 
                 // Position
                 ufbx_vec3 pos = ufbx_get_vertex_vec3(&fbxMesh->vertex_position, idx);
-                pv.px = static_cast<float>(pos.x) * opts.scaleFactor;
-                pv.py = static_cast<float>(pos.y) * opts.scaleFactor;
-                pv.pz = static_cast<float>(pos.z) * opts.scaleFactor;
+                pv.px = static_cast<float>(pos.x) * effectiveOpts.scaleFactor;
+                pv.py = static_cast<float>(pos.y) * effectiveOpts.scaleFactor;
+                pv.pz = static_cast<float>(pos.z) * effectiveOpts.scaleFactor;
 
                 // Normal
-                if (opts.includeNormals && fbxMesh->vertex_normal.exists)
+                if (effectiveOpts.includeNormals && fbxMesh->vertex_normal.exists)
                 {
                     ufbx_vec3 n = ufbx_get_vertex_vec3(&fbxMesh->vertex_normal, idx);
                     pv.nx = static_cast<float>(n.x);
@@ -256,7 +277,7 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
                 }
 
                 // UV — use mesh data when available, fall back to spherical projection.
-                if (opts.includeUVs)
+                if (effectiveOpts.includeUVs)
                 {
                     if (fbxMesh->vertex_uv.exists)
                     {
@@ -264,17 +285,17 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
                         pv.u = static_cast<float>(uv.x);
                         pv.v = 1.0f - static_cast<float>(uv.y); // flip V for D3D / bgfx
                     }
-                    else if (opts.generateSphericalUVs)
+                    else if (effectiveOpts.generateSphericalUVs)
                     {
                         ComputeSphericalUV(pv.px, pv.py, pv.pz,
                                            meshCX, meshCY, meshCZ,
-                                           opts.sphericalUVScale,
+                                           effectiveOpts.sphericalUVScale,
                                            pv.u, pv.v);
                     }
                 }
 
                 // Tangent
-                if (opts.includeTangents && fbxMesh->vertex_tangent.exists)
+                if (effectiveOpts.includeTangents && fbxMesh->vertex_tangent.exists)
                 {
                     ufbx_vec3 t = ufbx_get_vertex_vec3(&fbxMesh->vertex_tangent, idx);
                     pv.tx = static_cast<float>(t.x);
@@ -339,21 +360,21 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
             bgfx::vertexPack(pos, false, bgfx::Attrib::Position,
                              outMeshData.layout, vbPtr, vi);
 
-            if (opts.includeNormals)
+            if (effectiveOpts.includeNormals)
             {
                 float nrm[4] = { v.nx, v.ny, v.nz, 0.0f };
                 bgfx::vertexPack(nrm, true, bgfx::Attrib::Normal,
                                  outMeshData.layout, vbPtr, vi);
             }
 
-            if (opts.includeUVs)
+            if (effectiveOpts.includeUVs)
             {
                 float uv[4] = { v.u, v.v, 0.0f, 0.0f };
                 bgfx::vertexPack(uv, true, bgfx::Attrib::TexCoord0,
                                  outMeshData.layout, vbPtr, vi);
             }
 
-            if (opts.includeTangents)
+            if (effectiveOpts.includeTangents)
             {
                 float tan[4] = { v.tx, v.ty, v.tz, v.tw };
                 bgfx::vertexPack(tan, true, bgfx::Attrib::Tangent,

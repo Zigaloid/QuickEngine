@@ -1,5 +1,6 @@
 ﻿#include "LevelComponentVisualizer.h"
 #include "CoreSystem/CoreSystem.h"
+#include "CoreSystem/AppConfig.h"
 #include "FileSystem/FileSystemManager.h"
 #include "EntityComponent.h"
 #include "DeleteEntityCommand.h"
@@ -451,7 +452,7 @@ namespace ImGuiVisualizers {
 		if (!fileSystem) return;
 
 		// Look for entity files in the Assets/Entities directory
-		std::string entityPath = "./Assets/Entities";
+		std::string entityPath = Core::AppConfig::Instance().ResolvePath("./Assets/Entities");
 		auto dirResult = fileSystem->OpenDirectory(entityPath);
 		if (!dirResult.IsSuccess()) return;
 

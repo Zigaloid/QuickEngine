@@ -18,6 +18,19 @@ struct FileCompareResult
     std::string name;
     Status      status      = Status::Identical;
     float       diffPercent = 0.f; // 0 = identical … 100 = completely different
+    std::string absPathA;   // absolute path in tree A (empty if OnlyInB)
+    std::string absPathB;   // absolute path in tree B (empty if OnlyInA)
+};
+
+// One line in a side-by-side diff view
+struct DiffLine
+{
+    enum class Type { Context, OnlyA, OnlyB };
+    Type        type     = Type::Context;
+    std::string lineA;
+    std::string lineB;
+    int         lineNumA = 0;
+    int         lineNumB = 0;
 };
 
 struct DirCompareNode
@@ -66,6 +79,21 @@ private:
     std::mutex     m_statusMutex;
     DirCompareNode m_rootNode;
 
+    // File diff panel
+    std::string                m_selectedName;
+    std::string                m_selectedAbsPathA;
+    std::string                m_selectedAbsPathB;
+    FileCompareResult::Status  m_selectedStatus = FileCompareResult::Status::Identical;
+    std::vector<DiffLine>      m_diffLines;
+    bool                       m_hasDiff    = false;
+    float                      m_treeHeight = 350.f;
+
+    // Visibility toggles (legend checkboxes)
+    bool m_showIdentical = true;
+    bool m_showDifferent = true;
+    bool m_showOnlyA     = true;
+    bool m_showOnlyB     = true;
+
     // Comparison entry points
     void StartComparison();
     void DoComparison(std::string pathA, std::string pathB,
@@ -74,13 +102,19 @@ private:
     // Rendering helpers
     void RenderLegend()                               const;
     void RenderOverallStats(const DirCompareNode& node) const;
-    void RenderDirNode(const DirCompareNode& node)    const;
-    void RenderFileRow(const FileCompareResult& file) const;
+    void RenderDirNode(const DirCompareNode& node);
+    void RenderFileRow(const FileCompareResult& file);
+    void RenderDiffPanel();
+    void LoadFileDiff(const std::string& absPathA, const std::string& absPathB,
+                      FileCompareResult::Status status);
+    static std::vector<DiffLine> ComputeDiff(const std::vector<std::string>& linesA,
+                                             const std::vector<std::string>& linesB);
 
     // Filter helpers
     static std::set<std::string> ParseExtensions(const char* filterStr);
     static bool                  PassesFilter(const std::filesystem::path& p,
                                               const std::set<std::string>& exts);
+    bool                         PassesVisibilityFilter(FileCompareResult::Status s) const;
 
 #ifdef _WIN32
     bool BrowseForFolder(char* outPath, std::size_t outSize);

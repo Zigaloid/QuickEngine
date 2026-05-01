@@ -219,16 +219,19 @@ void CodeCompareVisualizer::DoComparison(std::string pathA, std::string pathB,
 
             if (inA && !inB)
             {
-                result.status = FileCompareResult::Status::OnlyInA;
+                result.status   = FileCompareResult::Status::OnlyInA;
+                result.absPathA = filesA.at(rel).string();
             }
             else if (!inA && inB)
             {
-                result.status = FileCompareResult::Status::OnlyInB;
+                result.status   = FileCompareResult::Status::OnlyInB;
+                result.absPathB = filesB.at(rel).string();
             }
             else
             {
-                result.diffPercent = ComputeDiffPercent(filesA.at(rel).string(),
-                                                        filesB.at(rel).string());
+                result.absPathA    = filesA.at(rel).string();
+                result.absPathB    = filesB.at(rel).string();
+                result.diffPercent = ComputeDiffPercent(result.absPathA, result.absPathB);
                 result.status = result.diffPercent < 0.01f
                     ? FileCompareResult::Status::Identical
                     : FileCompareResult::Status::Different;
@@ -295,22 +298,26 @@ void CodeCompareVisualizer::RenderLegend() const
 {
     constexpr float gap = 18.f;
 
-    auto entry = [](ImU32 col, const char* label)
+    // Helper: checkbox + coloured label inline
+    struct Entry { bool* flag; ImU32 col; const char* cbId; const char* label; };
+    const Entry entries[] =
     {
-        ImGui::PushStyleColor(ImGuiCol_Text, col);
-        ImGui::Bullet();
-        ImGui::PopStyleColor();
-        ImGui::SameLine(0, 4.f);
-        ImGui::TextUnformatted(label);
+        { &const_cast<CodeCompareVisualizer*>(this)->m_showIdentical, IM_COL32( 60, 190,  60, 255), "##chkIdentical", "Identical" },
+        { &const_cast<CodeCompareVisualizer*>(this)->m_showDifferent, IM_COL32(220, 185,  40, 255), "##chkDifferent", "Different" },
+        { &const_cast<CodeCompareVisualizer*>(this)->m_showOnlyA,     IM_COL32( 70, 140, 220, 255), "##chkOnlyA",     "Only in A" },
+        { &const_cast<CodeCompareVisualizer*>(this)->m_showOnlyB,     IM_COL32(220,  75,  75, 255), "##chkOnlyB",     "Only in B" },
     };
 
-    entry(IM_COL32( 60, 190,  60, 255), "Identical");
-    ImGui::SameLine(0, gap);
-    entry(IM_COL32(220, 185,  40, 255), "Different");
-    ImGui::SameLine(0, gap);
-    entry(IM_COL32( 70, 140, 220, 255), "Only in A");
-    ImGui::SameLine(0, gap);
-    entry(IM_COL32(220,  75,  75, 255), "Only in B");
+    for (int i = 0; i < 4; ++i)
+    {
+        if (i > 0) ImGui::SameLine(0, gap);
+        ImGui::Checkbox(entries[i].cbId, entries[i].flag);
+        ImGui::SameLine(0, 4.f);
+        ImGui::PushStyleColor(ImGuiCol_Text,
+            *entries[i].flag ? entries[i].col : IM_COL32(90, 90, 90, 255));
+        ImGui::TextUnformatted(entries[i].label);
+        ImGui::PopStyleColor();
+    }
 }
 
 void CodeCompareVisualizer::RenderOverallStats(const DirCompareNode& node) const
@@ -339,7 +346,7 @@ void CodeCompareVisualizer::RenderOverallStats(const DirCompareNode& node) const
     ImGui::Spacing();
 }
 
-void CodeCompareVisualizer::RenderFileRow(const FileCompareResult& file) const
+void CodeCompareVisualizer::RenderFileRow(const FileCompareResult& file)
 {
     ImU32       textCol;
     const char* statusStr;
@@ -360,10 +367,24 @@ void CodeCompareVisualizer::RenderFileRow(const FileCompareResult& file) const
 
     ImGui::TableNextRow();
 
-    // Column 0 – filename
+    // Column 0 – filename with selectable spanning all columns
     ImGui::TableSetColumnIndex(0);
+    const bool isSelected = (m_selectedAbsPathA == file.absPathA &&
+                             m_selectedAbsPathB == file.absPathB &&
+                             m_selectedName     == file.name);
+
     ImGui::PushStyleColor(ImGuiCol_Text, textCol);
-    ImGui::TextUnformatted(file.name.c_str());
+    if (ImGui::Selectable(file.name.c_str(), isSelected,
+                          ImGuiSelectableFlags_SpanAllColumns |
+                          ImGuiSelectableFlags_AllowOverlap,
+                          { 0.f, 0.f }))
+    {
+        m_selectedName     = file.name;
+        m_selectedAbsPathA = file.absPathA;
+        m_selectedAbsPathB = file.absPathB;
+        m_selectedStatus   = file.status;
+        LoadFileDiff(file.absPathA, file.absPathB, file.status);
+    }
     ImGui::PopStyleColor();
 
     // Column 1 – status
@@ -386,7 +407,7 @@ void CodeCompareVisualizer::RenderFileRow(const FileCompareResult& file) const
     }
 }
 
-void CodeCompareVisualizer::RenderDirNode(const DirCompareNode& node) const
+void CodeCompareVisualizer::RenderDirNode(const DirCompareNode& node)
 {
     if (node.totalFiles == 0) return;
 
@@ -444,13 +465,192 @@ void CodeCompareVisualizer::RenderDirNode(const DirCompareNode& node) const
             ImGui::TableHeadersRow();
 
             for (const auto& f : node.files)
-                RenderFileRow(f);
+            {
+                if (PassesVisibilityFilter(f.status))
+                    RenderFileRow(f);
+            }
 
             ImGui::EndTable();
         }
     }
 
     ImGui::TreePop();
+}
+
+// ─── File diff ───────────────────────────────────────────────────────────────
+
+/*static*/ std::vector<DiffLine> CodeCompareVisualizer::ComputeDiff(
+    const std::vector<std::string>& A,
+    const std::vector<std::string>& B)
+{
+    // LCS-based diff, capped to avoid O(N²) blowup on huge files
+    const int m = static_cast<int>(std::min(A.size(), size_t(3000)));
+    const int n = static_cast<int>(std::min(B.size(), size_t(3000)));
+
+    // dp[i][j] = LCS length of A[0..i-1], B[0..j-1]
+    // Use short to keep the table small (~18 MB for 3000×3000)
+    std::vector<std::vector<short>> dp(m + 1, std::vector<short>(n + 1, 0));
+    for (int i = 1; i <= m; ++i)
+        for (int j = 1; j <= n; ++j)
+            dp[i][j] = (A[i-1] == B[j-1])
+                ? static_cast<short>(dp[i-1][j-1] + 1)
+                : std::max(dp[i-1][j], dp[i][j-1]);
+
+    // Backtrack to build the edit list
+    std::vector<DiffLine> result;
+    int lineNumA = 0, lineNumB = 0;
+
+    // Build in reverse, track line numbers from the end
+    int i = m, j = n;
+    while (i > 0 || j > 0)
+    {
+        if (i > 0 && j > 0 && A[i-1] == B[j-1])
+        {
+            result.push_back({ DiffLine::Type::Context, A[i-1], B[j-1], i, j });
+            --i; --j;
+        }
+        else if (j > 0 && (i == 0 || dp[i][j-1] >= dp[i-1][j]))
+        {
+            result.push_back({ DiffLine::Type::OnlyB, "", B[j-1], 0, j });
+            --j;
+        }
+        else
+        {
+            result.push_back({ DiffLine::Type::OnlyA, A[i-1], "", i, 0 });
+            --i;
+        }
+    }
+
+    // Lines beyond the cap are appended as-is (context)
+    for (int k = m; k < static_cast<int>(A.size()); ++k)
+        result.push_back({ DiffLine::Type::OnlyA, A[k], "", k + 1, 0 });
+    for (int k = n; k < static_cast<int>(B.size()); ++k)
+        result.push_back({ DiffLine::Type::OnlyB, "", B[k], 0, k + 1 });
+
+    std::reverse(result.begin(), result.end());
+    return result;
+}
+
+void CodeCompareVisualizer::LoadFileDiff(const std::string& absPathA,
+                                          const std::string& absPathB,
+                                          FileCompareResult::Status status)
+{
+    const auto linesA = absPathA.empty() ? std::vector<std::string>{} : ReadLines(absPathA);
+    const auto linesB = absPathB.empty() ? std::vector<std::string>{} : ReadLines(absPathB);
+    m_diffLines = ComputeDiff(linesA, linesB);
+    m_hasDiff   = true;
+}
+
+void CodeCompareVisualizer::RenderDiffPanel()
+{
+    // Title bar with file name and close button
+    ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(25, 25, 30, 255));
+    ImGui::BeginChild("##diffpanel", { 0.f, 0.f }, false,
+        ImGuiWindowFlags_HorizontalScrollbar);
+
+    // Header row
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 180, 180, 255));
+        ImGui::Text("Diff:  %s", m_selectedName.c_str());
+        ImGui::PopStyleColor();
+        ImGui::SameLine();
+        if (ImGui::SmallButton("Close"))
+        {
+            m_hasDiff = false;
+            m_diffLines.clear();
+        }
+        ImGui::Separator();
+    }
+
+    constexpr ImGuiTableFlags tflags =
+        ImGuiTableFlags_ScrollY          |
+        ImGuiTableFlags_ScrollX          |
+        ImGuiTableFlags_RowBg            |
+        ImGuiTableFlags_BordersInnerV    |
+        ImGuiTableFlags_SizingFixedFit   |
+        ImGuiTableFlags_NoHostExtendX;
+
+    if (ImGui::BeginTable("##diff", 4, tflags))
+    {
+        const float lineNumW  = ImGui::CalcTextSize("99999").x + 8.f;
+        const float codeW     = 600.f;
+
+        ImGui::TableSetupScrollFreeze(0, 1);
+        ImGui::TableSetupColumn("##lnA",  ImGuiTableColumnFlags_WidthFixed, lineNumW);
+        ImGui::TableSetupColumn("A",      ImGuiTableColumnFlags_WidthFixed, codeW);
+        ImGui::TableSetupColumn("##lnB",  ImGuiTableColumnFlags_WidthFixed, lineNumW);
+        ImGui::TableSetupColumn("B",      ImGuiTableColumnFlags_WidthFixed, codeW);
+        ImGui::TableHeadersRow();
+
+        // Background colours per row type
+        constexpr ImU32 bgOnlyA  = IM_COL32( 80,  30,  30, 180);
+        constexpr ImU32 bgOnlyB  = IM_COL32( 30,  70,  30, 180);
+        constexpr ImU32 colNumA  = IM_COL32(180, 100, 100, 255);
+        constexpr ImU32 colNumB  = IM_COL32(100, 180, 100, 255);
+        constexpr ImU32 colCtx   = IM_COL32(120, 120, 120, 255);
+        constexpr ImU32 colTextA = IM_COL32(230, 160, 160, 255);
+        constexpr ImU32 colTextB = IM_COL32(140, 210, 140, 255);
+
+        ImGuiListClipper clipper;
+        clipper.Begin(static_cast<int>(m_diffLines.size()));
+        while (clipper.Step())
+        {
+            for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row)
+            {
+                const DiffLine& dl = m_diffLines[row];
+
+                ImGui::TableNextRow();
+
+                if (dl.type == DiffLine::Type::OnlyA)
+                    ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, bgOnlyA);
+                else if (dl.type == DiffLine::Type::OnlyB)
+                    ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, bgOnlyB);
+
+                // Line number A
+                ImGui::TableSetColumnIndex(0);
+                if (dl.lineNumA > 0)
+                {
+                    ImGui::PushStyleColor(ImGuiCol_Text, colNumA);
+                    ImGui::Text("%d", dl.lineNumA);
+                    ImGui::PopStyleColor();
+                }
+
+                // Content A
+                ImGui::TableSetColumnIndex(1);
+                if (!dl.lineA.empty())
+                {
+                    const ImU32 tc = dl.type == DiffLine::Type::OnlyA ? colTextA : colCtx;
+                    ImGui::PushStyleColor(ImGuiCol_Text, tc);
+                    ImGui::TextUnformatted(dl.lineA.c_str());
+                    ImGui::PopStyleColor();
+                }
+
+                // Line number B
+                ImGui::TableSetColumnIndex(2);
+                if (dl.lineNumB > 0)
+                {
+                    ImGui::PushStyleColor(ImGuiCol_Text, colNumB);
+                    ImGui::Text("%d", dl.lineNumB);
+                    ImGui::PopStyleColor();
+                }
+
+                // Content B
+                ImGui::TableSetColumnIndex(3);
+                if (!dl.lineB.empty())
+                {
+                    const ImU32 tc = dl.type == DiffLine::Type::OnlyB ? colTextB : colCtx;
+                    ImGui::PushStyleColor(ImGuiCol_Text, tc);
+                    ImGui::TextUnformatted(dl.lineB.c_str());
+                    ImGui::PopStyleColor();
+                }
+            }
+        }
+        clipper.End();
+        ImGui::EndTable();
+    }
+
+    ImGui::EndChild();
+    ImGui::PopStyleColor(); // ChildBg
 }
 
 bool CodeCompareVisualizer::Render(bool* isOpen)
@@ -549,10 +749,40 @@ bool CodeCompareVisualizer::Render(bool* isOpen)
     // Safe to read m_rootNode — worker has finished
     RenderOverallStats(m_rootNode);
 
-    ImGui::BeginChild("##tree", { 0.f, 0.f }, false,
+    const float availH   = ImGui::GetContentRegionAvail().y;
+    constexpr float kMinH = 80.f;
+    constexpr float kSplitterH = 5.f;
+
+    // Clamp tree height: always leave room for at least kMinH of diff panel (if shown)
+    if (m_hasDiff)
+        m_treeHeight = std::clamp(m_treeHeight, kMinH, availH - kMinH - kSplitterH);
+
+    // ── Directory tree ────────────────────────────────────────────────────
+    ImGui::BeginChild("##tree",
+        { 0.f, m_hasDiff ? m_treeHeight : 0.f }, false,
         ImGuiWindowFlags_HorizontalScrollbar);
     RenderDirNode(m_rootNode);
     ImGui::EndChild();
+
+    if (m_hasDiff)
+    {
+        // ── Splitter handle ───────────────────────────────────────────────
+        ImGui::PushStyleColor(ImGuiCol_Button,        IM_COL32( 50,  50,  50, 255));
+        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32( 90,  90,  90, 255));
+        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  IM_COL32(120, 120, 120, 255));
+        ImGui::Button("##vsplit", { -1.f, kSplitterH });
+        ImGui::PopStyleColor(3);
+
+        if (ImGui::IsItemActive())
+            m_treeHeight = std::clamp(
+                m_treeHeight + ImGui::GetIO().MouseDelta.y,
+                kMinH, availH - kMinH - kSplitterH);
+        if (ImGui::IsItemHovered() || ImGui::IsItemActive())
+            ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
+
+        // ── Diff panel ────────────────────────────────────────────────────
+        RenderDiffPanel();
+    }
 
     ImGui::End();
     return true;
@@ -618,6 +848,18 @@ bool CodeCompareVisualizer::BrowseForFolder(char* outPath, std::size_t outSize)
 #endif
 
 // ─── Extension filter helpers ────────────────────────────────────────────────
+
+bool CodeCompareVisualizer::PassesVisibilityFilter(FileCompareResult::Status s) const
+{
+    switch (s)
+    {
+    case FileCompareResult::Status::Identical: return m_showIdentical;
+    case FileCompareResult::Status::Different: return m_showDifferent;
+    case FileCompareResult::Status::OnlyInA:   return m_showOnlyA;
+    case FileCompareResult::Status::OnlyInB:   return m_showOnlyB;
+    default:                                   return true;
+    }
+}
 
 /*static*/ std::set<std::string> CodeCompareVisualizer::ParseExtensions(const char* filterStr)
 {

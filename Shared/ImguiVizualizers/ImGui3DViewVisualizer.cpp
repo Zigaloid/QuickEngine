@@ -1,7 +1,6 @@
 #include "ImGui3DViewVisualizer.h"
 
 // Project headers
-#include "EntityInstance.h"
 #include "CoreSystem/CoreSystem.h"
 #include "MeshComponent.h"
 #include "EntityComponent.h"

@@ -247,6 +247,7 @@
       <Filter>ResourceManager</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="CoreSystem\AppConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp">
@@ -348,6 +349,7 @@
     <ClCompile Include="ResourceManager\ResourceManager.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
+    <ClCompile Include="CoreSystem\AppConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\ComponentSystemDocumentation.html">

@@ -4,6 +4,8 @@
 #include "Physics/PhysicsManager.h"
 #include "GameCameraController.h"
 #include "Rendering/BgfxRenderPrimitives.h"
+#include "levelComponent.h"
+#include "CoreSystem\functionqueue.h"
 
 #include <memory>
 
@@ -25,5 +27,7 @@ private:
     // Primary game viewport camera — renders directly into bgfx view 0.
     BgfxGameCamera            m_camera;
     std::shared_ptr<GameCameraController>     m_cameraController;
-    RenderPrimitives::BgfxRenderPrimitives  m_primitives;
+    RenderPrimitives::BgfxRenderPrimitives    m_primitives;
+    CLevelComponent *m_RootLevel;
+    Core::FunctionQueue                       m_functionQueue;
 };
