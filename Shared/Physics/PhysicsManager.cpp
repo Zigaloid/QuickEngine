@@ -1,6 +1,9 @@
 #include "PhysicsManager.h"
 
 #include <Jolt/Jolt.h>
+
+PhysicsManager* PhysicsManager::s_instance = nullptr;
+
 #include <Jolt/RegisterTypes.h>
 #include <Jolt/Core/Factory.h>
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>

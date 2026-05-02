@@ -36,11 +36,15 @@
     {                                                                                   \
         try {                                                                           \
             InternalReadMembers( GetReflectionMap(), doc);                              \
+        } catch (const Reflection::ReflectionException& e) {                           \
+            REFL_WARNING(Reflection::ErrorCategory::Validation,                         \
+                "Skipping failed member read", std::string(GetRflClassName()) + ": " + e.what());\
+        }                                                                               \
+        try {                                                                           \
             _P_::ReadMembers(doc);                                                      \
         } catch (const Reflection::ReflectionException& e) {                           \
-            REFL_ERROR(Reflection::ErrorCategory::Validation,                           \
-                "Failed to read members", std::string(GetRflClassName()) + ": " + e.what());\
-            throw;                                                                      \
+            REFL_WARNING(Reflection::ErrorCategory::Validation,                         \
+                "Skipping failed base read", std::string(GetRflClassName()) + ": " + e.what());\
         }                                                                               \
     }                                                                                   \
     static ClassFactory s_factoryRegistration;

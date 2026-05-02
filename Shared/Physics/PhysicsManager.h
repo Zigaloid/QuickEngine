@@ -97,7 +97,19 @@ public:
     JPH::BodyInterface&  GetBodyInterface()  { return m_physicsSystem->GetBodyInterface(); }
     bool                 IsInitialized() const { return m_initialized; }
 
+    // -----------------------------------------------------------------------
+    // Global instance access
+    // -----------------------------------------------------------------------
+
+    /// Returns the active PhysicsManager, or nullptr if none has been set.
+    static PhysicsManager* Get() { return s_instance; }
+
+    /// Called by the owning application to register / unregister the active instance.
+    static void SetInstance(PhysicsManager* instance) { s_instance = instance; }
+
 private:
+    static PhysicsManager* s_instance;
+
     JPH::ObjectLayer ObjectLayerForMotionType(JPH::EMotionType motionType) const;
 
     Config                                      m_config;

@@ -8,15 +8,12 @@
 REGISTER_COMPONENT(CTransformComponent, "Transform", "Rendering");
 
 REFL_DEFINE_OBJECT(CTransformComponent)
-	REFL_DEFINE_VECTOR3_MEMBER(CTransformComponent, m_rotation),
-	REFL_DEFINE_VECTOR3_MEMBER(CTransformComponent, m_translation),
-	REFL_DEFINE_VECTOR3_MEMBER(CTransformComponent, m_scale),
+	REFL_DEFINE_MATRIX4_MEMBER(CTransformComponent, m_matrix),
 REFL_DEFINE_END
 
 bool CTransformComponent::OnInitialize()
 {
-    // Build the transformation matrix from the rotation, translation, and scale
-    m_matrix.fromTRS(m_translation, m_rotation, m_scale);
+    // Build the transformation matrix from the rotation, translation, and scale    
 	return true;
 }
 

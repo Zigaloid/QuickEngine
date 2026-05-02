@@ -90,6 +90,9 @@
     <ClInclude Include="..\Shared\Components\MeshComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\TransformComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
@@ -111,6 +114,12 @@
     <ClInclude Include="..\Shared\Physics\PhysicsSystem.h">
       <Filter>..\Shared\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\BgfxGameCamera.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\BgfxRenderPrimitives.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
@@ -121,9 +130,6 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h">
-      <Filter>..\Shared\ResourceTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
@@ -344,15 +350,6 @@
     </ClInclude>
     <ClInclude Include="Game.h" />
     <ClInclude Include="logo.h" />
-    <ClInclude Include="..\Shared\Rendering\GameCameraController.h">
-      <Filter>..\Shared\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Rendering\BgfxGameCamera.h">
-      <Filter>..\Shared\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Rendering\BgfxRenderPrimitives.h">
-      <Filter>..\Shared\Rendering</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -433,6 +430,9 @@
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
@@ -451,6 +451,9 @@
     <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp">
       <Filter>..\Shared\Physics</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
@@ -458,9 +461,6 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp">
-      <Filter>..\Shared\ResourceTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
@@ -549,8 +549,5 @@
     </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp">
-      <Filter>..\Shared\Rendering</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

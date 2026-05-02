@@ -4,9 +4,12 @@
 #include "ComponentSystem/ComponentSystem.h"
 #include "ShaderResource.h"
 #include "MeshResource.h"
+#include "PhysicsBodyComponent.h"
+#include "Physics/PhysicsManager.h"
+#include "Math/Quaternion.h"
 #include <bx/bounds.h>
 
-// ── CMeshComponent ─────────────────────────────────────────────────
+// ── CMeshComponent ─────────────────────────────────────────────────────────
 REGISTER_COMPONENT(CRenderComponent, "RenComp", "Graphics");
 REGISTER_COMPONENT(CMeshComponent, "Mesh", "Graphics");
 
@@ -18,9 +21,46 @@ REFL_DEFINE_OBJECT(CRenderComponent)
 	REFL_DEFINE_MATRIX4_MEMBER(CRenderComponent, m_modelMatrix),
 REFL_DEFINE_END
 
+bool CRenderComponent::OnInitialize()
+{
+	return true;
+}
+
+void CRenderComponent::OnUpdate(double /*deltaTime*/)
+{
+	Component* parent = GetParent();
+	if (!parent)
+		return;
+
+	// Re-acquires only when the cache is empty or the referenced component was released.
+	auto physBody = m_physicsBodyRef.Get([&]() {
+		return parent->FindChild<CPhysicsBodyComponent>();
+	});
+
+	if (!physBody || physBody->GetBodyID().IsInvalid())
+		return;
+
+	if (!m_physicsTransformInitialized)
+	{
+		physBody->SetWorldTransform(m_modelMatrix);
+		m_physicsTransformInitialized = true;
+		return;
+	}
+
+	m_modelMatrix = physBody->GetWorldTransform();
+}
+
+void CRenderComponent::OnShutdown()
+{
+	m_physicsBodyRef.Reset();
+	m_physicsTransformInitialized = false;
+}
+
 bool CMeshComponent::OnInitialize()
 {	
 	DECLARE_FUNC_VLOW();
+	CRenderComponent::OnInitialize();
+
 	if (!Core::CoreSystem::IsInitialized())
 	{
 		std::cerr << "CMeshComponent: CoreSystem is not initialized" << std::endl;
@@ -41,9 +81,11 @@ bool CMeshComponent::OnInitialize()
 	return true;
 }
 
-void CMeshComponent::OnUpdate(double /*deltaTime*/)
+void CMeshComponent::OnUpdate(double deltaTime)
 {	
 	DECLARE_FUNC_MEDIUM();
+	CRenderComponent::OnUpdate(deltaTime); // Update the model matrix from physics each frame
+
 	auto* renderFunctionQueue = Core::CoreSystem::GetRenderFunctionQueue();
 	if (renderFunctionQueue)
 	{

@@ -4,6 +4,9 @@
 #include "StaticMeshResource.h"
 #include "Math/Matrix4f.h"
 
+// Forward-declare to avoid pulling in the full physics header here.
+class CPhysicsBodyComponent;
+
 class CRenderComponent : public ComponentSystem::Component
 {
 public:
@@ -22,13 +25,20 @@ public:
 	}
 
 	virtual void Render(bgfx::ViewId viewId) {};
+	bool OnInitialize() override;
+	void OnUpdate(double deltaTime) override;
+	void OnShutdown() override;
 	std::shared_ptr<Matrix4f> GetModelMatrix() const { return m_transformPtr; }
 	
 private:
-    std::shared_ptr<Matrix4f> m_transformPtr; // Optional shared transform for selection/picking
-    std::shared_ptr<Vector4f> m_boundingSpherePtr; // Optional shared bounding sphere for selection/picking
+    std::shared_ptr<Matrix4f> m_transformPtr;
+    std::shared_ptr<Vector4f> m_boundingSpherePtr;
 	Vector4f m_boundingSphere;
     Matrix4f m_modelMatrix;
+    bool m_physicsTransformInitialized = false;
+
+	/** @brief Cached weak reference to the sibling physics body — resolved once on first use. */
+	ComponentSystem::CachedComponentRef<CPhysicsBodyComponent> m_physicsBodyRef;
 };
 
 class CMeshComponent : public CRenderComponent

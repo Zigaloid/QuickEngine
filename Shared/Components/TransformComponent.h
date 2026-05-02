@@ -20,7 +20,4 @@ public:
 	bool IsLoaded() const;
 private:
 	Matrix4f m_matrix;
-	Vector3f m_rotation;
-	Vector3f m_translation;
-	Vector3f m_scale;
 };

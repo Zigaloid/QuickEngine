@@ -32,6 +32,7 @@ bool GameApp::Initialize()
 	physicsConfig.maxBodies = 1024;
 	physicsConfig.gravity   = -9.81f;
 	m_physicsManager.Initialize(physicsConfig);
+	PhysicsManager::SetInstance(&m_physicsManager);
 
 	// Register the camera controller with the core mouse system.
 	auto* mouseManager = Core::CoreSystem::GetFirstComponentOfType<Input::MouseManager>();
@@ -52,7 +53,7 @@ bool GameApp::Initialize()
 	}
 	auto* componentManager = Core::CoreSystem::GetComponentManager();
 	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
-	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/Level1.lvl.obj.json");
+	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/Level2.lvl.obj.json");
 	m_RootLevel->SafeRead(levelPath);
 
 	componentManager->Initialize();
@@ -132,6 +133,7 @@ bool GameApp::Shutdown()
 	if (mouseManager && m_cameraController)
 		mouseManager->RemoveInputHandler(m_cameraController);
 
+	PhysicsManager::SetInstance(nullptr);
 	m_primitives.Shutdown();
 	m_physicsManager.Shutdown();
 	m_visualizerManager.Shutdown();

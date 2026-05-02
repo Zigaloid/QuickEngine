@@ -100,6 +100,7 @@
     <ClInclude Include="..\Shared\Components\FbxMeshComponent.h" />
     <ClInclude Include="..\Shared\Components\LevelComponent.h" />
     <ClInclude Include="..\Shared\Components\MeshComponent.h" />
+    <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h" />
     <ClInclude Include="..\Shared\Components\TransformComponent.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.h" />
@@ -133,7 +134,6 @@
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h" />
-    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\TextureResource.h" />
@@ -236,6 +236,7 @@
     <ClCompile Include="..\Shared\Components\FbxMeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp" />
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp" />
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp" />
@@ -260,7 +261,6 @@
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />
-    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp" />

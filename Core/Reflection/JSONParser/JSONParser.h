@@ -96,26 +96,26 @@ public:
 	}
 	void ReadObject(const CPropertyBase& property, CReflectedBase* obj)
 	{
-		Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
-
 		Value* valueMember = FindValue(property);
 		if (valueMember)
 		{
+			Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
 			Push(member);
+			ScopedPop guard(*this);
 			CReflectedBase* subObj = reinterpret_cast<CReflectedBase*>(property.GetAddress(obj));
 			subObj->ReadMembers(*this);
-			Pop();
 		}
 	}
 
 	// Refactored to use unique_ptr
 	void ReadObjectPtr(const CPropertyBase& property, CReflectedBase* obj)
 	{
-		Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
 		Value* valueMember = FindValue(property);
 		if (valueMember)
 		{
+			Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
 			Push(member);
+			ScopedPop guard(*this);
 			std::unique_ptr<CReflectedBase>* subObjPtr =
 				reinterpret_cast<std::unique_ptr<CReflectedBase>*>(property.GetAddress(obj));
 
@@ -124,7 +124,6 @@ public:
 				subObj->ReadMembers(*this);
 				*subObjPtr = std::move(subObj);
 			}
-			Pop();
 		}
 	}
 
@@ -146,16 +145,16 @@ public:
 				vectorOfObject->reserve(arrayMember->GetArray().Size());
 
 				for (auto& element : arrayMember->GetArray())
-				{
-					Push(&element);
-					Value* valueMember = &element.FindMember(JTAG_VALUE)->value;
-					auto subObj = CreateObjectAsUniquePtr(valueMember->GetString());
-					if (subObj) {
-						subObj->ReadMembers(*this);
-						vectorOfObject->push_back(std::move(subObj));
+					{
+						Push(&element);
+						ScopedPop elementGuard(*this);
+						Value* valueMember = &element.FindMember(JTAG_VALUE)->value;
+						auto subObj = CreateObjectAsUniquePtr(valueMember->GetString());
+						if (subObj) {
+							subObj->ReadMembers(*this);
+							vectorOfObject->push_back(std::move(subObj));
+						}
 					}
-					Pop();
-				}
 			}
 		}
 	}
@@ -423,24 +422,25 @@ public:
 	// Component-specific methods - handle components using ComponentManager
 	void ReadComponent(const CPropertyBase& property, CReflectedBase* obj)
 	{
-		Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
 		Value* valueMember = FindValue(property);
 		if (valueMember)
 		{
+			Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
 			Push(member);
+			ScopedPop guard(*this);
 			ComponentSystem::Component* subObj = reinterpret_cast<ComponentSystem::Component*>(property.GetAddress(obj));
 			subObj->ReadMembers(*this);
-			Pop();
 		}
 	}
 
 	void ReadComponentPtr(const CPropertyBase& property, CReflectedBase* obj)
 	{
-		Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
 		Value* valueMember = FindValue(property);
 		if (valueMember)
 		{
+			Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
 			Push(member);
+			ScopedPop guard(*this);
 			std::unique_ptr<ComponentSystem::Component>* subObjPtr =
 				reinterpret_cast<std::unique_ptr<ComponentSystem::Component>*>(property.GetAddress(obj));
 
@@ -449,7 +449,6 @@ public:
 				subObj->ReadMembers(*this);
 				*subObjPtr = std::move(subObj);
 			}
-			Pop();
 		}
 	}
 
@@ -471,16 +470,16 @@ public:
 				vectorOfComponent->reserve(arrayMember->GetArray().Size());
 
 				for (auto& element : arrayMember->GetArray())
-				{
-					Push(&element);
-					Value* valueMember = &element.FindMember(JTAG_VALUE)->value;
-					auto subObj = CreateComponentAsUniquePtr(valueMember->GetString());
-					if (subObj) {
-						subObj->ReadMembers(*this);
-						vectorOfComponent->push_back(std::move(subObj));
+					{
+						Push(&element);
+						ScopedPop elementGuard(*this);
+						Value* valueMember = &element.FindMember(JTAG_VALUE)->value;
+						auto subObj = CreateComponentAsUniquePtr(valueMember->GetString());
+						if (subObj) {
+							subObj->ReadMembers(*this);
+							vectorOfComponent->push_back(std::move(subObj));
+						}
 					}
-					Pop();
-				}
 			}
 		}
 	}
@@ -563,6 +562,7 @@ public:
 				for (auto& element : arrayMember->GetArray())
 				{
 					Push(&element);
+					ScopedPop elementGuard(*this);
 					Value* valueMember = &element.FindMember(JTAG_VALUE)->value;
 
 					std::string className = valueMember->GetString();
@@ -594,10 +594,9 @@ public:
 						}
 					}
 					else {
-						ReflectionDebug.print("ReadComponentRawPtrArray: FAILED to create component of type: " + className + "\n");
-					}
-					Pop();
-				}
+							ReflectionDebug.print("ReadComponentRawPtrArray: FAILED to create component of type: " + className + "\n");
+							}
+						}
 			}
 			else {
 				ReflectionDebug.print("ReadComponentRawPtrArray: arrayMember is not an array!\n");
@@ -676,6 +675,17 @@ public:
 		m_currentObject = m_objectStack.back();
 		m_objectStack.pop_back();
 	}
+
+	/// RAII guard that calls Pop() on destruction, ensuring Push/Pop balance even
+	/// when an exception is thrown during a nested ReadMembers call.
+	struct ScopedPop
+	{
+		CRFL_JSONParser& parser;
+		explicit ScopedPop(CRFL_JSONParser& p) : parser(p) {}
+		~ScopedPop() { parser.Pop(); }
+		ScopedPop(const ScopedPop&) = delete;
+		ScopedPop& operator=(const ScopedPop&) = delete;
+	};
 	void BeginArray()
 	{
 		Value* newValue = new Value;

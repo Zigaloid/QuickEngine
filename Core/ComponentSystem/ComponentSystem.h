@@ -25,7 +25,7 @@ namespace ComponentSystem {
 	// ── Component ─────────────────────────────────────────────────────────────────
 
 	/** @brief Base class for all engine components; participates in the ECS lifecycle. */
-	class Component : public CReflectedBase {
+	class Component : public CReflectedBase, public std::enable_shared_from_this<Component> {
 	public:
 		REFL_DECLARE_OBJECT(Component, CReflectedBase);
 	private:
@@ -284,7 +284,7 @@ namespace ComponentSystem {
 	/** @brief Object pool for components of a single type, supporting acquire/release recycling. */
 	class ComponentPool {
 	private:
-		std::vector<std::unique_ptr<Component>> m_pool;
+		std::vector<std::shared_ptr<Component>> m_pool;   // shared ownership so shared_from_this works
 		std::vector<Component*> m_active;
 		std::vector<Component*> m_inactive;
 		std::unique_ptr<ComponentFactory> m_factory;
@@ -300,7 +300,7 @@ namespace ComponentSystem {
 
 			for (size_t i = 0; i < initialSize; ++i)
 			{
-				auto component = m_factory->Create();
+				auto component = std::shared_ptr<Component>(m_factory->Create().release());
 				m_inactive.push_back(component.get());
 				m_pool.push_back(std::move(component));
 			}
@@ -320,7 +320,7 @@ namespace ComponentSystem {
 			}
 			else if (m_pool.size() < m_maxSize)
 			{
-				auto newComponent = m_factory->Create();
+				auto newComponent = std::shared_ptr<Component>(m_factory->Create().release());
 				component = newComponent.get();
 				m_pool.push_back(std::move(newComponent));
 			}
@@ -418,6 +418,17 @@ namespace ComponentSystem {
 		size_t GetTotalCount()    const { return m_pool.size(); }
 		std::type_index GetComponentType() const { return m_factory->GetComponentType(); }
 		const std::vector<Component*>& GetActiveComponents() const { return m_active; }
+
+		/** @brief Returns the pool-owned shared_ptr for a raw pointer, or nullptr if not found. */
+		std::shared_ptr<Component> GetSharedPtr(Component* raw) const
+		{
+			for (const auto& sp : m_pool)
+			{
+				if (sp.get() == raw)
+					return sp;
+			}
+			return nullptr;
+		}
 	};
 
 	// ── ComponentManager ──────────────────────────────────────────────────────────
@@ -674,10 +685,110 @@ namespace ComponentSystem {
 
 		bool IsInitialized()         const { return m_initialized; }
 		size_t GetRegisteredTypeCount() const { return m_pools.size(); }
+
+		/** @brief Returns the pool-owned shared_ptr for a raw pointer, searching all pools.
+		 *  Returns nullptr if the component is not pool-managed (e.g. created with raw new). */
+		std::shared_ptr<Component> GetSharedPtr(Component* raw) const
+		{
+			if (!raw) return nullptr;
+			for (const auto& [typeIndex, pool] : m_pools)
+			{
+				if (auto sp = pool->GetSharedPtr(raw))
+					return sp;
+			}
+			return nullptr;
+		}
 	};
 
 	// ── Static member initialization ──────────────────────────────────────────────
 
 	inline ComponentId Component::m_nextId = 1;
+
+	// ── CachedComponentRef ────────────────────────────────────────────────────────
+
+	/** @brief Retains a weak reference to a sibling/child Component of type T.
+	 *
+	 *  On the first call to Get(), the supplied acquire function is invoked to locate
+	 *  the component and the result is cached as a weak_ptr.  Subsequent calls simply
+	 *  lock the weak_ptr.  If the referenced component is ever released back to its
+	 *  pool (and the weak_ptr expires), the next call transparently re-acquires it.
+	 *
+	 *  Usage:
+	 *  @code
+	 *    // Member:
+	 *    CachedComponentRef<CPhysicsBodyComponent> m_physicsBodyRef;
+	 *
+	 *    // In OnUpdate:
+	 *    auto physBody = m_physicsBodyRef.Get([&]() {
+	 *        return GetParent() ? GetParent()->FindChild<CPhysicsBodyComponent>() : nullptr;
+	 *    });
+	 *    if (!physBody) return;
+	 *  @endcode
+	 */
+	template<typename T>
+	class CachedComponentRef {
+		std::weak_ptr<T> m_weak;
+		T* m_rawFallback = nullptr; // used when the component is not pool-managed
+
+	public:
+		/** @brief Returns a shared_ptr to the cached component.
+		 *  @param acquireFn  Called once when the cache is empty or has expired.
+		 *                    May return nullptr if the component is not yet available. */
+		std::shared_ptr<T> Get(std::function<T*()> acquireFn = nullptr)
+		{
+			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+
+			// Fast path: pool-managed component, weak_ptr still alive.
+			if (auto ptr = m_weak.lock())
+				return ptr;
+
+			// Fast path: non-pool-managed component, raw pointer already cached.
+			if (m_rawFallback)
+				return std::shared_ptr<T>(m_rawFallback, [](T*) {});
+
+			// Cache miss — run the acquire function.
+			if (!acquireFn) return nullptr;
+			T* raw = acquireFn();
+			if (!raw) return nullptr;
+
+			// Try to back the cache with the pool's shared_ptr so expiry is detectable.
+			if (auto* manager = Core::CoreSystem::GetComponentManager())
+			{
+				if (auto sp = std::dynamic_pointer_cast<T>(manager->GetSharedPtr(raw)))
+				{
+					m_weak = sp;
+					return sp;
+				}
+			}
+
+			// Component is not pool-managed: cache the raw pointer and return a
+			// non-owning alias. Lifetime is guaranteed by the component hierarchy.
+			m_rawFallback = raw;
+			return std::shared_ptr<T>(raw, [](T*) {});
+		}
+
+		/** @brief Manually caches an already-located component pointer. */
+		void Set(T* raw)
+		{
+			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+			Reset();
+			if (!raw) return;
+			if (auto* manager = Core::CoreSystem::GetComponentManager())
+			{
+				if (auto sp = std::dynamic_pointer_cast<T>(manager->GetSharedPtr(raw)))
+				{
+					m_weak = sp;
+					return;
+				}
+			}
+			m_rawFallback = raw;
+		}
+
+		/** @brief Returns true if the cached reference is still alive. */
+		bool IsValid() const { return !m_weak.expired() || m_rawFallback != nullptr; }
+
+		/** @brief Clears the cached reference. */
+		void Reset() { m_weak.reset(); m_rawFallback = nullptr; }
+	};
 
 } // namespace ComponentSystem

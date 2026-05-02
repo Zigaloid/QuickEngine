@@ -186,9 +186,6 @@
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
-      <Filter>..\Shared\ResourceTypes</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
@@ -407,6 +404,9 @@
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="QuickEdit.h" />
+    <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -559,9 +559,6 @@
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
-      <Filter>..\Shared\ResourceTypes</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
@@ -649,6 +646,9 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
+    <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="AppConfig.json" />

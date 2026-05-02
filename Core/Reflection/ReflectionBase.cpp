@@ -436,15 +436,15 @@ void CReflectedBase::InternalReadMembers(vector<CReflectionMapEntry>& reflection
 		}
 		catch (const Reflection::ReflectionException& e)
 		{
-			REFL_ERROR(Reflection::ErrorCategory::PropertyAccess,
-				"Failed to read property",
+			REFL_WARNING(Reflection::ErrorCategory::PropertyAccess,
+				"Skipping property after read error",
 				"Property: " + property.GetProperty()->GetName() + ", Error: " + e.what());
 			// Continue with other properties instead of failing completely
 		}
 		catch (const std::exception& e)
 		{
-			REFL_ERROR(Reflection::ErrorCategory::PropertyAccess,
-				"Unexpected error reading property",
+			REFL_WARNING(Reflection::ErrorCategory::PropertyAccess,
+				"Skipping property after unexpected error",
 				"Property: " + property.GetProperty()->GetName() + ", Error: " + e.what());
 		}
 	}
@@ -500,8 +500,6 @@ bool CReflectedBase::ValidateReflectionMap(const vector<CReflectionMapEntry>& re
 {
 	if (reflectionMap.empty())
 	{
-		REFL_WARNING(Reflection::ErrorCategory::Validation,
-			"Empty reflection map", "Class: " + std::string(GetRflClassName()));
 		return true; // Empty map is valid, just unusual
 	}
 
