@@ -76,6 +76,7 @@ project "QuickEdit"
 	includedirs { "../Shared/ResourceTypes" }  
 	includedirs { "../Shared/Components" } 
 	includedirs { "../Shared/Physics" } 
+	includedirs { "../Shared/Rendering" }
 	includedirs { "../Shared/bgfx_common" }   
 	includedirs { "../Shared/utils/" }
 
@@ -109,6 +110,8 @@ project "QuickEdit"
 	files { "../Shared/Components/**.h" }
 	files { "../Shared/Physics/**.cpp" }
 	files { "../Shared/Physics/**.h" }
+	files { "../Shared/Rendering/**.cpp" }
+	files { "../Shared/Rendering/**.h" }
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.cpp" }
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.h" }
 	files { "../Shared/ImguiVizualizers/IImGuiVisualizer.h" }	
@@ -144,6 +147,8 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/CombinedObjJson3DVisualizer.h" }
 	files { "../Shared/ImguiVizualizers/MeshComponentVisualizer.cpp" }
 	files { "../Shared/ImguiVizualizers/MeshComponentVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/EntityComponentVisualizer.cpp" }
+	files { "../Shared/ImguiVizualizers/EntityComponentVisualizer.h" }
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMapRegistry.cpp" }
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMapRegistry.h" }
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMapEditor.cpp" }

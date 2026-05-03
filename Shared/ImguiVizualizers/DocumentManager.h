@@ -26,6 +26,7 @@ class DocumentManager
     friend class ObjJsonLauncher;
     friend class MeshComponentLauncher;
     friend class LevelComponentLauncher;
+    friend class EntityComponentLauncher;
     friend class WidgetEditorLauncher;
 public:
     explicit DocumentManager(ImGuiVisualizers::ImGuiVisualizerManager& visualizerManager);
@@ -45,9 +46,9 @@ private:
     // Note: store a non-owning pointer to the launcher so ProcessPendingEditors
     // can call its Create(...) factory method.
     void EnqueueEditor(const std::string& key,
-                       const std::string& filePath,
-                       const std::string& className,
-                       IAssetLauncher* launcher);
+        const std::string& filePath,
+        const std::string& className,
+        IAssetLauncher* launcher);
 
     // ── Asset Launcher Registry ─────────────────────────────────────────
 
@@ -118,9 +119,9 @@ public:
 class ObjJsonLauncher : public IAssetLauncher
 {
 public:
-    ObjJsonLauncher(DocumentManager& manager, 
-                    const std::string& suffix, 
-                    const std::string& className);
+    ObjJsonLauncher(DocumentManager& manager,
+        const std::string& suffix,
+        const std::string& className);
 
     void Launch(const std::string& assetPath) override;
 
@@ -170,6 +171,23 @@ private:
     std::string m_className;
 };
 
+class EntityComponentLauncher : public IAssetLauncher
+{
+public:
+    EntityComponentLauncher(DocumentManager& manager,
+        const std::string& suffix,
+        const std::string& className);
+
+    void Launch(const std::string& assetPath) override;
+
+    std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) override;
+
+private:
+    DocumentManager& m_manager;
+    std::string m_suffix;
+    std::string m_className;
+};
 
 
 class WidgetEditorLauncher : public IAssetLauncher

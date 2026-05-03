@@ -2,6 +2,7 @@
 #include "ObjJsonEditor.h"
 #include "MeshComponentVisualizer.h"
 #include "LevelComponentVisualizer.h"
+#include "EntityComponentVisualizer.h"
 #include "PropertyWidgetMapEditor.h"
 
 #ifdef _WIN32
@@ -13,9 +14,9 @@
 // Asset Launcher Implementations
 // ─────────────────────────────────────────────────────────────────────────────
 
-ObjJsonLauncher::ObjJsonLauncher(DocumentManager& manager, 
-                                 const std::string& suffix, 
-                                 const std::string& className)
+ObjJsonLauncher::ObjJsonLauncher(DocumentManager& manager,
+    const std::string& suffix,
+    const std::string& className)
     : m_manager(manager)
     , m_suffix(suffix)
     , m_className(className)
@@ -104,7 +105,37 @@ LevelComponentLauncher::Create(const std::string& assetPath, const std::string& 
     return combined;
 }
 
+// -- Entity launcher implementation ------------------------------------------------
 
+EntityComponentLauncher::EntityComponentLauncher(DocumentManager& manager,
+    const std::string& suffix,
+    const std::string& className)
+    : m_manager(manager)
+    , m_suffix(suffix)
+    , m_className(className)
+{
+}
+void EntityComponentLauncher::Launch(const std::string& assetPath)
+{
+    std::string key = ImGuiVisualizers::EntityComponentVisualizer::MakeDocumentKey(assetPath);
+
+    // If already open, just bring it to front
+    if (m_manager.m_openEditorKeys.contains(key)) {
+        m_manager.m_visualizerManager.SetVisible(key, true);
+        return;
+    }
+    // Defer registration to avoid mutating m_entries during RenderAll
+    m_manager.EnqueueEditor(key, assetPath, m_className, this);
+}
+
+std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+EntityComponentLauncher::Create(const std::string& assetPath, const std::string& className)
+{
+    auto combined = std::make_unique<ImGuiVisualizers::EntityComponentVisualizer>();
+    // Combined visualizer exposes OpenObjectFile(...)
+    combined->OpenObjectFile(assetPath, className);
+    return combined;
+}
 
 WidgetEditorLauncher::WidgetEditorLauncher(DocumentManager& manager,
     const std::string& suffix,
@@ -169,12 +200,12 @@ void DocumentManager::InitializeLaunchers()
     // ObjJson launchers
     m_launchers["MeshObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".mesh.obj.json", "CMeshComponent");
     m_launchers["MatObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".mat.obj.json", "CMaterialResource");
-    m_launchers["DefObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".def.obj.json", "CEntityDefinition");        
+    m_launchers["DefObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".def.obj.json", "CEntityDefinition");
     m_launchers["WidgetsObjJson"] = std::make_unique<WidgetEditorLauncher>(*this, ".widgets.obj.json", "PropertyWidgetMapRegistry");
     m_launchers["LevelObjJson"] = std::make_unique<LevelComponentLauncher>(*this, ".lvl.obj.json", "CLevelComponent");
-    m_launchers["EntityObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".ent.obj.json", "CEntityComponent");
+    m_launchers["EntityObjJson"] = std::make_unique<EntityComponentLauncher>(*this, ".ent.obj.json", "CEntityComponent");
     m_launchers["StaticMeshObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".smesh.obj.json", "CStaticMeshResource");
-
+    m_launchers["PhysicsBodyObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".phys.obj.json", "CPhysicsBodyResource");
     // Texture launcher (TODO)
     m_launchers["Texture"] = std::make_unique<NoOpLauncher>();
 }
@@ -187,16 +218,17 @@ IAssetLauncher* DocumentManager::GetLauncher(const char* name)
 
 std::vector<DocumentManager::AssetTypeConfig> DocumentManager::GetAssetTypeConfigs()
 {
-    return 
+    return
     {
         // ObjJson types
         { ".mesh.obj.json",     "Mesh Component",         IM_COL32(100, 200, 255, 255),   "O",  "MeshObjJson",    true, false },
         { ".def.obj.json",      "Definition Object",      IM_COL32(100, 200, 255, 255),   "O",  "DefObjJson",     true, false },
-        { ".mat.obj.json",      "Material Resource",      IM_COL32(100, 200, 255, 255),   "O",  "MatObjJson",     true, false },        
+        { ".mat.obj.json",      "Material Resource",      IM_COL32(100, 200, 255, 255),   "O",  "MatObjJson",     true, false },
         { ".widgets.obj.json",  "Class Widgets",          IM_COL32(100, 200, 255, 255),   "O",  "WidgetsObjJson", true, false },
         { ".lvl.obj.json",      "Level Component",        IM_COL32(100, 200, 255, 255),   "O",  "LevelObjJson",   true, false },
         { ".ent.obj.json",      "Entity Component",       IM_COL32(100, 200, 255, 255),   "O",  "EntityObjJson",  true, false },
         { ".smesh.obj.json",    "Static Mesh Resource",   IM_COL32(100, 200, 255, 255),   "O",  "StaticMeshObjJson", true, false },
+        { ".phys.obj.json",     "Physics Body Resource", IM_COL32(100, 200, 255, 255),   "O",  "PhysicsBodyObjJson", true, false },
         { ".png",               "PNG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
         { ".bmp",               "BMP Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
         { ".jpg",               "JPG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
@@ -231,7 +263,8 @@ void DocumentManager::RegisterAssetTypes()
                         [launcher](const std::string& path) { launcher->Launch(path); }
                     };
                 }
-            } else {
+            }
+            else {
                 // External-only (e.g., Lua scripts)
                 assetType->primaryLaunch = {
                     "Open in External Editor",
@@ -248,7 +281,7 @@ void DocumentManager::RegisterAssetTypes()
                     ImGuiVisualizers::AssetLaunchMode::External,
                     nullptr,
                     ""
-                });
+                    });
             }
 
             if (config.hasExternalEditorFallback) {
@@ -257,7 +290,7 @@ void DocumentManager::RegisterAssetTypes()
                     ImGuiVisualizers::AssetLaunchMode::External,
                     nullptr,
                     ""
-                });
+                    });
             }
         }
     }
@@ -266,9 +299,9 @@ void DocumentManager::RegisterAssetTypes()
 }
 
 void DocumentManager::EnqueueEditor(const std::string& key,
-                                    const std::string& filePath,
-                                    const std::string& className,
-                                    IAssetLauncher* launcher)
+    const std::string& filePath,
+    const std::string& className,
+    IAssetLauncher* launcher)
 {
     m_pendingEditors.push_back({ key, filePath, className, launcher });
 }
@@ -311,5 +344,5 @@ void DocumentManager::CleanupClosedEditors()
             return true;
         }
         return false;
-    });
+        });
 }

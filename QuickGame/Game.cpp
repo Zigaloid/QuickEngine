@@ -53,7 +53,7 @@ bool GameApp::Initialize()
 	}
 	auto* componentManager = Core::CoreSystem::GetComponentManager();
 	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
-	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/Level2.lvl.obj.json");
+	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/Level3.lvl.obj.json");
 	m_RootLevel->SafeRead(levelPath);
 
 	componentManager->Initialize();

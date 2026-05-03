@@ -103,7 +103,7 @@ public:
 			Push(member);
 			ScopedPop guard(*this);
 			CReflectedBase* subObj = reinterpret_cast<CReflectedBase*>(property.GetAddress(obj));
-			subObj->ReadMembers(*this);
+			subObj->ReadMembers(*this);			
 		}
 	}
 

@@ -25,6 +25,87 @@ namespace ImGuiVisualizers {
 
 bgfx::VertexLayout PosColorVertex::ms_layout;
 
+// ── File-scope geometry helpers ─────────────────────────────────────────
+
+static constexpr int kWireSegments = 16; // segments per wire circle
+
+/// Transform a local-space point by a column-major 4x4 matrix (bgfx convention).
+/// out = mtx * (x, y, z, 1)
+static void TransformPoint(float out[3], const float p[3], const float m[16])
+{
+    out[0] = m[0] * p[0] + m[4] * p[1] + m[8]  * p[2] + m[12];
+    out[1] = m[1] * p[0] + m[5] * p[1] + m[9]  * p[2] + m[13];
+    out[2] = m[2] * p[0] + m[6] * p[1] + m[10] * p[2] + m[14];
+}
+
+/// Emit one full wire circle lying in the local XZ plane at y = yOffset.
+/// Points are transformed into world space via mtx before storing.
+/// Returns the updated vertex index.
+static uint32_t EmitWireCircle(PosColorVertex* v, uint32_t idx,
+                                const float* mtx,
+                                float radius, float yOffset,
+                                uint32_t color)
+{
+    for (int i = 0; i < kWireSegments; ++i)
+    {
+        const float t0 = bx::kPi2 * static_cast<float>(i)     / kWireSegments;
+        const float t1 = bx::kPi2 * static_cast<float>(i + 1) / kWireSegments;
+
+        const float lp0[3] = { radius * bx::cos(t0), yOffset, radius * bx::sin(t0) };
+        const float lp1[3] = { radius * bx::cos(t1), yOffset, radius * bx::sin(t1) };
+
+        float wp0[3], wp1[3];
+        TransformPoint(wp0, lp0, mtx);
+        TransformPoint(wp1, lp1, mtx);
+
+        v[idx++] = { wp0[0], wp0[1], wp0[2], color };
+        v[idx++] = { wp1[0], wp1[1], wp1[2], color };
+    }
+    return idx;
+}
+
+/// Emit a hemisphere as two orthogonal semicircles (XY and ZY planes).
+/// yOffset is the base of the hemisphere (centre of the sphere cap).
+/// yDir = +1.0f for upper cap, -1.0f for lower cap.
+/// Returns the updated vertex index.
+static uint32_t EmitHemisphereArcs(PosColorVertex* v, uint32_t idx,
+                                    const float* mtx,
+                                    float radius, float yOffset, float yDir,
+                                    uint32_t color)
+{
+    const int halfSegs = kWireSegments / 2;
+
+    // Two orthogonal arcs: XY plane and ZY plane
+    for (int arc = 0; arc < 2; ++arc)
+    {
+        for (int i = 0; i < halfSegs; ++i)
+        {
+            const float t0 = bx::kPi * static_cast<float>(i)     / halfSegs;
+            const float t1 = bx::kPi * static_cast<float>(i + 1) / halfSegs;
+
+            float lp0[3], lp1[3];
+            if (arc == 0) // XY plane
+            {
+                lp0[0] = radius * bx::cos(t0); lp0[1] = yOffset + yDir * radius * bx::sin(t0); lp0[2] = 0.0f;
+                lp1[0] = radius * bx::cos(t1); lp1[1] = yOffset + yDir * radius * bx::sin(t1); lp1[2] = 0.0f;
+            }
+            else // ZY plane
+            {
+                lp0[0] = 0.0f; lp0[1] = yOffset + yDir * radius * bx::sin(t0); lp0[2] = radius * bx::cos(t0);
+                lp1[0] = 0.0f; lp1[1] = yOffset + yDir * radius * bx::sin(t1); lp1[2] = radius * bx::cos(t1);
+            }
+
+            float wp0[3], wp1[3];
+            TransformPoint(wp0, lp0, mtx);
+            TransformPoint(wp1, lp1, mtx);
+
+            v[idx++] = { wp0[0], wp0[1], wp0[2], color };
+            v[idx++] = { wp1[0], wp1[1], wp1[2], color };
+        }
+    }
+    return idx;
+}
+
 // ── Initialisation / shutdown ───────────────────────────────────────────
 
 bool BgfxRenderPrimitives::Initialize()
@@ -63,6 +144,34 @@ void BgfxRenderPrimitives::Shutdown()
     if (bgfx::isValid(m_sphereIbh))   { bgfx::destroy(m_sphereIbh);   m_sphereIbh   = BGFX_INVALID_HANDLE; }
 
     m_initialized = false;
+}
+
+// ── Submit helper ───────────────────────────────────────────────────────
+
+void BgfxRenderPrimitives::SubmitTransientLines(bgfx::ViewId viewId,
+                                                 const PosColorVertex* verts,
+                                                 uint32_t count) const
+{
+    if (!checkAvailTransientBuffers(count, PosColorVertex::ms_layout, 0))
+        return;
+
+    bgfx::TransientVertexBuffer tvb;
+    bgfx::allocTransientVertexBuffer(&tvb, count, PosColorVertex::ms_layout);
+    bx::memCopy(tvb.data, verts, count * sizeof(PosColorVertex));
+
+    float identity[16];
+    bx::mtxIdentity(identity);
+    bgfx::setTransform(identity);
+
+    bgfx::setVertexBuffer(0, &tvb, 0, count);
+    bgfx::setState(BGFX_STATE_WRITE_RGB
+                 | BGFX_STATE_WRITE_A
+                 | BGFX_STATE_WRITE_Z
+                 | BGFX_STATE_DEPTH_TEST_LESS
+                 | BGFX_STATE_PT_LINES
+                 | BGFX_STATE_MSAA);
+
+    bgfx::submit(viewId, m_program);
 }
 
 // ── Grid ────────────────────────────────────────────────────────────────
@@ -338,6 +447,142 @@ void BgfxRenderPrimitives::RenderSphere(bgfx::ViewId viewId,
                  | BGFX_STATE_MSAA);
 
     bgfx::submit(viewId, m_program);
+}
+
+// ── Shape-aware wireframe helpers ───────────────────────────────────────
+
+void BgfxRenderPrimitives::RenderWireBox(bgfx::ViewId viewId,
+                                          const float* worldMtx,
+                                          float halfX, float halfY, float halfZ,
+                                          uint32_t color)
+{
+    if (!m_initialized)
+        return;
+
+    // Scale the world matrix basis vectors by full extents (unit cube has half-size 0.5)
+    float scaled[16];
+    bx::memCopy(scaled, worldMtx, sizeof(scaled));
+    const float sx = halfX * 2.0f, sy = halfY * 2.0f, sz = halfZ * 2.0f;
+    scaled[0] *= sx;  scaled[1] *= sx;  scaled[2]  *= sx;
+    scaled[4] *= sy;  scaled[5] *= sy;  scaled[6]  *= sy;
+    scaled[8] *= sz;  scaled[9] *= sz;  scaled[10] *= sz;
+
+    RenderWireCube(viewId, scaled, color);
+}
+
+void BgfxRenderPrimitives::RenderWireSphere(bgfx::ViewId viewId,
+                                             const float* worldMtx,
+                                             float radius,
+                                             uint32_t color)
+{
+    if (!m_initialized)
+        return;
+
+    // 3 great circles: XZ equator, XY, ZY — each kWireSegments line segments
+    constexpr uint32_t kNumVerts = kWireSegments * 2 * 3;
+    PosColorVertex verts[kNumVerts];
+    uint32_t idx = 0;
+
+    idx = EmitWireCircle(verts, idx, worldMtx, radius, 0.0f, color); // XZ equator
+
+    for (int i = 0; i < kWireSegments; ++i)
+    {
+        const float t0 = bx::kPi2 * static_cast<float>(i)     / kWireSegments;
+        const float t1 = bx::kPi2 * static_cast<float>(i + 1) / kWireSegments;
+
+        // XY plane
+        const float xy0[3] = { radius * bx::cos(t0), radius * bx::sin(t0), 0.0f };
+        const float xy1[3] = { radius * bx::cos(t1), radius * bx::sin(t1), 0.0f };
+        float wxy0[3], wxy1[3];
+        TransformPoint(wxy0, xy0, worldMtx);
+        TransformPoint(wxy1, xy1, worldMtx);
+        verts[idx++] = { wxy0[0], wxy0[1], wxy0[2], color };
+        verts[idx++] = { wxy1[0], wxy1[1], wxy1[2], color };
+
+        // ZY plane
+        const float zy0[3] = { 0.0f, radius * bx::sin(t0), radius * bx::cos(t0) };
+        const float zy1[3] = { 0.0f, radius * bx::sin(t1), radius * bx::cos(t1) };
+        float wzy0[3], wzy1[3];
+        TransformPoint(wzy0, zy0, worldMtx);
+        TransformPoint(wzy1, zy1, worldMtx);
+        verts[idx++] = { wzy0[0], wzy0[1], wzy0[2], color };
+        verts[idx++] = { wzy1[0], wzy1[1], wzy1[2], color };
+    }
+
+    SubmitTransientLines(viewId, verts, idx);
+}
+
+void BgfxRenderPrimitives::RenderWireCylinder(bgfx::ViewId viewId,
+                                               const float* worldMtx,
+                                               float radius, float halfHeight,
+                                               uint32_t color)
+{
+    if (!m_initialized)
+        return;
+
+    // Top circle + bottom circle + kWireSegments/2 vertical lines
+    constexpr int       kVLines   = kWireSegments / 2;
+    constexpr uint32_t kNumVerts  = kWireSegments * 2 * 2   // two circles
+                                  + kVLines * 2;            // vertical lines
+    PosColorVertex verts[kNumVerts];
+    uint32_t idx = 0;
+
+    idx = EmitWireCircle(verts, idx, worldMtx, radius,  halfHeight, color);
+    idx = EmitWireCircle(verts, idx, worldMtx, radius, -halfHeight, color);
+
+    for (int i = 0; i < kVLines; ++i)
+    {
+        const float t = bx::kPi2 * static_cast<float>(i) / kVLines;
+        const float lTop[3] = { radius * bx::cos(t),  halfHeight, radius * bx::sin(t) };
+        const float lBot[3] = { radius * bx::cos(t), -halfHeight, radius * bx::sin(t) };
+        float wTop[3], wBot[3];
+        TransformPoint(wTop, lTop, worldMtx);
+        TransformPoint(wBot, lBot, worldMtx);
+        verts[idx++] = { wTop[0], wTop[1], wTop[2], color };
+        verts[idx++] = { wBot[0], wBot[1], wBot[2], color };
+    }
+
+    SubmitTransientLines(viewId, verts, idx);
+}
+
+void BgfxRenderPrimitives::RenderWireCapsule(bgfx::ViewId viewId,
+                                              const float* worldMtx,
+                                              float radius, float halfCylinderHeight,
+                                              uint32_t color)
+{
+    if (!m_initialized)
+        return;
+
+    // Top circle + bottom circle + vertical lines + upper hemisphere arcs + lower hemisphere arcs
+    constexpr int       kVLines   = kWireSegments / 2;
+    constexpr int       kArcSegs  = kWireSegments / 2;
+    constexpr uint32_t kNumVerts  = kWireSegments * 2 * 2       // top + bottom circles
+                                  + kVLines * 2                  // vertical lines
+                                  + 2 * 2 * kArcSegs * 2;       // 2 caps × 2 arcs × kArcSegs segments × 2 verts
+    PosColorVertex verts[kNumVerts];
+    uint32_t idx = 0;
+
+    idx = EmitWireCircle(verts, idx, worldMtx, radius,  halfCylinderHeight, color);
+    idx = EmitWireCircle(verts, idx, worldMtx, radius, -halfCylinderHeight, color);
+
+    for (int i = 0; i < kVLines; ++i)
+    {
+        const float t = bx::kPi2 * static_cast<float>(i) / kVLines;
+        const float lTop[3] = { radius * bx::cos(t),  halfCylinderHeight, radius * bx::sin(t) };
+        const float lBot[3] = { radius * bx::cos(t), -halfCylinderHeight, radius * bx::sin(t) };
+        float wTop[3], wBot[3];
+        TransformPoint(wTop, lTop, worldMtx);
+        TransformPoint(wBot, lBot, worldMtx);
+        verts[idx++] = { wTop[0], wTop[1], wTop[2], color };
+        verts[idx++] = { wBot[0], wBot[1], wBot[2], color };
+    }
+
+    // Upper hemisphere arcs (above +halfCylinderHeight)
+    idx = EmitHemisphereArcs(verts, idx, worldMtx, radius,  halfCylinderHeight, +1.0f, color);
+    // Lower hemisphere arcs (below -halfCylinderHeight)
+    idx = EmitHemisphereArcs(verts, idx, worldMtx, radius, -halfCylinderHeight, -1.0f, color);
+
+    SubmitTransientLines(viewId, verts, idx);
 }
 
 } // namespace ImGuiVisualizers

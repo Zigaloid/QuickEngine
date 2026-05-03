@@ -40,6 +40,9 @@
     <Filter Include="..\Shared\Physics">
       <UniqueIdentifier>{D9FE70EC-4515-6F82-8E8C-FAA3FAE13F0A}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\Shared\Rendering">
+      <UniqueIdentifier>{743AE17E-E09B-BE8C-6909-053FD569F54B}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\Shared\ResourceTypes">
       <UniqueIdentifier>{33C33C54-9FFA-84EB-A804-E90E14BBABE4}</UniqueIdentifier>
     </Filter>
@@ -87,6 +90,9 @@
     <ClInclude Include="..\Shared\Components\MeshComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\TransformComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
@@ -118,6 +124,9 @@
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\DocumentManager.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h">
@@ -174,6 +183,12 @@
     <ClInclude Include="..\Shared\Physics\PhysicsSystem.h">
       <Filter>..\Shared\Physics</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\BgfxGameCamera.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\GameCameraController.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
@@ -184,6 +199,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
@@ -404,9 +422,6 @@
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="QuickEdit.h" />
-    <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -487,6 +502,9 @@
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
@@ -506,6 +524,9 @@
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp">
@@ -557,6 +578,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
@@ -646,11 +670,5 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
-    <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="AppConfig.json" />
   </ItemGroup>
 </Project>

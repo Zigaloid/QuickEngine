@@ -38,7 +38,10 @@ void CRenderComponent::OnUpdate(double /*deltaTime*/)
 	});
 
 	if (!physBody || physBody->GetBodyID().IsInvalid())
+	{
+		physBody->CreateBody();
 		return;
+	}
 
 	if (!m_physicsTransformInitialized)
 	{

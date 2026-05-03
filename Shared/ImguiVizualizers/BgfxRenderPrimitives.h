@@ -55,18 +55,12 @@ public:
 
     /**
      * @brief Submit an infinite-style ground grid centred at the origin.
-     * @param viewId  The BGFX view to submit into.
-     * @param size    Half-extent of the grid.
-     * @param step    Spacing between lines.
-     * @param color   ABGR colour for the grid lines.
      */
     void RenderGrid(bgfx::ViewId viewId, float size = 20.0f,
                     float step = 1.0f, uint32_t color = 0xff808080);
 
     /**
      * @brief Submit RGB axes at the origin (X=red, Y=green, Z=blue).
-     * @param viewId  The BGFX view to submit into.
-     * @param length  Length of each axis.
      */
     void RenderAxes(bgfx::ViewId viewId, float length = 2.0f);
 
@@ -81,35 +75,74 @@ public:
     void RenderWireCube(bgfx::ViewId viewId, const float* mtx44, uint32_t abgrColor);
 
     /**
-     * @brief Submit a single line segment.
+     * @brief Submit a solid-colour unit sphere at the given transform.
+     */
+    void RenderSphere(bgfx::ViewId viewId, const float* mtx44, uint32_t abgrColor);
+
+    /**
+     * @brief Submit a single line segment in world space.
      */
     void RenderLine(bgfx::ViewId viewId,
                     float x0, float y0, float z0,
                     float x1, float y1, float z1,
                     uint32_t abgrColor);
 
-    /**
-     * @brief Submit a UV sphere at the given transform.
-     */
-    void RenderSphere(bgfx::ViewId viewId, const float* mtx44, uint32_t abgrColor);
+    // ── Shape-aware wireframe helpers ───────────────────────────────────
+    // These take a world-space matrix (rotation + translation) and explicit
+    // shape parameters, handling the scale transform internally.
 
-    bool IsInitialized() const { return m_initialized; }
+    /**
+     * @brief Wireframe axis-aligned box.
+     * @param halfX/Y/Z  Half-extents along each local axis.
+     */
+    void RenderWireBox(bgfx::ViewId viewId, const float* worldMtx,
+                       float halfX, float halfY, float halfZ,
+                       uint32_t color);
+
+    /**
+     * @brief Wireframe sphere built from three great-circle arcs.
+     * @param radius  Sphere radius.
+     */
+    void RenderWireSphere(bgfx::ViewId viewId, const float* worldMtx,
+                          float radius, uint32_t color);
+
+    /**
+     * @brief Wireframe cylinder aligned to the local Y axis.
+     * @param radius      Cylinder radius.
+     * @param halfHeight  Half the total cylinder height.
+     */
+    void RenderWireCylinder(bgfx::ViewId viewId, const float* worldMtx,
+                            float radius, float halfHeight,
+                            uint32_t color);
+
+    /**
+     * @brief Wireframe capsule aligned to the local Y axis.
+     * @param radius             Hemisphere radius (also the end-cap radius).
+     * @param halfCylinderHeight Half the height of the cylindrical section only,
+     *                           matching JPH::CapsuleShapeSettings convention.
+     */
+    void RenderWireCapsule(bgfx::ViewId viewId, const float* worldMtx,
+                           float radius, float halfCylinderHeight,
+                           uint32_t color);
 
 private:
     void CreateCubeBuffers();
-    void CreateSphereBuffers(int rings = 16, int segments = 32);
+    void CreateSphereBuffers(int rings = 8, int segments = 16);
 
-    bool                     m_initialized = false;
-    bgfx::ProgramHandle      m_program     = BGFX_INVALID_HANDLE;
+    void SubmitTransientLines(bgfx::ViewId viewId,
+                              const PosColorVertex* verts,
+                              uint32_t count) const;
 
-    // Static cube geometry
+    bool m_initialized = false;
+
+    bgfx::ProgramHandle m_program     = BGFX_INVALID_HANDLE;
+
     bgfx::VertexBufferHandle m_cubeVbh     = BGFX_INVALID_HANDLE;
     bgfx::IndexBufferHandle  m_cubeIbh     = BGFX_INVALID_HANDLE;
     bgfx::IndexBufferHandle  m_cubeWireIbh = BGFX_INVALID_HANDLE;
 
-    // Static sphere geometry
-    bgfx::VertexBufferHandle m_sphereVbh   = BGFX_INVALID_HANDLE;
-    bgfx::IndexBufferHandle  m_sphereIbh   = BGFX_INVALID_HANDLE;
+    bgfx::VertexBufferHandle m_sphereVbh = BGFX_INVALID_HANDLE;
+    bgfx::IndexBufferHandle  m_sphereIbh = BGFX_INVALID_HANDLE;
 };
 
 } // namespace ImGuiVisualizers

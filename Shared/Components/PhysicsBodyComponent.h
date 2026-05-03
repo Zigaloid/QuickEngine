@@ -5,6 +5,7 @@
 #include "FileSystem/FileSystemManager.h"
 #include "Physics/PhysicsManager.h"
 #include "Math/Matrix4f.h"
+#include "Math/Vector3f.h"
 
 #include <Jolt/Jolt.h>
 JPH_SUPPRESS_WARNINGS
@@ -17,13 +18,20 @@ JPH_SUPPRESS_WARNINGS
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
 
+#include "PhysicsBodyResource.h"
+
+#include <bgfx/bgfx.h> // for bgfx::ViewId
+
+/// Forward-declare the minimal primitive renderer to avoid heavy includes in all translation units.
+namespace ImGuiVisualizers { class BgfxRenderPrimitives; }
+
 /// Selects which primitive collision shape to build.
 /// Stored as int so it can be serialised through the reflection system.
 ///
-///  0 – Box      : half-extents (m_halfExtentX/Y/Z)
-///  1 – Sphere   : m_radius
-///  2 – Capsule  : m_radius + m_halfHeight  (cylindrical portion, Y-axis aligned)
-///  3 – Cylinder : m_radius + m_halfHeight  (Y-axis aligned)
+///  0 – Box      : scale defines full X/Y/Z extents  (halfExtent = scale * 0.5)
+///  1 – Sphere   : scale.x defines diameter          (radius = scale.x * 0.5, uniform)
+///  2 – Capsule  : scale.x = diameter, scale.y = total height
+///  3 – Cylinder : scale.x = diameter, scale.y = total height
 enum class EPhysicsShapeType : int
 {
     Box      = 0,
@@ -31,24 +39,6 @@ enum class EPhysicsShapeType : int
     Capsule  = 2,
     Cylinder = 3,
 };
-
-/**
- * @brief A resource that describes a Jolt physics body built from a single
- *        primitive collision shape (Box / Sphere / Capsule / Cylinder).
- *
- * All shape and body parameters are serialisable through the reflection
- * system, following the same pattern as CStaticMeshResource.
- *
- * File extension convention: ".physics.json"
- *
- * Typical usage:
- * @code
- *   auto res = resourceManager->RequestResource<CPhysicsBodyComponent>("player.physics.json");
- *   // ...wait for IsReady()...
- *   JPH::BodyCreationSettings bcs = res->MakeBodyCreationSettings(position, rotation, layer);
- *   JPH::BodyID id = bodyInterface.CreateAndAddBody(bcs, JPH::EActivation::Activate);
- * @endcode
- */
 
 class CPhysicsBodyComponent : public ComponentSystem::Component
 {
@@ -61,39 +51,43 @@ public:
 
     bool OnInitialize() override;
     void OnShutdown()   override;
+    bool CreateBody();
 
     /// Returns the Jolt BodyID assigned when this component was added to the simulation.
     /// Will be JPH::BodyID::cInvalidBodyID if not yet initialized or if no PhysicsManager was available.
     JPH::BodyID GetBodyID() const { return m_bodyId; }
 
     /// Shape type as EPhysicsShapeType (cast from the serialised int).
-    EPhysicsShapeType GetShapeType() const { return static_cast<EPhysicsShapeType>(m_shapeType); }
+    EPhysicsShapeType GetShapeType() const
+    {
+        auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
+        return res ? static_cast<EPhysicsShapeType>(res->GetShapeType()) : EPhysicsShapeType::Box;
+    }
 
-    /// Box half-extents along each axis.
-    float GetHalfExtentX() const { return m_halfExtentX; }
-    float GetHalfExtentY() const { return m_halfExtentY; }
-    float GetHalfExtentZ() const { return m_halfExtentZ; }
-
-    /// Radius used by Sphere, Capsule, and Cylinder shapes.
-    float GetRadius()     const { return m_radius; }
-
-    /// Half-height of the cylindrical section for Capsule / Cylinder shapes.
-    float GetHalfHeight() const { return m_halfHeight; }
+    /// The scale of the unit shape. Derived shape parameters are:
+    ///   Box:               halfExtent  = scale * 0.5
+    ///   Sphere:            radius      = scale.x * 0.5
+    ///   Capsule/Cylinder:  radius      = scale.x * 0.5, halfHeight = scale.y * 0.5
+    Vector3f GetScale() const
+    {
+        auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
+        return r ? r->GetScale() : Vector3f(1.0f, 1.0f, 1.0f);
+    }
 
     // ── Body parameter accessors ───────────────────────────────────────────
 
     /// Motion type as JPH::EMotionType (cast from the serialised int).
     /// 0 = Static, 1 = Kinematic, 2 = Dynamic.
-    JPH::EMotionType GetMotionType()    const { return static_cast<JPH::EMotionType>(m_motionType); }
-    float            GetFriction()      const { return m_friction; }
-    float            GetRestitution()   const { return m_restitution; }
-    float            GetLinearDamping() const { return m_linearDamping; }
-    float            GetAngularDamping()const { return m_angularDamping; }
+    JPH::EMotionType GetMotionType()     const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? static_cast<JPH::EMotionType>(r->GetMotionType()) : JPH::EMotionType::Static; }
+    float            GetFriction()       const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetFriction()       : 0.2f;  }
+    float            GetRestitution()    const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetRestitution()    : 0.0f;  }
+    float            GetLinearDamping()  const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetLinearDamping()  : 0.05f; }
+    float            GetAngularDamping() const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetAngularDamping() : 0.05f; }
 
     // ── Built shape ────────────────────────────────────────────────────────
 
     /// Returns the compiled Jolt shape, or nullptr before Finalize() succeeds.
-    const JPH::Shape* GetShape() const { return m_shape; }
+    const JPH::Shape* GetShape() const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetShape() : nullptr; }
 
     /// Constructs a BodyCreationSettings with this resource's shape and body
     /// properties applied. Fill in position / rotation / object layer before
@@ -116,33 +110,16 @@ public:
     void SetWorldTransform(const Matrix4f& transform,
                            JPH::EActivation activation = JPH::EActivation::Activate);
 
+    /// Debug render the collision shape using the supplied primitive renderer.
+    /// Called by the editor visualizer to draw physics shapes into the 3D view.
+    void DebugRender(bgfx::ViewId viewId, ImGuiVisualizers::BgfxRenderPrimitives& prims) const;
+
 private:
-    // ── Reflected (serialised) members ────────────────────────────────────
 
-    /// Shape selector: 0=Box, 1=Sphere, 2=Capsule, 3=Cylinder.
-    int   m_shapeType      = 0;
-
-    // Box
-    float m_halfExtentX    = 0.5f;
-    float m_halfExtentY    = 0.5f;
-    float m_halfExtentZ    = 0.5f;
-
-    // Sphere / Capsule / Cylinder
-    float m_radius         = 0.5f;
-
-    // Capsule / Cylinder
-    float m_halfHeight     = 0.5f;
-
-    // Body properties
-    /// Motion type: 0=Static, 1=Kinematic, 2=Dynamic.
-    int   m_motionType     = 0;
-    float m_friction       = 0.2f;
-    float m_restitution    = 0.0f;
-    float m_linearDamping  = 0.05f;
-    float m_angularDamping = 0.05f;
+    // Physics data is now provided by a CPhysicsBodyResource referenced by this component.
+    CPhysicsBodyResourceReference m_bodyResource;
 
     // ── Runtime (not reflected) ───────────────────────────────────────────
-    JPH::ShapeRefC m_shape;
-    JPH::BodyID    m_bodyId;
+    JPH::BodyID m_bodyId;
 };
 
