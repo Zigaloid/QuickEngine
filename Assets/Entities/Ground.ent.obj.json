@@ -61,60 +61,15 @@
                 },
                 {
                     "Value": "CPhysicsBodyComponent",
-                    "m_shapeType": {
-                        "Value": 0,
-                        "Type": 1,
-                        "Size": 4
-                    },
-                    "m_halfExtentX": {
-                        "Value": 0.5,
-                        "Type": 2,
-                        "Size": 4
-                    },
-                    "m_halfExtentY": {
-                        "Value": 0.5,
-                        "Type": 2,
-                        "Size": 4
-                    },
-                    "m_halfExtentZ": {
-                        "Value": 0.5,
-                        "Type": 2,
-                        "Size": 4
-                    },
-                    "m_radius": {
-                        "Value": 0.5,
-                        "Type": 2,
-                        "Size": 4
-                    },
-                    "m_halfHeight": {
-                        "Value": 0.5,
-                        "Type": 2,
-                        "Size": 4
-                    },
-                    "m_motionType": {
-                        "Value": 0,
-                        "Type": 1,
-                        "Size": 4
-                    },
-                    "m_friction": {
-                        "Value": 0.20000000298023224,
-                        "Type": 2,
-                        "Size": 4
-                    },
-                    "m_restitution": {
-                        "Value": 0.0,
-                        "Type": 2,
-                        "Size": 4
-                    },
-                    "m_linearDamping": {
-                        "Value": 0.05000000074505806,
-                        "Type": 2,
-                        "Size": 4
-                    },
-                    "m_angularDamping": {
-                        "Value": 0.05000000074505806,
-                        "Type": 2,
-                        "Size": 4
+                    "m_bodyResource": {
+                        "Value": "CPhysicsBodyResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/physics/ground.phys.obj.json",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 64
                     },
                     "m_active": {
                         "Value": true,

@@ -83,7 +83,7 @@ public:
     float            GetRestitution()    const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetRestitution()    : 0.0f;  }
     float            GetLinearDamping()  const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetLinearDamping()  : 0.05f; }
     float            GetAngularDamping() const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetAngularDamping() : 0.05f; }
-
+    
     // ── Built shape ────────────────────────────────────────────────────────
 
     /// Returns the compiled Jolt shape, or nullptr before Finalize() succeeds.

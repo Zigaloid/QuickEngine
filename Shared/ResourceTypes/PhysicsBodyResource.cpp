@@ -7,7 +7,7 @@ REFL_DEFINE_END
 
 REFL_DEFINE_OBJECT(CPhysicsBodyResource)
     REFL_DEFINE_INT_MEMBER    (CPhysicsBodyResource, m_shapeType),
-    REFL_DEFINE_VECTOR3_MEMBER(CPhysicsBodyResource, m_scale),
+    REFL_DEFINE_MATRIX4_MEMBER(CPhysicsBodyResource, m_transform),
     REFL_DEFINE_INT_MEMBER    (CPhysicsBodyResource, m_motionType),
     REFL_DEFINE_FLOAT_MEMBER  (CPhysicsBodyResource, m_friction),
     REFL_DEFINE_FLOAT_MEMBER  (CPhysicsBodyResource, m_restitution),
@@ -27,27 +27,30 @@ void CPhysicsBodyResource::Finalize()
 {
     JPH::ShapeSettings::ShapeResult result;
 
+    // Extract scale from the serialized transform
+    const Vector3f scale = m_transform.ExtractScale();
+
     switch (static_cast<int>(m_shapeType))
     {
     case 0: // Box — unit 1x1x1 cube, half-extents = scale * 0.5
     {
-        const JPH::Vec3 halfExtent(m_scale.x * 0.5f, m_scale.y * 0.5f, m_scale.z * 0.5f);
+        const JPH::Vec3 halfExtent(scale.GetX() * 0.5f, scale.GetY() * 0.5f, scale.GetZ() * 0.5f);
         result = JPH::BoxShapeSettings(halfExtent).Create();
         break;
     }
     case 1: // Sphere — unit sphere of radius 0.5, scaled uniformly by scale.x
     {
-        result = JPH::SphereShapeSettings(m_scale.x * 0.5f).Create();
+        result = JPH::SphereShapeSettings(scale.GetX() * 0.5f).Create();
         break;
     }
     case 2: // Capsule — unit capsule: radius = scale.x * 0.5, halfHeight = scale.y * 0.5
     {
-        result = JPH::CapsuleShapeSettings(m_scale.y * 0.5f, m_scale.x * 0.5f).Create();
+        result = JPH::CapsuleShapeSettings(scale.GetY() * 0.5f, scale.GetX() * 0.5f).Create();
         break;
     }
     case 3: // Cylinder — unit cylinder: radius = scale.x * 0.5, halfHeight = scale.y * 0.5
     {
-        result = JPH::CylinderShapeSettings(m_scale.y * 0.5f, m_scale.x * 0.5f).Create();
+        result = JPH::CylinderShapeSettings(scale.GetY() * 0.5f, scale.GetX() * 0.5f).Create();
         break;
     }
     default:

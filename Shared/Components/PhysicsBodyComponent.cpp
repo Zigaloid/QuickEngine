@@ -1,19 +1,18 @@
-﻿#include "PhysicsBodyComponent.h"
-#include "ResourceManager/ResourceManager.h"
+﻿#include "ResourceManager/ResourceManager.h"
 #include "CoreSystem/CoreSystem.h"
 #include "Physics/PhysicsManager.h"
 #include "Math/Quaternion.h"
-
-#include "../ResourceTypes/PhysicsBodyResource.h"
+#include "PhysicsBodyComponent.h"
+#include "PhysicsBodyResource.h"
 
 // Include primitives renderer for DebugRender implementation
-#include "../ImguiVizualizers/BgfxRenderPrimitives.h"
+#include "BgfxRenderPrimitives.h"
 #include <bx/math.h>
 
 // ── Reflection registration ────────────────────────────────────────────────
 
 REFL_DEFINE_OBJECT(CPhysicsBodyComponent)
-    REFL_DEFINE_OBJECT_MEMBER(CPhysicsBodyComponent, m_bodyResource),
+REFL_DEFINE_OBJECT_MEMBER(CPhysicsBodyComponent, m_bodyResource),
 REFL_DEFINE_END
 
 REGISTER_COMPONENT(CPhysicsBodyComponent, "PhysBody", "Physics");
@@ -65,7 +64,50 @@ JPH::BodyCreationSettings CPhysicsBodyComponent::MakeBodyCreationSettings(
     auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
     if (res && res->GetShape())
     {
-        return res->MakeBodyCreationSettings(position, rotation, objectLayer);
+        // If caller provided default position/rotation use the resource TRS as the body transform.
+        // Otherwise use the supplied position/rotation as-is.
+        bool useResourceTRS = true;
+
+        // Check position == zero
+        const double epsPos = 1e-9;
+        if (std::abs(position.GetX()) > epsPos || std::abs(position.GetY()) > epsPos || std::abs(position.GetZ()) > epsPos)
+            useResourceTRS = false;
+
+        // Check rotation == identity
+        const double epsRot = 1e-9;
+        if (std::abs(rotation.GetX()) > epsRot || std::abs(rotation.GetY()) > epsRot || std::abs(rotation.GetZ()) > epsRot || std::abs(rotation.GetW() - 1.0) > epsRot)
+            useResourceTRS = false;
+
+        JPH::RVec3 finalPos = position;
+        JPH::Quat  finalRot = rotation;
+
+        if (useResourceTRS)
+        {
+            const Matrix4f& t = res->GetTransform();
+            const Vector3f   trans = t.ExtractTranslation();
+            const Vector3f   rotDeg = t.ExtractRotationEuler(); // degrees
+
+            // Convert degrees -> radians for Quaternion constructor (expects radians)
+            const float degToRad = static_cast<float>(M_PI) / 180.0f;
+            const Quaternion q(rotDeg.GetX() * degToRad, rotDeg.GetY() * degToRad, rotDeg.GetZ() * degToRad);
+
+            finalPos = JPH::RVec3(static_cast<double>(trans.GetX()), static_cast<double>(trans.GetY()), static_cast<double>(trans.GetZ()));
+            finalRot = JPH::Quat(q.GetX(), q.GetY(), q.GetZ(), q.GetW());
+        }
+
+        JPH::BodyCreationSettings settings(
+            res->GetShape(),
+            finalPos,
+            finalRot,
+            static_cast<JPH::EMotionType>(res->GetMotionType()),
+            objectLayer);
+
+        settings.mFriction = res->GetFriction();
+        settings.mRestitution = res->GetRestitution();
+        settings.mLinearDamping = res->GetLinearDamping();
+        settings.mAngularDamping = res->GetAngularDamping();
+
+        return settings;
     }
 
     // Fallback: return empty settings if resource not available.
@@ -95,7 +137,7 @@ Matrix4f CPhysicsBodyComponent::GetWorldTransform() const
     if (!physics || !physics->IsInitialized())
         return Matrix4f::GetIdentity();
 
-    JPH::BodyInterface& bi  = physics->GetBodyInterface();
+    JPH::BodyInterface& bi = physics->GetBodyInterface();
     const JPH::RVec3    pos = bi.GetPosition(m_bodyId);
     const JPH::Quat     rot = bi.GetRotation(m_bodyId);
 
@@ -134,10 +176,19 @@ void CPhysicsBodyComponent::DebugRender(bgfx::ViewId viewId, ImGuiVisualizers::B
     if (!IsActive())
         return;
 
-    const Matrix4f world    = GetWorldTransform();
-    const Vector3f scale    = GetScale();
-    const float*   mtx      = world.data();
-    const uint32_t color    = 0xff00ffff; // cyan
+    const Matrix4f world = GetWorldTransform();
+    const Vector3f scale = GetScale();
+    const uint32_t color = 0xff00ffff; // cyan
+
+    // Compose with resource TRS so local offsets / rotation are visualized.
+    Matrix4f drawMatrix = world;
+    auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
+    if (res)
+    {
+        drawMatrix = world * res->GetTransform();
+    }
+
+    const float* mtx = drawMatrix.data();
 
     switch (GetShapeType())
     {

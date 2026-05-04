@@ -37,7 +37,15 @@ public:
 
     // Accessors for serialized parameters
     int             GetShapeType()      const { return m_shapeType; }
-    const Vector3f& GetScale()          const { return m_scale; }
+    // Returns the decomposed scale from the serialized transform (by value).
+    Vector3f        GetScale()          const { return m_transform.ExtractScale(); }
+    // Returns the decomposed translation from the serialized transform.
+    Vector3f        GetPosition()       const { return m_transform.ExtractTranslation(); }
+    // Returns the decomposed rotation (Euler angles in degrees, X/Y/Z) from the serialized transform.
+    Vector3f        GetRotationEuler()  const { return m_transform.ExtractRotationEuler(); }
+    // If callers need raw TRS matrix:
+    const Matrix4f& GetTransform()      const { return m_transform; }
+
     int             GetMotionType()     const { return m_motionType; }
     float           GetFriction()       const { return m_friction; }
     float           GetRestitution()    const { return m_restitution; }
@@ -54,18 +62,19 @@ public:
 
 private:
     // Reflected (serialised) members
-    // m_scale represents the size of a unit shape:
-    //   Box:               halfExtent  = m_scale * 0.5
-    //   Sphere:            radius      = m_scale.x * 0.5  (uniform)
-    //   Capsule/Cylinder:  radius      = m_scale.x * 0.5
-    //                      halfHeight  = m_scale.y * 0.5
-    int     m_shapeType      = 0;
-    Vector3f m_scale         = { 1.0f, 1.0f, 1.0f };
-    int     m_motionType     = 0;
-    float   m_friction       = 0.2f;
-    float   m_restitution    = 0.0f;
-    float   m_linearDamping  = 0.05f;
-    float   m_angularDamping = 0.05f;
+    // m_transform represents the TRS applied to a unit shape. The unit shape semantics:
+    //   Box:               halfExtent  = (m_transform scale) * 0.5
+    //   Sphere:            radius      = (m_transform scale).x * 0.5  (uniform expected)
+    //   Capsule/Cylinder:  radius      = (m_transform scale).x * 0.5
+    //                      halfHeight  = (m_transform scale).y * 0.5
+    // The transform stores translation, rotation (Euler degrees), and scale.
+    int      m_shapeType      = 0;
+    Matrix4f m_transform      = Matrix4f::GetIdentity();
+    int      m_motionType     = 0;
+    float    m_friction       = 0.2f;
+    float    m_restitution    = 0.0f;
+    float    m_linearDamping  = 0.05f;
+    float    m_angularDamping = 0.05f;
 
     // Runtime
     JPH::ShapeRefC m_shape;
