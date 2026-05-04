@@ -91,7 +91,7 @@ JPH::BodyCreationSettings CPhysicsBodyComponent::MakeBodyCreationSettings(
             const float degToRad = static_cast<float>(M_PI) / 180.0f;
             const Quaternion q(rotDeg.GetX() * degToRad, rotDeg.GetY() * degToRad, rotDeg.GetZ() * degToRad);
 
-            finalPos = JPH::RVec3(static_cast<double>(trans.GetX()), static_cast<double>(trans.GetY()), static_cast<double>(trans.GetZ()));
+            finalPos = JPH::RVec3(trans.GetX(), trans.GetY(), trans.GetZ());
             finalRot = JPH::Quat(q.GetX(), q.GetY(), q.GetZ(), q.GetW());
         }
 
@@ -131,11 +131,11 @@ void CPhysicsBodyComponent::OnShutdown()
 Matrix4f CPhysicsBodyComponent::GetWorldTransform() const
 {
     if (m_bodyId.IsInvalid())
-        return Matrix4f::GetIdentity();
+        return m_modelMatrix;
 
     PhysicsManager* physics = PhysicsManager::Get();
     if (!physics || !physics->IsInitialized())
-        return Matrix4f::GetIdentity();
+        return m_modelMatrix;
 
     JPH::BodyInterface& bi = physics->GetBodyInterface();
     const JPH::RVec3    pos = bi.GetPosition(m_bodyId);
@@ -152,6 +152,9 @@ Matrix4f CPhysicsBodyComponent::GetWorldTransform() const
 
 void CPhysicsBodyComponent::SetWorldTransform(const Matrix4f& transform, JPH::EActivation activation)
 {
+    // Always update internal matrix so DebugRender uses the latest transform.
+    m_modelMatrix = transform;
+
     if (m_bodyId.IsInvalid())
         return;
 

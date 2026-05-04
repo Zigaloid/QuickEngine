@@ -5,6 +5,7 @@
 #include "Reflection/ReflectionBase.h"
 #include "CoreSystem/CoreDebugChannels.h"
 #include "CoreSystem/AppConfig.h"
+#include "CoreSystem/CoreSystem.h"
 
 #include <string>
 #include <vector>

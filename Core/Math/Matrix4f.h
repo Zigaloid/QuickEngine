@@ -91,6 +91,18 @@ public:
     void Zero()  { m_matrix.fill(0.0f); }
     void zero()  { Zero(); } // backward compat
 
+    // ── Comparison Operators ─────────────────────────────────────────────────
+
+    bool operator==(const Matrix4f& other) const
+    {
+        return m_matrix == other.m_matrix;
+    }
+
+    bool operator!=(const Matrix4f& other) const
+    {
+        return m_matrix != other.m_matrix;
+    }
+
     Matrix4f Transpose() const
     {
         Matrix4f result;

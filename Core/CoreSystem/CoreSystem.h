@@ -1,7 +1,6 @@
 #pragma once
 
 #include "FileSystem/FileSystemManager.h"
-#include "ResourceManager/ResourceManager.h"
 #include "componentSystem/ComponentSystemScheduler.h"
 #include "JobSystem/JobSystem.h"
 #include "DebugChannel/DebugChannel.h"
@@ -11,6 +10,9 @@
 
 #include <memory>
 #include <iostream>
+
+// Forward-declare ResourceManager to avoid circular include
+namespace ResourceSystem { class ResourceManager; }
 
 namespace FileSystem {
     class FileSystemManager;

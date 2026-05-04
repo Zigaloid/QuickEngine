@@ -5,7 +5,8 @@
 #include <cfloat>
 
 // include physics body header to detect and call DebugRender
-#include "../Components/PhysicsBodyComponent.h"
+#include "PhysicsBodyComponent.h"
+#include "PhysicsBodySelectable.h"
 
 namespace ImGuiVisualizers {
 
@@ -44,7 +45,8 @@ bool EntityComponentVisualizer::AttachMeshFromPath(const std::string& entityPath
         m_selectionManager.RenderSelectionGizmo(Get3DView().GetFrameBuffer(), m_gizmoMode, 2.0f);
     });
 
-    RegisterRenderComponents(m_entityComp);
+    // Register physics body components as selectables (we only want to select physics bodies)
+    RegisterPhysicsComponents(m_entityComp);
 
     return true;
 }
@@ -69,7 +71,27 @@ void EntityComponentVisualizer::ReleaseEntityComponent()
 
 void EntityComponentVisualizer::RegisterEntityActions()
 {
-    auto& am = m_editor.GetActionManager();
+    auto& am = m_actionManager;
+
+    // Save action
+    am.RegisterAction({
+        .path = "File.Save",
+        .description = "Save the currently opened object to disk",
+        .targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
+        .callback = [this]() { m_editor.Save(); },
+        .isEnabled = [this]() { return m_editor.IsLoaded(); },
+        .sortPriority = 10
+        });
+
+    // Reload action
+    am.RegisterAction({
+        .path = "File.Reload",
+        .description = "Reload the object from disk (discard changes)",
+        .targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
+        .callback = [this]() { m_editor.Reload(); },
+        .isEnabled = [this]() { return m_editor.IsLoaded(); },
+        .sortPriority = 20
+        });
 
     am.RegisterAction({
         .path = "View.GizmoMode.Translate",
@@ -102,32 +124,34 @@ void EntityComponentVisualizer::RegisterEntityActions()
         });
 }
 
-void EntityComponentVisualizer::RegisterRenderComponents(ComponentSystem::Component* root)
+void EntityComponentVisualizer::RegisterPhysicsComponents(ComponentSystem::Component* root)
 {
-    std::vector<CRenderComponent*> renderComps;
-    CollectRenderComponents(root, renderComps);
+    std::vector<CPhysicsBodyComponent*> physComps;
+    CollectPhysicsComponents(root, physComps);
 
-    for (CRenderComponent* rc : renderComps)
+    for (CPhysicsBodyComponent* pc : physComps)
     {
-        auto selectable = std::make_shared<CRenderComponentSelectable>(rc);
+        auto selectable = std::make_shared<CPhysicsBodySelectable>(pc);
+        // Initialize selectable from the component state
+        selectable->UpdateFromComponent();
         m_componentSelectables.push_back(selectable);
         m_selectionManager.AddSelectable(selectable);
     }
 }
 
-void EntityComponentVisualizer::CollectRenderComponents(ComponentSystem::Component* comp,
-    std::vector<CRenderComponent*>& out)
+void EntityComponentVisualizer::CollectPhysicsComponents(ComponentSystem::Component* comp,
+    std::vector<CPhysicsBodyComponent*>& out)
 {
     if (!comp) return;
 
-    if (auto* rc = dynamic_cast<CRenderComponent*>(comp))
+    if (auto* pc = dynamic_cast<CPhysicsBodyComponent*>(comp))
     {
-        out.push_back(rc);
+        out.push_back(pc);
     }
 
     for (auto* child : comp->GetChildren())
     {
-        CollectRenderComponents(child, out);
+        CollectPhysicsComponents(child, out);
     }
 }
 
@@ -153,6 +177,24 @@ void EntityComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, Bg
         }
     }
 
+    // Update any selectable associated with this physics component so the
+    // selection system has up-to-date transform / bounding-sphere data.
+    if (auto* physComp2 = dynamic_cast<CPhysicsBodyComponent*>(comp))
+    {
+        for (auto& sel : m_componentSelectables)
+        {
+            if (!sel) continue;
+            if (sel->GetOwner() == physComp2)
+            {
+                // Try to cast to our physics selectable and update
+                auto physSel = std::dynamic_pointer_cast<CPhysicsBodySelectable>(sel);
+                if (physSel)
+                    physSel->UpdateFromComponent();
+                break;
+            }
+        }
+    }
+
     for (auto* child : comp->GetChildren())
     {
         RenderComponentHierarchy(viewId, prims, child);
@@ -169,14 +211,21 @@ void EntityComponentVisualizer::RenderSelectionHighlight(bgfx::ViewId viewId,
 
     for (const auto& selectable : allSelected)
     {
-        auto rc = std::dynamic_pointer_cast<CRenderComponentSelectable>(selectable);
-        if (!rc) continue;
+        if (!selectable) continue;
 
-        CRenderComponent* comp = rc->GetComponent();
-        if (!comp || !comp->IsActive()) continue;
+        // Skip inactive owners (if the owner is a Component)
+        CReflectedBase* owner = selectable->GetOwner();
+        if (owner)
+        {
+            if (auto* compOwner = dynamic_cast<ComponentSystem::Component*>(owner))
+            {
+                if (!compOwner->IsActive())
+                    continue;
+            }
+        }
 
-        const Vector4f bs = *comp->GetBoundingSphere();
-        const float* m = comp->GetModelMatrix()->data();
+        const Vector4f bs = selectable->GetBoundingSphere();
+        const float* m = selectable->GetTransform().data();
 
         const float cx = m[0] * bs.x + m[4] * bs.y + m[8] * bs.z + m[12];
         const float cy = m[1] * bs.x + m[5] * bs.y + m[9] * bs.z + m[13];
@@ -253,11 +302,11 @@ bool EntityComponentVisualizer::Render(bool* isOpen)
 
     if (ImGui::BeginMenuBar())
     {
-        m_editor.GetActionManager().RenderMenuBar();
+        m_actionManager.RenderMenuBar();
         ImGui::EndMenuBar();
     }
 
-    m_editor.GetActionManager().RenderToolbar();
+    m_actionManager.RenderToolbar();
 
     // Gizmo combo
     ImGui::SameLine();

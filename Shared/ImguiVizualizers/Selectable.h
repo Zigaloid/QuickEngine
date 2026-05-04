@@ -59,7 +59,7 @@ public:
         if (m_BoundingSphere)
             return *m_BoundingSphere;
 
-        return Vector4f(0.0f, 0.0f, 0.0f, 0.0f);
+        return Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
     }
 
     /// Returns the non-owning pointer to the CReflectedBase owner object, or

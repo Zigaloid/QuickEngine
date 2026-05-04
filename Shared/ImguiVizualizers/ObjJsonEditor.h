@@ -264,17 +264,6 @@ namespace ImGuiVisualizers {
 				.sortPriority = 20
 				});
 
-			// Close action
-			m_actionManager.RegisterAction({
-				.path = "File.Close",
-				.description = "Close the editor",
-				.targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
-				.callback = [this]() {
-					Close();
-				},
-				.isEnabled = [this]() { return m_object != nullptr; },
-				.sortPriority = 30
-				});
 		}
 
 		void UnregisterEditorActions()
@@ -282,7 +271,6 @@ namespace ImGuiVisualizers {
 			std::string prefix = "ObjEditor." + std::to_string(m_instanceId);
 			m_actionManager.UnregisterAction(prefix + ".Save");
 			m_actionManager.UnregisterAction(prefix + ".Reload");
-			m_actionManager.UnregisterAction(prefix + ".Close");
 		}
 
 	private:

@@ -8,6 +8,7 @@
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
 #include "CoreSystem/CoreSystem.h"
+#include "ResourceManager/ResourceManager.h"
 #include "CoreSystem/Timer.h"
 #include "net/NexusClient.h"
 #include "QuickEdit.h"

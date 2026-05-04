@@ -2,6 +2,7 @@
 #include "ICommand.h"
 #include "Selectable.h"
 #include "../Core/Math/Matrix4f.h"
+#include "PhysicsBodySelectable.h"
 #include <memory>
 #include <vector>
 
@@ -46,7 +47,21 @@ private:
             if (auto sel = e.selectable.lock())
             {
                 if (Matrix4f* mtx = sel->GetTransformMutable())
+                {
                     *mtx = e.*which;
+
+                    // If this selectable adapts a physics body, push the
+                    // updated world transform back into the physics component
+                    // so that the simulation (and debug rendering) reflect
+                    // undo/redo operations as well.
+                    if (auto physSel = dynamic_cast<CPhysicsBodySelectable*>(sel.get()))
+                    {
+                        if (auto* comp = physSel->GetComponent())
+                        {
+                            comp->SetWorldTransform(*mtx);
+                        }
+                    }
+                }
             }
         }
     }

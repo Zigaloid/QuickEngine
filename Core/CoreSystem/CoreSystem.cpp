@@ -3,6 +3,7 @@
 #include "ComponentSystem/ComponentSystem.h"
 #include "ComponentSystem/ComponentSystemScheduler.h"
 #include "ComponentSystem/ComponentRegistry.h"
+#include "ResourceManager/ResourceManager.h"
 #include "FunctionCallManager.h"
 #include "FileSystem/StandardFileSystem.h"
 #include "Net/NexusClient.h"

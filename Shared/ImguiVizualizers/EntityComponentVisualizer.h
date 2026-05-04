@@ -3,6 +3,7 @@
 #include "CombinedObjJson3DVisualizer.h"
 #include "SelectionManager.h"
 #include "RenderComponentSelectable.h"
+#include "PhysicsBodySelectable.h"
 #include "EntityComponent.h"
 #include "BgfxGizmoRenderer.h"
 #include "CommandHistory.h"
@@ -59,9 +60,9 @@ private:
     void ReleaseEntityComponent();
     void RegisterEntityActions();
 
-    void RegisterRenderComponents(ComponentSystem::Component* root);
-    void CollectRenderComponents(ComponentSystem::Component* comp,
-                                 std::vector<CRenderComponent*>& out);
+    void RegisterPhysicsComponents(ComponentSystem::Component* root);
+    void CollectPhysicsComponents(ComponentSystem::Component* comp,
+                                 std::vector<CPhysicsBodyComponent*>& out);
     // Updated signature: pass primitives so components that are not CRenderComponent
     // (e.g. physics bodies) can render debug visuals.
     void RenderComponentHierarchy(bgfx::ViewId viewId, BgfxRenderPrimitives& prims, ComponentSystem::Component* comp);
@@ -73,13 +74,14 @@ private:
     CSelectionManager  m_selectionManager;
     GizmoMode          m_gizmoMode;
 
-    std::vector<std::shared_ptr<CRenderComponentSelectable>> m_componentSelectables;
+    std::vector<std::shared_ptr<CSelectable>> m_componentSelectables;
 
     ImVec2 m_viewportMin  = { 0.0f, 0.0f };
     ImVec2 m_viewportSize = { 1.0f, 1.0f };
 
     CCommandHistory  m_history{ 100 };
     PropertyInspector m_propertyInspector;
+    UI::UnifiedActionManager m_actionManager;
 };
 
 } // namespace ImGuiVisualizers

@@ -46,7 +46,16 @@ public:
     REFL_DECLARE_OBJECT(CPhysicsBodyComponent, Component);
     DECLARE_COMPONENT();
 
-    CPhysicsBodyComponent() = default;
+    CPhysicsBodyComponent()
+        : m_bodyId(JPH::BodyID::cInvalidBodyID)
+    {
+        m_modelMatrix.Identity();
+        // Expose internal members via shared_ptr with no-op deleters so other owners
+        // (selectables / gizmo) can hold shared_ptrs that point at our internal storage.
+        m_transformPtr = std::shared_ptr<Matrix4f>(&m_modelMatrix, [](Matrix4f*) {});
+        m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
+    }
+
     ~CPhysicsBodyComponent() override = default;
 
     bool OnInitialize() override;
@@ -114,6 +123,11 @@ public:
     /// Called by the editor visualizer to draw physics shapes into the 3D view.
     void DebugRender(bgfx::ViewId viewId, ImGuiVisualizers::BgfxRenderPrimitives& prims) const;
 
+    // ── Expose shared pointers to internal transform / bounding-sphere so that
+    //     selectables and gizmos can hold and mutate the same live data.
+    std::shared_ptr<Matrix4f> GetModelMatrix() const { return m_transformPtr; }
+    std::shared_ptr<Vector4f> GetBoundingSphere() const { return m_boundingSpherePtr; }
+
 private:
 
     // Physics data is now provided by a CPhysicsBodyResource referenced by this component.
@@ -121,5 +135,12 @@ private:
 
     // ── Runtime (not reflected) ───────────────────────────────────────────
     JPH::BodyID m_bodyId;
+
+    // Internal storage exposed via shared_ptr (no-op deleter) so other systems can
+    // reference live transform and bounding information.
+    mutable Matrix4f m_modelMatrix;
+    mutable Vector4f m_boundingSphere;
+    mutable std::shared_ptr<Matrix4f> m_transformPtr;
+    mutable std::shared_ptr<Vector4f> m_boundingSpherePtr;
 };
 
