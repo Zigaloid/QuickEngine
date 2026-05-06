@@ -127,6 +127,7 @@ namespace ImGuiVisualizers
 		m_widgetMap = nullptr;
 		m_ExpandedNodes.clear();
 		m_StringBuffers.clear();
+		m_inlineResources.clear();
 	}
 
 	void PropertyInspector::RenderObjectProperties(CReflectedBase* object, const std::string& objectName)

@@ -26,8 +26,7 @@ private:
 
     // Primary game viewport camera — renders directly into bgfx view 0.
     BgfxGameCamera            m_camera;
-    std::shared_ptr<GameCameraController>     m_cameraController;
-    RenderPrimitives::BgfxRenderPrimitives    m_primitives;
+    std::shared_ptr<GameCameraController>     m_cameraController;    
     CLevelComponent *m_RootLevel;
     Core::FunctionQueue                       m_functionQueue;
 };

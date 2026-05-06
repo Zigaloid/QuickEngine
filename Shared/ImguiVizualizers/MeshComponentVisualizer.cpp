@@ -22,7 +22,7 @@ bool MeshComponentVisualizer::AttachMeshFromPath(const std::string& meshPath)
         m_meshComp->ReInitialize();
 
         // Provide a render callback to the 3D view that invokes the component's Render().
-        Get3DView().SetRenderCallback([this](bgfx::ViewId viewId, BgfxRenderPrimitives& /*prims*/) {
+        Get3DView().SetRenderCallback([this](bgfx::ViewId viewId, Rendering::BgfxRenderPrimitives& /*prims*/) {
             if (!m_meshComp) return;            
                 m_meshComp->Render(viewId);
         });

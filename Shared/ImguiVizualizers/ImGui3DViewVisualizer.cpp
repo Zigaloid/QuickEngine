@@ -26,13 +26,13 @@ ImGui3DViewVisualizer::ImGui3DViewVisualizer(const char* name,
 
 void ImGui3DViewVisualizer::Initialize()
 {
-    m_primitives.Initialize();
+    Rendering::BgfxRenderPrimitives::Instance().Initialize();
 }
 
 void ImGui3DViewVisualizer::Shutdown()
 {
     m_viewport.Shutdown();
-    m_primitives.Shutdown();
+    Rendering::BgfxRenderPrimitives::Instance().Shutdown();
 }
 
 void ImGui3DViewVisualizer::Update(float deltaTime)
@@ -106,17 +106,14 @@ void ImGui3DViewVisualizer::RenderContent(const ImVec2& contentSize)
 
         if (m_showGrid) 
         {
-            m_primitives.RenderGrid(viewId, m_gridConfig.size,
+            Rendering::BgfxRenderPrimitives::Instance().RenderGrid(viewId, m_gridConfig.size,
                                     m_gridConfig.step, m_gridConfig.color);
         }
-        if (m_showAxes) 
-        {
-            m_primitives.RenderAxes(viewId);
-        }
+
 
         // User-supplied draw calls
         if (m_renderCallback) {
-            m_renderCallback(viewId, m_primitives);
+            m_renderCallback(viewId, Rendering::BgfxRenderPrimitives::Instance());
         }
 
         // Display the offscreen texture and create an invisible interactive item

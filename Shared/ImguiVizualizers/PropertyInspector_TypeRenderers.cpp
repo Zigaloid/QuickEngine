@@ -16,6 +16,8 @@
 #include "ClassFactory/ClassFactory.h"
 #include "ComponentSystem/ComponentSystem.h"
 #include "ComponentSystem/ComponentRegistry.h"
+#include "ResourceManager/ResourceManager.h"
+#include "CoreSystem/AppConfig.h"
 
 namespace ImGuiVisualizers {
 
@@ -358,6 +360,12 @@ namespace ImGuiVisualizers {
                     ImGui::Text("Address: %p", subObject);
 
                 RenderObjectProperties(subObject, property.GetName());
+
+                // If this is a CResourceReference pointing to an .obj.json, offer inline editing
+                CResourceReference* resRef = dynamic_cast<CResourceReference*>(subObject);
+                if (resRef) {
+                    RenderResourceReferenceInline(resRef, idSource);
+                }
             }
 
             ImGui::TreePop();
@@ -391,6 +399,84 @@ namespace ImGuiVisualizers {
 
         CReflectedBase* subObject = reinterpret_cast<CReflectedBase*>(addr);
         RenderReflectedObjectCommon(property, subObject, subObject, "[Object]", false, "Embedded object");
+    }
+
+    void PropertyInspector::RenderResourceReferenceInline(CResourceReference* resRef, const void* idSource)
+    {
+        const std::string& fileName = resRef->GetResourceFileName();
+
+        // Only support .obj.json files for inline editing
+        const std::string objJsonSuffix = ".obj.json";
+        if (fileName.size() < objJsonSuffix.size() ||
+            fileName.compare(fileName.size() - objJsonSuffix.size(), objJsonSuffix.size(), objJsonSuffix) != 0)
+        {
+            return;
+        }
+
+        std::string resolvedPath = Core::AppConfig::Instance().ResolvePath(fileName);
+
+        ImGui::Separator();
+
+        auto it = m_inlineResources.find(idSource);
+        if (it == m_inlineResources.end())
+        {
+            std::string btnId = "Edit Inline##" + std::to_string(reinterpret_cast<uintptr_t>(idSource));
+            if (ImGui::Button(btnId.c_str()))
+            {
+                // Determine class name from the resource reference's type info
+                    // typeid().name() on MSVC returns "class CFoo" — strip the prefix
+                    std::string className = resRef->GetReourceTypeName();
+                    const std::string classPrefix = "class ";
+                    if (className.compare(0, classPrefix.size(), classPrefix) == 0)
+                        className = className.substr(classPrefix.size());
+                    const std::string structPrefix = "struct ";
+                    if (className.compare(0, structPrefix.size(), structPrefix) == 0)
+                        className = className.substr(structPrefix.size());
+
+                    // Try to create via ClassFactory
+                    CReflectedBase* raw = ClassFactory::CreateObject(className.c_str());
+                if (raw)
+                {
+                    if (raw->Read(resolvedPath.c_str()))
+                    {
+                        m_inlineResources[idSource] = std::unique_ptr<CReflectedBase>(raw);
+                    }
+                    else
+                    {
+                        // Still show the default-constructed object
+                        m_inlineResources[idSource] = std::unique_ptr<CReflectedBase>(raw);
+                    }
+                }
+            }
+        }
+        else
+        {
+            CReflectedBase* inlineObj = it->second.get();
+
+            ImGui::TextColored(ImVec4(0.5f, 1.0f, 0.5f, 1.0f), "Inline: %s", fileName.c_str());
+
+            if (!m_readOnly)
+            {
+                ImGui::SameLine();
+                std::string saveId = "Save##inline_" + std::to_string(reinterpret_cast<uintptr_t>(idSource));
+                if (ImGui::Button(saveId.c_str()))
+                {
+                    inlineObj->Write(resolvedPath.c_str());
+                }
+            }
+
+            ImGui::SameLine();
+            std::string closeId = "Close##inline_" + std::to_string(reinterpret_cast<uintptr_t>(idSource));
+            if (ImGui::Button(closeId.c_str()))
+            {
+                m_inlineResources.erase(idSource);
+                return;
+            }
+
+            ImGui::Indent();
+            RenderObjectProperties(inlineObj, fileName);
+            ImGui::Unindent();
+        }
     }
 
     void PropertyInspector::RenderObjectPtrProperty(const CPropertyBase& property, CReflectedBase* object)

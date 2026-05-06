@@ -9,6 +9,8 @@
 #include "BgfxRenderPrimitives.h"
 #include <bx/math.h>
 
+#include <Jolt/Physics/Collision/Shape/RotatedTranslatedShape.h>
+
 // ── Reflection registration ────────────────────────────────────────────────
 
 REFL_DEFINE_OBJECT(CPhysicsBodyComponent)
@@ -22,8 +24,13 @@ bool CPhysicsBodyComponent::OnInitialize()
     return true;
 }
 
-bool CPhysicsBodyComponent::CreateBody()
+void CPhysicsBodyComponent::OnUpdate(double deltaTime)
 {
+}
+
+bool CPhysicsBodyComponent::CreateBody( const Matrix4f &worldTransform )
+{
+
     // If it's already valid just return.
     if (m_bodyId.IsInvalid() == false)
         return true;
@@ -34,8 +41,8 @@ bool CPhysicsBodyComponent::CreateBody()
     {
         // Resource not ready yet.
         return false;
-    }
-
+    }    
+    
     PhysicsManager* physics = PhysicsManager::Get();
     if (physics && physics->IsInitialized())
     {
@@ -49,6 +56,9 @@ bool CPhysicsBodyComponent::CreateBody()
         m_bodyId = physics->GetBodyInterface().CreateAndAddBody(
             bcs, JPH::EActivation::Activate);
 
+        // Place the body at the mesh's world position directly.
+        // The resource offset is already baked into the shape via RotatedTranslatedShape.
+        SetWorldTransform(worldTransform);
         return true;
     }
     return false;
@@ -62,43 +72,12 @@ JPH::BodyCreationSettings CPhysicsBodyComponent::MakeBodyCreationSettings(
     JPH::ObjectLayer objectLayer) const
 {
     auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-    if (res && res->GetShape())
+    if (res && m_shape)
     {
-        // If caller provided default position/rotation use the resource TRS as the body transform.
-        // Otherwise use the supplied position/rotation as-is.
-        bool useResourceTRS = true;
-
-        // Check position == zero
-        const double epsPos = 1e-9;
-        if (std::abs(position.GetX()) > epsPos || std::abs(position.GetY()) > epsPos || std::abs(position.GetZ()) > epsPos)
-            useResourceTRS = false;
-
-        // Check rotation == identity
-        const double epsRot = 1e-9;
-        if (std::abs(rotation.GetX()) > epsRot || std::abs(rotation.GetY()) > epsRot || std::abs(rotation.GetZ()) > epsRot || std::abs(rotation.GetW() - 1.0) > epsRot)
-            useResourceTRS = false;
-
-        JPH::RVec3 finalPos = position;
-        JPH::Quat  finalRot = rotation;
-
-        if (useResourceTRS)
-        {
-            const Matrix4f& t = res->GetTransform();
-            const Vector3f   trans = t.ExtractTranslation();
-            const Vector3f   rotDeg = t.ExtractRotationEuler(); // degrees
-
-            // Convert degrees -> radians for Quaternion constructor (expects radians)
-            const float degToRad = static_cast<float>(M_PI) / 180.0f;
-            const Quaternion q(rotDeg.GetX() * degToRad, rotDeg.GetY() * degToRad, rotDeg.GetZ() * degToRad);
-
-            finalPos = JPH::RVec3(trans.GetX(), trans.GetY(), trans.GetZ());
-            finalRot = JPH::Quat(q.GetX(), q.GetY(), q.GetZ(), q.GetW());
-        }
-
         JPH::BodyCreationSettings settings(
-            res->GetShape(),
-            finalPos,
-            finalRot,
+            m_shape,
+            position,
+            rotation,
             static_cast<JPH::EMotionType>(res->GetMotionType()),
             objectLayer);
 
@@ -112,6 +91,72 @@ JPH::BodyCreationSettings CPhysicsBodyComponent::MakeBodyCreationSettings(
 
     // Fallback: return empty settings if resource not available.
     return JPH::BodyCreationSettings(JPH::ShapeRefC(), position, rotation, JPH::EMotionType::Static, objectLayer);
+}
+
+void CPhysicsBodyComponent::InitializeShape(const Matrix4f& objTran)
+{
+    auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
+    if (!res)
+        return;
+
+    JPH::ShapeSettings::ShapeResult result;
+
+    // Extract scale from the serialized transform
+    Vector3f scale = (res->GetTransform() * objTran).ExtractScale();
+
+    switch (res->GetShapeType())
+    {
+    case 0: // Box — unit 1x1x1 cube, half-extents = scale * 0.5
+    {
+        const JPH::Vec3 halfExtent(scale.GetX() * 0.5f, scale.GetY() * 0.5f, scale.GetZ() * 0.5f);
+        result = JPH::BoxShapeSettings(halfExtent).Create();
+        break;
+    }
+    case 1: // Sphere — unit sphere of radius 0.5, scaled uniformly by scale.x
+    {
+        result = JPH::SphereShapeSettings(scale.GetX() * 0.5f).Create();
+        break;
+    }
+    case 2: // Capsule — unit capsule: radius = scale.x * 0.5, halfHeight = scale.y * 0.5
+    {
+        result = JPH::CapsuleShapeSettings(scale.GetY() * 0.5f, scale.GetX() * 0.5f).Create();
+        break;
+    }
+    case 3: // Cylinder — unit cylinder: radius = scale.x * 0.5, halfHeight = scale.y * 0.5
+    {
+        result = JPH::CylinderShapeSettings(scale.GetY() * 0.5f, scale.GetX() * 0.5f).Create();
+        break;
+    }
+    default:
+        return;
+    }
+
+    if (result.HasError())
+    {
+        return;
+    }
+
+    // Wrap the shape with the resource's local offset so the collision geometry
+    // is offset from the body origin, without needing to shift the body position.
+    JPH::ShapeRefC baseShape = result.Get();
+    Vector3f resPos = res->GetTransform().ExtractTranslation();
+    Quaternion resRot = Quaternion::FromMatrix(res->GetTransform()).Normalized();
+
+    bool hasOffset = (resPos.GetX() != 0.0f || resPos.GetY() != 0.0f || resPos.GetZ() != 0.0f);
+    bool hasRotation = (std::abs(resRot.GetX()) > 0.0001f || std::abs(resRot.GetY()) > 0.0001f || std::abs(resRot.GetZ()) > 0.0001f);
+
+    if (hasOffset || hasRotation)
+    {
+        JPH::RotatedTranslatedShapeSettings offsetSettings(
+            JPH::Vec3(resPos.GetX(), resPos.GetY(), resPos.GetZ()),
+            JPH::Quat(resRot.GetX(), resRot.GetY(), resRot.GetZ(), resRot.GetW()),
+            baseShape);
+        auto offsetResult = offsetSettings.Create();
+        if (!offsetResult.HasError())
+            baseShape = offsetResult.Get();
+    }
+
+    m_shape = baseShape;
 }
 
 void CPhysicsBodyComponent::OnShutdown()
@@ -130,12 +175,9 @@ void CPhysicsBodyComponent::OnShutdown()
 
 Matrix4f CPhysicsBodyComponent::GetWorldTransform() const
 {
-    if (m_bodyId.IsInvalid())
-        return m_modelMatrix;
-
     PhysicsManager* physics = PhysicsManager::Get();
     if (!physics || !physics->IsInitialized())
-        return m_modelMatrix;
+        return Matrix4f::GetIdentity();
 
     JPH::BodyInterface& bi = physics->GetBodyInterface();
     const JPH::RVec3    pos = bi.GetPosition(m_bodyId);
@@ -152,19 +194,13 @@ Matrix4f CPhysicsBodyComponent::GetWorldTransform() const
 
 void CPhysicsBodyComponent::SetWorldTransform(const Matrix4f& transform, JPH::EActivation activation)
 {
-    // Always update internal matrix so DebugRender uses the latest transform.
-    m_modelMatrix = transform;
-
-    if (m_bodyId.IsInvalid())
-        return;
-
     PhysicsManager* physics = PhysicsManager::Get();
     if (!physics || !physics->IsInitialized())
         return;
 
     const Vector3f   t = transform.ExtractTranslation();
-    const Quaternion q = Quaternion::FromMatrix(transform);
-
+    const Quaternion rq = Quaternion::FromMatrix(transform);
+    const Quaternion q = rq.Normalized();
     physics->GetBodyInterface().SetPositionAndRotation(
         m_bodyId,
         JPH::RVec3(t.GetX(), t.GetY(), t.GetZ()),
@@ -174,38 +210,26 @@ void CPhysicsBodyComponent::SetWorldTransform(const Matrix4f& transform, JPH::EA
 
 // ── Debug rendering ───────────────────────────────────────────────────────
 
-void CPhysicsBodyComponent::DebugRender(bgfx::ViewId viewId, ImGuiVisualizers::BgfxRenderPrimitives& prims) const
+void CPhysicsBodyComponent::DebugRender(bgfx::ViewId viewId, Matrix4f &transform) const
 {
-    if (!IsActive())
-        return;
+    
+    Rendering::BgfxRenderPrimitives& prims = Rendering::BgfxRenderPrimitives::Instance();
 
-    const Matrix4f world = GetWorldTransform();
-    const Vector3f scale = GetScale();
-    const uint32_t color = 0xff00ffff; // cyan
-
-    // Compose with resource TRS so local offsets / rotation are visualized.
-    Matrix4f drawMatrix = world;
-    auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-    if (res)
-    {
-        drawMatrix = world * res->GetTransform();
-    }
-
-    const float* mtx = drawMatrix.data();
-
+    const float* mtx = transform.data();
+    const uint32_t color = 0xff00ffff;
     switch (GetShapeType())
     {
     case EPhysicsShapeType::Box:
-        prims.RenderWireBox(viewId, mtx, scale.x * 0.5f, scale.y * 0.5f, scale.z * 0.5f, color);
+        prims.RenderWireBox(viewId, mtx, color);
         break;
     case EPhysicsShapeType::Sphere:
-        prims.RenderWireSphere(viewId, mtx, scale.x * 0.5f, color);
+        prims.RenderWireSphere(viewId, mtx, color);
         break;
     case EPhysicsShapeType::Capsule:
-        prims.RenderWireCapsule(viewId, mtx, scale.x * 0.5f, scale.y * 0.5f, color);
+        prims.RenderWireCapsule(viewId, mtx, color);
         break;
     case EPhysicsShapeType::Cylinder:
-        prims.RenderWireCylinder(viewId, mtx, scale.x * 0.5f, scale.y * 0.5f, color);
+        prims.RenderWireCylinder(viewId, mtx, color);
         break;
     default:
         break;

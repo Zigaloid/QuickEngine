@@ -120,6 +120,9 @@
     <ClInclude Include="..\Shared\Rendering\BgfxRenderPrimitives.h">
       <Filter>..\Shared\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
@@ -127,6 +130,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h">
@@ -347,9 +353,6 @@
     </ClInclude>
     <ClInclude Include="Game.h" />
     <ClInclude Include="logo.h" />
-    <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
-      <Filter>..\Shared\ResourceTypes</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -454,10 +457,16 @@
     <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp">
       <Filter>..\Shared\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp">
@@ -546,8 +555,5 @@
     </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
-      <Filter>..\Shared\ResourceTypes</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

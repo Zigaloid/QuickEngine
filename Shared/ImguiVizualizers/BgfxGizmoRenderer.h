@@ -5,6 +5,7 @@
 
 #include "BgfxRenderPrimitives.h"
 #include "BgfxViewIdAllocator.h"
+using namespace Rendering;
 
 namespace ImGuiVisualizers {
 

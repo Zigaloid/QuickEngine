@@ -55,7 +55,7 @@
                                         1.0,
                                         0.0,
                                         0.0,
-                                        3.6908559799194336,
+                                        5.368636608123779,
                                         0.0,
                                         1.0
                                     ],
@@ -129,6 +129,96 @@
                                 },
                                 "m_children": {
                                     "Value": "CTransformComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 32
+                                }
+                            }
+                        ],
+                        "Type": 19,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CEntityComponent",
+                    "m_name": {
+                        "Value": "",
+                        "Type": 3,
+                        "Size": 40
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CEntityComponent",
+                        "Elements": [
+                            {
+                                "Value": "CMeshComponent",
+                                "m_meshResource": {
+                                    "Value": "CStaticMeshResourceReference",
+                                    "m_resourceFileName": {
+                                        "Value": "./assets/staticmeshes/gound.smesh.obj.json",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 64
+                                },
+                                "m_modelMatrix": {
+                                    "Value": [
+                                        4.763233184814453,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        5.4597063064575195,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0
+                                    ],
+                                    "Type": 8,
+                                    "Size": 64
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CMeshComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 32
+                                }
+                            },
+                            {
+                                "Value": "CPhysicsBodyComponent",
+                                "m_bodyResource": {
+                                    "Value": "CPhysicsBodyResourceReference",
+                                    "m_resourceFileName": {
+                                        "Value": "./assets/physics/ground.phys.obj.json",
+                                        "Type": 3,
+                                        "Size": 40
+                                    },
+                                    "Type": 4,
+                                    "Size": 64
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CPhysicsBodyComponent",
                                     "Elements": [],
                                     "Type": 19,
                                     "Size": 32

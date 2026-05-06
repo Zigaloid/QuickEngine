@@ -32,7 +32,7 @@ bool EntityComponentVisualizer::AttachMeshFromPath(const std::string& entityPath
     }
     else
     {
-        // Same instance: clear selection/render state but do not Shutdown the editor-owned instance.
+        // Same instance: clear selection/render state but do not Shutdown the editor-owned instance./
         m_selectionManager.ClearSelectables();
         m_componentSelectables.clear();
     }
@@ -78,7 +78,12 @@ void EntityComponentVisualizer::RegisterEntityActions()
         .path = "File.Save",
         .description = "Save the currently opened object to disk",
         .targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
-        .callback = [this]() { m_editor.Save(); },
+        .callback = [this]() {
+            m_editor.Save();
+            // Also save any referenced physics body resources that may have been
+            // modified via the gizmo or the property inspector.
+            SavePhysicsBodyResources();
+        },
         .isEnabled = [this]() { return m_editor.IsLoaded(); },
         .sortPriority = 10
         });
@@ -122,6 +127,26 @@ void EntityComponentVisualizer::RegisterEntityActions()
         .isChecked = [this]() { return m_gizmoMode == GizmoMode::Rotate; },
         .sortPriority = 30
         });
+}
+
+void EntityComponentVisualizer::SavePhysicsBodyResources()
+{
+    if (!m_entityComp) return;
+
+    std::vector<CPhysicsBodyComponent*> physComps;
+    CollectPhysicsComponents(m_entityComp, physComps);
+
+    for (CPhysicsBodyComponent* pc : physComps)
+    {
+        if (!pc) continue;        
+        auto& resRef = pc->GetBodyResourceRef();
+        auto resource = resRef.GetResourceAs<CPhysicsBodyResource>();        
+
+        if (resource && !resource->GetPath().empty())
+        {
+            resource->Write(resource->GetPath().c_str());
+        }
+    }
 }
 
 void EntityComponentVisualizer::RegisterPhysicsComponents(ComponentSystem::Component* root)
@@ -173,7 +198,27 @@ void EntityComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, Bg
     {
         if (physComp->IsActive())
         {
-            physComp->DebugRender(viewId, prims);
+            CPhysicsBodyResource* res = physComp->GetBodyResource();
+            if (res)
+            {
+                Matrix4f transform = res->GetTransform();
+
+                // If the owning entity has a CRenderComponent, multiply by its model matrix
+                ComponentSystem::Component* parent = comp->GetParent();
+                if (parent)
+                {
+                    for (auto* sibling : parent->GetChildren())
+                    {
+                        if (auto* renderComp = dynamic_cast<CRenderComponent*>(sibling))
+                        {
+                            transform = (*renderComp->GetModelMatrix()) * transform;
+                            break;
+                        }
+                    }
+                }
+
+                physComp->DebugRender(viewId, transform);
+            }
         }
     }
 
@@ -257,16 +302,32 @@ void EntityComponentVisualizer::RenderInspectorPanel()
     }
 
     // Sync the property inspector to the most-recently selected object.
+    // When a physics body is selected, point the inspector at the underlying
+    // PhysicsBodyResource so that gizmo transform edits are reflected directly.
     const auto& lastSelected = m_selectionManager.GetSelected();
-    CReflectedBase* owner = lastSelected ? lastSelected->GetOwner() : nullptr;
-    if (owner != m_propertyInspector.GetObject())
-        m_propertyInspector.SetObject(owner);
+    CReflectedBase* inspectorTarget = nullptr;
+
+    if (lastSelected)
+    {
+        auto physSel = std::dynamic_pointer_cast<CPhysicsBodySelectable>(lastSelected);
+        if (physSel && physSel->GetComponent())
+        {
+            CPhysicsBodyResource* res = physSel->GetComponent()->GetBodyResource();
+            if (res)
+                inspectorTarget = res;
+        }
+        if (!inspectorTarget)
+            inspectorTarget = lastSelected->GetOwner();
+    }
+
+    if (inspectorTarget != m_propertyInspector.GetObject())
+        m_propertyInspector.SetObject(inspectorTarget);
 
     if (ImGui::BeginTabBar("##InspectorTabs"))
     {
         if (ImGui::BeginTabItem("Properties"))
         {
-            if (owner)
+            if (inspectorTarget)
                 m_propertyInspector.RenderContent();
             else
                 ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "No object selected");

@@ -1,8 +1,11 @@
 #pragma once
+#pragma once
+
 #include "imgui.h"
 #include "Reflection/ReflectionBase.h"
 #include "Reflection/ReflectionMap.h"
 #include "ComponentSystem/ComponentRegistry.h"
+#include "ResourceManager/ResourceManager.h"
 #include "PropertyWidgetMap.h"
 #include "PropertyWidgetMapRegistry.h"
 
@@ -69,6 +72,7 @@ namespace ImGuiVisualizers {
 		void RenderVector4Property(const CPropertyBase& property, CReflectedBase* object);
 		void RenderMatrix4Property(const CPropertyBase& property, CReflectedBase* object);
 		void RenderReflectedObjectCommon(const CPropertyBase& property, CReflectedBase* subObject, const void* idSource, const char* typeTag, bool showAddress, const char* nullNameOverride);
+		void RenderResourceReferenceInline(CResourceReference* resRef, const void* idSource);
 		void RenderObjectProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderObjectPtrProperty(const CPropertyBase& property, CReflectedBase* object);
 		void RenderObjectPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object);
@@ -159,6 +163,9 @@ namespace ImGuiVisualizers {
 			size_t index;
 		};
 		std::vector<PendingComponentDeletion> m_PendingDeletions;
+
+		// Inline-edited .obj.json resources keyed by property address
+		std::unordered_map<const void*, std::unique_ptr<CReflectedBase>> m_inlineResources;
 
 		// Input buffers for editable properties
 		float m_floatBuffer;

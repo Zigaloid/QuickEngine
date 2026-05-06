@@ -47,7 +47,7 @@ public:
         int         maxConcurrentJobs    = -1;      // -1 = hardware_concurrency - 1
         uint32_t    tempAllocatorSizeMB  = 10;
         float       gravity              = -9.81f;
-        int         collisionSteps       = 1;
+        int         collisionSteps       = 2;
     };
 
     PhysicsManager() = default;

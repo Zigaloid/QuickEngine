@@ -21,7 +21,7 @@ static const bgfx::EmbeddedShader s_3dviewShaders[] =
     BGFX_EMBEDDED_SHADER_END()
 };
 
-namespace ImGuiVisualizers {
+namespace Rendering {
 
 bgfx::VertexLayout PosColorVertex::ms_layout;
 
@@ -42,8 +42,7 @@ static void TransformPoint(float out[3], const float p[3], const float m[16])
 /// Points are transformed into world space via mtx before storing.
 /// Returns the updated vertex index.
 static uint32_t EmitWireCircle(PosColorVertex* v, uint32_t idx,
-                                const float* mtx,
-                                float radius, float yOffset,
+                                const float* mtx,                                
                                 uint32_t color)
 {
     for (int i = 0; i < kWireSegments; ++i)
@@ -51,8 +50,8 @@ static uint32_t EmitWireCircle(PosColorVertex* v, uint32_t idx,
         const float t0 = bx::kPi2 * static_cast<float>(i)     / kWireSegments;
         const float t1 = bx::kPi2 * static_cast<float>(i + 1) / kWireSegments;
 
-        const float lp0[3] = { radius * bx::cos(t0), yOffset, radius * bx::sin(t0) };
-        const float lp1[3] = { radius * bx::cos(t1), yOffset, radius * bx::sin(t1) };
+        const float lp0[3] = { bx::cos(t0), 0.0f, bx::sin(t0) };
+        const float lp1[3] = { bx::cos(t1), 0.0f, bx::sin(t1) };
 
         float wp0[3], wp1[3];
         TransformPoint(wp0, lp0, mtx);
@@ -451,136 +450,211 @@ void BgfxRenderPrimitives::RenderSphere(bgfx::ViewId viewId,
 
 // ── Shape-aware wireframe helpers ───────────────────────────────────────
 
-void BgfxRenderPrimitives::RenderWireBox(bgfx::ViewId viewId,
-                                          const float* worldMtx,
-                                          float halfX, float halfY, float halfZ,
-                                          uint32_t color)
+void BgfxRenderPrimitives::RenderWireBox(bgfx::ViewId viewId, const float* worldMtx, uint32_t color)
 {
     if (!m_initialized)
         return;
 
-    // Scale the world matrix basis vectors by full extents (unit cube has half-size 0.5)
-    float scaled[16];
-    bx::memCopy(scaled, worldMtx, sizeof(scaled));
-    const float sx = halfX * 2.0f, sy = halfY * 2.0f, sz = halfZ * 2.0f;
-    scaled[0] *= sx;  scaled[1] *= sx;  scaled[2]  *= sx;
-    scaled[4] *= sy;  scaled[5] *= sy;  scaled[6]  *= sy;
-    scaled[8] *= sz;  scaled[9] *= sz;  scaled[10] *= sz;
-
-    RenderWireCube(viewId, scaled, color);
-}
-
-void BgfxRenderPrimitives::RenderWireSphere(bgfx::ViewId viewId,
-                                             const float* worldMtx,
-                                             float radius,
-                                             uint32_t color)
-{
-    if (!m_initialized)
-        return;
-
-    // 3 great circles: XZ equator, XY, ZY — each kWireSegments line segments
-    constexpr uint32_t kNumVerts = kWireSegments * 2 * 3;
-    PosColorVertex verts[kNumVerts];
+    // Unit box: 12 edges × 2 verts = 24 vertices
+    constexpr uint32_t numVerts = 24;
+    PosColorVertex verts[numVerts];
     uint32_t idx = 0;
 
-    idx = EmitWireCircle(verts, idx, worldMtx, radius, 0.0f, color); // XZ equator
+    // 8 corners of a unit cube (-0.5 to +0.5)
+    static const float corners[8][3] = {
+        {-0.5f, -0.5f, -0.5f}, { 0.5f, -0.5f, -0.5f},
+        { 0.5f,  0.5f, -0.5f}, {-0.5f,  0.5f, -0.5f},
+        {-0.5f, -0.5f,  0.5f}, { 0.5f, -0.5f,  0.5f},
+        { 0.5f,  0.5f,  0.5f}, {-0.5f,  0.5f,  0.5f},
+    };
+    static const int edges[12][2] = {
+        {0,1},{1,2},{2,3},{3,0},
+        {4,5},{5,6},{6,7},{7,4},
+        {0,4},{1,5},{2,6},{3,7},
+    };
 
+    for (int i = 0; i < 12; ++i)
+    {
+        float wp0[3], wp1[3];
+        TransformPoint(wp0, corners[edges[i][0]], worldMtx);
+        TransformPoint(wp1, corners[edges[i][1]], worldMtx);
+        verts[idx++] = { wp0[0], wp0[1], wp0[2], color };
+        verts[idx++] = { wp1[0], wp1[1], wp1[2], color };
+    }
+
+    SubmitTransientLines(viewId, verts, idx);
+}
+
+void BgfxRenderPrimitives::RenderWireSphere(bgfx::ViewId viewId, const float* worldMtx, uint32_t color)
+{
+    if (!m_initialized)
+        return;
+
+    // 3 great circles (XY, XZ, YZ planes), each kWireSegments line segments
+    constexpr uint32_t numVerts = kWireSegments * 2 * 3;
+    PosColorVertex verts[numVerts];
+    uint32_t idx = 0;
+
+    // XZ plane (horizontal)
     for (int i = 0; i < kWireSegments; ++i)
     {
-        const float t0 = bx::kPi2 * static_cast<float>(i)     / kWireSegments;
-        const float t1 = bx::kPi2 * static_cast<float>(i + 1) / kWireSegments;
+        const float t0 = bx::kPi2 * float(i)     / kWireSegments;
+        const float t1 = bx::kPi2 * float(i + 1) / kWireSegments;
+        const float lp0[3] = { 0.5f * bx::cos(t0), 0.0f, 0.5f * bx::sin(t0) };
+        const float lp1[3] = { 0.5f * bx::cos(t1), 0.0f, 0.5f * bx::sin(t1) };
+        float wp0[3], wp1[3];
+        TransformPoint(wp0, lp0, worldMtx);
+        TransformPoint(wp1, lp1, worldMtx);
+        verts[idx++] = { wp0[0], wp0[1], wp0[2], color };
+        verts[idx++] = { wp1[0], wp1[1], wp1[2], color };
+    }
 
-        // XY plane
-        const float xy0[3] = { radius * bx::cos(t0), radius * bx::sin(t0), 0.0f };
-        const float xy1[3] = { radius * bx::cos(t1), radius * bx::sin(t1), 0.0f };
-        float wxy0[3], wxy1[3];
-        TransformPoint(wxy0, xy0, worldMtx);
-        TransformPoint(wxy1, xy1, worldMtx);
-        verts[idx++] = { wxy0[0], wxy0[1], wxy0[2], color };
-        verts[idx++] = { wxy1[0], wxy1[1], wxy1[2], color };
+    // XY plane (front)
+    for (int i = 0; i < kWireSegments; ++i)
+    {
+        const float t0 = bx::kPi2 * float(i)     / kWireSegments;
+        const float t1 = bx::kPi2 * float(i + 1) / kWireSegments;
+        const float lp0[3] = { 0.5f * bx::cos(t0), 0.5f * bx::sin(t0), 0.0f };
+        const float lp1[3] = { 0.5f * bx::cos(t1), 0.5f * bx::sin(t1), 0.0f };
+        float wp0[3], wp1[3];
+        TransformPoint(wp0, lp0, worldMtx);
+        TransformPoint(wp1, lp1, worldMtx);
+        verts[idx++] = { wp0[0], wp0[1], wp0[2], color };
+        verts[idx++] = { wp1[0], wp1[1], wp1[2], color };
+    }
 
-        // ZY plane
-        const float zy0[3] = { 0.0f, radius * bx::sin(t0), radius * bx::cos(t0) };
-        const float zy1[3] = { 0.0f, radius * bx::sin(t1), radius * bx::cos(t1) };
-        float wzy0[3], wzy1[3];
-        TransformPoint(wzy0, zy0, worldMtx);
-        TransformPoint(wzy1, zy1, worldMtx);
-        verts[idx++] = { wzy0[0], wzy0[1], wzy0[2], color };
-        verts[idx++] = { wzy1[0], wzy1[1], wzy1[2], color };
+    // YZ plane (side)
+    for (int i = 0; i < kWireSegments; ++i)
+    {
+        const float t0 = bx::kPi2 * float(i)     / kWireSegments;
+        const float t1 = bx::kPi2 * float(i + 1) / kWireSegments;
+        const float lp0[3] = { 0.0f, 0.5f * bx::cos(t0), 0.5f * bx::sin(t0) };
+        const float lp1[3] = { 0.0f, 0.5f * bx::cos(t1), 0.5f * bx::sin(t1) };
+        float wp0[3], wp1[3];
+        TransformPoint(wp0, lp0, worldMtx);
+        TransformPoint(wp1, lp1, worldMtx);
+        verts[idx++] = { wp0[0], wp0[1], wp0[2], color };
+        verts[idx++] = { wp1[0], wp1[1], wp1[2], color };
     }
 
     SubmitTransientLines(viewId, verts, idx);
 }
 
-void BgfxRenderPrimitives::RenderWireCylinder(bgfx::ViewId viewId,
-                                               const float* worldMtx,
-                                               float radius, float halfHeight,
-                                               uint32_t color)
+void BgfxRenderPrimitives::RenderWireCylinder(bgfx::ViewId viewId, const float* worldMtx, uint32_t color)
 {
     if (!m_initialized)
         return;
 
-    // Top circle + bottom circle + kWireSegments/2 vertical lines
-    constexpr int       kVLines   = kWireSegments / 2;
-    constexpr uint32_t kNumVerts  = kWireSegments * 2 * 2   // two circles
-                                  + kVLines * 2;            // vertical lines
-    PosColorVertex verts[kNumVerts];
+    // Unit cylinder: radius 0.5, height 1.0 (y from -0.5 to +0.5)
+    // Top circle + bottom circle + 4 vertical lines
+    constexpr uint32_t numVerts = kWireSegments * 2 * 2 + 4 * 2;
+    PosColorVertex verts[numVerts];
     uint32_t idx = 0;
 
-    idx = EmitWireCircle(verts, idx, worldMtx, radius,  halfHeight, color);
-    idx = EmitWireCircle(verts, idx, worldMtx, radius, -halfHeight, color);
-
-    for (int i = 0; i < kVLines; ++i)
+    // Top and bottom circles
+    for (int cap = 0; cap < 2; ++cap)
     {
-        const float t = bx::kPi2 * static_cast<float>(i) / kVLines;
-        const float lTop[3] = { radius * bx::cos(t),  halfHeight, radius * bx::sin(t) };
-        const float lBot[3] = { radius * bx::cos(t), -halfHeight, radius * bx::sin(t) };
-        float wTop[3], wBot[3];
-        TransformPoint(wTop, lTop, worldMtx);
-        TransformPoint(wBot, lBot, worldMtx);
-        verts[idx++] = { wTop[0], wTop[1], wTop[2], color };
-        verts[idx++] = { wBot[0], wBot[1], wBot[2], color };
+        const float y = (cap == 0) ? 0.5f : -0.5f;
+        for (int i = 0; i < kWireSegments; ++i)
+        {
+            const float t0 = bx::kPi2 * float(i)     / kWireSegments;
+            const float t1 = bx::kPi2 * float(i + 1) / kWireSegments;
+            const float lp0[3] = { 0.5f * bx::cos(t0), y, 0.5f * bx::sin(t0) };
+            const float lp1[3] = { 0.5f * bx::cos(t1), y, 0.5f * bx::sin(t1) };
+            float wp0[3], wp1[3];
+            TransformPoint(wp0, lp0, worldMtx);
+            TransformPoint(wp1, lp1, worldMtx);
+            verts[idx++] = { wp0[0], wp0[1], wp0[2], color };
+            verts[idx++] = { wp1[0], wp1[1], wp1[2], color };
+        }
+    }
+
+    // 4 vertical struts
+    static const float angles[4] = { 0.0f, bx::kPiHalf, bx::kPi, bx::kPi + bx::kPiHalf };
+    for (int i = 0; i < 4; ++i)
+    {
+        const float lp0[3] = { 0.5f * bx::cos(angles[i]),  0.5f, 0.5f * bx::sin(angles[i]) };
+        const float lp1[3] = { 0.5f * bx::cos(angles[i]), -0.5f, 0.5f * bx::sin(angles[i]) };
+        float wp0[3], wp1[3];
+        TransformPoint(wp0, lp0, worldMtx);
+        TransformPoint(wp1, lp1, worldMtx);
+        verts[idx++] = { wp0[0], wp0[1], wp0[2], color };
+        verts[idx++] = { wp1[0], wp1[1], wp1[2], color };
     }
 
     SubmitTransientLines(viewId, verts, idx);
 }
 
-void BgfxRenderPrimitives::RenderWireCapsule(bgfx::ViewId viewId,
-                                              const float* worldMtx,
-                                              float radius, float halfCylinderHeight,
-                                              uint32_t color)
+void BgfxRenderPrimitives::RenderWireCapsule(bgfx::ViewId viewId, const float* worldMtx, uint32_t color)
 {
     if (!m_initialized)
         return;
 
-    // Top circle + bottom circle + vertical lines + upper hemisphere arcs + lower hemisphere arcs
-    constexpr int       kVLines   = kWireSegments / 2;
-    constexpr int       kArcSegs  = kWireSegments / 2;
-    constexpr uint32_t kNumVerts  = kWireSegments * 2 * 2       // top + bottom circles
-                                  + kVLines * 2                  // vertical lines
-                                  + 2 * 2 * kArcSegs * 2;       // 2 caps × 2 arcs × kArcSegs segments × 2 verts
-    PosColorVertex verts[kNumVerts];
+    // Unit capsule: radius 0.5, total height 1.0 (half-height 0.5, so cylinder portion is 0)
+    // Actually for a unit capsule let's define: radius=0.5, cylinder half-height=0.0
+    // meaning the two hemispheres meet at center. To be more useful, define:
+    // total height = 1.0, radius = 0.25, cylinder half-height = 0.25
+    // But conventionally a "unit capsule" is radius 0.5 height 1.0 with the hemispheres
+    // extending beyond. Let's use: radius=0.5, center-to-cap-center = 0.0 (pure sphere).
+    // 
+    // More standard: radius=0.5, half-height of cylinder=0.5, total height=2*0.5+2*0.5=2
+    // scaled to unit: radius=0.25, half-height=0.25 => total=1.0
+    // 
+    // Let's go with: radius 0.5, half-cylinder-height 0 (i.e. a sphere for unit size).
+    // Actually the most useful convention: the capsule fits in a unit box.
+    // Height=1 along Y, radius=0.5, so cylinder half-height = 0 => it's a sphere.
+    // That's not useful. Let's just do radius=0.5, half-height=0.5 (total h=2, scaled by transform).
+    // The user said "unit shape" so let's keep it in [-0.5, 0.5] box:
+    // radius = 0.25, cylinder half-height = 0.25, total = 1.0 along Y.
+
+    const float radius = 0.25f;
+    const float halfH  = 0.25f; // cylinder half-height
+
+    // Circles at top and bottom of cylinder + 4 vertical struts + hemisphere arcs
+    // Top circle + bottom circle + 4 struts + 2 hemispheres (2 arcs each, half segments each)
+    const int halfSegs = kWireSegments / 2;
+    constexpr uint32_t maxVerts = kWireSegments * 2 * 2  // two circles
+                                + 4 * 2                   // 4 struts
+                                + (kWireSegments / 2) * 2 * 2 * 2; // 2 hemispheres × 2 arcs × halfSegs segments
+    PosColorVertex verts[maxVerts];
     uint32_t idx = 0;
 
-    idx = EmitWireCircle(verts, idx, worldMtx, radius,  halfCylinderHeight, color);
-    idx = EmitWireCircle(verts, idx, worldMtx, radius, -halfCylinderHeight, color);
-
-    for (int i = 0; i < kVLines; ++i)
+    // Top and bottom circles of the cylinder portion
+    for (int cap = 0; cap < 2; ++cap)
     {
-        const float t = bx::kPi2 * static_cast<float>(i) / kVLines;
-        const float lTop[3] = { radius * bx::cos(t),  halfCylinderHeight, radius * bx::sin(t) };
-        const float lBot[3] = { radius * bx::cos(t), -halfCylinderHeight, radius * bx::sin(t) };
-        float wTop[3], wBot[3];
-        TransformPoint(wTop, lTop, worldMtx);
-        TransformPoint(wBot, lBot, worldMtx);
-        verts[idx++] = { wTop[0], wTop[1], wTop[2], color };
-        verts[idx++] = { wBot[0], wBot[1], wBot[2], color };
+        const float y = (cap == 0) ? halfH : -halfH;
+        for (int i = 0; i < kWireSegments; ++i)
+        {
+            const float t0 = bx::kPi2 * float(i)     / kWireSegments;
+            const float t1 = bx::kPi2 * float(i + 1) / kWireSegments;
+            const float lp0[3] = { radius * bx::cos(t0), y, radius * bx::sin(t0) };
+            const float lp1[3] = { radius * bx::cos(t1), y, radius * bx::sin(t1) };
+            float wp0[3], wp1[3];
+            TransformPoint(wp0, lp0, worldMtx);
+            TransformPoint(wp1, lp1, worldMtx);
+            verts[idx++] = { wp0[0], wp0[1], wp0[2], color };
+            verts[idx++] = { wp1[0], wp1[1], wp1[2], color };
+        }
     }
 
-    // Upper hemisphere arcs (above +halfCylinderHeight)
-    idx = EmitHemisphereArcs(verts, idx, worldMtx, radius,  halfCylinderHeight, +1.0f, color);
-    // Lower hemisphere arcs (below -halfCylinderHeight)
-    idx = EmitHemisphereArcs(verts, idx, worldMtx, radius, -halfCylinderHeight, -1.0f, color);
+    // 4 vertical struts
+    static const float angles[4] = { 0.0f, bx::kPiHalf, bx::kPi, bx::kPi + bx::kPiHalf };
+    for (int i = 0; i < 4; ++i)
+    {
+        const float lp0[3] = { radius * bx::cos(angles[i]),  halfH, radius * bx::sin(angles[i]) };
+        const float lp1[3] = { radius * bx::cos(angles[i]), -halfH, radius * bx::sin(angles[i]) };
+        float wp0[3], wp1[3];
+        TransformPoint(wp0, lp0, worldMtx);
+        TransformPoint(wp1, lp1, worldMtx);
+        verts[idx++] = { wp0[0], wp0[1], wp0[2], color };
+        verts[idx++] = { wp1[0], wp1[1], wp1[2], color };
+    }
+
+    // Upper hemisphere arcs (XY and ZY planes)
+    idx = EmitHemisphereArcs(verts, idx, worldMtx, radius, halfH, 1.0f, color);
+
+    // Lower hemisphere arcs
+    idx = EmitHemisphereArcs(verts, idx, worldMtx, radius, -halfH, -1.0f, color);
 
     SubmitTransientLines(viewId, verts, idx);
 }

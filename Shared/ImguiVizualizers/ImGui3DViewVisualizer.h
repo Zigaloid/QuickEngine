@@ -31,7 +31,7 @@ public:
      * @param prims    Reference to the shared primitive renderer.
      */
     using RenderCallback = std::function<void(bgfx::ViewId viewId,
-                                              BgfxRenderPrimitives& prims)>;
+        Rendering::BgfxRenderPrimitives& prims)>;
 
     /**
      * @param name      Window title (must be unique for each instance).
@@ -57,8 +57,7 @@ public:
     // ── Public API ─────────────────────────────────────────────────────
 
     void SetRenderCallback(RenderCallback cb) { m_renderCallback = std::move(cb); }
-
-    BgfxRenderPrimitives&   GetPrimitives()    { return m_primitives; }
+    
     Bgfx3DCamera&           GetCamera()        { return m_camera; }
     bgfx::FrameBufferHandle GetFrameBuffer()   const { return m_viewport.GetFrameBuffer(); }
 
@@ -91,8 +90,7 @@ private:
     // Subsystems
     Bgfx3DViewport       m_viewport;
     Bgfx3DCamera         m_camera;
-    BgfxRenderPrimitives  m_primitives;
-
+    
     // External render hook
     RenderCallback m_renderCallback;
 

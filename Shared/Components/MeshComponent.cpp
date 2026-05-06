@@ -37,20 +37,33 @@ void CRenderComponent::OnUpdate(double /*deltaTime*/)
 		return parent->FindChild<CPhysicsBodyComponent>();
 	});
 
-	if (!physBody || physBody->GetBodyID().IsInvalid())
-	{
-		physBody->CreateBody();
-		return;
-	}
-
 	if (!m_physicsTransformInitialized)
 	{
-		physBody->SetWorldTransform(m_modelMatrix);
-		m_physicsTransformInitialized = true;
-		return;
-	}
+		m_scale = Matrix4f::Scale(m_modelMatrix.ExtractScale());
+		if ( physBody )
+		{
+			physBody->InitializeShape(m_scale);
 
-	m_modelMatrix = physBody->GetWorldTransform();
+			// Strip scale before passing to CreateBody so that SetWorldTransform
+			// receives a clean rotation+translation matrix for quaternion extraction.
+			Matrix4f worldNoScale = m_modelMatrix * Matrix4f::Scale(Vector3f(
+				1.0f / m_scale.ExtractScale().GetX(),
+				1.0f / m_scale.ExtractScale().GetY(),
+				1.0f / m_scale.ExtractScale().GetZ()));
+			physBody->CreateBody(worldNoScale);
+			m_physicsTransformInitialized = true;
+		}
+	}
+	else
+	{
+		// Only sync the model matrix from physics for dynamic/kinematic bodies
+		// that can actually move. Static bodies keep their original authored matrix
+		// to avoid lossy quaternion round-trip drift.
+		if (physBody && physBody->GetMotionType() != JPH::EMotionType::Static)
+		{
+			m_modelMatrix = physBody->GetWorldTransform() * m_scale;
+		}
+	}
 }
 
 void CRenderComponent::OnShutdown()
@@ -215,8 +228,27 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 				matshRes->GetMesh()->submit(&statePtr, 1, GetModelMatrix()->GetData().data(), 1);
 			}
 		}
-	}
+        // Render the physics body if available (for debugging)
+        Component* parent = GetParent();
+        if (!parent)
+            return;
 
+        // Re-acquires only when the cache is empty or the referenced component was released.
+        auto physBody = m_physicsBodyRef.Get();
+		if (physBody)
+		{
+			auto res = physBody->GetBodyResource();
+			if (res)
+			{				
+				Matrix4f physMatrix = physBody->GetWorldTransform();
+				physMatrix = physMatrix * m_scale;
+				Matrix4f matrix = res->GetTransform();				
+				Vector3f resScale = matrix.ExtractScale();				
+				matrix = physMatrix * matrix;
+				physBody->DebugRender(0, matrix);
+			}
+		}
+	}
 }
 
 bool CMeshComponent::IsLoaded() const

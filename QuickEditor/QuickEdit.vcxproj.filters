@@ -105,9 +105,6 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.h">
-      <Filter>..\Shared\ImguiVizualizers</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxViewIdAllocator.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
@@ -184,6 +181,9 @@
       <Filter>..\Shared\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Rendering\BgfxGameCamera.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\BgfxRenderPrimitives.h">
       <Filter>..\Shared\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Rendering\GameCameraController.h">
@@ -514,9 +514,6 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.cpp">
-      <Filter>..\Shared\ImguiVizualizers</Filter>
-    </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
@@ -570,6 +567,9 @@
     </ClCompile>
     <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp">
       <Filter>..\Shared\Physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp">
+      <Filter>..\Shared\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>

@@ -28,15 +28,15 @@ public:
 	bool OnInitialize() override;
 	void OnUpdate(double deltaTime) override;
 	void OnShutdown() override;
-	std::shared_ptr<Matrix4f> GetModelMatrix() const { return m_transformPtr; }
-	
+	std::shared_ptr<Matrix4f> GetModelMatrix() const { return m_transformPtr; }    
 private:
-    std::shared_ptr<Matrix4f> m_transformPtr;
-    std::shared_ptr<Vector4f> m_boundingSpherePtr;
+	std::shared_ptr<Matrix4f> m_transformPtr;
+	std::shared_ptr<Vector4f> m_boundingSpherePtr;
 	Vector4f m_boundingSphere;
-    Matrix4f m_modelMatrix;
-    bool m_physicsTransformInitialized = false;
-
+	Matrix4f m_modelMatrix;
+	bool m_physicsTransformInitialized = false;
+protected:
+	Matrix4f m_scale;
 	/** @brief Cached weak reference to the sibling physics body — resolved once on first use. */
 	ComponentSystem::CachedComponentRef<CPhysicsBodyComponent> m_physicsBodyRef;
 };

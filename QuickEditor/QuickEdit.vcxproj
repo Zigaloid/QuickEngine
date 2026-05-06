@@ -105,7 +105,6 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.h" />
-    <ClInclude Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\BgfxViewIdAllocator.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CombinedObjJson3DVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h" />
@@ -132,6 +131,7 @@
     <ClInclude Include="..\Shared\Physics\PhysicsManager.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\Shared\Rendering\BgfxGameCamera.h" />
+    <ClInclude Include="..\Shared\Rendering\BgfxRenderPrimitives.h" />
     <ClInclude Include="..\Shared\Rendering\GameCameraController.h" />
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h" />
@@ -244,7 +244,6 @@
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp" />
-    <ClCompile Include="..\Shared\ImguiVizualizers\BgfxRenderPrimitives.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandHistory.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
@@ -263,6 +262,7 @@
     <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp" />
+    <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />

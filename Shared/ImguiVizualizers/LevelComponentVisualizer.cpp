@@ -3,6 +3,7 @@
 #include "CoreSystem/AppConfig.h"
 #include "FileSystem/FileSystemManager.h"
 #include "EntityComponent.h"
+#include "PhysicsBodyComponent.h"
 #include "DeleteEntityCommand.h"
 #include <bx/bounds.h>
 #include <algorithm>
@@ -143,6 +144,36 @@ namespace ImGuiVisualizers {
 			if (renderComp->IsActive())
 			{
 				renderComp->Render(viewId);
+			}
+		}
+
+		// If this is a physics body component, debug-render its collision shape
+		// using the sibling RenderComponent's model matrix (if one exists).
+		if (auto* physComp = dynamic_cast<CPhysicsBodyComponent*>(comp))
+		{
+			if (physComp->IsActive())
+			{
+				CPhysicsBodyResource* res = physComp->GetBodyResource();
+				if (res)
+				{
+					Matrix4f transform = res->GetTransform();
+
+					// Look for a sibling CRenderComponent and multiply its model matrix
+					ComponentSystem::Component* parent = comp->GetParent();
+					if (parent)
+					{
+						for (auto* sibling : parent->GetChildren())
+						{
+							if (auto* renderComp = dynamic_cast<CRenderComponent*>(sibling))
+							{
+								transform = (*renderComp->GetModelMatrix()) * transform;
+								break;
+							}
+						}
+					}
+
+					physComp->DebugRender(viewId, transform);
+				}
 			}
 		}
 

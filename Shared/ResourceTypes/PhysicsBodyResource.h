@@ -4,6 +4,9 @@
 #include "ResourceManager/ResourceManager.h"
 #include "Math/Matrix4f.h"
 #include "Math/Vector3f.h"
+#include "Math/Vector4f.h"
+
+#include <memory>
 
 #include <Jolt/Jolt.h>
 JPH_SUPPRESS_WARNINGS
@@ -26,8 +29,16 @@ public:
         return { ".phys.obj.json" };
     }
 
-    CPhysicsBodyResource() {}
-    explicit CPhysicsBodyResource(const std::string& path) : Resource(path) {}
+    CPhysicsBodyResource()
+    {
+        m_modelMatrixPtr = std::shared_ptr<Matrix4f>(&m_transform, [](Matrix4f*) {});
+        m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
+    }
+    explicit CPhysicsBodyResource(const std::string& path) : Resource(path)
+    {
+        m_modelMatrixPtr = std::shared_ptr<Matrix4f>(&m_transform, [](Matrix4f*) {});
+        m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
+    }
 
     // Use base-class Update to load the file data on the worker thread.
     bool Update(FileSystem::FileSystemManager& fileSystem) override;
@@ -45,6 +56,15 @@ public:
     Vector3f        GetRotationEuler()  const { return m_transform.ExtractRotationEuler(); }
     // If callers need raw TRS matrix:
     const Matrix4f& GetTransform()      const { return m_transform; }
+    Matrix4f&       GetTransformMutable()      { return m_transform; }
+    void            SetTransform(const Matrix4f& t) { m_transform = t; }
+
+    // Shared model matrix and bounding sphere for selectables / gizmos.
+    // The model matrix points directly at m_transform.
+    std::shared_ptr<Matrix4f> GetModelMatrix()      const { return m_modelMatrixPtr; }
+    std::shared_ptr<Vector4f> GetBoundingSphere()   const { return m_boundingSpherePtr; }
+    Matrix4f&                 GetModelMatrixRef()         { return m_transform; }
+    Vector4f&                 GetBoundingSphereRef()      { return m_boundingSphere; }
 
     int             GetMotionType()     const { return m_motionType; }
     float           GetFriction()       const { return m_friction; }
@@ -52,13 +72,9 @@ public:
     float           GetLinearDamping()  const { return m_linearDamping; }
     float           GetAngularDamping() const { return m_angularDamping; }
 
-    // Runtime
-    const JPH::Shape* GetShape() const { return m_shape.GetPtr(); }
 
-    JPH::BodyCreationSettings MakeBodyCreationSettings(
-        JPH::RVec3Arg    position    = JPH::RVec3::sZero(),
-        JPH::QuatArg     rotation    = JPH::Quat::sIdentity(),
-        JPH::ObjectLayer objectLayer = 0) const;
+
+
 
 private:
     // Reflected (serialised) members
@@ -76,8 +92,13 @@ private:
     float    m_linearDamping  = 0.05f;
     float    m_angularDamping = 0.05f;
 
-    // Runtime
-    JPH::ShapeRefC m_shape;
+
+
+    // Shared bounding data and pointer wrappers for external references (selectables, gizmos).
+    // m_modelMatrixPtr points directly at m_transform (no-op deleter).
+    mutable Vector4f m_boundingSphere;
+    mutable std::shared_ptr<Matrix4f> m_modelMatrixPtr;
+    mutable std::shared_ptr<Vector4f> m_boundingSpherePtr;
 };
 
 class CPhysicsBodyResourceReference : public CTypedResourceReference<CPhysicsBodyResource>

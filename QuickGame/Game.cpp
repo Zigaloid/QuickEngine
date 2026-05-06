@@ -3,6 +3,7 @@
 #include "ImGui3DViewVisualizer.h"
 #include "MessageSystem/MessageBus.h"
 #include <iostream>
+#include <algorithm>
 #include "PropertyWidgetMapRegistry.h"
 #include "ShaderResource.h"
 #include "CoreSystem\CoreDebugChannels.h"
@@ -20,7 +21,7 @@ bool GameApp::Initialize()
 	CTextureResourceReference testTextureRef;
 	testTextureRef.OnLoaded();
 
-	m_primitives.Initialize();
+	Rendering::BgfxRenderPrimitives::Instance().Initialize();
 
 	m_visualizerManager.Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), false);
@@ -90,10 +91,15 @@ void GameApp::RegisterComponents()
 void GameApp::Update(double deltaTime)
 {
 	DECLARE_FUNC_VLOW();
-	m_physicsManager.Update(static_cast<float>(deltaTime));
+	if(Core::CoreSystem::GetResourceManager()->GetPendingFinalizationCount() == 0)
+	{
+		// Clamp deltaTime to avoid tunneling during hitches or loading frames.
+		constexpr float kMaxPhysicsStep = 1.0f / 60.0f;
+		const float clampedDt = std::min(static_cast<float>(deltaTime), kMaxPhysicsStep);
+		m_physicsManager.Update(clampedDt);
+	}
 	m_visualizerManager.Update(static_cast<float>(deltaTime));
 	Core::MessageSystem::MessageBus::Get().ProcessAll();
-
 }
 
 void GameApp::Render(double deltaTime)
@@ -112,7 +118,7 @@ void GameApp::Render(double deltaTime)
 	
 	bgfx::setViewTransform(0, viewMtx, projMtx);
 
-	m_primitives.RenderGrid(0, 100.0f, 1.0f, 0xff808080);
+	Rendering::BgfxRenderPrimitives::Instance().RenderGrid(0, 100.0f, 1.0f, 0xff808080);
 	
 }
 
@@ -134,7 +140,7 @@ bool GameApp::Shutdown()
 		mouseManager->RemoveInputHandler(m_cameraController);
 
 	PhysicsManager::SetInstance(nullptr);
-	m_primitives.Shutdown();
+	Rendering::BgfxRenderPrimitives::Instance().Shutdown();
 	m_physicsManager.Shutdown();
 	m_visualizerManager.Shutdown();
 	return true;

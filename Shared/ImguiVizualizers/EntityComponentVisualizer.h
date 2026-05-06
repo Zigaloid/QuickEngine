@@ -59,6 +59,7 @@ protected:
 private:
     void ReleaseEntityComponent();
     void RegisterEntityActions();
+    void SavePhysicsBodyResources();
 
     void RegisterPhysicsComponents(ComponentSystem::Component* root);
     void CollectPhysicsComponents(ComponentSystem::Component* comp,

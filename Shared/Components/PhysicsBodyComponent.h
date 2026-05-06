@@ -23,7 +23,7 @@ JPH_SUPPRESS_WARNINGS
 #include <bgfx/bgfx.h> // for bgfx::ViewId
 
 /// Forward-declare the minimal primitive renderer to avoid heavy includes in all translation units.
-namespace ImGuiVisualizers { class BgfxRenderPrimitives; }
+namespace Rendering { class BgfxRenderPrimitives; }
 
 /// Selects which primitive collision shape to build.
 /// Stored as int so it can be serialised through the reflection system.
@@ -49,18 +49,16 @@ public:
     CPhysicsBodyComponent()
         : m_bodyId(JPH::BodyID::cInvalidBodyID)
     {
-        m_modelMatrix.Identity();
-        // Expose internal members via shared_ptr with no-op deleters so other owners
-        // (selectables / gizmo) can hold shared_ptrs that point at our internal storage.
-        m_transformPtr = std::shared_ptr<Matrix4f>(&m_modelMatrix, [](Matrix4f*) {});
-        m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
     }
 
     ~CPhysicsBodyComponent() override = default;
 
     bool OnInitialize() override;
     void OnShutdown()   override;
-    bool CreateBody();
+    
+    bool CreateBody(const Matrix4f& worldTransform);
+
+    void OnUpdate(double deltaTime) override;
 
     /// Returns the Jolt BodyID assigned when this component was added to the simulation.
     /// Will be JPH::BodyID::cInvalidBodyID if not yet initialized or if no PhysicsManager was available.
@@ -95,8 +93,11 @@ public:
     
     // ── Built shape ────────────────────────────────────────────────────────
 
-    /// Returns the compiled Jolt shape, or nullptr before Finalize() succeeds.
-    const JPH::Shape* GetShape() const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetShape() : nullptr; }
+    /// Returns the compiled Jolt shape, or nullptr before InitializeShape() is called.
+    const JPH::Shape* GetShape() const { return m_shape.GetPtr(); }
+
+    /// Constructs the Jolt collision shape from the resource's serialized parameters.
+    void InitializeShape(const Matrix4f& objTran);
 
     /// Constructs a BodyCreationSettings with this resource's shape and body
     /// properties applied. Fill in position / rotation / object layer before
@@ -121,12 +122,29 @@ public:
 
     /// Debug render the collision shape using the supplied primitive renderer.
     /// Called by the editor visualizer to draw physics shapes into the 3D view.
-    void DebugRender(bgfx::ViewId viewId, ImGuiVisualizers::BgfxRenderPrimitives& prims) const;
+    void DebugRender(bgfx::ViewId viewId, Matrix4f& transform) const;
 
-    // ── Expose shared pointers to internal transform / bounding-sphere so that
-    //     selectables and gizmos can hold and mutate the same live data.
-    std::shared_ptr<Matrix4f> GetModelMatrix() const { return m_transformPtr; }
-    std::shared_ptr<Vector4f> GetBoundingSphere() const { return m_boundingSpherePtr; }
+    // ── Expose shared pointers to transform / bounding-sphere via the resource
+    //     so that selectables and gizmos can hold and mutate the same live data.
+    std::shared_ptr<Matrix4f> GetModelMatrix() const
+    {
+        auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
+        return res ? res->GetModelMatrix() : nullptr;
+    }
+    std::shared_ptr<Vector4f> GetBoundingSphere() const
+    {
+        auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
+        return res ? res->GetBoundingSphere() : nullptr;
+    }
+
+    /// Returns the underlying PhysicsBodyResource (or nullptr if not loaded).
+    CPhysicsBodyResource* GetBodyResource() const
+    {
+        return m_bodyResource.GetResourceAs<CPhysicsBodyResource>().get();
+    }
+
+    /// Returns the resource reference itself (for inline PropertyInspector editing).
+    CPhysicsBodyResourceReference& GetBodyResourceRef() { return m_bodyResource; }
 
 private:
 
@@ -135,12 +153,6 @@ private:
 
     // ── Runtime (not reflected) ───────────────────────────────────────────
     JPH::BodyID m_bodyId;
-
-    // Internal storage exposed via shared_ptr (no-op deleter) so other systems can
-    // reference live transform and bounding information.
-    mutable Matrix4f m_modelMatrix;
-    mutable Vector4f m_boundingSphere;
-    mutable std::shared_ptr<Matrix4f> m_transformPtr;
-    mutable std::shared_ptr<Vector4f> m_boundingSpherePtr;
+    JPH::ShapeRefC m_shape;
 };
 

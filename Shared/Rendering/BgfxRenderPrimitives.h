@@ -4,7 +4,7 @@
 #include <bx/math.h>
 #include <vector>
 
-namespace ImGuiVisualizers {
+namespace Rendering {
 
 /**
  * @brief Vertex layout for simple position + colour rendering via BGFX.
@@ -32,15 +32,26 @@ struct PosColorVertex {
  * Shaders are loaded once at Initialize() time via the standard BGFX
  * loadProgram() helper.
  */
-class BgfxRenderPrimitives
+class BgfxRenderPrimitives  
 {
 public:
-    BgfxRenderPrimitives() = default;
+    static BgfxRenderPrimitives& Instance()
+    {
+        static BgfxRenderPrimitives instance;
+        return instance;
+    }
+
     ~BgfxRenderPrimitives() { Shutdown(); }
 
     BgfxRenderPrimitives(const BgfxRenderPrimitives&) = delete;
     BgfxRenderPrimitives& operator=(const BgfxRenderPrimitives&) = delete;
+    BgfxRenderPrimitives(BgfxRenderPrimitives&&) = delete;
+    BgfxRenderPrimitives& operator=(BgfxRenderPrimitives&&) = delete;
 
+private:
+    BgfxRenderPrimitives() = default;
+
+public:
     /**
      * @brief Create vertex layout, shader programs, and static geometry.
      */
@@ -87,43 +98,10 @@ public:
                     float x1, float y1, float z1,
                     uint32_t abgrColor);
 
-    // ── Shape-aware wireframe helpers ───────────────────────────────────
-    // These take a world-space matrix (rotation + translation) and explicit
-    // shape parameters, handling the scale transform internally.
-
-    /**
-     * @brief Wireframe axis-aligned box.
-     * @param halfX/Y/Z  Half-extents along each local axis.
-     */
-    void RenderWireBox(bgfx::ViewId viewId, const float* worldMtx,
-                       float halfX, float halfY, float halfZ,
-                       uint32_t color);
-
-    /**
-     * @brief Wireframe sphere built from three great-circle arcs.
-     * @param radius  Sphere radius.
-     */
-    void RenderWireSphere(bgfx::ViewId viewId, const float* worldMtx,
-                          float radius, uint32_t color);
-
-    /**
-     * @brief Wireframe cylinder aligned to the local Y axis.
-     * @param radius      Cylinder radius.
-     * @param halfHeight  Half the total cylinder height.
-     */
-    void RenderWireCylinder(bgfx::ViewId viewId, const float* worldMtx,
-                            float radius, float halfHeight,
-                            uint32_t color);
-
-    /**
-     * @brief Wireframe capsule aligned to the local Y axis.
-     * @param radius             Hemisphere radius (also the end-cap radius).
-     * @param halfCylinderHeight Half the height of the cylindrical section only,
-     *                           matching JPH::CapsuleShapeSettings convention.
-     */
-    void RenderWireCapsule(bgfx::ViewId viewId, const float* worldMtx,
-                           float radius, float halfCylinderHeight,
-                           uint32_t color);
+    void RenderWireBox(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
+    void RenderWireSphere(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
+    void RenderWireCylinder(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
+    void RenderWireCapsule(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
 
 private:
     void CreateCubeBuffers();

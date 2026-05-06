@@ -24,36 +24,25 @@ public:
     {
         if (!m_component) return;
 
-        auto transformPtr = GetTransformPtr();
-        if (transformPtr)
-        {
-            // Read the current physics simulation transform.
-            Matrix4f world = m_component->GetWorldTransform();
+        // The gizmo edits the resource's local transform (m_transform) directly
+        // via the shared pointer from GetModelMatrix(). This represents the
+        // physics shape's offset relative to the mesh — no physics simulation
+        // sync is needed in the editor context.
 
-            if (*transformPtr != world)
-            {
-                // The shared matrix was modified externally (e.g. by a gizmo drag) —
-                // push the change back into the physics simulation.
-                m_component->SetWorldTransform(*transformPtr);
-            }
-            else
-            {
-                // No external change — sync from simulation (e.g. dynamic body moved).
-                *transformPtr = world;
-            }
-        }
-
-        // Bounding sphere: use local centre at origin and radius from component scale
+        // Update bounding sphere from the resource transform's scale.
         auto bsPtr = GetBoundingSpherePtr();
         if (bsPtr)
         {
-            Vector3f scale = m_component->GetScale();
-            float maxScale = scale.GetX();
-            if (scale.GetY() > maxScale) maxScale = scale.GetY();
-            if (scale.GetZ() > maxScale) maxScale = scale.GetZ();
+            CPhysicsBodyResource* res = m_component->GetBodyResource();
+            if (res)
+            {
+                Vector3f scale = res->GetTransform().ExtractScale();
+                float maxScale = scale.GetX();
+                if (scale.GetY() > maxScale) maxScale = scale.GetY();
+                if (scale.GetZ() > maxScale) maxScale = scale.GetZ();
 
-            // local centre at origin; radius = half of max extent
-            *bsPtr = Vector4f(0.0f, 0.0f, 0.0f, maxScale * 0.5f);
+                *bsPtr = Vector4f(0.0f, 0.0f, 0.0f, maxScale * 0.5f);
+            }
         }
     }
 

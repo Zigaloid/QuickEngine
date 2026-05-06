@@ -5,30 +5,27 @@
             "Type": 1,
             "Size": 4
         },
-        "m_halfExtentX": {
-            "Value": 0.5,
-            "Type": 2,
-            "Size": 4
-        },
-        "m_halfExtentY": {
-            "Value": 0.5,
-            "Type": 2,
-            "Size": 4
-        },
-        "m_halfExtentZ": {
-            "Value": 0.5,
-            "Type": 2,
-            "Size": 4
-        },
-        "m_radius": {
-            "Value": 0.5,
-            "Type": 2,
-            "Size": 4
-        },
-        "m_halfHeight": {
-            "Value": 0.5,
-            "Type": 2,
-            "Size": 4
+        "m_transform": {
+            "Value": [
+                0.7097960114479065,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.7336909770965576,
+                0.0,
+                0.023865461349487305,
+                0.49800199270248413,
+                0.01608186960220337,
+                1.0
+            ],
+            "Type": 8,
+            "Size": 64
         },
         "m_motionType": {
             "Value": 2,
