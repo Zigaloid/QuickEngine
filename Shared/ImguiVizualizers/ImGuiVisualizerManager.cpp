@@ -1,6 +1,7 @@
 ﻿#include "ImGuiVisualizerManager.h"
 
 #include "IImGuiVisualizer.h"
+#include "KeyboardShortcutManager.h"
 #include "imgui.h"
 
 #include <algorithm>
@@ -46,6 +47,8 @@ void ImGuiVisualizerManager::Register(const std::string& key,
         added.visualizer->Initialize();
         added.initialized = true;
     }
+
+    RegisterShortcut(m_entries.back());
 }
 
 void ImGuiVisualizerManager::Unregister(const std::string& key)
@@ -56,6 +59,8 @@ void ImGuiVisualizerManager::Unregister(const std::string& key)
 
     std::size_t index = it->second;
     auto& entry = m_entries[index];
+
+    UnregisterShortcut(entry);
 
     if (entry.initialized) {
         entry.visualizer->Shutdown();
@@ -91,6 +96,8 @@ void ImGuiVisualizerManager::Shutdown()
 {
     for (auto& entry : m_entries)
     {
+        UnregisterShortcut(entry);
+
         if (entry.initialized)
         {
             entry.visualizer->Shutdown();
@@ -113,9 +120,41 @@ void ImGuiVisualizerManager::Update(float deltaTime)
     }
 }
 
+// Parse a shortcut string and extract only the key token (ignore modifiers).
+// Accepts forms like "Ctrl+Alt+A" or "A" or "F1" but returns only the key.
+// No parsing of modifiers: visualizers provide an ImGuiKey via GetShortcut()
+
+void ImGuiVisualizerManager::RegisterShortcut(Entry& entry)
+{
+    ImGuiKey key = entry.visualizer->GetShortcut();
+    if (key == ImGuiKey_None)
+        return;
+
+    // Visualizers must provide modifiers via GetShortcutModifiers(). Use that mask.
+    Input::KeyModifier mods = entry.visualizer->GetShortcutModifiers();
+
+    std::string name = ShortcutName(entry.key);
+    std::string desc = std::string("Toggle ") + entry.visualizer->GetName();
+    std::string entryKey = entry.key;
+
+    Input::KeyboardShortcutManager::Instance().RegisterShortcut(
+        name, desc, key, mods,
+        [this, entryKey]() { ToggleVisible(entryKey); });
+}
+
+void ImGuiVisualizerManager::UnregisterShortcut(Entry& entry)
+{
+    Input::KeyboardShortcutManager::Instance().UnregisterShortcut(ShortcutName(entry.key));
+}
+
+std::string ImGuiVisualizerManager::ShortcutName(const std::string& key)
+{
+    return "Visualizer.Toggle." + key;
+}
+
 void ImGuiVisualizerManager::RenderAll()
 {
-    // Get the dockspace ID for the main dock. If the host window created the dockspace
+    // Get the dockspace ID
     // with the same name ("MainDockSpace"), this will return a non-zero ImGuiID.
     ImGuiID mainDockId = ImGui::GetID("MainDockSpace");
 
@@ -156,8 +195,20 @@ void ImGuiVisualizerManager::RenderWindowsMenu()
 
         for (auto* entry : rootItems)
         {
+            // Build a display string for the shortcut (modifiers + key)
+            ImGuiKey key = entry->visualizer->GetShortcut();
+            const char* shortcutLabel = nullptr;
+            std::string shortcutStr;
+            if (key != ImGuiKey_None) {
+                Input::KeyModifier mods = entry->visualizer->GetShortcutModifiers();
+                std::string modStr = Input::KeyboardShortcutManager::ModifierToString(mods);
+                if (!modStr.empty()) shortcutStr = modStr + "+";
+                shortcutStr += Input::KeyboardShortcutManager::KeyToString(key);
+                shortcutLabel = shortcutStr.c_str();
+            }
+
             ImGui::MenuItem(entry->visualizer->GetName(),
-                            entry->visualizer->GetShortcut(),
+                            shortcutLabel,
                             &entry->visible);
         }
 
@@ -170,8 +221,20 @@ void ImGuiVisualizerManager::RenderWindowsMenu()
             {
                 for (auto* entry : entries)
                 {
+                    // Build a display string for the shortcut (modifiers + key)
+                    ImGuiKey key = entry->visualizer->GetShortcut();
+                    const char* shortcutLabel = nullptr;
+                    std::string shortcutStr;
+                    if (key != ImGuiKey_None) {
+                        Input::KeyModifier mods = entry->visualizer->GetShortcutModifiers();
+                        std::string modStr = Input::KeyboardShortcutManager::ModifierToString(mods);
+                        if (!modStr.empty()) shortcutStr = modStr + "+";
+                        shortcutStr += Input::KeyboardShortcutManager::KeyToString(key);
+                        shortcutLabel = shortcutStr.c_str();
+                    }
+
                     ImGui::MenuItem(entry->visualizer->GetName(),
-                                    entry->visualizer->GetShortcut(),
+                                    shortcutLabel,
                                     &entry->visible);
                 }
                 ImGui::EndMenu();

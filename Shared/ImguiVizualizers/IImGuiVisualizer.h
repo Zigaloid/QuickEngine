@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include "KeyboardShortcutManager.h"
 
 namespace ImGuiVisualizers {
 
@@ -48,10 +49,17 @@ public:
     virtual const char* GetName() const = 0;
 
     /**
-     * @brief Optional keyboard shortcut label shown in the Windows menu.
-     * Return nullptr if no shortcut is assigned.
+     * @brief Optional keyboard shortcut key. Return ImGuiKey_None if no shortcut is assigned.
+     * Visualizers should return the key and implement GetShortcutModifiers() to provide modifiers.
      */
-    virtual const char* GetShortcut() const { return nullptr; }
+    virtual ImGuiKey GetShortcut() const { return ImGuiKey_None; }
+
+    /**
+     * @brief Optional modifier mask for the shortcut returned by GetShortcut().
+     * Return Input::KeyModifier::None by default. Implement this to expose
+     * combinations like Ctrl+Alt for a visualizer's shortcut.
+     */
+    virtual Input::KeyModifier GetShortcutModifiers() const { return Input::KeyModifier::None; }
 
     /**
      * @brief Optional menu category for grouping in the Windows menu.

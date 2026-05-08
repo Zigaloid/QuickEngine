@@ -10,6 +10,7 @@
 #include "imgui/imgui.h"
 #include "CoreSystem/CoreSystem.h"
 #include "CoreSystem/Timer.h"
+#include "ResourceManager/ResourceManager.h"
 #include "net/NexusClient.h"
 #include "..\shared\sharednexusdefines.h"
 #include "..\shared\ProfilerController.h"

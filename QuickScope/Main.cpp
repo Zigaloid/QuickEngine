@@ -13,6 +13,7 @@
 #include "net/NexusClient.h"
 #include "..\shared\sharednexusdefines.h"
 #include "..\shared\ProfilerController.h"
+#include "ResourceManager/ResourceManager.h"
 #include "QuickScopeApp.h"
 
 namespace

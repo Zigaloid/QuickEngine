@@ -98,6 +98,7 @@
     <ClInclude Include="..\..\External\ufbx\ufbx.h" />
     <ClInclude Include="..\..\Shared\ImguiVizualizers\CommandConsole.h" />
     <ClInclude Include="..\..\Shared\ImguiVizualizers\ImguiVisualizerManager.h" />
+    <ClInclude Include="..\..\Shared\ImguiVizualizers\KeyboardShortcutManager.h" />
     <ClInclude Include="..\..\Shared\bgfx_common\args.h" />
     <ClInclude Include="..\..\Shared\bgfx_common\aviwriter.h" />
     <ClInclude Include="..\..\Shared\bgfx_common\bgfx_utils.h" />
@@ -167,6 +168,8 @@
     <ClInclude Include="..\..\Shared\utils\MathUtils.h" />
     <ClInclude Include="..\..\Shared\utils\ObjMeshConverter.h" />
     <ClInclude Include="..\..\Shared\utils\StringUtils.h" />
+    <ClInclude Include="AIAssistantService.h" />
+    <ClInclude Include="AIAssistantVisualizer.h" />
     <ClInclude Include="CodeCompare.h" />
     <ClInclude Include="CodeCompareVisualizer.h" />
     <ClInclude Include="logo.h" />
@@ -196,6 +199,7 @@
     <ClCompile Include="..\..\External\ufbx\ufbx.c" />
     <ClCompile Include="..\..\Shared\ImguiVizualizers\CommandConsole.cpp" />
     <ClCompile Include="..\..\Shared\ImguiVizualizers\ImguiVisualizerManager.cpp" />
+    <ClCompile Include="..\..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\bgfx_utils.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\camera.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\cube_atlas.cpp" />
@@ -223,6 +227,8 @@
     <ClCompile Include="..\..\Shared\bgfx_common\nanovg\nanovg_bgfx.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\ps\particle_system.cpp" />
     <ClCompile Include="..\..\Shared\utils\MathUtils.cpp" />
+    <ClCompile Include="AIAssistantService.cpp" />
+    <ClCompile Include="AIAssistantVisualizer.cpp" />
     <ClCompile Include="CodeCompare.cpp" />
     <ClCompile Include="CodeCompareVisualizer.cpp" />
     <ClCompile Include="Main.cpp" />

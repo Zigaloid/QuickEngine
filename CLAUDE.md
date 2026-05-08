@@ -22,6 +22,14 @@ msbuild Core\Core.sln /p:Configuration=Debug /p:Platform=x64
 QuickScope\bin\Debug\QuickScope.exe
 ```
 
+**Build and run unit tests:**
+```
+msbuild UnitTests\CoreTests\CoreSystemTests.sln /p:Configuration=Debug /p:Platform=x64
+UnitTests\CoreTests\bin\Debug\CoreUnitTests.exe
+# Run a single test filter:
+UnitTests\CoreTests\bin\Debug\CoreUnitTests.exe --gtest_filter=ReflectionTests.*
+```
+
 **Build order matters** — `Core` must be built before any application project (`QuickScope`, `QuickEditor`, `QuickGame`, `NexusServer`). bgfx libraries must also be pre-built under `External/bgfx/.build/projects/vs2019/`.
 
 **Compiler requirements:** MSVC v143, C++20, x64, static runtime (`/MT`). The `/Zc:preprocessor` and `/Zc:__cplusplus` flags are required.
@@ -39,6 +47,11 @@ QuickScope\bin\Debug\QuickScope.exe
 | `QuickGame/` | Executable | Game/engine test harness |
 | `NexusServer/` | Executable | Telemetry aggregation server |
 | `External/` | Vendored | bgfx, ImGui (docking), ufbx, RapidJSON, STB |
+| `Tools/FbxToBgfxMesh/` | Executable | Offline FBX → bgfx binary mesh converter |
+| `Tools/CodeCompare/` | Executable | Standalone diff/compare tool with AI assistant integration |
+| `UnitTests/CoreTests/` | GTest executable | Unit tests for Core subsystems |
+
+HTML documentation for all Core subsystems lives in `Core/Documentation/index.html`.
 
 ### Core Engine (`Core/`)
 
@@ -94,6 +107,12 @@ The canonical reference file is `Shared/ImguiVizualizers/ImGui3DViewVisualizer.h
 - **Include order:** `.cpp` includes own header first, then project headers (quotes), then system headers (angle brackets)
 - Run `/conventions` on files in `Shared/` to auto-check and fix violations
 
+### Editor-specific systems (`Shared/ImguiVizualizers/`)
+
+- **`SelectionManager`** — single source of truth for selected entities; visualizers subscribe to selection changes rather than storing selections themselves.
+- **`PropertyInspector`** — reflection-driven inspector; renders editable widgets for any `CReflectedBase` object. Type-specific renderers are registered in `PropertyWidgetMapRegistry`.
+- **`DocumentManager`** — tracks open editor documents and routes asset-open requests to the correct `IImGuiVisualizer` launcher.
+
 ## Key Patterns
 
 **Registering a new component:**
@@ -110,6 +129,20 @@ REFL_DEFINE_END
 ```cpp
 // Derive from IImGuiVisualizer, implement Initialize/Shutdown/Update/Render/GetName
 // Register: manager.Register("key", std::make_unique<CMyVisualizer>());
+```
+
+**Implementing an undoable operation (QuickEditor):**
+```cpp
+// Derive from ICommand (Shared/ImguiVizualizers/ICommand.h)
+class CMyCommand : public ImGuiVisualizers::ICommand
+{
+public:
+    void Execute() override { /* apply */ }
+    void Undo()    override { /* revert */ }
+    const char* GetLabel() const override { return "My Operation"; }
+};
+// Push to history (calls Execute immediately):
+m_commandHistory.Push(std::make_unique<CMyCommand>(...));
 ```
 
 **Requesting a resource:**

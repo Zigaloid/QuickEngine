@@ -135,6 +135,9 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
@@ -171,8 +174,8 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\KeyboardShortcutManager.h">
-      <Filter>..\Shared</Filter>
+    <ClInclude Include="..\Shared\Physics\JoltDebugRenderer.h">
+      <Filter>..\Shared\Physics</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Physics\PhysicsManager.h">
       <Filter>..\Shared\Physics</Filter>
@@ -532,6 +535,9 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
@@ -559,8 +565,8 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
-    <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp">
-      <Filter>..\Shared</Filter>
+    <ClCompile Include="..\Shared\Physics\JoltDebugRenderer.cpp">
+      <Filter>..\Shared\Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp">
       <Filter>..\Shared\Physics</Filter>

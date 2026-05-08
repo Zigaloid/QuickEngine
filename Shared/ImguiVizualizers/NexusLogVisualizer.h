@@ -43,7 +43,7 @@ public:
 	}
 
 	const char* GetName() const override { return "Log"; }
-	const char* GetShortcut() const override { return nullptr; }
+	ImGuiKey GetShortcut() const override { return ImGuiKey_None; }
 	const char* GetMenuCategory() const override { return "Show"; }
 
 	/**

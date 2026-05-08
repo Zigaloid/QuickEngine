@@ -39,7 +39,7 @@ public:
      * @param category  Optional menu category.
      */
     explicit ImGui3DViewVisualizer(const char* name     = "3D View",
-                                   const char* shortcut = nullptr,
+                                   ImGuiKey shortcut    = ImGuiKey_None,
                                    const char* category = "Visualizers");
 
     ~ImGui3DViewVisualizer() override = default;
@@ -51,7 +51,7 @@ public:
     void        Update(float deltaTime) override;
     bool        Render(bool* isOpen) override;
     const char* GetName()         const override { return m_name.c_str(); }
-    const char* GetShortcut()     const override { return m_shortcut.empty() ? nullptr : m_shortcut.c_str(); }
+    ImGuiKey    GetShortcut()     const override { return m_shortcutKey; }
     const char* GetMenuCategory() const override { return m_category.empty() ? nullptr : m_category.c_str(); }
 
     // ── Public API ─────────────────────────────────────────────────────
@@ -84,7 +84,7 @@ private:
 
     // Identity / menu strings
     std::string m_name;
-    std::string m_shortcut;
+    ImGuiKey    m_shortcutKey = ImGuiKey_None;
     std::string m_category;
 
     // Subsystems

@@ -17,7 +17,7 @@ class CombinedObjJson3DVisualizer : public IImGuiVisualizer
 public:
     explicit CombinedObjJson3DVisualizer(const char* name = "Mesh Editor")
         : m_windowName(name)
-        , m_view("3D View (Obj)", nullptr, "Visualizers")
+        , m_view("3D View (Obj)", ImGuiKey_None, "Visualizers")
     {}
 
     ~CombinedObjJson3DVisualizer() override = default;
@@ -111,7 +111,7 @@ public:
     }
 
     const char* GetName() const override { return m_windowName.c_str(); }
-    const char* GetShortcut() const override { return nullptr; }
+    ImGuiKey    GetShortcut() const override { return ImGuiKey_None; }
     const char* GetMenuCategory() const override { return "Show"; }
 
     // Forward helper operations to the embedded editor

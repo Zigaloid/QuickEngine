@@ -94,6 +94,8 @@ project "NexusServer"
 	files { "../Shared/ImguiVizualizers/NexusLogFilterState.h" }
 	files { "../Shared/ImguiVizualizers/NexusLogVisualizer.cpp" }
 	files { "../Shared/ImguiVizualizers/NexusLogVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.cpp" }
+	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.h" }
 	
 -- Main app files.
 	files { "./**.cpp", "./**.h" }      

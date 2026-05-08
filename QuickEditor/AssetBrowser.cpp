@@ -1,6 +1,7 @@
 ﻿#include "AssetBrowser.h"
 #include "CoreSystem/CoreSystem.h"
 #include "CoreSystem/AppConfig.h"
+#include "KeyboardShortcutManager.h"
 
 #include <sstream>
 #include <iomanip>
@@ -144,18 +145,15 @@ void AssetBrowser::Initialize()
     // Initialize type filter visibility from existing registrations
     for (const auto& type : m_registry.GetAll()) {
         m_typeFilterVisible[type.extension] = type.visibleByDefault;
-    }    
+    }            
 }
-
-
-
 void AssetBrowser::Shutdown()
 {
     m_assets.clear();
     m_rootNode = {};
 }
 
-void AssetBrowser::Update(float /*deltaTime*/)
+void AssetBrowser::Update(float deltaTime)
 {
     if (m_treeNeedsRebuild) {
         RebuildFolderTree();
@@ -224,9 +222,9 @@ const char* AssetBrowser::GetName() const
     return "Asset Browser";
 }
 
-const char* AssetBrowser::GetShortcut() const
+ImGuiKey AssetBrowser::GetShortcut() const
 {
-    return nullptr;
+    return ImGuiKey_None;
 }
 
 const char* AssetBrowser::GetMenuCategory() const

@@ -151,6 +151,9 @@ private:
     Entry* FindEntry(const std::string& key);
     const Entry* FindEntry(const std::string& key) const;
     void RenderFileMenu();
+    void RegisterShortcut(Entry& entry);
+    void UnregisterShortcut(Entry& entry);
+    static std::string ShortcutName(const std::string& key);
 };
 
 } // namespace ImGuiVisualizers

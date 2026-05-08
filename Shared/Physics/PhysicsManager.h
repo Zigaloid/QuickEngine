@@ -12,6 +12,11 @@
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 
+#ifdef JPH_DEBUG_RENDERER
+#include <Jolt/Physics/Body/BodyManager.h>
+class JoltDebugRenderer;
+#endif
+
 JPH_SUPPRESS_WARNINGS
 
 // ---------------------------------------------------------------------------
@@ -94,8 +99,20 @@ public:
     // -----------------------------------------------------------------------
 
     JPH::PhysicsSystem*  GetPhysicsSystem()  { return m_physicsSystem; }
-    JPH::BodyInterface&  GetBodyInterface()  { return m_physicsSystem->GetBodyInterface(); }
+    JPH::BodyInterface&  GetBodyInterface()  { return m_physicsSystem->GetBodyInterfaceNoLock(); }
+    JPH::BodyInterface&  GetBodyInterfaceLocking()  { return m_physicsSystem->GetBodyInterface(); }
     bool                 IsInitialized() const { return m_initialized; }
+
+#ifdef JPH_DEBUG_RENDERER
+    /// Draw all physics bodies using Jolt's debug renderer. Call during your Render() pass.
+    void DebugDraw(const float* viewMtx);
+
+    /// Access the debug renderer for configuration (enable/disable, view ID, etc.).
+    JoltDebugRenderer* GetDebugRenderer() { return m_debugRenderer; }
+#endif
+
+    /// Marks the broad phase as needing rebuild (called from any thread).
+    void                 SetBroadPhaseDirty() { m_broadPhaseDirty = true; }
 
     // -----------------------------------------------------------------------
     // Global instance access
@@ -114,10 +131,15 @@ private:
 
     Config                                      m_config;
     bool                                        m_initialized = false;
+    bool                                        m_broadPhaseDirty = false;
 
     JPH::TempAllocatorImpl*                     m_tempAllocator  = nullptr;
     JPH::JobSystemThreadPool*                   m_jobSystem      = nullptr;
     JPH::PhysicsSystem*                         m_physicsSystem  = nullptr;
+
+#ifdef JPH_DEBUG_RENDERER
+    JoltDebugRenderer*                          m_debugRenderer  = nullptr;
+#endif
 
     // Layer interface objects – must outlive m_physicsSystem.
     struct BPLayerInterfaceImpl;

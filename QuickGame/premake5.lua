@@ -113,8 +113,8 @@ project "Game"
 	files { "../Shared/ImguiVizualizers/IImGuiVisualizer.h" }	
 	files { "../Shared/ImguiVizualizers/CommandConsole.cpp" }
 	files { "../Shared/ImguiVizualizers/CommandConsole.h" }
-	files { "../Shared/KeyboardShortcutManager.cpp" }
-	files { "../Shared/KeyboardShortcutManager.h" }
+	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.cpp" }
+	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.h" }
 	files { "../Shared/Rendering/bgfx*.cpp" }
 	files { "../Shared/Rendering/bgfx*.h" }
 

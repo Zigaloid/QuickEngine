@@ -10,6 +10,10 @@ PhysicsManager* PhysicsManager::s_instance = nullptr;
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 
+#ifdef JPH_DEBUG_RENDERER
+#include "JoltDebugRenderer.h"
+#endif
+
 #include <thread>
 #include <cassert>
 
@@ -131,6 +135,11 @@ bool PhysicsManager::Initialize(const Config& config)
 
     m_physicsSystem->SetGravity(JPH::Vec3(0.0f, m_config.gravity, 0.0f));
 
+#ifdef JPH_DEBUG_RENDERER
+    m_debugRenderer = new JoltDebugRenderer();
+    JPH::DebugRenderer::sInstance = m_debugRenderer;
+#endif
+
     m_initialized = true;
     return true;
 }
@@ -140,6 +149,12 @@ void PhysicsManager::Update(float deltaTime)
     if (!m_initialized)
         return;
 
+    if (m_broadPhaseDirty)
+    {
+        m_physicsSystem->OptimizeBroadPhase();
+        m_broadPhaseDirty = false;
+    }
+
     m_physicsSystem->Update(deltaTime, m_config.collisionSteps, m_tempAllocator, m_jobSystem);
 }
 
@@ -147,6 +162,11 @@ void PhysicsManager::Shutdown()
 {
     if (!m_initialized)
         return;
+
+    #ifdef JPH_DEBUG_RENDERER
+    JPH::DebugRenderer::sInstance = nullptr;
+    delete m_debugRenderer;     m_debugRenderer  = nullptr;
+#endif
 
     delete m_physicsSystem;     m_physicsSystem  = nullptr;
     delete m_objLayerPairFilter; m_objLayerPairFilter = nullptr;
@@ -227,6 +247,35 @@ void PhysicsManager::RemoveBody(JPH::BodyID bodyId)
     if (bodyId.IsInvalid())
         return;
 
-    GetBodyInterface().RemoveBody(bodyId);
-    GetBodyInterface().DestroyBody(bodyId);
+    GetBodyInterfaceLocking().RemoveBody(bodyId);
+    GetBodyInterfaceLocking().DestroyBody(bodyId);
 }
+
+// ---------------------------------------------------------------------------
+// Debug drawing
+// ---------------------------------------------------------------------------
+
+#ifdef JPH_DEBUG_RENDERER
+void PhysicsManager::DebugDraw(const float* viewMtx)
+{
+    if (!m_initialized || !m_debugRenderer || !m_debugRenderer->IsEnabled())
+        return;
+
+    m_debugRenderer->SetCamera(viewMtx);
+
+    // Configure what to draw
+    JPH::BodyManager::DrawSettings settings;
+    settings.mDrawShape = true;
+    settings.mDrawShapeWireframe = true;
+    settings.mDrawBoundingBox = true;
+    settings.mDrawCenterOfMassTransform = false;
+    settings.mDrawWorldTransform = false;
+    settings.mDrawVelocity = false;
+    settings.mDrawSleepStats = false;
+
+    m_physicsSystem->DrawBodies(settings, m_debugRenderer);
+
+    // Flush all accumulated lines to bgfx
+    m_debugRenderer->Flush();
+}
+#endif

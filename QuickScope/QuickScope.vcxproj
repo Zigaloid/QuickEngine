@@ -103,6 +103,7 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiButterflyChart.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiLineGraph.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ProfilerFrameComparisonView.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ProfilerOutlierView.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ProfilerSession.h" />
@@ -111,7 +112,6 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\ProfilerViewUtils.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ProfilerVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
-    <ClInclude Include="..\Shared\KeyboardShortcutManager.h" />
     <ClInclude Include="..\Shared\bgfx_common\args.h" />
     <ClInclude Include="..\Shared\bgfx_common\aviwriter.h" />
     <ClInclude Include="..\Shared\bgfx_common\bgfx_utils.h" />
@@ -213,6 +213,7 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiButterflyChart.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiLineGraph.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ProfilerFrameComparisonView.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ProfilerOutlierView.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ProfilerSession.cpp" />
@@ -221,7 +222,6 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\ProfilerViewUtils.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ProfilerVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp" />
-    <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\bgfx_utils.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\camera.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\cube_atlas.cpp" />

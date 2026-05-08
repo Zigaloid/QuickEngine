@@ -6,8 +6,12 @@
 #include <atomic>
 #include <mutex>
 #include <filesystem>
+#include <unordered_map>
 
 #include "IImGuiVisualizer.h"
+#include "imgui.h"
+
+class AIAssistantService; // forward declaration — avoids pulling in WinHTTP headers
 
 // ─── Data structures ─────────────────────────────────────────────────────────
 
@@ -49,6 +53,13 @@ struct DirCompareNode
     void ComputeAggregates();
 };
 
+// Cached result of a single AI query
+struct AIQueryResult
+{
+    std::string text;
+    bool        isError = false;
+};
+
 // ─── Visualizer ──────────────────────────────────────────────────────────────
 
 class CodeCompareVisualizer : public ImGuiVisualizers::IImGuiVisualizer
@@ -59,6 +70,9 @@ public:
 
     bool Render(bool* isOpen) override;
     void Update(float deltaTime) override { (void)deltaTime; }
+
+    // Inject the shared AI service (optional — AI button hidden when nullptr)
+    void SetAIService(AIAssistantService* service) { m_aiService = service; }
 
 private:
     // Path inputs
@@ -86,7 +100,7 @@ private:
     FileCompareResult::Status  m_selectedStatus = FileCompareResult::Status::Identical;
     std::vector<DiffLine>      m_diffLines;
     bool                       m_hasDiff    = false;
-    float                      m_treeHeight = 350.f;
+    ImGuiID                    m_dockspaceId = 0;
 
     // Visibility toggles (legend checkboxes)
     bool m_showIdentical = true;
@@ -115,6 +129,20 @@ private:
     static bool                  PassesFilter(const std::filesystem::path& p,
                                               const std::set<std::string>& exts);
     bool                         PassesVisibilityFilter(FileCompareResult::Status s) const;
+
+    // AI integration
+    AIAssistantService* m_aiService      = nullptr;
+    std::string         m_aiResponse;
+    bool                m_aiHasResponse  = false;
+    bool                m_aiIsError      = false;
+    bool                m_aiScrollBottom = false;
+    bool                m_aiFromCache    = false;
+
+    // Persistent cache: hash(absPathA + '|' + absPathB) -> result
+    std::unordered_map<std::size_t, AIQueryResult> m_aiCache;
+    std::size_t m_aiCurrentKey = 0;
+
+    void RenderAIPanel();
 
 #ifdef _WIN32
     bool BrowseForFolder(char* outPath, std::size_t outSize);

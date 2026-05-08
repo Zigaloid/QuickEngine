@@ -1,4 +1,5 @@
 #include "CodeCompareVisualizer.h"
+#include "AIAssistantService.h"
 
 #include "imgui.h"
 
@@ -539,25 +540,101 @@ void CodeCompareVisualizer::LoadFileDiff(const std::string& absPathA,
     const auto linesB = absPathB.empty() ? std::vector<std::string>{} : ReadLines(absPathB);
     m_diffLines = ComputeDiff(linesA, linesB);
     m_hasDiff   = true;
+
+    // Compute a stable cache key for this file pair
+    const std::string cacheKeyStr = absPathA + "|" + absPathB;
+    m_aiCurrentKey = std::hash<std::string>{}(cacheKeyStr);
+
+    // Restore a previously cached AI result if one exists
+    const auto it = m_aiCache.find(m_aiCurrentKey);
+    if (it != m_aiCache.end())
+    {
+        m_aiResponse     = it->second.text;
+        m_aiIsError      = it->second.isError;
+        m_aiHasResponse  = true;
+        m_aiFromCache    = true;
+        m_aiScrollBottom = false;
+    }
+    else
+    {
+        m_aiResponse     = {};
+        m_aiIsError      = false;
+        m_aiHasResponse  = false;
+        m_aiFromCache    = false;
+    }
 }
 
 void CodeCompareVisualizer::RenderDiffPanel()
 {
-    // Title bar with file name and close button
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_HorizontalScrollbar;
     ImGui::PushStyleColor(ImGuiCol_ChildBg, IM_COL32(25, 25, 30, 255));
-    ImGui::BeginChild("##diffpanel", { 0.f, 0.f }, false,
-        ImGuiWindowFlags_HorizontalScrollbar);
+
+    if (!ImGui::Begin("File Diff##cc", &m_hasDiff, flags))
+    {
+        ImGui::PopStyleColor();
+        ImGui::End();
+        return;
+    }
+
+    ImGui::PopStyleColor();
 
     // Header row
     {
         ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 180, 180, 255));
         ImGui::Text("Diff:  %s", m_selectedName.c_str());
         ImGui::PopStyleColor();
-        ImGui::SameLine();
-        if (ImGui::SmallButton("Close"))
+
+        if (m_aiService)
         {
-            m_hasDiff = false;
-            m_diffLines.clear();
+            ImGui::SameLine();
+            const bool aiQuerying = m_aiService->IsQuerying();
+            if (aiQuerying) ImGui::BeginDisabled();
+            if (ImGui::SmallButton(aiQuerying ? "Asking AI..." : "Ask AI"))
+            {
+                m_aiHasResponse = false;
+                m_aiFromCache   = false;
+                m_aiResponse.clear();
+                m_aiCache.erase(m_aiCurrentKey); // discard stale cached result
+
+                // Build a structured prompt from the current diff
+                std::string prompt;
+                prompt.reserve(4096);
+                prompt += "You are a senior C++ engineer reviewing a code diff.\n";
+                prompt += "File: " + m_selectedName + "\n";
+                prompt += "Please:\n";
+                prompt += "1. Summarise what changed and why it likely matters.\n";
+                prompt += "2. Identify any public API changes (added/removed/renamed functions, changed signatures, new types).\n";
+                prompt += "3. Flag any potential bugs or regressions introduced.\n\n";
+                prompt += "Diff (- removed, + added, context lines unmarked):\n";
+                prompt += "```\n";
+
+                int lineCount = 0;
+                for (const auto& dl : m_diffLines)
+                {
+                    if (++lineCount > 300) { prompt += "... (truncated)\n"; break; }
+                    switch (dl.type)
+                    {
+                    case DiffLine::Type::Context: prompt += "  " + dl.lineA + "\n"; break;
+                    case DiffLine::Type::OnlyA:   prompt += "- " + dl.lineA + "\n"; break;
+                    case DiffLine::Type::OnlyB:   prompt += "+ " + dl.lineB + "\n"; break;
+                    }
+                }
+                prompt += "```\n";
+
+                m_aiService->Query(prompt,
+                    [this](const std::string& response, bool isError)
+                    {
+                        m_aiResponse     = response;
+                        m_aiIsError      = isError;
+                        m_aiHasResponse  = true;
+                        m_aiFromCache    = false;
+                        m_aiScrollBottom = true;
+
+                        // Persist result so switching files and back restores it
+                        m_aiCache[m_aiCurrentKey] = { response, isError };
+                    });
+            }
+            if (aiQuerying) ImGui::EndDisabled();
         }
         ImGui::Separator();
     }
@@ -649,15 +726,67 @@ void CodeCompareVisualizer::RenderDiffPanel()
         ImGui::EndTable();
     }
 
-    ImGui::EndChild();
-    ImGui::PopStyleColor(); // ChildBg
+    ImGui::End();
+}
+
+void CodeCompareVisualizer::RenderAIPanel()
+{
+    if (!ImGui::Begin("AI Analysis##cc", &m_aiHasResponse))
+    {
+        ImGui::End();
+        return;
+    }
+
+    // Header — show whether this is a cached or live result
+    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(180, 210, 255, 255));
+    ImGui::TextUnformatted("AI Analysis:");
+    ImGui::PopStyleColor();
+
+    if (m_aiFromCache)
+    {
+        ImGui::SameLine(0, 8.f);
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(150, 150, 100, 255));
+        ImGui::TextUnformatted("(cached — press \"Ask AI\" in the diff panel to refresh)");
+        ImGui::PopStyleColor();
+    }
+
+    ImGui::Separator();
+
+    if (m_aiIsError)
+        ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(255, 100, 100, 255));
+
+    // Render line by line so ImGui wraps correctly
+    const char* begin = m_aiResponse.c_str();
+    const char* end   = begin + m_aiResponse.size();
+    const char* ls    = begin;
+    while (ls < end)
+    {
+        const char* le = ls;
+        while (le < end && *le != '\n') ++le;
+        ImGui::TextUnformatted(ls, le);
+        ls = (le < end) ? le + 1 : end;
+    }
+
+    if (m_aiIsError)
+        ImGui::PopStyleColor();
+
+    if (m_aiScrollBottom)
+    {
+        ImGui::SetScrollHereY(1.0f);
+        m_aiScrollBottom = false;
+    }
+
+    ImGui::End();
 }
 
 bool CodeCompareVisualizer::Render(bool* isOpen)
 {
-    ImGui::SetNextWindowSize({ 1100.f, 750.f }, ImGuiCond_FirstUseEver);
+    ImGui::SetNextWindowSize({ 1200.f, 800.f }, ImGuiCond_FirstUseEver);
 
-    if (!ImGui::Begin(GetName(), isOpen, ImGuiWindowFlags_NoCollapse))
+    const ImGuiWindowFlags mainFlags =
+        ImGuiWindowFlags_NoCollapse;
+
+    if (!ImGui::Begin(GetName(), isOpen, mainFlags))
     {
         ImGui::End();
         return false;
@@ -666,14 +795,15 @@ bool CodeCompareVisualizer::Render(bool* isOpen)
     // ── Path inputs ───────────────────────────────────────────────────────
     ImGui::SeparatorText("Directories to Compare");
 
-    const float labelW  = ImGui::CalcTextSize("Path A:").x + 8.f;
-    const float inputW  = -1.f; // fill remaining
+    const float labelW   = ImGui::CalcTextSize("Path A:").x + 8.f;
+    const float browseW  = 80.f;
+    const float spacing  = ImGui::GetStyle().ItemSpacing.x;
 
     ImGui::Text("Path A:"); ImGui::SameLine(labelW);
-    ImGui::SetNextItemWidth(-90.f);
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - browseW - spacing);
     ImGui::InputText("##pathA", m_pathA, sizeof(m_pathA));
     ImGui::SameLine();
-    if (ImGui::Button("Browse##A", { 80.f, 0.f }))
+    if (ImGui::Button("Browse##A", { browseW, 0.f }))
     {
 #ifdef _WIN32
         BrowseForFolder(m_pathA, sizeof(m_pathA));
@@ -681,10 +811,10 @@ bool CodeCompareVisualizer::Render(bool* isOpen)
     }
 
     ImGui::Text("Path B:"); ImGui::SameLine(labelW);
-    ImGui::SetNextItemWidth(-90.f);
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - browseW - spacing);
     ImGui::InputText("##pathB", m_pathB, sizeof(m_pathB));
     ImGui::SameLine();
-    if (ImGui::Button("Browse##B", { 80.f, 0.f }))
+    if (ImGui::Button("Browse##B", { browseW, 0.f }))
     {
 #ifdef _WIN32
         BrowseForFolder(m_pathB, sizeof(m_pathB));
@@ -693,10 +823,10 @@ bool CodeCompareVisualizer::Render(bool* isOpen)
 
     // ── Extension filter ──────────────────────────────────────────────────
     ImGui::Text("Filter: "); ImGui::SameLine(labelW);
-    ImGui::SetNextItemWidth(-90.f);
+    ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x - browseW - spacing);
     ImGui::InputText("##filter", m_filterStr, sizeof(m_filterStr));
     ImGui::SameLine();
-    if (ImGui::Button("Clear##filter", { 80.f, 0.f }))
+    if (ImGui::Button("Clear##filter", { browseW, 0.f }))
         m_filterStr[0] = '\0';
     ImGui::SameLine(0, 6.f);
     ImGui::TextDisabled("(e.g. *.cpp;*.h  |  empty = all files)");
@@ -734,57 +864,48 @@ bool CodeCompareVisualizer::Render(bool* isOpen)
 
     ImGui::Separator();
 
-    // ── Results ───────────────────────────────────────────────────────────
-    const bool hasResult  = m_hasResult.load();
-    const bool isWorking  = m_isComparing.load();
+    // ── DockSpace — fills the remaining area below the toolbar ────────────
+    m_dockspaceId = ImGui::GetID("##ccdockspace");
+    ImGui::DockSpace(m_dockspaceId, { 0.f, 0.f }, ImGuiDockNodeFlags_None);
 
-    if (!hasResult || isWorking)
+    ImGui::End(); // end main "Code Comparison" window
+
+    // ── Sub-windows docked into the DockSpace ─────────────────────────────
+
+    // File Tree window (always shown)
+    ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
+    if (ImGui::Begin("File Tree##cc"))
     {
-        ImGui::Spacing();
-        ImGui::TextDisabled("Enter two directory paths above and press Compare.");
-        ImGui::End();
-        return true;
+        const bool hasResult = m_hasResult.load();
+        const bool isWorking = m_isComparing.load();
+
+        if (!hasResult || isWorking)
+        {
+            ImGui::Spacing();
+            ImGui::TextDisabled("Enter two directory paths above and press Compare.");
+        }
+        else
+        {
+            RenderOverallStats(m_rootNode);
+            RenderDirNode(m_rootNode);
+        }
     }
+    ImGui::End();
 
-    // Safe to read m_rootNode — worker has finished
-    RenderOverallStats(m_rootNode);
-
-    const float availH   = ImGui::GetContentRegionAvail().y;
-    constexpr float kMinH = 80.f;
-    constexpr float kSplitterH = 5.f;
-
-    // Clamp tree height: always leave room for at least kMinH of diff panel (if shown)
-    if (m_hasDiff)
-        m_treeHeight = std::clamp(m_treeHeight, kMinH, availH - kMinH - kSplitterH);
-
-    // ── Directory tree ────────────────────────────────────────────────────
-    ImGui::BeginChild("##tree",
-        { 0.f, m_hasDiff ? m_treeHeight : 0.f }, false,
-        ImGuiWindowFlags_HorizontalScrollbar);
-    RenderDirNode(m_rootNode);
-    ImGui::EndChild();
-
+    // File Diff window (shown when a file is selected)
     if (m_hasDiff)
     {
-        // ── Splitter handle ───────────────────────────────────────────────
-        ImGui::PushStyleColor(ImGuiCol_Button,        IM_COL32( 50,  50,  50, 255));
-        ImGui::PushStyleColor(ImGuiCol_ButtonHovered, IM_COL32( 90,  90,  90, 255));
-        ImGui::PushStyleColor(ImGuiCol_ButtonActive,  IM_COL32(120, 120, 120, 255));
-        ImGui::Button("##vsplit", { -1.f, kSplitterH });
-        ImGui::PopStyleColor(3);
-
-        if (ImGui::IsItemActive())
-            m_treeHeight = std::clamp(
-                m_treeHeight + ImGui::GetIO().MouseDelta.y,
-                kMinH, availH - kMinH - kSplitterH);
-        if (ImGui::IsItemHovered() || ImGui::IsItemActive())
-            ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeNS);
-
-        // ── Diff panel ────────────────────────────────────────────────────
+        ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
         RenderDiffPanel();
     }
 
-    ImGui::End();
+    // AI Analysis window (shown when a response is available)
+    if (m_aiHasResponse)
+    {
+        ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
+        RenderAIPanel();
+    }
+
     return true;
 }
 

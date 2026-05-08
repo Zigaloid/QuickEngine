@@ -14,6 +14,7 @@
 #include "..\shared\sharednexusdefines.h"
 #include "..\shared\ProfilerController.h"
 #include "CodeCompare.h"
+#include "ResourceManager\ResourceManager.h"
 
 namespace
 {

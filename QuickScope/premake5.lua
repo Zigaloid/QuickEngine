@@ -102,12 +102,11 @@ project "QuickScope"
 	files { "../Shared/ImguiVizualizers/ImGuiButterflyChart.cpp" }
 	files { "../Shared/ImguiVizualizers/ImGuiButterflyChart.h" }	
 
-
 	files { "../Shared/ImguiVizualizers/UnifiedActionManager.cpp" }
 	files { "../Shared/ImguiVizualizers/UnifiedActionManager.h" }	
 
-	files { "../Shared/KeyboardShortcutManager.cpp" }
-	files { "../Shared/KeyboardShortcutManager.h" }	
+	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.cpp" }
+	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.h" }	
 	
 -- Main app files.
 	files { "./**.cpp", "./**.h" }      

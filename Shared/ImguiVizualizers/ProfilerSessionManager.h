@@ -24,7 +24,7 @@ public:
     void Update(float deltaTime) override { (void)deltaTime; }
     bool Render(bool* isOpen) override;
     const char* GetName() const override { return "ProfilerManager"; }
-    const char* GetShortcut() const override { return nullptr; }
+    ImGuiKey GetShortcut() const override { return ImGuiKey_None; }
     const char* GetMenuCategory() const override { return "Show"; }
 
     // ---- Session management ----

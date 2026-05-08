@@ -78,17 +78,13 @@ project "FbxToBgfxMesh"
 	files { path.join(engineRootPath, "Shared/bgfx_common/**.cpp") }
 	files { path.join(engineRootPath, "Shared/bgfx_common/**.h") }
 	
-	files { path.join(engineRootPath, "External/bgfx/3rdparty/meshoptimizer/src/**.cpp") }
-	files { path.join(engineRootPath, "External/bgfx/3rdparty/meshoptimizer/src/**.h") }
-	files { path.join(engineRootPath, "External/imgui-docking/imgui.cpp") }
-	files { path.join(engineRootPath, "External/imgui-docking/backends/imgui_impl_opengl3.cpp") }
-	files { path.join(engineRootPath, "External/imgui-docking/imgui_tables.cpp") }
-	files { path.join(engineRootPath, "External/imgui-docking/imgui_Widgets.cpp") }
-	files { path.join(engineRootPath, "External/imgui-docking/imgui_draw.cpp") }
 	files { path.join(engineRootPath, "Shared/ImguiVizualizers/ImguiVisualizerManager.cpp" ) }
 	files { path.join(engineRootPath, "Shared/ImguiVizualizers/ImguiVisualizerManager.h" ) }
 	files { path.join(engineRootPath, "Shared/ImguiVizualizers/CommandConsole.cpp" ) }
 	files { path.join(engineRootPath, "Shared/ImguiVizualizers/CommandConsole.h" ) }
+	files { path.join(engineRootPath, "Shared/ImguiVizualizers/KeyboardShortcutManager.cpp" ) }
+	files { path.join(engineRootPath, "Shared/ImguiVizualizers/KeyboardShortcutManager.h" ) }
+
 	files { "./**.cpp", "./**.h" }      
 
 	filter "configurations:Debug"

@@ -98,6 +98,7 @@
     <ClInclude Include="..\..\External\ufbx\ufbx.h" />
     <ClInclude Include="..\..\Shared\ImguiVizualizers\CommandConsole.h" />
     <ClInclude Include="..\..\Shared\ImguiVizualizers\ImguiVisualizerManager.h" />
+    <ClInclude Include="..\..\Shared\ImguiVizualizers\KeyboardShortcutManager.h" />
     <ClInclude Include="..\..\Shared\bgfx_common\args.h" />
     <ClInclude Include="..\..\Shared\bgfx_common\aviwriter.h" />
     <ClInclude Include="..\..\Shared\bgfx_common\bgfx_utils.h" />
@@ -195,6 +196,7 @@
     <ClCompile Include="..\..\External\ufbx\ufbx.c" />
     <ClCompile Include="..\..\Shared\ImguiVizualizers\CommandConsole.cpp" />
     <ClCompile Include="..\..\Shared\ImguiVizualizers\ImguiVisualizerManager.cpp" />
+    <ClCompile Include="..\..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\bgfx_utils.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\camera.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\cube_atlas.cpp" />

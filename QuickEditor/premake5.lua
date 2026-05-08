@@ -155,8 +155,8 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/PropertyWidgetMapEditor.h" }
 	files { "../Shared/ImguiVizualizers/UnifiedActionManager.cpp" }
 	files { "../Shared/ImguiVizualizers/UnifiedActionManager.h" }
-	files { "../Shared/KeyboardShortcutManager.cpp" }
-	files { "../Shared/KeyboardShortcutManager.h" }
+	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.cpp" }
+	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.h" }
 
 	files { "./**.cpp", "./**.h" }      
 

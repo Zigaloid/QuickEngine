@@ -75,6 +75,9 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\NexusFlowGraph.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
@@ -365,6 +368,9 @@
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\NexusFlowGraph.cpp">

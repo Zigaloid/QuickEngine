@@ -89,6 +89,9 @@ project "CodeCompare"
 	files { path.join(engineRootPath, "Shared/ImguiVizualizers/ImguiVisualizerManager.h" ) }
 	files { path.join(engineRootPath, "Shared/ImguiVizualizers/CommandConsole.cpp" ) }
 	files { path.join(engineRootPath, "Shared/ImguiVizualizers/CommandConsole.h" ) }
+	files { path.join(engineRootPath, "Shared/ImguiVizualizers/KeyboardShortcutManager.cpp" ) }
+	files { path.join(engineRootPath, "Shared/ImguiVizualizers/KeyboardShortcutManager.h" ) }
+
 	files { "./**.cpp", "./**.h" }      
 
 	filter "configurations:Debug"

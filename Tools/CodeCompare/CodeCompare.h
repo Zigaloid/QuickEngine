@@ -6,6 +6,7 @@
 #include "app\AppInterface.h"
 #include "ImGuiVisualizerManager.h"
 #include "CodeCompareVisualizer.h"
+#include "AIAssistantService.h"
 
 class CToolApp : public IApplication
 {
@@ -19,4 +20,5 @@ public:
 
 private:
 	ImGuiVisualizers::ImGuiVisualizerManager m_visualizerManager;
+	AIAssistantService m_aiService;
 };

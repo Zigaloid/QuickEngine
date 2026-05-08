@@ -115,6 +115,7 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ObjJsonEditor.h" />
@@ -127,7 +128,7 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\SelectionManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\TransformCommand.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
-    <ClInclude Include="..\Shared\KeyboardShortcutManager.h" />
+    <ClInclude Include="..\Shared\Physics\JoltDebugRenderer.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsManager.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\Shared\Rendering\BgfxGameCamera.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp" />
@@ -259,7 +261,7 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\SelectionManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp" />
-    <ClCompile Include="..\Shared\KeyboardShortcutManager.cpp" />
+    <ClCompile Include="..\Shared\Physics\JoltDebugRenderer.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp" />

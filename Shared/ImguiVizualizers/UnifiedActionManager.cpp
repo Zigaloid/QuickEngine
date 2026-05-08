@@ -345,7 +345,7 @@ namespace UI {
             }
 
             if (keyCode != 0) {
-                ksm.RegisterShortcut(path, desc.description, keyCode, mods, desc.callback);
+                ksm.RegisterShortcut(path, desc.description, static_cast<ImGuiKey>(keyCode), mods, desc.callback);
             }
         }
     }

@@ -53,12 +53,18 @@ bool CPhysicsBodyComponent::CreateBody( const Matrix4f &worldTransform )
         JPH::BodyCreationSettings bcs = MakeBodyCreationSettings(
             JPH::RVec3::sZero(), JPH::Quat::sIdentity(), layer);
 
-        m_bodyId = physics->GetBodyInterface().CreateAndAddBody(
+        m_bodyId = physics->GetBodyInterfaceLocking().CreateAndAddBody(
             bcs, JPH::EActivation::Activate);
+
+        if (m_bodyId.IsInvalid())
+            return false;
 
         // Place the body at the mesh's world position directly.
         // The resource offset is already baked into the shape via RotatedTranslatedShape.
         SetWorldTransform(worldTransform);
+
+        // Signal that the broad phase needs rebuilding (done on main thread before next step).
+        physics->SetBroadPhaseDirty();
         return true;
     }
     return false;
@@ -85,6 +91,10 @@ JPH::BodyCreationSettings CPhysicsBodyComponent::MakeBodyCreationSettings(
         settings.mRestitution = res->GetRestitution();
         settings.mLinearDamping = res->GetLinearDamping();
         settings.mAngularDamping = res->GetAngularDamping();
+
+        // Use continuous collision detection for dynamic bodies to prevent tunneling.
+        if (settings.mMotionType == JPH::EMotionType::Dynamic)
+            settings.mMotionQuality = JPH::EMotionQuality::LinearCast;
 
         return settings;
     }
@@ -179,7 +189,7 @@ Matrix4f CPhysicsBodyComponent::GetWorldTransform() const
     if (!physics || !physics->IsInitialized())
         return Matrix4f::GetIdentity();
 
-    JPH::BodyInterface& bi = physics->GetBodyInterface();
+    JPH::BodyInterface& bi = physics->GetBodyInterfaceLocking();
     const JPH::RVec3    pos = bi.GetPosition(m_bodyId);
     const JPH::Quat     rot = bi.GetRotation(m_bodyId);
 
@@ -201,7 +211,7 @@ void CPhysicsBodyComponent::SetWorldTransform(const Matrix4f& transform, JPH::EA
     const Vector3f   t = transform.ExtractTranslation();
     const Quaternion rq = Quaternion::FromMatrix(transform);
     const Quaternion q = rq.Normalized();
-    physics->GetBodyInterface().SetPositionAndRotation(
+    physics->GetBodyInterfaceLocking().SetPositionAndRotation(
         m_bodyId,
         JPH::RVec3(t.GetX(), t.GetY(), t.GetZ()),
         JPH::Quat(q.GetX(), q.GetY(), q.GetZ(), q.GetW()),

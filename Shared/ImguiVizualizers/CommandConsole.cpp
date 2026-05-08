@@ -65,12 +65,13 @@ void CommandConsole::RefreshFunctionCallManagerCommands()
 void CommandConsole::InitializeFunctionCallManager()
 {
     DECLARE_FUNC_VLOW();
-    
+
     // Get FunctionCallManager from CoreSystem
     m_functionManager = Core::CoreSystem::GetFunctionManager();
     if (m_functionManager)
     {
         RefreshFunctionCallManagerCommands();
+        m_isEnabled = true;
     }
     else
     {
@@ -178,7 +179,26 @@ void CommandConsole::ClearAll()
 bool CommandConsole::RenderConsoleWindow(const char* windowTitle, bool* isOpen)
 {
     DECLARE_FUNC_LOW();
-    
+
+    // If the user pressed the configured shortcut while the window is open,
+    // close the window. This lets the console toggle itself even when it
+    // currently has keyboard focus and ImGui is capturing input.
+    ImGuiKey toggleKey = GetShortcut();
+    if (isOpen != nullptr && isOpen && *isOpen && toggleKey != ImGuiKey_None) {
+        // Check required modifiers
+        Input::KeyModifier reqMods = GetShortcutModifiers();
+        bool modsOk = true;
+        if ((reqMods & Input::KeyModifier::Ctrl) != Input::KeyModifier::None) modsOk &= ImGui::IsKeyDown(ImGuiMod_Ctrl);
+        if ((reqMods & Input::KeyModifier::Alt) != Input::KeyModifier::None)  modsOk &= ImGui::IsKeyDown(ImGuiMod_Alt);
+        if ((reqMods & Input::KeyModifier::Shift) != Input::KeyModifier::None)modsOk &= ImGui::IsKeyDown(ImGuiMod_Shift);
+        if ((reqMods & Input::KeyModifier::Super) != Input::KeyModifier::None)modsOk &= ImGui::IsKeyDown(ImGuiMod_Super);
+
+        if (modsOk && ImGui::IsKeyPressed(toggleKey, false)) {
+            *isOpen = false;
+            return false;
+        }
+    }
+
     // Check if window should be open
     bool windowShouldBeOpen = (isOpen == nullptr) || *isOpen;
     

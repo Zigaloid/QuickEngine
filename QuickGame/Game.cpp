@@ -1,9 +1,9 @@
 ﻿#include "Game.h"
 #include "CommandConsole.h"
 #include "ImGui3DViewVisualizer.h"
+#include "KeyboardShortcutManager.h"
 #include "MessageSystem/MessageBus.h"
 #include <iostream>
-#include <algorithm>
 #include "PropertyWidgetMapRegistry.h"
 #include "ShaderResource.h"
 #include "CoreSystem\CoreDebugChannels.h"
@@ -56,8 +56,13 @@ bool GameApp::Initialize()
 	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
 	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/Level3.lvl.obj.json");
 	m_RootLevel->SafeRead(levelPath);
+	m_lastLevelPath = levelPath;
 
 	componentManager->Initialize();
+
+	Input::KeyboardShortcutManager::Instance().Initialize();
+
+	RegisterConsoleCommands();
 
 	return true;
 }
@@ -93,11 +98,9 @@ void GameApp::Update(double deltaTime)
 	DECLARE_FUNC_VLOW();
 	if(Core::CoreSystem::GetResourceManager()->GetPendingFinalizationCount() == 0)
 	{
-		// Clamp deltaTime to avoid tunneling during hitches or loading frames.
-		constexpr float kMaxPhysicsStep = 1.0f / 60.0f;
-		const float clampedDt = std::min(static_cast<float>(deltaTime), kMaxPhysicsStep);
-		m_physicsManager.Update(clampedDt);
+		m_physicsManager.Update(static_cast<float>(deltaTime));
 	}
+	Input::KeyboardShortcutManager::Instance().Update(deltaTime);
 	m_visualizerManager.Update(static_cast<float>(deltaTime));
 	Core::MessageSystem::MessageBus::Get().ProcessAll();
 }
@@ -119,6 +122,10 @@ void GameApp::Render(double deltaTime)
 	bgfx::setViewTransform(0, viewMtx, projMtx);
 
 	Rendering::BgfxRenderPrimitives::Instance().RenderGrid(0, 100.0f, 1.0f, 0xff808080);
+
+#ifdef JPH_DEBUG_RENDERER
+	m_physicsManager.DebugDraw(viewMtx);
+#endif
 	
 }
 
@@ -131,6 +138,55 @@ void GameApp::ImguiUpdate()
 void GameApp::ImguiMainMenu()
 {
 	m_visualizerManager.RenderMenuBar();
+}
+
+void GameApp::LoadLevel(std::string filePath)
+{
+	std::string resolvedPath = Core::AppConfig::Instance().ResolvePath(filePath);
+
+	auto* componentManager = Core::CoreSystem::GetComponentManager();
+	if (m_RootLevel)
+	{
+		componentManager->ReleaseComponent(m_RootLevel);
+		m_RootLevel = nullptr;
+	}
+
+	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
+	m_RootLevel->SafeRead(resolvedPath);
+	m_RootLevel->Initialize();
+	m_lastLevelPath = resolvedPath;
+}
+
+void GameApp::ReloadLevel()
+{
+	if (m_lastLevelPath.empty())
+	{
+		return;
+	}
+
+	auto* componentManager = Core::CoreSystem::GetComponentManager();
+	if (m_RootLevel)
+	{
+		componentManager->ReleaseComponent(m_RootLevel);
+		m_RootLevel = nullptr;
+	}
+
+	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
+	m_RootLevel->SafeRead(m_lastLevelPath);
+	m_RootLevel->Initialize();
+}
+
+void GameApp::RegisterConsoleCommands()
+{
+	auto* funcManager = Core::CoreSystem::GetFunctionManager();
+	if (!funcManager)
+		return;
+
+	funcManager->RegisterFunction<void, std::string>(
+		"Level_Load", [this](std::string path) { LoadLevel(path); }, {"filePath"});
+
+	funcManager->RegisterFunction<void>(
+		"Level_Reload", std::function<void()>([this]() { ReloadLevel(); }));
 }
 
 bool GameApp::Shutdown()

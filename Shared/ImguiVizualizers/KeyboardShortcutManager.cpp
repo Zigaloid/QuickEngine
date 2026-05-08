@@ -1,43 +1,81 @@
 #include "KeyboardShortcutManager.h"
-#include "CoreSystem/CoreSystem.h"
+#include "KeyboardShortcutManager.h"
 #include <iostream>
 #include <sstream>
 #include <algorithm>
 
-// GLFW includes for key codes
-#include "glfw/glfw3.h"
+#include "imgui.h"
 
 namespace Input {
 
+    KeyboardShortcutManager& KeyboardShortcutManager::Instance() {
+        static KeyboardShortcutManager instance;
+        return instance;
+    }
+
     KeyboardShortcutManager::KeyboardShortcutManager()
-        : ComponentSystem::Component()
+        : m_initialized(false)
         , m_globalEnabled(true)        
     {
     }
 
-    bool KeyboardShortcutManager::OnInitialize() {
-        if (IsInitialized()) {
+    bool KeyboardShortcutManager::Initialize() {
+        if (m_initialized) {
             return true;
         }
 
+        m_initialized = true;
         std::cout << "KeyboardShortcutManager initialized" << std::endl;        
         return true;
     }
 
-    void KeyboardShortcutManager::OnUpdate(double deltaTime) {
-        // No per-frame updates needed for keyboard shortcuts
-        // All handling is done via callbacks
+    void KeyboardShortcutManager::Update(double deltaTime) {
+        if (!m_globalEnabled || !m_initialized) {
+            return;
+        }
+
+        // If ImGui is capturing keyboard input, we still allow processing of
+        // registered shortcuts that explicitly requested to ignore ImGui capture.
+        bool wantCapture = ImGui::GetIO().WantCaptureKeyboard;
+
+        KeyModifier currentMods = GetCurrentImGuiModifiers();
+
+        // Poll all registered keys via ImGui
+        for (auto& [combo, info] : m_shortcuts) {
+            if (!info->enabled) continue;
+
+            bool triggered = false;
+            switch (combo.action) {
+                case KeyAction::Press:   triggered = ImGui::IsKeyPressed(combo.key, false); break;
+                case KeyAction::Release: triggered = ImGui::IsKeyReleased(combo.key); break;
+                case KeyAction::Repeat:  triggered = ImGui::IsKeyPressed(combo.key, true); break;
+            }
+
+            if (!triggered) continue;
+
+            if (currentMods != combo.modifiers) continue;
+
+            if (wantCapture && !info->ignoreImguiCapture) {
+                // ImGui is capturing input and this shortcut doesn't request to
+                // bypass capture, so skip it.
+                continue;
+            }
+
+            ExecuteShortcut(*info);
+        }
     }
 
-    void KeyboardShortcutManager::OnShutdown() {
-        UnregisterAllShortcuts();        
+    void KeyboardShortcutManager::Shutdown() {
+        UnregisterAllShortcuts();
+        m_initialized = false;
         std::cout << "KeyboardShortcutManager shut down" << std::endl;
     }
 
     bool KeyboardShortcutManager::RegisterShortcut(const std::string& name, 
                                                   const std::string& description,
                                                   const KeyCombination& combination, 
-                                                  ShortcutCallback callback) {
+                                                  ShortcutCallback callback,
+                                                  bool ignoreImguiCapture) {
         if (!IsValidKeyCombination(combination)) {
             std::cerr << "Invalid key combination for shortcut: " << name << std::endl;
             return false;
@@ -63,7 +101,7 @@ namespace Input {
         }
 
         // Create and register the shortcut
-        auto shortcut = std::make_shared<ShortcutInfo>(name, description, combination, std::move(callback));
+        auto shortcut = std::make_shared<ShortcutInfo>(name, description, combination, std::move(callback), ignoreImguiCapture);
         
         m_shortcuts[combination] = shortcut;
         m_shortcutsByName[name] = shortcut;
@@ -74,11 +112,12 @@ namespace Input {
 
     bool KeyboardShortcutManager::RegisterShortcut(const std::string& name,
                                                   const std::string& description,
-                                                  int key,
+                                                  ImGuiKey key,
                                                   KeyModifier modifiers,
                                                   ShortcutCallback callback,
-                                                  KeyAction action) {
-        return RegisterShortcut(name, description, KeyCombination(key, modifiers, action), std::move(callback));
+                                                  KeyAction action,
+                                                  bool ignoreImguiCapture) {
+        return RegisterShortcut(name, description, KeyCombination(key, modifiers, action), std::move(callback), ignoreImguiCapture);
     }
 
     bool KeyboardShortcutManager::UnregisterShortcut(const std::string& name) {
@@ -147,42 +186,14 @@ namespace Input {
         return (it != m_shortcutsByName.end()) ? it->second.get() : nullptr;
     }
 
-    void KeyboardShortcutManager::HandleKeyInput(int key, int scancode, int action, int mods) {
-        if (!m_globalEnabled || !IsInitialized()) {
-            return;
-        }
-
-        // Convert GLFW parameters to our types
-        KeyModifier modifiers = GlfwModsToKeyModifier(mods);
-        KeyAction keyAction;
-        
-        switch (action) {
-            case GLFW_PRESS:   keyAction = KeyAction::Press; break;
-            case GLFW_RELEASE: keyAction = KeyAction::Release; break;
-            case GLFW_REPEAT:  keyAction = KeyAction::Repeat; break;
-            default: return; // Unknown action
-        }
-
-        // Create key combination for lookup
-        KeyCombination combination(key, modifiers, keyAction);
-        
-        // Find matching shortcut
-        auto it = m_shortcuts.find(combination);
-        if (it != m_shortcuts.end() && it->second->enabled) {
-            ExecuteShortcut(*it->second);
-        }
-    }
-
-    KeyModifier KeyboardShortcutManager::GlfwModsToKeyModifier(int glfwMods) {
+    KeyModifier KeyboardShortcutManager::GetCurrentImGuiModifiers() {
         KeyModifier result = KeyModifier::None;
-        
-        if (glfwMods & GLFW_MOD_SHIFT)    result = result | KeyModifier::Shift;
-        if (glfwMods & GLFW_MOD_CONTROL)  result = result | KeyModifier::Ctrl;
-        if (glfwMods & GLFW_MOD_ALT)      result = result | KeyModifier::Alt;
-        if (glfwMods & GLFW_MOD_SUPER)    result = result | KeyModifier::Super;
-        if (glfwMods & GLFW_MOD_CAPS_LOCK) result = result | KeyModifier::CapsLock;
-        if (glfwMods & GLFW_MOD_NUM_LOCK)  result = result | KeyModifier::NumLock;
-        
+
+        if (ImGui::IsKeyDown(ImGuiMod_Shift))   result = result | KeyModifier::Shift;
+        if (ImGui::IsKeyDown(ImGuiMod_Ctrl))    result = result | KeyModifier::Ctrl;
+        if (ImGui::IsKeyDown(ImGuiMod_Alt))     result = result | KeyModifier::Alt;
+        if (ImGui::IsKeyDown(ImGuiMod_Super))   result = result | KeyModifier::Super;
+
         return result;
     }
 
@@ -229,79 +240,17 @@ namespace Input {
         return oss.str();
     }
 
-    std::string KeyboardShortcutManager::KeyToString(int key) {
-        // Handle special keys
-        switch (key) {
-            case GLFW_KEY_SPACE:         return "Space";
-            case GLFW_KEY_APOSTROPHE:    return "'";
-            case GLFW_KEY_COMMA:         return ",";
-            case GLFW_KEY_MINUS:         return "-";
-            case GLFW_KEY_PERIOD:        return ".";
-            case GLFW_KEY_SLASH:         return "/";
-            case GLFW_KEY_SEMICOLON:     return ";";
-            case GLFW_KEY_EQUAL:         return "=";
-            case GLFW_KEY_LEFT_BRACKET:  return "[";
-            case GLFW_KEY_BACKSLASH:     return "\\";
-            case GLFW_KEY_RIGHT_BRACKET: return "]";
-            case GLFW_KEY_GRAVE_ACCENT:  return "`";
-            case GLFW_KEY_ESCAPE:        return "Escape";
-            case GLFW_KEY_ENTER:         return "Enter";
-            case GLFW_KEY_TAB:           return "Tab";
-            case GLFW_KEY_BACKSPACE:     return "Backspace";
-            case GLFW_KEY_INSERT:        return "Insert";
-            case GLFW_KEY_DELETE:        return "Delete";
-            case GLFW_KEY_RIGHT:         return "Right";
-            case GLFW_KEY_LEFT:          return "Left";
-            case GLFW_KEY_DOWN:          return "Down";
-            case GLFW_KEY_UP:            return "Up";
-            case GLFW_KEY_PAGE_UP:       return "PageUp";
-            case GLFW_KEY_PAGE_DOWN:     return "PageDown";
-            case GLFW_KEY_HOME:          return "Home";
-            case GLFW_KEY_END:           return "End";
-            case GLFW_KEY_CAPS_LOCK:     return "CapsLock";
-            case GLFW_KEY_SCROLL_LOCK:   return "ScrollLock";
-            case GLFW_KEY_NUM_LOCK:      return "NumLock";
-            case GLFW_KEY_PRINT_SCREEN:  return "PrintScreen";
-            case GLFW_KEY_PAUSE:         return "Pause";
+    std::string KeyboardShortcutManager::KeyToString(ImGuiKey key) {
+        const char* name = ImGui::GetKeyName(key);
+        if (name && name[0] != '\0') {
+            return std::string(name);
         }
-        
-        // Function keys
-        if (key >= GLFW_KEY_F1 && key <= GLFW_KEY_F25) {
-            return "F" + std::to_string(key - GLFW_KEY_F1 + 1);
-        }
-        
-        // Number keys
-        if (key >= GLFW_KEY_0 && key <= GLFW_KEY_9) {
-            return std::string(1, static_cast<char>('0' + (key - GLFW_KEY_0)));
-        }
-        
-        // Letter keys
-        if (key >= GLFW_KEY_A && key <= GLFW_KEY_Z) {
-            return std::string(1, static_cast<char>('A' + (key - GLFW_KEY_A)));
-        }
-        
-        // Keypad keys
-        if (key >= GLFW_KEY_KP_0 && key <= GLFW_KEY_KP_9) {
-            return "Keypad" + std::to_string(key - GLFW_KEY_KP_0);
-        }
-        
-        switch (key) {
-            case GLFW_KEY_KP_DECIMAL:  return "Keypad.";
-            case GLFW_KEY_KP_DIVIDE:   return "Keypad/";
-            case GLFW_KEY_KP_MULTIPLY: return "Keypad*";
-            case GLFW_KEY_KP_SUBTRACT: return "Keypad-";
-            case GLFW_KEY_KP_ADD:      return "Keypad+";
-            case GLFW_KEY_KP_ENTER:    return "KeypadEnter";
-            case GLFW_KEY_KP_EQUAL:    return "Keypad=";
-        }
-        
-        // Default for unknown keys
-        return "Key" + std::to_string(key);
+        return "Key" + std::to_string(static_cast<int>(key));
     }
 
     bool KeyboardShortcutManager::IsValidKeyCombination(const KeyCombination& combination) const {
         // Check if key is valid (basic validation)
-        return combination.key >= 0 && combination.key <= GLFW_KEY_LAST;
+        return combination.key > ImGuiKey_None && combination.key < ImGuiKey_COUNT;
     }
 
     void KeyboardShortcutManager::LogShortcutRegistration(const ShortcutInfo& shortcut) {

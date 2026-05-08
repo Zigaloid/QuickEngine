@@ -14,10 +14,10 @@ namespace ImGuiVisualizers {
 // ── Construction ────────────────────────────────────────────────────────
 
 ImGui3DViewVisualizer::ImGui3DViewVisualizer(const char* name,
-                                             const char* shortcut,
+                                             ImGuiKey shortcut,
                                              const char* category)
     : m_name(name ? name : "3D View")
-    , m_shortcut(shortcut ? shortcut : "")
+    , m_shortcutKey(shortcut)
     , m_category(category ? category : "")
 {
 }

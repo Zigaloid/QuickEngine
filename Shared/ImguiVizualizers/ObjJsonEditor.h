@@ -110,8 +110,8 @@ namespace ImGuiVisualizers {
 			return true;
 		}
 
-		const char* GetName() const override { return m_displayName.c_str(); }
-		const char* GetShortcut() const override { return nullptr; }
+        const char* GetName() const override { return m_displayName.c_str(); }
+		ImGuiKey    GetShortcut() const override { return ImGuiKey_None; }
 		const char* GetMenuCategory() const override { return "Show"; }
 
 		CReflectedBase* GetObject() const { return m_object.get(); }

@@ -50,8 +50,8 @@ void CRenderComponent::OnUpdate(double /*deltaTime*/)
 				1.0f / m_scale.ExtractScale().GetX(),
 				1.0f / m_scale.ExtractScale().GetY(),
 				1.0f / m_scale.ExtractScale().GetZ()));
-			physBody->CreateBody(worldNoScale);
-			m_physicsTransformInitialized = true;
+			if( physBody->CreateBody(worldNoScale) )
+				m_physicsTransformInitialized = true;
 		}
 	}
 	else
@@ -232,7 +232,7 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
         Component* parent = GetParent();
         if (!parent)
             return;
-
+#ifdef PHYSICS_DEBUG_RENDER
         // Re-acquires only when the cache is empty or the referenced component was released.
         auto physBody = m_physicsBodyRef.Get();
 		if (physBody)
@@ -248,6 +248,7 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 				physBody->DebugRender(0, matrix);
 			}
 		}
+#endif	// End physics debug render
 	}
 }
 

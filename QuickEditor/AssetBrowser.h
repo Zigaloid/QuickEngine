@@ -208,7 +208,7 @@ public:
     void Update(float deltaTime) override;
     bool Render(bool* isOpen) override;
     const char* GetName() const override;
-    const char* GetShortcut() const override;
+    ImGuiKey    GetShortcut() const override;
     const char* GetMenuCategory() const override;
 
     // ── Configuration ───────────────────────────────────────────────────

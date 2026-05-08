@@ -32,7 +32,7 @@ bool QuickEditApp::Initialize()
 	physicsConfig.maxBodies = 1024;
 	physicsConfig.gravity   = -9.81f;
 	m_physicsManager.Initialize(physicsConfig);
-
+    Input::KeyboardShortcutManager::Instance().Initialize();
 	return true;
 }
 
@@ -53,6 +53,7 @@ void QuickEditApp::Update(double deltaTime)
 	m_visualizerManager.Update(static_cast<float>(deltaTime));
 	m_documentManager->CleanupClosedEditors();
 	Core::MessageSystem::MessageBus::Get().ProcessAll();
+    Input::KeyboardShortcutManager::Instance().Update(deltaTime);    
 }
 
 void QuickEditApp::Render(double deltaTime)

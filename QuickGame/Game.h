@@ -29,4 +29,9 @@ private:
     std::shared_ptr<GameCameraController>     m_cameraController;    
     CLevelComponent *m_RootLevel;
     Core::FunctionQueue                       m_functionQueue;
+    std::string                               m_lastLevelPath;
+
+    void LoadLevel(std::string filePath);
+    void ReloadLevel();
+    void RegisterConsoleCommands();
 };

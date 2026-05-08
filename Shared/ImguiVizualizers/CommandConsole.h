@@ -24,21 +24,25 @@ class CommandConsole : public ImGuiVisualizers::IImGuiVisualizer
 {
 public:
 
-    void Initialize() override {}
+    void Initialize() override { InitializeFunctionCallManager(); }
     void Shutdown() override {}
     void Update(float deltaTime) override { (void)deltaTime; }
 
     bool Render(bool* isOpen) override
     {
-        RenderConsoleWindow();
+        if (!m_isEnabled)
+        {
+            InitializeFunctionCallManager();
+        }
+        // Forward the isOpen pointer so the console can close itself (e.g. via shortcut)
+        RenderConsoleWindow("Command Console", isOpen);
         return true;
     }
 
     const char* GetName() const override { return "Command Console"; }
-    const char* GetShortcut() const override { return nullptr; }
+    ImGuiKey GetShortcut() const override { return ImGuiKey_GraveAccent; }
     const char* GetMenuCategory() const override { return "Show"; }
-
-
+    Input::KeyModifier GetShortcutModifiers() const override { return Input::KeyModifier::None; }
     /**
      * @brief Command information structure
      */
