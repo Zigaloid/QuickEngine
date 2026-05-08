@@ -27,7 +27,3 @@ void CPhysicsBodyResource::Finalize()
 {
     ResourceSystem::Resource::Finalize();
 }
-
-
-
-

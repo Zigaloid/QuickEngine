@@ -6,6 +6,7 @@
 #include "CommandHistory.h"
 #include "imgui/imgui.h"
 #include <bgfx/bgfx.h>
+#include <functional>
 #include <memory>
 #include <vector>
 
@@ -57,6 +58,12 @@ namespace ImGuiVisualizers {
 		/// operations) are automatically recorded. Pass nullptr to disable.
 		void SetCommandHistory(CCommandHistory* history) { m_commandHistory = history; }
 
+		/// Optional callback invoked at the start of a gizmo drag when the SHIFT
+		/// key is held. The callback should duplicate the selected objects and
+		/// update the selection to the new copies before the drag proceeds.
+		using ShiftDragCallback = std::function<void()>;
+		void SetShiftDragCallback(ShiftDragCallback cb) { m_shiftDragCallback = std::move(cb); }
+
 		// ── Selectable registry ────────────────────────────────────────────
 
 		void AddSelectable(std::shared_ptr<CSelectable> selectable);
@@ -77,6 +84,9 @@ namespace ImGuiVisualizers {
 		bool IsSelected(const std::shared_ptr<CSelectable>& selectable) const;
 		void ClearSelection();
 		void SetSelected(std::shared_ptr<CSelectable> selectable);
+
+		/// Replaces the entire selection with the given set of selectables.
+		void SetAllSelected(const std::vector<std::shared_ptr<CSelectable>>& selectables);
 
 		// ── Gizmo ──────────────────────────────────────────────────────────
 
@@ -146,7 +156,8 @@ namespace ImGuiVisualizers {
 		};
 
 		DragState        m_drag;
-		CCommandHistory* m_commandHistory = nullptr;   // ← new: non-owning
+		CCommandHistory*   m_commandHistory    = nullptr;   // ← new: non-owning
+		ShiftDragCallback  m_shiftDragCallback;              ///< Called on SHIFT+drag start.
 	};
 
 } // namespace ImGuiVisualizers

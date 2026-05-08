@@ -19,7 +19,7 @@ public:
     void ImguiMainMenu() override;
     bool Shutdown() override;
     void RegisterComponents();
-
+    void HandleQuickEditCommand(const std::string& messageBody);
 private:
     ImGuiVisualizers::ImGuiVisualizerManager  m_visualizerManager;
     PhysicsManager                            m_physicsManager;

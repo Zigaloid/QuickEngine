@@ -4,6 +4,7 @@
 #include <cfloat>
 #include <cmath>
 #include <algorithm>
+#include <functional>
 #include <imgui/imgui.h>
 
 namespace ImGuiVisualizers {
@@ -64,6 +65,17 @@ void CSelectionManager::SetSelected(std::shared_ptr<CSelectable> selectable)
     if (selectable)
         m_selection.push_back(selectable);
     m_lastSelected = std::move(selectable);
+}
+
+void CSelectionManager::SetAllSelected(const std::vector<std::shared_ptr<CSelectable>>& selectables)
+{
+    m_selection.clear();
+    for (const auto& sel : selectables)
+    {
+        if (sel)
+            m_selection.push_back(sel);
+    }
+    m_lastSelected = m_selection.empty() ? nullptr : m_selection.back();
 }
 
 bool CSelectionManager::IsSelected(const std::shared_ptr<CSelectable>& selectable) const
@@ -353,6 +365,17 @@ void CSelectionManager::BeginGizmoDrag(GizmoMode mode, const Matrix4f& gizmoMtx)
 {
     if (m_selection.empty())
         return;
+
+    // If SHIFT is held, invoke the duplicate callback so the caller can
+    // replace the selection with fresh duplicates before the drag starts.
+    // The callback is expected to update m_selection via SetAllSelected().
+    if (ImGui::GetIO().KeyShift && m_shiftDragCallback)
+    {
+        m_shiftDragCallback();
+        // If duplication left us with no selectables, abort the drag.
+        if (m_selection.empty())
+            return;
+    }
 
     const Ray      ray    = BuildPickRay();
     const Vector3f origin = gizmoMtx.ExtractTranslation();

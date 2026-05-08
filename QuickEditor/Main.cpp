@@ -68,8 +68,7 @@ namespace
 				scheduler->WaitForCompletion();
 
 				theApp.Update(m_deltaTime);
-				UpdateDeltaTime();
-				NEXUS_SEND_MESSAGE(FPS_PIPE, MSG_TYPE_FRAME_TIME, std::to_string(m_deltaTime).c_str());
+				UpdateDeltaTime();			
 				
 				return true;
 			}

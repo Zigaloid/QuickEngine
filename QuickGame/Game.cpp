@@ -3,6 +3,8 @@
 #include "ImGui3DViewVisualizer.h"
 #include "KeyboardShortcutManager.h"
 #include "MessageSystem/MessageBus.h"
+#include "Net/NexusClient.h"
+#include "SharedNexusDefines.h"
 #include <iostream>
 #include "PropertyWidgetMapRegistry.h"
 #include "ShaderResource.h"
@@ -15,6 +17,7 @@
 #include "entry\entry.h"
 #include "imgui.h"
 
+
 std::shared_ptr<CShaderResource> testShader;
 bool GameApp::Initialize()
 {	
@@ -25,6 +28,9 @@ bool GameApp::Initialize()
 
 	m_visualizerManager.Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), false);
+
+    // Ensure FunctionCallManager exists so console commands can be registered
+	Core::CoreSystem::Initialize(Core::InitFlag::FunctionCallManager);
 
 	// App setup component types.
 	RegisterComponents();
@@ -64,7 +70,31 @@ bool GameApp::Initialize()
 
 	RegisterConsoleCommands();
 
+	// If the Command Console exists, refresh its FunctionCallManager-backed commands
+	{
+		auto* console = m_visualizerManager.GetVisualizerAs<CommandConsole>("Command Console");
+		if (console) {
+			console->RefreshFunctionCallManagerCommands();
+		}
+	}
+
+	NEXUS_SUBSCRIBE_CALLBACK(GAME_PIPE, "ANY", HandleQuickEditCommand);
+
 	return true;
+}
+
+void GameApp::HandleQuickEditCommand(const std::string& messageBody)
+{
+	DECLARE_FUNC_VLOW();
+	// Simple command parsing - expects "command arg1 arg2 ..."
+	std::istringstream iss(messageBody);
+	std::string command;
+	iss >> command;
+
+	if (command == "Level_Reload")
+	{
+		m_visualizerManager.GetVisualizerAs<CommandConsole>("Command Console")->SubmitCommand("Level_Reload()");
+	}
 }
 
 void GameApp::RegisterComponents()
@@ -103,6 +133,9 @@ void GameApp::Update(double deltaTime)
 	Input::KeyboardShortcutManager::Instance().Update(deltaTime);
 	m_visualizerManager.Update(static_cast<float>(deltaTime));
 	Core::MessageSystem::MessageBus::Get().ProcessAll();
+	
+	NEXUS_SEND_MESSAGE(FPS_PIPE, MSG_TYPE_FRAME_TIME, std::to_string(deltaTime).c_str());
+
 }
 
 void GameApp::Render(double deltaTime)

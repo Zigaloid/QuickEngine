@@ -190,6 +190,7 @@
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="logo.h" />
+    <ClInclude Include="Shared\ImguiVizualizers\ConsoleVariable.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp" />

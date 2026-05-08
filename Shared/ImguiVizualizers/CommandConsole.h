@@ -38,7 +38,7 @@ public:
         RenderConsoleWindow("Command Console", isOpen);
         return true;
     }
-
+    
     const char* GetName() const override { return "Command Console"; }
     ImGuiKey GetShortcut() const override { return ImGuiKey_GraveAccent; }
     const char* GetMenuCategory() const override { return "Show"; }
@@ -234,6 +234,12 @@ public:
      * @brief Get the registered commands
      */
     const std::vector<CommandInfo>& GetRegisteredCommands() const { return m_commands; }
+
+    /**
+     * @brief Execute a command programmatically, as if typed into the console
+     * @param commandLine The full command line to execute
+     */
+    void SubmitCommand(const std::string& commandLine);
 
     /**
      * @brief Render the console window

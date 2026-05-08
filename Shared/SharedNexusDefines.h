@@ -7,8 +7,10 @@ static const std::string FPS_PIPE = "Fps";
 static const std::string CONSOLE_PIPE = "Console";
 static const std::string PROFILER_PIPE = "Profiler";
 static const std::string TELEMETRY_PIPE = "Telemetry";
+static const std::string GAME_PIPE = "Game";
 
 // Message types.
+static const std::string MSG_TYPE_CONSOLE_COMMAND = "ConsoleCommand";
 static const std::string MSG_TYPE_PROFILER_DATA = "ProfilerData";
 static const std::string MSG_TYPE_CAMERA_POS = "CameraPos";
 static const std::string MSG_TYPE_FRAME_TIME = "FrameTime";

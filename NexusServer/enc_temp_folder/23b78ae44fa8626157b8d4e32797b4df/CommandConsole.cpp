@@ -22,12 +22,10 @@ CommandConsole::CommandConsole(int maxHistorySize, int maxMessageCount, bool cas
 {
     DECLARE_FUNC_VLOW();
     memset(m_inputBuffer, 0, sizeof(m_inputBuffer));
-
-
+    //
     // Add welcome message
     AddInfo("Console initialized. Type 'help' for available commands.");    
 }
-
 
 void CommandConsole::SetCommandCallback(CommandCallback callback)
 {
@@ -424,15 +422,6 @@ int CommandConsole::TextEditCallback(ImGuiInputTextCallbackData* data)
     }
     
     return 0;
-}
-
-void CommandConsole::SubmitCommand(const std::string& commandLine)
-{
-    std::string trimmed = Trim(commandLine);
-    if (!trimmed.empty())
-    {
-        ExecuteCommand(trimmed);
-    }
 }
 
 void CommandConsole::ExecuteCommand(const std::string& commandLine)

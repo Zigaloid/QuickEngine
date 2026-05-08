@@ -3,7 +3,7 @@
         "m_name": {
             "Value": "SimpleTree",
             "Type": 3,
-            "Size": 32
+            "Size": 40
         },
         "m_active": {
             "Value": true,
@@ -20,10 +20,10 @@
                         "m_resourceFileName": {
                             "Value": "./assets/staticmeshes/tree.smesh.obj.json",
                             "Type": 3,
-                            "Size": 32
+                            "Size": 40
                         },
                         "Type": 4,
-                        "Size": 56
+                        "Size": 64
                     },
                     "m_modelMatrix": {
                         "Value": [
@@ -56,12 +56,36 @@
                         "Value": "CMeshComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CPhysicsBodyComponent",
+                    "m_bodyResource": {
+                        "Value": "CPhysicsBodyResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/physics/tree.phys.obj.json",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 32
                     }
                 }
             ],
             "Type": 19,
-            "Size": 24
+            "Size": 32
         }
     }
 }

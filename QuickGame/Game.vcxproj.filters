@@ -356,6 +356,9 @@
     </ClInclude>
     <ClInclude Include="Game.h" />
     <ClInclude Include="logo.h" />
+    <ClInclude Include="Shared\ImguiVizualizers\ConsoleVariable.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">

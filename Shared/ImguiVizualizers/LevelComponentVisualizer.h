@@ -7,6 +7,7 @@
 #include "BgfxGizmoRenderer.h"
 #include "CommandHistory.h"
 #include "DeleteEntityCommand.h"
+#include "DuplicateEntitiesCommand.h"
 #include "PropertyInspector.h"
 #include <vector>
 #include <string>
@@ -39,6 +40,7 @@ public:
     void Initialize() override
     {
         m_selectionManager.SetCommandHistory(&m_history);
+        m_selectionManager.SetShiftDragCallback([this]() { DuplicateSelectedEntities(); });
         CombinedObjJson3DVisualizer::Initialize();
         RegisterLevelActions();
     }
@@ -66,6 +68,13 @@ private:
     void RefreshEntityAssets();
     void HandleEntityDrop();
     void RenderInspectorPanel();
+
+    /// Same as RegisterRenderComponents but also returns the newly created selectables.
+    std::vector<std::shared_ptr<CSelectable>> RegisterRenderComponentsReturning(ComponentSystem::Component* root);
+
+    /// Duplicates the parent entity of every currently selected object,
+    /// registers the new selectables, and pushes an undoable command.
+    void DuplicateSelectedEntities();
 
     /// Removes all selectables belonging to @p entity from the manager and
     /// the local m_componentSelectables list.

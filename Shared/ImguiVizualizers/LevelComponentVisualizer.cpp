@@ -8,6 +8,11 @@
 #include <bx/bounds.h>
 #include <algorithm>
 #include <cfloat>
+#include "Net/NexusClient.h"
+#include "SharedNexusDefines.h"
+
+// Undefine Windows GDI macro that conflicts with our GetObject() method
+#undef GetObject
 
 namespace ImGuiVisualizers {
 
@@ -120,19 +125,72 @@ namespace ImGuiVisualizers {
 			.isChecked = [this]() { return m_gizmoMode == GizmoMode::Rotate; },
 			.sortPriority = 30
 			});
+		am.RegisterAction({
+			.path = "File.Save",
+			.description = "Save the current level.",
+			.targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback = [this]() 
+			{ 				
+				m_editor.Save();
+				NEXUS_SEND_MESSAGE(GAME_PIPE, MSG_TYPE_CONSOLE_COMMAND, "Level_Reload");
+			},
+			.isEnabled = [this]() { return m_levelComp != nullptr; },
+			.isChecked = [this]() { return m_gizmoMode == GizmoMode::Rotate; },
+			.sortPriority = 30
+			});
 	}
 
 	void LevelComponentVisualizer::RegisterRenderComponents(ComponentSystem::Component* root)
 	{
+		RegisterRenderComponentsReturning(root);
+	}
+
+	std::vector<std::shared_ptr<CSelectable>> LevelComponentVisualizer::RegisterRenderComponentsReturning(ComponentSystem::Component* root)
+	{
 		std::vector<CRenderComponent*> renderComps;
 		CollectRenderComponents(root, renderComps);
+
+		std::vector<std::shared_ptr<CSelectable>> result;
+		result.reserve(renderComps.size());
 
 		for (CRenderComponent* rc : renderComps)
 		{
 			auto selectable = std::make_shared<CRenderComponentSelectable>(rc);
 			m_componentSelectables.push_back(selectable);
 			m_selectionManager.AddSelectable(selectable);
+			result.push_back(selectable);
 		}
+
+		return result;
+	}
+
+	void LevelComponentVisualizer::DuplicateSelectedEntities()
+	{
+		if (!m_levelComp)
+			return;
+
+		// Collect the unique CEntityComponent parents from the current selection.
+		std::vector<CEntityComponent*> sourceEntities;
+		for (const auto& sel : m_selectionManager.GetAllSelected())
+		{
+			auto* owner = dynamic_cast<CEntityComponent*>(sel->GetOwner());
+			if (!owner)
+				continue;
+			if (std::find(sourceEntities.begin(), sourceEntities.end(), owner) == sourceEntities.end())
+				sourceEntities.push_back(owner);
+		}
+
+		if (sourceEntities.empty())
+			return;
+
+		auto cmd = std::make_unique<CDuplicateEntitiesCommand>(
+			m_levelComp,
+			sourceEntities,
+			&m_selectionManager,
+			[this](ComponentSystem::Component* root) { return RegisterRenderComponentsReturning(root); },
+			[this](CEntityComponent* e) { DeregisterEntitySelectables(e); });
+
+		m_history.Push(std::move(cmd));
 	}
 
 	void LevelComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, ComponentSystem::Component* comp)

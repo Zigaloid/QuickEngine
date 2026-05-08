@@ -2,6 +2,12 @@
 
 #include <Jolt/Jolt.h>
 
+// Console variables
+#include "ConsoleVariable.h"
+
+// Declare console command to toggle physics debug draw
+CONSOLE_COMMAND(bool, PhysicsManager_DebugDraw, "Set to 1 to turn on physics debug draw");
+
 PhysicsManager* PhysicsManager::s_instance = nullptr;
 
 #include <Jolt/RegisterTypes.h>
@@ -164,7 +170,6 @@ void PhysicsManager::Shutdown()
         return;
 
     #ifdef JPH_DEBUG_RENDERER
-    JPH::DebugRenderer::sInstance = nullptr;
     delete m_debugRenderer;     m_debugRenderer  = nullptr;
 #endif
 
@@ -258,7 +263,13 @@ void PhysicsManager::RemoveBody(JPH::BodyID bodyId)
 #ifdef JPH_DEBUG_RENDERER
 void PhysicsManager::DebugDraw(const float* viewMtx)
 {
-    if (!m_initialized || !m_debugRenderer || !m_debugRenderer->IsEnabled())
+    if (!m_initialized || !m_debugRenderer)
+        return;
+
+    // Sync console variable to renderer enabled state each frame so toggling via console takes effect immediately
+    m_debugRenderer->SetEnabled(PhysicsManager_DebugDraw);
+
+    if (!m_debugRenderer->IsEnabled())
         return;
 
     m_debugRenderer->SetCamera(viewMtx);
