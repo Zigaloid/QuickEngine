@@ -58,6 +58,30 @@
                         "Type": 19,
                         "Size": 24
                     }
+                },
+                {
+                    "Value": "CPhysicsBodyComponent",
+                    "m_bodyResource": {
+                        "Value": "CPhysicsBodyResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/physics/bunny.phys.obj.json",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "Type": 4,
+                        "Size": 56
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
                 }
             ],
             "Type": 19,

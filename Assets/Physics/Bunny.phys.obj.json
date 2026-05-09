@@ -1,0 +1,56 @@
+{
+    "RootObject": {
+        "m_shapeType": {
+            "Value": 1,
+            "Type": 1,
+            "Size": 4
+        },
+        "m_transform": {
+            "Value": [
+                1.5,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.5,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                1.5,
+                0.0,
+                -0.006093651056289673,
+                0.5767513513565063,
+                0.0,
+                1.0
+            ],
+            "Type": 8,
+            "Size": 64
+        },
+        "m_motionType": {
+            "Value": 2,
+            "Type": 1,
+            "Size": 4
+        },
+        "m_friction": {
+            "Value": 0.20000000298023224,
+            "Type": 2,
+            "Size": 4
+        },
+        "m_restitution": {
+            "Value": 0.0,
+            "Type": 2,
+            "Size": 4
+        },
+        "m_linearDamping": {
+            "Value": 0.05000000074505806,
+            "Type": 2,
+            "Size": 4
+        },
+        "m_angularDamping": {
+            "Value": 0.05000000074505806,
+            "Type": 2,
+            "Size": 4
+        }
+    }
+}

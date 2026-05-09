@@ -56,7 +56,7 @@
                                         0.0,
                                         4.470828056335449,
                                         0.48392772674560547,
-                                        1.028171420097351,
+                                        5.745080947875977,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -180,9 +180,9 @@
                                         0.0,
                                         5.4597063064575195,
                                         0.0,
-                                        0.07995033264160156,
+                                        0.02794712781906128,
                                         0.00017073750495910645,
-                                        0.0530390739440918,
+                                        -0.09831929206848145,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -272,7 +272,7 @@
                                         0.0,
                                         3.980802536010742,
                                         0.0,
-                                        -4.680702209472656,
+                                        -4.432168960571289,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -362,7 +362,7 @@
                                         0.0,
                                         3.964080810546875,
                                         0.0,
-                                        0.0,
+                                        0.1504783034324646,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -452,7 +452,7 @@
                                         0.0,
                                         0.0,
                                         0.0,
-                                        -4.675144195556641,
+                                        -4.705685138702393,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -918,7 +918,7 @@
                                         0.0,
                                         5.4597063064575195,
                                         0.0,
-                                        0.0,
+                                        0.012323379516601563,
                                         0.0,
                                         4.741236686706543,
                                         1.0
@@ -1312,72 +1312,6 @@
                 {
                     "Value": "CEntityComponent",
                     "m_name": {
-                        "Value": "Bunny",
-                        "Type": 3,
-                        "Size": 32
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CEntityComponent",
-                        "Elements": [
-                            {
-                                "Value": "CMeshComponent",
-                                "m_meshResource": {
-                                    "Value": "CStaticMeshResourceReference",
-                                    "m_resourceFileName": {
-                                        "Value": "./assets/staticmeshes/bunny.smesh.obj.json",
-                                        "Type": 3,
-                                        "Size": 32
-                                    },
-                                    "Type": 4,
-                                    "Size": 56
-                                },
-                                "m_modelMatrix": {
-                                    "Value": [
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
-                                        0.0,
-                                        4.2060065269470215,
-                                        0.0,
-                                        -1.6324604749679565,
-                                        1.0
-                                    ],
-                                    "Type": 8,
-                                    "Size": 64
-                                },
-                                "m_active": {
-                                    "Value": true,
-                                    "Type": 12,
-                                    "Size": 1
-                                },
-                                "m_children": {
-                                    "Value": "CMeshComponent",
-                                    "Elements": [],
-                                    "Type": 19,
-                                    "Size": 24
-                                }
-                            }
-                        ],
-                        "Type": 19,
-                        "Size": 24
-                    }
-                },
-                {
-                    "Value": "CEntityComponent",
-                    "m_name": {
                         "Value": "SimpleTree",
                         "Type": 3,
                         "Size": 32
@@ -1416,9 +1350,9 @@
                                         0.0,
                                         1.0,
                                         0.0,
-                                        0.0,
+                                        -4.445243835449219,
                                         0.11811268329620361,
-                                        0.0,
+                                        4.776660919189453,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -1507,8 +1441,8 @@
                                         5.4597063064575195,
                                         0.0,
                                         7.941758155822754,
-                                        0.0,
-                                        4.741236686706543,
+                                        -0.022893130779266357,
+                                        4.621463298797607,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -1776,9 +1710,9 @@
                                         0.0,
                                         0.12200243026018143,
                                         0.0,
-                                        3.6022636890411377,
+                                        4.397615909576416,
                                         0.11811268329620361,
-                                        2.7864208221435547,
+                                        -3.684030532836914,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -1815,6 +1749,214 @@
                                 },
                                 "m_children": {
                                     "Value": "CPhysicsBodyComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 24
+                                }
+                            }
+                        ],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CEntityComponent",
+                    "m_name": {
+                        "Value": "Bunny",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CEntityComponent",
+                        "Elements": [
+                            {
+                                "Value": "CMeshComponent",
+                                "m_meshResource": {
+                                    "Value": "CStaticMeshResourceReference",
+                                    "m_resourceFileName": {
+                                        "Value": "./assets/staticmeshes/bunny.smesh.obj.json",
+                                        "Type": 3,
+                                        "Size": 32
+                                    },
+                                    "Type": 4,
+                                    "Size": 56
+                                },
+                                "m_modelMatrix": {
+                                    "Value": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        -3.3305411338806152,
+                                        0.34597066044807434,
+                                        0.0760951042175293,
+                                        1.0
+                                    ],
+                                    "Type": 8,
+                                    "Size": 64
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CMeshComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CPhysicsBodyComponent",
+                                "m_bodyResource": {
+                                    "Value": "CPhysicsBodyResourceReference",
+                                    "m_resourceFileName": {
+                                        "Value": "./assets/physics/bunny.phys.obj.json",
+                                        "Type": 3,
+                                        "Size": 32
+                                    },
+                                    "Type": 4,
+                                    "Size": 56
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CPhysicsBodyComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 24
+                                }
+                            }
+                        ],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CEntityComponent",
+                    "m_name": {
+                        "Value": "Player",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CEntityComponent",
+                        "Elements": [
+                            {
+                                "Value": "CMeshComponent",
+                                "m_meshResource": {
+                                    "Value": "CStaticMeshResourceReference",
+                                    "m_resourceFileName": {
+                                        "Value": "./assets/staticmeshes/warrior.smesh.obj.json",
+                                        "Type": 3,
+                                        "Size": 32
+                                    },
+                                    "Type": 4,
+                                    "Size": 56
+                                },
+                                "m_modelMatrix": {
+                                    "Value": [
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        0.0,
+                                        1.0,
+                                        0.0,
+                                        0.0,
+                                        0.1902155578136444,
+                                        2.095065116882324,
+                                        1.0
+                                    ],
+                                    "Type": 8,
+                                    "Size": 64
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CMeshComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CPhysicsBodyComponent",
+                                "m_bodyResource": {
+                                    "Value": "CPhysicsBodyResourceReference",
+                                    "m_resourceFileName": {
+                                        "Value": "./assets/physics/player.phys.obj.json",
+                                        "Type": 3,
+                                        "Size": 32
+                                    },
+                                    "Type": 4,
+                                    "Size": 56
+                                },
+                                "m_active": {
+                                    "Value": false,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CPhysicsBodyComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CThirdPersonInputComponent",
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CThirdPersonInputComponent",
+                                    "Elements": [],
+                                    "Type": 19,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CCharacterComponent",
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CCharacterComponent",
                                     "Elements": [],
                                     "Type": 19,
                                     "Size": 24

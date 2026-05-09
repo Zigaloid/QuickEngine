@@ -1,8 +1,14 @@
 #include "WindowsGamepad.h"
 
+#include "WindowsGamepad.h"
+
 #include <iostream>
 #include <algorithm>
 #include <cmath>
+#include <vector>
+#include <string>
+#include <Windows.h>
+#include <hidusage.h>
 
 namespace Input {
 
@@ -48,6 +54,27 @@ bool WindowsGamepad::Initialize()
     XINPUT_STATE state;
     DWORD result = XInputGetState(m_gamepadId, &state);
 
+    if (result != ERROR_SUCCESS)
+    {
+        std::cout << "WindowsGamepad: initial XInputGetState failed for slot " << m_gamepadId << " (code " << result << ")\n";
+        // Emit a debug listing of all XInput slots to help diagnosis
+        DebugListXInputSlots();
+        DebugListRawInputDevices();
+        // Requested slot not connected — try to find any XInput controller
+        for (DWORD i = 0; i < XUSER_MAX_COUNT; ++i)
+        {
+            XINPUT_STATE probe;
+            if (XInputGetState(i, &probe) == ERROR_SUCCESS)
+            {
+                std::cout << "WindowsGamepad: requested slot " << m_gamepadId << " not connected, using slot " << i << " instead\n";
+                m_gamepadId = i;
+                state = probe;
+                result = ERROR_SUCCESS;
+                break;
+            }
+        }
+    }
+
     if (result == ERROR_SUCCESS)
     {
         m_connected      = true;
@@ -63,6 +90,81 @@ bool WindowsGamepad::Initialize()
     m_connected = false;
     std::cout << "WindowsGamepad " << m_gamepadId << " failed to initialize (not connected)" << std::endl;
     return false;
+}
+
+void WindowsGamepad::DebugListXInputSlots()
+{
+    std::cout << "---- XInput slot probe ----" << std::endl;
+    for (DWORD i = 0; i < XUSER_MAX_COUNT; ++i)
+    {
+        XINPUT_STATE state;
+        DWORD r = XInputGetState(i, &state);
+        std::cout << "Slot " << i << ": result=" << r;
+        if (r == ERROR_SUCCESS)
+        {
+            std::cout << " packet=" << state.dwPacketNumber << " buttons=0x" << std::hex << state.Gamepad.wButtons << std::dec;
+            XINPUT_CAPABILITIES caps;
+            if (XInputGetCapabilities(i, 0, &caps) == ERROR_SUCCESS)
+            {
+                std::cout << " type=" << static_cast<int>(caps.Type) << " subType=" << static_cast<int>(caps.SubType);
+            }
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "---- end probe ----" << std::endl;
+}
+
+void WindowsGamepad::DebugListRawInputDevices()
+{
+    UINT num = 0;
+    if (GetRawInputDeviceList(nullptr, &num, sizeof(RAWINPUTDEVICELIST)) != 0)
+    {
+        std::cout << "GetRawInputDeviceList failed to get count\n";
+        return;
+    }
+
+    std::vector<RAWINPUTDEVICELIST> list(num);
+    if (GetRawInputDeviceList(list.data(), &num, sizeof(RAWINPUTDEVICELIST)) == (UINT)-1)
+    {
+        std::cout << "GetRawInputDeviceList failed to enumerate\n";
+        return;
+    }
+
+    std::cout << "---- RawInput devices (count=" << num << ") ----" << std::endl;
+    for (UINT i = 0; i < num; ++i)
+    {
+        const RAWINPUTDEVICELIST& d = list[i];
+        std::string type = (d.dwType == RIM_TYPEMOUSE) ? "Mouse" : (d.dwType == RIM_TYPEKEYBOARD) ? "Keyboard" : "HID";
+
+        // Retrieve the device name
+        UINT cb = 0;
+        GetRawInputDeviceInfoA(d.hDevice, RIDI_DEVICENAME, nullptr, &cb);
+        std::string name;
+        if (cb > 0)
+        {
+            name.resize(cb);
+            if (GetRawInputDeviceInfoA(d.hDevice, RIDI_DEVICENAME, name.data(), &cb) == (UINT)-1)
+                name = "<unknown>";
+        }
+
+        // Retrieve device info
+        RID_DEVICE_INFO info;
+        info.cbSize = sizeof(info);
+        UINT inforet = sizeof(info);
+        if (GetRawInputDeviceInfoA(d.hDevice, RIDI_DEVICEINFO, &info, &inforet) == (UINT)-1)
+        {
+            std::cout << "Device " << i << " type=" << type << " name=" << name << " info=<error>\n";
+            continue;
+        }
+
+        std::cout << "Device " << i << " type=" << type << " name=" << name;
+        if (d.dwType == RIM_TYPEHID)
+        {
+            std::cout << " vid=" << info.hid.dwVendorId << " pid=" << info.hid.dwProductId << " usagePage=" << info.hid.usUsagePage << " usage=" << info.hid.usUsage;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << "---- end RawInput probe ----" << std::endl;
 }
 
 void WindowsGamepad::Update()

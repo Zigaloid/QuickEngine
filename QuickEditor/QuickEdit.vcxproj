@@ -96,11 +96,13 @@
   <ItemGroup>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\External\ufbx\ufbx.h" />
+    <ClInclude Include="..\Shared\Components\CharacterComponent.h" />
     <ClInclude Include="..\Shared\Components\EntityComponent.h" />
     <ClInclude Include="..\Shared\Components\FbxMeshComponent.h" />
     <ClInclude Include="..\Shared\Components\LevelComponent.h" />
     <ClInclude Include="..\Shared\Components\MeshComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h" />
+    <ClInclude Include="..\Shared\Components\ThirdPersonInputComponent.h" />
     <ClInclude Include="..\Shared\Components\TransformComponent.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.h" />
@@ -237,11 +239,13 @@
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="..\External\ufbx\ufbx.c" />
+    <ClCompile Include="..\Shared\Components\CharacterComponent.cpp" />
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp" />
     <ClCompile Include="..\Shared\Components\FbxMeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp" />
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\ThirdPersonInputComponent.cpp" />
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp" />

@@ -11,9 +11,13 @@
 #include "CoreSystem\CoreDebugChannels.h"
 #include "CoreSystem\CoreSystem.h"
 #include "CoreSystem\AppConfig.h"
+#include "Input\InputActionManager.h"
 #include "MeshComponent.h"
 #include "Input\MouseManager.h"
 #include "Input\WindowsMouse.h"
+#include "Input\GamepadManager.h"
+#include "Input\WindowsGamepad.h"
+
 #include "entry\entry.h"
 #include "imgui.h"
 
@@ -34,15 +38,11 @@ bool GameApp::Initialize()
 
 	// App setup component types.
 	RegisterComponents();
-
-	PhysicsManager::Config physicsConfig;
-	physicsConfig.maxBodies = 1024;
-	physicsConfig.gravity   = -9.81f;
-	m_physicsManager.Initialize(physicsConfig);
-	PhysicsManager::SetInstance(&m_physicsManager);
-
-	// Register the camera controller with the core mouse system.
-	auto* mouseManager = Core::CoreSystem::GetFirstComponentOfType<Input::MouseManager>();
+	// Create and initialize a MouseManager instance so it is discoverable
+	// and receives OnUpdate calls via the scheduler each frame.
+	auto* componentManager = Core::CoreSystem::GetComponentManager();
+	auto* mouseManager = componentManager->CreateComponent<Input::MouseManager>();	
+	auto* gamepadManager = componentManager->CreateComponent<Input::GamepadManager>();
 	if (mouseManager)
 	{
 		// Create and register a Windows mouse with the native window handle.
@@ -58,7 +58,29 @@ bool GameApp::Initialize()
 		m_cameraController = std::make_shared<GameCameraController>(m_camera);
 		mouseManager->AddInputHandler(m_cameraController);
 	}
-	auto* componentManager = Core::CoreSystem::GetComponentManager();
+    if (gamepadManager)
+	{
+		// Create an XInput-backed gamepad for player 0 by default.
+		auto windowsGamepad = std::make_unique<Input::WindowsGamepad>(0);
+		windowsGamepad->Initialize();
+		gamepadManager->SetDefaultConfig(Input::GamepadConfig{});
+		gamepadManager->AddGamepad(std::move(windowsGamepad));
+	}
+    auto inputActionManager = componentManager->CreateComponent<Input::InputActionManager>();
+	// Register the component instance with CoreSystem so global lookups succeed
+	Core::CoreSystem::SetActionManager(inputActionManager);
+
+	inputActionManager->AttachMouseManager(mouseManager);
+	inputActionManager->AttachGamepadManager(gamepadManager);
+
+
+
+	PhysicsManager::Config physicsConfig;
+	physicsConfig.maxBodies = 1024;
+	physicsConfig.gravity   = -9.81f;
+	m_physicsManager.Initialize(physicsConfig);
+	PhysicsManager::SetInstance(&m_physicsManager);
+
 	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
 	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/Level3.lvl.obj.json");
 	m_RootLevel->SafeRead(levelPath);
@@ -108,19 +130,17 @@ void GameApp::RegisterComponents()
 	componentManager->RegisterComponentType<Input::MouseManager>();
 	scheduler->RegisterComponentType<Input::MouseManager>(0, "MouseManager");
 
+	componentManager->RegisterComponentType<Input::GamepadManager>();
+	scheduler->RegisterComponentType<Input::GamepadManager>(0, "GamepadManager");
+
 	componentManager->RegisterComponentType<CEntityComponent>();
 	scheduler->RegisterComponentType<CEntityComponent>(0, "Entity");
 
 	componentManager->RegisterComponentType<CMeshComponent>();
 	scheduler->RegisterComponentType<CMeshComponent>(0, "Mesh");
 
-	// Create and initialize a MouseManager instance so it is discoverable
-	// and receives OnUpdate calls via the scheduler each frame.
-	auto* mouseManager = componentManager->CreateComponent<Input::MouseManager>();
-	if (mouseManager)
-	{
-		mouseManager->Initialize();
-	}
+	componentManager->RegisterComponentType<Input::InputActionManager>();
+	scheduler->RegisterComponentType<Input::InputActionManager>(0, "InputActions");
 }
 
 void GameApp::Update(double deltaTime)
@@ -133,7 +153,7 @@ void GameApp::Update(double deltaTime)
 	Input::KeyboardShortcutManager::Instance().Update(deltaTime);
 	m_visualizerManager.Update(static_cast<float>(deltaTime));
 	Core::MessageSystem::MessageBus::Get().ProcessAll();
-	
+
 	NEXUS_SEND_MESSAGE(FPS_PIPE, MSG_TYPE_FRAME_TIME, std::to_string(deltaTime).c_str());
 
 }

@@ -20,6 +20,8 @@ namespace FileSystem {
 class CNexusClient;
 class ComponentRegistry;
 
+namespace Input { class InputActionManager; }
+
 // Helper macros for simplified Nexus client usage in application code
 #define NEXUS_SUBSCRIBE(pipe, app) Core::CoreSystem::GetNexusClient()->Subscribe(pipe, app);
 #define NEXUS_SUBSCRIBE_CALLBACK(pipe, app, callback) Core::CoreSystem::GetNexusClient()->Subscribe(pipe, app, [this](const SNexusMessage& msg) { callback(msg.body); });
@@ -45,9 +47,10 @@ enum class InitFlag : uint32_t {
     FunctionCallManager = 1 << 5,
     Scheduler           = 1 << 6,
     NexusClient         = 1 << 7,
+    ActionManager       = 1 << 8,
 
     All = Log | FileSystem | ResourceManager | JobSystem
-        | ComponentManager | FunctionCallManager | Scheduler | NexusClient
+        | ComponentManager | FunctionCallManager | Scheduler | NexusClient | ActionManager
 };
 
 // Bitwise operators for InitFlag
@@ -81,6 +84,7 @@ private:
     static std::unique_ptr<FunctionCall::FunctionCallManager>         s_functionManager;
     static std::unique_ptr<CThreadSafeLog>                           s_log;
     static std::unique_ptr<CNexusClient>                             s_nexusClient;
+    static std::shared_ptr<Input::InputActionManager>                s_actionManager;
     static bool                                                       s_initialized;
     static InitFlag                                                   s_initFlags;
     static FunctionQueue                                              s_renderFunctionQueue;
@@ -147,6 +151,12 @@ public:
     {
         return s_nexusClient.get();
     }
+
+    static Input::InputActionManager* GetActionManager()
+    {
+        return s_actionManager.get();
+    }
+    static void SetActionManager(Input::InputActionManager* mgr);
 
     static FunctionQueue* GetRenderFunctionQueue()
     {

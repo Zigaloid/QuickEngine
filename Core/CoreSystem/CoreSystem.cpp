@@ -7,6 +7,7 @@
 #include "FunctionCallManager.h"
 #include "FileSystem/StandardFileSystem.h"
 #include "Net/NexusClient.h"
+#include "Input/InputActionManager.h"
 
 #include <iostream>
 
@@ -24,6 +25,7 @@ std::unique_ptr<JobSystem>                                 CoreSystem::s_jobSyst
 std::unique_ptr<ComponentSystem::ComponentSystemScheduler> CoreSystem::s_componentSystemScheduler = nullptr;
 std::unique_ptr<CThreadSafeLog>                           CoreSystem::s_log = nullptr;
 std::unique_ptr<CNexusClient>                             CoreSystem::s_nexusClient = nullptr;
+std::shared_ptr<Input::InputActionManager>                CoreSystem::s_actionManager = nullptr;
 
 bool          CoreSystem::s_initialized        = false;
 InitFlag      CoreSystem::s_initFlags          = InitFlag::None;
@@ -38,7 +40,6 @@ bool CoreSystem::Initialize(InitFlag flags)
         CoreDebug.printf("CoreSystem: Already initialized\n");
         return true;
     }
-
     s_initFlags = flags;
 
     try
@@ -141,6 +142,19 @@ bool CoreSystem::Initialize(InitFlag flags)
             s_nexusClient = std::make_unique<CNexusClient>();
         }
 
+        // Initialize Input Action Manager
+        if (HasFlag(flags, InitFlag::ActionManager))
+        {
+            CoreDebug.printf("CoreSystem: Creating InputActionManager...\n");
+            s_actionManager = std::make_unique<Input::InputActionManager>();
+
+            if (!s_actionManager->Initialize())
+            {
+                CoreDebug.warning("CoreSystem: Failed to initialize InputActionManager\n");
+                return false;
+            }
+        }
+
         s_initialized = true;
         CoreDebug.printf("CoreSystem: All core systems initialized successfully!\n");
         return true;
@@ -158,6 +172,13 @@ void CoreSystem::Shutdown()
     if (!s_initialized) return;
 
     CoreDebug.printf("CoreSystem: Shutting down core engine systems...\n");
+
+    if (s_actionManager)
+    {
+        CoreDebug.printf("CoreSystem: Shutting down InputActionManager...\n");
+        s_actionManager->Shutdown();
+        s_actionManager.reset();
+    }
 
     if (s_nexusClient)
     {
@@ -302,6 +323,19 @@ void CoreSystem::PrintSystemStatus()
     }
 
     CoreDebug.printf("=========================\n\n");
+}
+
+void CoreSystem::SetActionManager(Input::InputActionManager* mgr)
+{
+    if (!mgr)
+    {
+        s_actionManager.reset();
+        return;
+    }
+
+    // Create a non-owning shared_ptr wrapper so CoreSystem can reference the
+    // component instance without taking ownership or trying to delete it.
+    s_actionManager = std::shared_ptr<Input::InputActionManager>(mgr, [](Input::InputActionManager*) {});
 }
 
 } // namespace Core

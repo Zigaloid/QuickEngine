@@ -93,6 +93,9 @@
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\ThirdPersonInputComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\TransformComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
@@ -356,8 +359,8 @@
     </ClInclude>
     <ClInclude Include="Game.h" />
     <ClInclude Include="logo.h" />
-    <ClInclude Include="Shared\ImguiVizualizers\ConsoleVariable.h">
-      <Filter>..\Shared\ImguiVizualizers</Filter>
+    <ClInclude Include="..\Shared\Components\CharacterComponent.h">
+      <Filter>..\Shared\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -440,6 +443,9 @@
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\ThirdPersonInputComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
@@ -564,5 +570,8 @@
     </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="..\Shared\Components\CharacterComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -74,6 +74,8 @@ public:
     explicit WindowsGamepad(DWORD gamepadId);
     virtual ~WindowsGamepad();
 
+
+
     // ── IGamepad ─────────────────────────────────────────────────────────────
 
     bool Initialize() override;
@@ -120,6 +122,10 @@ public:
     DWORD                GetXInputId()    const { return m_gamepadId; }
     const XINPUT_STATE&  GetXInputState() const { return m_currentState; }
     bool                 IsXInputConnected() const;
+
+    /// Debug helpers
+    static void DebugListXInputSlots();
+    static void DebugListRawInputDevices();
 };
 
 } // namespace Input

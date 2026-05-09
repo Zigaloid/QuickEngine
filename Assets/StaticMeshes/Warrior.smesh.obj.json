@@ -1,0 +1,24 @@
+{
+    "RootObject": {
+        "m_meshResource": {
+            "Value": "CMeshResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/meshes/warrior.mesh.bin",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 56
+        },
+        "m_materialResource": {
+            "Value": "CMaterialResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/materials/warrior.mat.obj.json",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 56
+        }
+    }
+}

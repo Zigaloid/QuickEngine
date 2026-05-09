@@ -93,6 +93,9 @@
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\ThirdPersonInputComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\TransformComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
@@ -425,6 +428,9 @@
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="QuickEdit.h" />
+    <ClInclude Include="..\Shared\Components\CharacterComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -506,6 +512,9 @@
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\ThirdPersonInputComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
@@ -676,5 +685,8 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
+    <ClCompile Include="..\Shared\Components\CharacterComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -84,6 +84,9 @@
     <ClInclude Include="ComponentSystem\ComponentSystemScheduler.h">
       <Filter>ComponentSystem</Filter>
     </ClInclude>
+    <ClInclude Include="CoreSystem\AppConfig.h">
+      <Filter>CoreSystem</Filter>
+    </ClInclude>
     <ClInclude Include="CoreSystem\CoreDebugChannels.h">
       <Filter>CoreSystem</Filter>
     </ClInclude>
@@ -111,6 +114,9 @@
     <ClInclude Include="FileSystem\StandardFileSystem.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
+    <ClInclude Include="Input\ActionContext.h">
+      <Filter>Input</Filter>
+    </ClInclude>
     <ClInclude Include="Input\GamepadInputHandler.h">
       <Filter>Input</Filter>
     </ClInclude>
@@ -118,6 +124,15 @@
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Input\GamepadManager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputAction.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputActionManager.h">
+      <Filter>Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Input\InputBinding.h">
       <Filter>Input</Filter>
     </ClInclude>
     <ClInclude Include="Input\MouseInputHandler.h">
@@ -247,7 +262,6 @@
       <Filter>ResourceManager</Filter>
     </ClInclude>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="CoreSystem\AppConfig.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp">
@@ -268,6 +282,9 @@
     <ClCompile Include="ComponentSystem\ComponentSystemScheduler.cpp">
       <Filter>ComponentSystem</Filter>
     </ClCompile>
+    <ClCompile Include="CoreSystem\AppConfig.cpp">
+      <Filter>CoreSystem</Filter>
+    </ClCompile>
     <ClCompile Include="CoreSystem\CoreDebugChannels.cpp">
       <Filter>CoreSystem</Filter>
     </ClCompile>
@@ -286,10 +303,19 @@
     <ClCompile Include="FileSystem\StandardFileSystem.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="Input\ActionContext.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
     <ClCompile Include="Input\GamepadInterface.cpp">
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="Input\GamepadManager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\InputActionManager.cpp">
+      <Filter>Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\InputBinding.cpp">
       <Filter>Input</Filter>
     </ClCompile>
     <ClCompile Include="Input\MouseManager.cpp">
@@ -349,7 +375,6 @@
     <ClCompile Include="ResourceManager\ResourceManager.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
-    <ClCompile Include="CoreSystem\AppConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\ComponentSystemDocumentation.html">

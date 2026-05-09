@@ -9,8 +9,13 @@
 namespace Input {
 
     KeyboardShortcutManager& KeyboardShortcutManager::Instance() {
-        static KeyboardShortcutManager instance;
-        return instance;
+        // Use a leaked heap-allocated singleton to avoid static destruction
+        // order issues: this ensures the manager remains valid during
+        // program shutdown even if other globals are destroyed earlier.
+        static KeyboardShortcutManager* instance = []() {
+            return new KeyboardShortcutManager();
+        }();
+        return *instance;
     }
 
     KeyboardShortcutManager::KeyboardShortcutManager()

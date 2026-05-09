@@ -107,9 +107,13 @@
     <ClInclude Include="FileSystem\FileSystemInterface.h" />
     <ClInclude Include="FileSystem\FileSystemManager.h" />
     <ClInclude Include="FileSystem\StandardFileSystem.h" />
+    <ClInclude Include="Input\ActionContext.h" />
     <ClInclude Include="Input\GamepadInputHandler.h" />
     <ClInclude Include="Input\GamepadInterface.h" />
     <ClInclude Include="Input\GamepadManager.h" />
+    <ClInclude Include="Input\InputAction.h" />
+    <ClInclude Include="Input\InputActionManager.h" />
+    <ClInclude Include="Input\InputBinding.h" />
     <ClInclude Include="Input\MouseInputHandler.h" />
     <ClInclude Include="Input\MouseInterface.h" />
     <ClInclude Include="Input\MouseManager.h" />
@@ -168,8 +172,11 @@
     <ClCompile Include="CoreSystem\FunctionQueue.cpp" />
     <ClCompile Include="DebugChannel\DebugChannel.cpp" />
     <ClCompile Include="FileSystem\StandardFileSystem.cpp" />
+    <ClCompile Include="Input\ActionContext.cpp" />
     <ClCompile Include="Input\GamepadInterface.cpp" />
     <ClCompile Include="Input\GamepadManager.cpp" />
+    <ClCompile Include="Input\InputActionManager.cpp" />
+    <ClCompile Include="Input\InputBinding.cpp" />
     <ClCompile Include="Input\MouseManager.cpp" />
     <ClCompile Include="Input\WindowsGamepad.cpp" />
     <ClCompile Include="Input\WindowsMouse.cpp" />
