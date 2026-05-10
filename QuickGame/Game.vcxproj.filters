@@ -81,9 +81,6 @@
     <ClInclude Include="..\Shared\Components\EntityComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
-    <ClInclude Include="..\Shared\Components\FbxMeshComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
     <ClInclude Include="..\Shared\Components\LevelComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
@@ -431,9 +428,6 @@
       <Filter>..\External\ufbx</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\FbxMeshComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp">

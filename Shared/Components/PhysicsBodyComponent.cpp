@@ -4,6 +4,7 @@
 #include "Math/Quaternion.h"
 #include "PhysicsBodyComponent.h"
 #include "PhysicsBodyResource.h"
+#include "TransformComponent.h"
 
 // Include primitives renderer for DebugRender implementation
 #include "BgfxRenderPrimitives.h"
@@ -24,25 +25,53 @@ bool CPhysicsBodyComponent::OnInitialize()
     return true;
 }
 
+bool CPhysicsBodyComponent::SetupPhysicsBody()
+{    
+    // Resolve the referenced resource and ensure it is finalized.
+    auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
+    if (!res || !res->IsFinalized())
+    {
+        return false;
+    }
+
+    auto* parent = GetParent();
+    if (parent)
+    {
+        CTransformComponent* parentTransform = parent->FindActiveChild<CTransformComponent>();
+        if (parentTransform)
+        {
+            m_parentTransform = &parentTransform->GetTransform();
+            m_cachedScale = Matrix4f::Scale(m_parentTransform->ExtractScale());
+			// If the body resource is already finalized, create the body immediately; otherwise defer until the resource finalizes.
+            if(m_bodyId.IsInvalid()) InitializeShape(m_cachedScale);
+            // Strip scale before passing to CreateBody so that SetWorldTransform
+            // receives a clean rotation+translation matrix for quaternion extraction.
+            Vector3f scale = m_parentTransform->ExtractScale();
+            Vector3f invScale(1.0f / scale.GetX(), 1.0f / scale.GetY(), 1.0f / scale.GetZ());
+            Matrix4f worldNoScale = *m_parentTransform * Matrix4f::Scale(invScale);
+            CreateBody(worldNoScale);
+            return true;
+        }
+    }
+    return false;
+}
+
 void CPhysicsBodyComponent::OnUpdate(double deltaTime)
 {
+    if (m_bodyInitialized == false)
+    {
+        m_bodyInitialized = SetupPhysicsBody();
+    }
+
+    if ( GetMotionType() != JPH::EMotionType::Static )
+    {
+        *m_parentTransform = GetWorldTransform() * m_cachedScale;
+    }
 }
 
 bool CPhysicsBodyComponent::CreateBody( const Matrix4f &worldTransform )
 {
 
-    // If it's already valid just return.
-    if (m_bodyId.IsInvalid() == false)
-        return true;
-
-    // Resolve the referenced resource and ensure it is finalized.
-    auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-    if (!res || !res->IsFinalized())
-    {
-        // Resource not ready yet.
-        return false;
-    }    
-    
     PhysicsManager* physics = PhysicsManager::Get();
     if (physics && physics->IsInitialized())
     {
@@ -179,6 +208,8 @@ void CPhysicsBodyComponent::OnShutdown()
         physics->RemoveBody(m_bodyId);
 
     m_bodyId = JPH::BodyID();
+
+    m_bodyInitialized = false;
 }
 
 // ── Transform helpers ──────────────────────────────────────────────────────

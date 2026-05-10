@@ -54,6 +54,7 @@ public:
     ~CPhysicsBodyComponent() override = default;
 
     bool OnInitialize() override;
+    bool SetupPhysicsBody();
     void OnShutdown()   override;
     
     bool CreateBody(const Matrix4f& worldTransform);
@@ -150,7 +151,9 @@ private:
 
     // Physics data is now provided by a CPhysicsBodyResource referenced by this component.
     CPhysicsBodyResourceReference m_bodyResource;
-
+	Matrix4f    *m_parentTransform = nullptr; // This is the owner Entity's transform, cached for convenience. May be nullptr if the parent has no transform.
+    Matrix4f    m_cachedScale;
+	bool    m_bodyInitialized = false;
     // ── Runtime (not reflected) ───────────────────────────────────────────
     JPH::BodyID m_bodyId;
     JPH::ShapeRefC m_shape;

@@ -6,6 +6,7 @@
 
 // Forward-declare to avoid pulling in the full physics header here.
 class CPhysicsBodyComponent;
+class CTransformComponent;
 
 class CRenderComponent : public ComponentSystem::Component
 {
@@ -34,6 +35,7 @@ private:
 	std::shared_ptr<Vector4f> m_boundingSpherePtr;
 	Vector4f m_boundingSphere;
 	Matrix4f m_modelMatrix;
+	CTransformComponent* m_parentTransform = nullptr;
 	bool m_physicsTransformInitialized = false;
 protected:
 	Matrix4f m_scale;

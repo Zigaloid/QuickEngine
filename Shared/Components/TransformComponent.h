@@ -18,6 +18,21 @@ public:
 	void OnShutdown() override;
 
 	bool IsLoaded() const;
+	Matrix4f &GetTransform() { return m_matrix; }
 private:
 	Matrix4f m_matrix;
 };
+
+inline CTransformComponent*FindParentTransform(const ComponentSystem::Component* component)
+{
+	auto* parent = component->GetParent();	
+	if (parent)
+	{
+		CTransformComponent* parentTransform = parent->FindActiveChild<CTransformComponent>();
+		if (parentTransform)
+		{
+			return parentTransform;
+		}
+	}
+	return nullptr;
+}

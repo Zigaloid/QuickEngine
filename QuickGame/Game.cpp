@@ -13,6 +13,8 @@
 #include "CoreSystem\AppConfig.h"
 #include "Input\InputActionManager.h"
 #include "MeshComponent.h"
+#include "PhysicsBodyComponent.h"
+#include "TransformComponent.h"
 #include "Input\MouseManager.h"
 #include "Input\WindowsMouse.h"
 #include "Input\GamepadManager.h"
@@ -82,7 +84,7 @@ bool GameApp::Initialize()
 	PhysicsManager::SetInstance(&m_physicsManager);
 
 	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
-	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/Level3.lvl.obj.json");
+	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/NewTest.lvl.obj.json");
 	m_RootLevel->SafeRead(levelPath);
 	m_lastLevelPath = levelPath;
 
@@ -141,6 +143,14 @@ void GameApp::RegisterComponents()
 
 	componentManager->RegisterComponentType<Input::InputActionManager>();
 	scheduler->RegisterComponentType<Input::InputActionManager>(0, "InputActions");
+
+	componentManager->RegisterComponentType<CPhysicsBodyComponent>();
+	scheduler->RegisterComponentType<CPhysicsBodyComponent>(0, "PhysicsBody");
+
+	componentManager->RegisterComponentType<CTransformComponent>();
+	scheduler->RegisterComponentType<CTransformComponent>(0, "Transform");
+	
+
 }
 
 void GameApp::Update(double deltaTime)

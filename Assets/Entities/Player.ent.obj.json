@@ -60,44 +60,6 @@
                     }
                 },
                 {
-                    "Value": "CPhysicsBodyComponent",
-                    "m_bodyResource": {
-                        "Value": "CPhysicsBodyResourceReference",
-                        "m_resourceFileName": {
-                            "Value": "./assets/physics/player.phys.obj.json",
-                            "Type": 3,
-                            "Size": 32
-                        },
-                        "Type": 4,
-                        "Size": 56
-                    },
-                    "m_active": {
-                        "Value": false,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CPhysicsBodyComponent",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 24
-                    }
-                },
-                {
-                    "Value": "CThirdPersonInputComponent",
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CThirdPersonInputComponent",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 24
-                    }
-                },
-                {
                     "Value": "CCharacterComponent",
                     "m_active": {
                         "Value": true,
@@ -106,6 +68,42 @@
                     },
                     "m_children": {
                         "Value": "CCharacterComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CTransformComponent",
+                    "m_matrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CTransformComponent",
                         "Elements": [],
                         "Type": 19,
                         "Size": 24

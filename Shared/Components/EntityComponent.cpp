@@ -5,7 +5,7 @@
 #include "MeshResource.h"
 
 // ── CMeshComponent ─────────────────────────────────────────────────
-REGISTER_COMPONENT(CEntityComponent, "Level", "LD");
+REGISTER_COMPONENT(CEntityComponent, "Entity", "LD");
 
 REFL_DEFINE_OBJECT(CEntityComponent)
 	REFL_DEFINE_STRING_MEMBER(CEntityComponent, m_name),

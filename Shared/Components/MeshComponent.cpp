@@ -2,6 +2,7 @@
 
 #include "CoreSystem/CoreSystem.h"
 #include "ComponentSystem/ComponentSystem.h"
+#include "TransformComponent.h"
 #include "ShaderResource.h"
 #include "MeshResource.h"
 #include "PhysicsBodyComponent.h"
@@ -9,12 +10,13 @@
 #include "Math/Quaternion.h"
 #include <bx/bounds.h>
 
+
 // ── CMeshComponent ─────────────────────────────────────────────────────────
 REGISTER_COMPONENT(CRenderComponent, "RenComp", "Graphics");
 REGISTER_COMPONENT(CMeshComponent, "Mesh", "Graphics");
 
 REFL_DEFINE_OBJECT(CMeshComponent)
-	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_meshResource),
+	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_meshResource)
 REFL_DEFINE_END
 
 REFL_DEFINE_OBJECT(CRenderComponent)	
@@ -23,47 +25,16 @@ REFL_DEFINE_END
 
 bool CRenderComponent::OnInitialize()
 {
+	m_parentTransform = FindParentTransform(this);
+	if( !m_parentTransform )
+		return false;	
+
 	return true;
 }
 
 void CRenderComponent::OnUpdate(double /*deltaTime*/)
 {
-	Component* parent = GetParent();
-	if (!parent)
-		return;
-
-	// Re-acquires only when the cache is empty or the referenced component was released.
-	auto physBody = m_physicsBodyRef.Get([&]() {
-		return parent->FindChild<CPhysicsBodyComponent>();
-	});
-
-	if (!m_physicsTransformInitialized)
-	{
-		m_scale = Matrix4f::Scale(m_modelMatrix.ExtractScale());
-		if ( physBody )
-		{
-			physBody->InitializeShape(m_scale);
-
-			// Strip scale before passing to CreateBody so that SetWorldTransform
-			// receives a clean rotation+translation matrix for quaternion extraction.
-			Matrix4f worldNoScale = m_modelMatrix * Matrix4f::Scale(Vector3f(
-				1.0f / m_scale.ExtractScale().GetX(),
-				1.0f / m_scale.ExtractScale().GetY(),
-				1.0f / m_scale.ExtractScale().GetZ()));
-			if( physBody->CreateBody(worldNoScale) )
-				m_physicsTransformInitialized = true;
-		}
-	}
-	else
-	{
-		// Only sync the model matrix from physics for dynamic/kinematic bodies
-		// that can actually move. Static bodies keep their original authored matrix
-		// to avoid lossy quaternion round-trip drift.
-		if (physBody && physBody->GetMotionType() != JPH::EMotionType::Static)
-		{
-			m_modelMatrix = physBody->GetWorldTransform() * m_scale;
-		}
-	}
+	m_modelMatrix = m_parentTransform->GetTransform();
 }
 
 void CRenderComponent::OnShutdown()
