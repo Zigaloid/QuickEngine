@@ -1,7 +1,7 @@
 {
     "RootObject": {
         "m_name": {
-            "Value": "Player",
+            "Value": "Ground",
             "Type": 3,
             "Size": 32
         },
@@ -25,28 +25,6 @@
                         "Type": 4,
                         "Size": 56
                     },
-                    "m_modelMatrix": {
-                        "Value": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0
-                        ],
-                        "Type": 8,
-                        "Size": 64
-                    },
                     "m_active": {
                         "Value": true,
                         "Type": 12,
@@ -61,6 +39,28 @@
                 },
                 {
                     "Value": "CCharacterComponent",
+                    "m_objectMatrix": {
+                        "Value": [
+                            0.6000000238418579,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.7765594720840454,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.6000000238418579,
+                            0.0,
+                            0.0,
+                            0.3916104733943939,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
                     "m_active": {
                         "Value": true,
                         "Type": 12,
@@ -104,6 +104,20 @@
                     },
                     "m_children": {
                         "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CThirdPersonInputComponent",
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CThirdPersonInputComponent",
                         "Elements": [],
                         "Type": 19,
                         "Size": 24

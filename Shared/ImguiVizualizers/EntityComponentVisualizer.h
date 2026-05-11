@@ -4,6 +4,7 @@
 #include "SelectionManager.h"
 #include "RenderComponentSelectable.h"
 #include "PhysicsBodySelectable.h"
+#include "PhysicsComponentSelectable.h"
 #include "EntityComponent.h"
 #include "BgfxGizmoRenderer.h"
 #include "CommandHistory.h"
@@ -63,7 +64,7 @@ private:
 
     void RegisterPhysicsComponents(ComponentSystem::Component* root);
     void CollectPhysicsComponents(ComponentSystem::Component* comp,
-                                 std::vector<CPhysicsBodyComponent*>& out);
+                                 std::vector<CPhysicsComponent*>& out);
     // Updated signature: pass primitives so components that are not CRenderComponent
     // (e.g. physics bodies) can render debug visuals.
     void RenderComponentHierarchy(bgfx::ViewId viewId, BgfxRenderPrimitives& prims, ComponentSystem::Component* comp);

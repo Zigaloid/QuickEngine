@@ -19,22 +19,21 @@ REFL_DEFINE_OBJECT(CMeshComponent)
 	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_meshResource)
 REFL_DEFINE_END
 
-REFL_DEFINE_OBJECT(CRenderComponent)	
-	REFL_DEFINE_MATRIX4_MEMBER(CRenderComponent, m_modelMatrix),
+REFL_DEFINE_OBJECT(CRenderComponent)
 REFL_DEFINE_END
 
 bool CRenderComponent::OnInitialize()
 {
 	m_parentTransform = FindParentTransform(this);
 	if( !m_parentTransform )
-		return false;	
+		return false;
 
+	m_transformPtr = std::shared_ptr<Matrix4f>(&m_parentTransform->GetTransform(), [](Matrix4f*) {});
 	return true;
 }
 
 void CRenderComponent::OnUpdate(double /*deltaTime*/)
 {
-	m_modelMatrix = m_parentTransform->GetTransform();
 }
 
 void CRenderComponent::OnShutdown()
@@ -196,7 +195,9 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 			const MeshState* statePtr = &m_meshState;
             if (matshRes->GetMesh())
 			{
-				matshRes->GetMesh()->submit(&statePtr, 1, GetModelMatrix()->GetData().data(), 1);
+				auto modelMatrix = GetModelMatrix();
+				if (modelMatrix)
+					matshRes->GetMesh()->submit(&statePtr, 1, modelMatrix->GetData().data(), 1);
 			}
 		}
         // Render the physics body if available (for debugging)

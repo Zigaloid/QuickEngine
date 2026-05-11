@@ -15,9 +15,7 @@ public:
     DECLARE_COMPONENT();
 	CRenderComponent()
 	{
-        m_modelMatrix.Identity();
-        m_transformPtr = std::shared_ptr<Matrix4f>(&m_modelMatrix, [](Matrix4f*) {});
-        m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
+		m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
 	};
 
 	virtual std::shared_ptr<Vector4f> GetBoundingSphere() const
@@ -34,7 +32,6 @@ private:
 	std::shared_ptr<Matrix4f> m_transformPtr;
 	std::shared_ptr<Vector4f> m_boundingSpherePtr;
 	Vector4f m_boundingSphere;
-	Matrix4f m_modelMatrix;
 	CTransformComponent* m_parentTransform = nullptr;
 	bool m_physicsTransformInitialized = false;
 protected:

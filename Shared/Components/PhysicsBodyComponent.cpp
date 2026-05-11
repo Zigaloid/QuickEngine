@@ -1,10 +1,8 @@
 ﻿#include "ResourceManager/ResourceManager.h"
 #include "CoreSystem/CoreSystem.h"
-#include "Physics/PhysicsManager.h"
 #include "Math/Quaternion.h"
 #include "PhysicsBodyComponent.h"
-#include "PhysicsBodyResource.h"
-#include "TransformComponent.h"
+#include "Math/Matrix4f.h"
 
 // Include primitives renderer for DebugRender implementation
 #include "BgfxRenderPrimitives.h"
@@ -15,88 +13,23 @@
 // ── Reflection registration ────────────────────────────────────────────────
 
 REFL_DEFINE_OBJECT(CPhysicsBodyComponent)
-REFL_DEFINE_OBJECT_MEMBER(CPhysicsBodyComponent, m_bodyResource),
+    REFL_DEFINE_INT_MEMBER(CPhysicsBodyComponent, m_shapeType),
+    REFL_DEFINE_INT_MEMBER(CPhysicsBodyComponent, m_motionType),
+    REFL_DEFINE_FLOAT_MEMBER(CPhysicsBodyComponent, m_friction),
+    REFL_DEFINE_FLOAT_MEMBER(CPhysicsBodyComponent, m_restitution),
+    REFL_DEFINE_FLOAT_MEMBER(CPhysicsBodyComponent, m_linearDamping),
+    REFL_DEFINE_FLOAT_MEMBER(CPhysicsBodyComponent, m_angularDamping),
 REFL_DEFINE_END
 
 REGISTER_COMPONENT(CPhysicsBodyComponent, "PhysBody", "Physics");
 
-bool CPhysicsBodyComponent::OnInitialize()
+void CPhysicsBodyComponent::ApplyTransformToParent(const Matrix4f& worldTransform)
 {
-    return true;
-}
+	// Static bodies don't move; skip writing back to avoid overwriting the transform.
+	if (GetMotionType() == JPH::EMotionType::Static)
+		return;
 
-bool CPhysicsBodyComponent::SetupPhysicsBody()
-{    
-    // Resolve the referenced resource and ensure it is finalized.
-    auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-    if (!res || !res->IsFinalized())
-    {
-        return false;
-    }
-
-    auto* parent = GetParent();
-    if (parent)
-    {
-        CTransformComponent* parentTransform = parent->FindActiveChild<CTransformComponent>();
-        if (parentTransform)
-        {
-            m_parentTransform = &parentTransform->GetTransform();
-            m_cachedScale = Matrix4f::Scale(m_parentTransform->ExtractScale());
-			// If the body resource is already finalized, create the body immediately; otherwise defer until the resource finalizes.
-            if(m_bodyId.IsInvalid()) InitializeShape(m_cachedScale);
-            // Strip scale before passing to CreateBody so that SetWorldTransform
-            // receives a clean rotation+translation matrix for quaternion extraction.
-            Vector3f scale = m_parentTransform->ExtractScale();
-            Vector3f invScale(1.0f / scale.GetX(), 1.0f / scale.GetY(), 1.0f / scale.GetZ());
-            Matrix4f worldNoScale = *m_parentTransform * Matrix4f::Scale(invScale);
-            CreateBody(worldNoScale);
-            return true;
-        }
-    }
-    return false;
-}
-
-void CPhysicsBodyComponent::OnUpdate(double deltaTime)
-{
-    if (m_bodyInitialized == false)
-    {
-        m_bodyInitialized = SetupPhysicsBody();
-    }
-
-    if ( GetMotionType() != JPH::EMotionType::Static )
-    {
-        *m_parentTransform = GetWorldTransform() * m_cachedScale;
-    }
-}
-
-bool CPhysicsBodyComponent::CreateBody( const Matrix4f &worldTransform )
-{
-
-    PhysicsManager* physics = PhysicsManager::Get();
-    if (physics && physics->IsInitialized())
-    {
-        JPH::ObjectLayer layer = (GetMotionType() == JPH::EMotionType::Static)
-            ? PhysicsLayers::NON_MOVING
-            : PhysicsLayers::MOVING;
-
-        JPH::BodyCreationSettings bcs = MakeBodyCreationSettings(
-            JPH::RVec3::sZero(), JPH::Quat::sIdentity(), layer);
-
-        m_bodyId = physics->GetBodyInterfaceLocking().CreateAndAddBody(
-            bcs, JPH::EActivation::Activate);
-
-        if (m_bodyId.IsInvalid())
-            return false;
-
-        // Place the body at the mesh's world position directly.
-        // The resource offset is already baked into the shape via RotatedTranslatedShape.
-        SetWorldTransform(worldTransform);
-
-        // Signal that the broad phase needs rebuilding (done on main thread before next step).
-        physics->SetBroadPhaseDirty();
-        return true;
-    }
-    return false;
+	CPhysicsComponent::ApplyTransformToParent(worldTransform);
 }
 
 // ── BodyCreationSettings factory ───────────────────────────────────────────
@@ -106,20 +39,19 @@ JPH::BodyCreationSettings CPhysicsBodyComponent::MakeBodyCreationSettings(
     JPH::QuatArg     rotation,
     JPH::ObjectLayer objectLayer) const
 {
-    auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-    if (res && m_shape)
+    if (m_shape)
     {
         JPH::BodyCreationSettings settings(
             m_shape,
             position,
             rotation,
-            static_cast<JPH::EMotionType>(res->GetMotionType()),
+            static_cast<JPH::EMotionType>(m_motionType),
             objectLayer);
 
-        settings.mFriction = res->GetFriction();
-        settings.mRestitution = res->GetRestitution();
-        settings.mLinearDamping = res->GetLinearDamping();
-        settings.mAngularDamping = res->GetAngularDamping();
+        settings.mFriction = m_friction;
+        settings.mRestitution = m_restitution;
+        settings.mLinearDamping = m_linearDamping;
+        settings.mAngularDamping = m_angularDamping;
 
         // Use continuous collision detection for dynamic bodies to prevent tunneling.
         if (settings.mMotionType == JPH::EMotionType::Dynamic)
@@ -134,16 +66,12 @@ JPH::BodyCreationSettings CPhysicsBodyComponent::MakeBodyCreationSettings(
 
 void CPhysicsBodyComponent::InitializeShape(const Matrix4f& objTran)
 {
-    auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-    if (!res)
-        return;
-
     JPH::ShapeSettings::ShapeResult result;
 
-    // Extract scale from the serialized transform
-    Vector3f scale = (res->GetTransform() * objTran).ExtractScale();
+    // Extract scale from the serialized transform 
+    Vector3f scale = (GetObjectMatrix() * objTran).ExtractScale();
 
-    switch (res->GetShapeType())
+    switch (m_shapeType)
     {
     case 0: // Box — unit 1x1x1 cube, half-extents = scale * 0.5
     {
@@ -178,8 +106,8 @@ void CPhysicsBodyComponent::InitializeShape(const Matrix4f& objTran)
     // Wrap the shape with the resource's local offset so the collision geometry
     // is offset from the body origin, without needing to shift the body position.
     JPH::ShapeRefC baseShape = result.Get();
-    Vector3f resPos = res->GetTransform().ExtractTranslation();
-    Quaternion resRot = Quaternion::FromMatrix(res->GetTransform()).Normalized();
+    Vector3f resPos = m_objectMatrix.ExtractTranslation();
+    Quaternion resRot = Quaternion::FromMatrix(m_objectMatrix).Normalized();
 
     bool hasOffset = (resPos.GetX() != 0.0f || resPos.GetY() != 0.0f || resPos.GetZ() != 0.0f);
     bool hasRotation = (std::abs(resRot.GetX()) > 0.0001f || std::abs(resRot.GetY()) > 0.0001f || std::abs(resRot.GetZ()) > 0.0001f);
@@ -196,57 +124,6 @@ void CPhysicsBodyComponent::InitializeShape(const Matrix4f& objTran)
     }
 
     m_shape = baseShape;
-}
-
-void CPhysicsBodyComponent::OnShutdown()
-{
-    if (m_bodyId.IsInvalid())
-        return;
-
-    PhysicsManager* physics = PhysicsManager::Get();
-    if (physics && physics->IsInitialized())
-        physics->RemoveBody(m_bodyId);
-
-    m_bodyId = JPH::BodyID();
-
-    m_bodyInitialized = false;
-}
-
-// ── Transform helpers ──────────────────────────────────────────────────────
-
-Matrix4f CPhysicsBodyComponent::GetWorldTransform() const
-{
-    PhysicsManager* physics = PhysicsManager::Get();
-    if (!physics || !physics->IsInitialized())
-        return Matrix4f::GetIdentity();
-
-    JPH::BodyInterface& bi = physics->GetBodyInterfaceLocking();
-    const JPH::RVec3    pos = bi.GetPosition(m_bodyId);
-    const JPH::Quat     rot = bi.GetRotation(m_bodyId);
-
-    const Quaternion q(rot.GetW(), rot.GetX(), rot.GetY(), rot.GetZ());
-    Matrix4f result = q.ToMatrix();
-    result.SetTranslation(Vector3f(
-        static_cast<float>(pos.GetX()),
-        static_cast<float>(pos.GetY()),
-        static_cast<float>(pos.GetZ())));
-    return result;
-}
-
-void CPhysicsBodyComponent::SetWorldTransform(const Matrix4f& transform, JPH::EActivation activation)
-{
-    PhysicsManager* physics = PhysicsManager::Get();
-    if (!physics || !physics->IsInitialized())
-        return;
-
-    const Vector3f   t = transform.ExtractTranslation();
-    const Quaternion rq = Quaternion::FromMatrix(transform);
-    const Quaternion q = rq.Normalized();
-    physics->GetBodyInterfaceLocking().SetPositionAndRotation(
-        m_bodyId,
-        JPH::RVec3(t.GetX(), t.GetY(), t.GetZ()),
-        JPH::Quat(q.GetX(), q.GetY(), q.GetZ(), q.GetW()),
-        activation);
 }
 
 // ── Debug rendering ───────────────────────────────────────────────────────

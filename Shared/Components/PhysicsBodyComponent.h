@@ -1,11 +1,8 @@
 ﻿#pragma once
 
 #include "Reflection/ReflectionBase.h"
-#include "ComponentSystem/ComponentSystem.h"
+#include "PhysicsComponent.h"
 #include "FileSystem/FileSystemManager.h"
-#include "Physics/PhysicsManager.h"
-#include "Math/Matrix4f.h"
-#include "Math/Vector3f.h"
 
 #include <Jolt/Jolt.h>
 JPH_SUPPRESS_WARNINGS
@@ -18,7 +15,9 @@ JPH_SUPPRESS_WARNINGS
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
 
-#include "PhysicsBodyResource.h"
+#include "Math/Matrix4f.h"
+#include "Math/Vector3f.h"
+#include "Math/Vector4f.h"
 
 #include <bgfx/bgfx.h> // for bgfx::ViewId
 
@@ -40,36 +39,26 @@ enum class EPhysicsShapeType : int
     Cylinder = 3,
 };
 
-class CPhysicsBodyComponent : public ComponentSystem::Component
+class CPhysicsBodyComponent : public CPhysicsComponent
 {
 public:
-    REFL_DECLARE_OBJECT(CPhysicsBodyComponent, Component);
+    REFL_DECLARE_OBJECT(CPhysicsBodyComponent, CPhysicsComponent);
     DECLARE_COMPONENT();
 
     CPhysicsBodyComponent()
-        : m_bodyId(JPH::BodyID::cInvalidBodyID)
     {
+        m_modelMatrixPtr = std::shared_ptr<Matrix4f>(&m_objectMatrix, [](Matrix4f*) {});
+        m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
     }
-
     ~CPhysicsBodyComponent() override = default;
 
-    bool OnInitialize() override;
-    bool SetupPhysicsBody();
-    void OnShutdown()   override;
-    
-    bool CreateBody(const Matrix4f& worldTransform);
-
-    void OnUpdate(double deltaTime) override;
-
-    /// Returns the Jolt BodyID assigned when this component was added to the simulation.
-    /// Will be JPH::BodyID::cInvalidBodyID if not yet initialized or if no PhysicsManager was available.
-    JPH::BodyID GetBodyID() const { return m_bodyId; }
+    // CPhysicsComponent overrides
+    void ApplyTransformToParent(const Matrix4f& worldTransform) override;
 
     /// Shape type as EPhysicsShapeType (cast from the serialised int).
     EPhysicsShapeType GetShapeType() const
     {
-        auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-        return res ? static_cast<EPhysicsShapeType>(res->GetShapeType()) : EPhysicsShapeType::Box;
+        return static_cast<EPhysicsShapeType>(m_shapeType);
     }
 
     /// The scale of the unit shape. Derived shape parameters are:
@@ -78,84 +67,58 @@ public:
     ///   Capsule/Cylinder:  radius      = scale.x * 0.5, halfHeight = scale.y * 0.5
     Vector3f GetScale() const
     {
-        auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-        return r ? r->GetScale() : Vector3f(1.0f, 1.0f, 1.0f);
+        return GetConstObjectMatrix().ExtractScale();
     }
 
     // ── Body parameter accessors ───────────────────────────────────────────
 
     /// Motion type as JPH::EMotionType (cast from the serialised int).
     /// 0 = Static, 1 = Kinematic, 2 = Dynamic.
-    JPH::EMotionType GetMotionType()     const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? static_cast<JPH::EMotionType>(r->GetMotionType()) : JPH::EMotionType::Static; }
-    float            GetFriction()       const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetFriction()       : 0.2f;  }
-    float            GetRestitution()    const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetRestitution()    : 0.0f;  }
-    float            GetLinearDamping()  const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetLinearDamping()  : 0.05f; }
-    float            GetAngularDamping() const { auto r = m_bodyResource.GetResourceAs<CPhysicsBodyResource>(); return r ? r->GetAngularDamping() : 0.05f; }
-    
+    JPH::EMotionType GetMotionType()     const override { return static_cast<JPH::EMotionType>(m_motionType); }
+    float            GetFriction()       const { return m_friction; }
+    float            GetRestitution()    const { return m_restitution; }
+    float            GetLinearDamping()  const { return m_linearDamping; }
+    float            GetAngularDamping() const { return m_angularDamping; }
+
     // ── Built shape ────────────────────────────────────────────────────────
 
     /// Returns the compiled Jolt shape, or nullptr before InitializeShape() is called.
     const JPH::Shape* GetShape() const { return m_shape.GetPtr(); }
 
-    /// Constructs the Jolt collision shape from the resource's serialized parameters.
-    void InitializeShape(const Matrix4f& objTran);
-
-    /// Constructs a BodyCreationSettings with this resource's shape and body
-    /// properties applied. Fill in position / rotation / object layer before
-    /// passing to JPH::BodyInterface::CreateAndAddBody().
-    JPH::BodyCreationSettings MakeBodyCreationSettings(
-        JPH::RVec3Arg    position    = JPH::RVec3::sZero(),
-        JPH::QuatArg     rotation    = JPH::Quat::sIdentity(),
-        JPH::ObjectLayer objectLayer = 0) const;
-
-    // ── Transform helpers ──────────────────────────────────────────────────
-
-    /// Reads the body's current world-space position and rotation from the
-    /// physics simulation and returns them as a Matrix4f.
-    /// Returns identity if the body is not yet valid.
-    Matrix4f GetWorldTransform() const;
-
-    /// Decomposes @p transform into position and rotation and pushes them
-    /// into the physics simulation.
-    /// @param activation  Whether to wake the body on the next step.
-    void SetWorldTransform(const Matrix4f& transform,
-                           JPH::EActivation activation = JPH::EActivation::Activate);
-
     /// Debug render the collision shape using the supplied primitive renderer.
     /// Called by the editor visualizer to draw physics shapes into the 3D view.
-    void DebugRender(bgfx::ViewId viewId, Matrix4f& transform) const;
+    void DebugRender(bgfx::ViewId viewId, Matrix4f& transform) const override;
 
     // ── Expose shared pointers to transform / bounding-sphere via the resource
     //     so that selectables and gizmos can hold and mutate the same live data.
-    std::shared_ptr<Matrix4f> GetModelMatrix() const
-    {
-        auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-        return res ? res->GetModelMatrix() : nullptr;
-    }
-    std::shared_ptr<Vector4f> GetBoundingSphere() const
-    {
-        auto res = m_bodyResource.GetResourceAs<CPhysicsBodyResource>();
-        return res ? res->GetBoundingSphere() : nullptr;
-    }
+    std::shared_ptr<Matrix4f> GetModelMatrix() const { return m_modelMatrixPtr; }
+    std::shared_ptr<Vector4f> GetBoundingSphere() const { return m_boundingSpherePtr; }
 
-    /// Returns the underlying PhysicsBodyResource (or nullptr if not loaded).
-    CPhysicsBodyResource* GetBodyResource() const
-    {
-        return m_bodyResource.GetResourceAs<CPhysicsBodyResource>().get();
-    }
+    // CPhysicsComponent editor interface
+    std::shared_ptr<Matrix4f> GetEditableTransform()      const override { return GetModelMatrix(); }
+    std::shared_ptr<Vector4f> GetEditableBoundingSphere() const override { return GetBoundingSphere(); }
 
-    /// Returns the resource reference itself (for inline PropertyInspector editing).
-    CPhysicsBodyResourceReference& GetBodyResourceRef() { return m_bodyResource; }
+protected:
+    // ── CPhysicsComponent template-method overrides ────────────────────────
+    void InitializeShape(const Matrix4f& scaleMtx) override;
+    JPH::BodyCreationSettings MakeBodyCreationSettings(
+        JPH::RVec3Arg    position,
+        JPH::QuatArg     rotation,
+        JPH::ObjectLayer objectLayer) const override;
 
 private:
 
-    // Physics data is now provided by a CPhysicsBodyResource referenced by this component.
-    CPhysicsBodyResourceReference m_bodyResource;
-	Matrix4f    *m_parentTransform = nullptr; // This is the owner Entity's transform, cached for convenience. May be nullptr if the parent has no transform.
-    Matrix4f    m_cachedScale;
-	bool    m_bodyInitialized = false;
-    // ── Runtime (not reflected) ───────────────────────────────────────────
-    JPH::BodyID m_bodyId;
-    JPH::ShapeRefC m_shape;
+    // --- Serialized (reflected) members
+    int      m_shapeType      = 0;
+    int      m_motionType     = 0;
+    float    m_friction       = 0.2f;
+    float    m_restitution    = 0.0f;
+    float    m_linearDamping  = 0.05f;
+    float    m_angularDamping = 0.05f;
+
+    // Shared bounding data and pointer wrappers for external references (selectables, gizmos).
+    mutable Vector4f m_boundingSphere;
+    mutable std::shared_ptr<Matrix4f> m_modelMatrixPtr;
+    mutable std::shared_ptr<Vector4f> m_boundingSpherePtr;
 };
 

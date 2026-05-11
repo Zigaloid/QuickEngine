@@ -101,6 +101,7 @@
     <ClInclude Include="..\Shared\Components\LevelComponent.h" />
     <ClInclude Include="..\Shared\Components\MeshComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h" />
+    <ClInclude Include="..\Shared\Components\PhysicsComponent.h" />
     <ClInclude Include="..\Shared\Components\ThirdPersonInputComponent.h" />
     <ClInclude Include="..\Shared\Components\TransformComponent.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\Bgfx3DCamera.h" />
@@ -243,6 +244,7 @@
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp" />
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp" />
     <ClCompile Include="..\Shared\Components\ThirdPersonInputComponent.cpp" />
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\Bgfx3DViewport.cpp" />

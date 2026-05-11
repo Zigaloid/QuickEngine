@@ -6,7 +6,9 @@
 
 // include physics body header to detect and call DebugRender
 #include "PhysicsBodyComponent.h"
+#include "CharacterComponent.h"
 #include "PhysicsBodySelectable.h"
+#include "PhysicsComponentSelectable.h"
 
 namespace ImGuiVisualizers {
 
@@ -133,31 +135,27 @@ void EntityComponentVisualizer::SavePhysicsBodyResources()
 {
     if (!m_entityComp) return;
 
-    std::vector<CPhysicsBodyComponent*> physComps;
+    // Only save CPhysicsBodyComponent resources — character components have no file-backed resource.
+    std::vector<CPhysicsComponent*> physComps;
     CollectPhysicsComponents(m_entityComp, physComps);
 
-    for (CPhysicsBodyComponent* pc : physComps)
+    for (CPhysicsComponent* pc : physComps)
     {
-        if (!pc) continue;        
-        auto& resRef = pc->GetBodyResourceRef();
-        auto resource = resRef.GetResourceAs<CPhysicsBodyResource>();        
-
-        if (resource && !resource->GetPath().empty())
-        {
-            resource->Write(resource->GetPath().c_str());
-        }
+        auto* bodyComp = dynamic_cast<CPhysicsBodyComponent*>(pc);
+        if (!bodyComp) continue;
+        // Physics body data is now stored directly in the component. Persisting
+        // component data to disk is not implemented here.
     }
 }
 
 void EntityComponentVisualizer::RegisterPhysicsComponents(ComponentSystem::Component* root)
 {
-    std::vector<CPhysicsBodyComponent*> physComps;
+    std::vector<CPhysicsComponent*> physComps;
     CollectPhysicsComponents(root, physComps);
 
-    for (CPhysicsBodyComponent* pc : physComps)
+    for (CPhysicsComponent* pc : physComps)
     {
-        auto selectable = std::make_shared<CPhysicsBodySelectable>(pc);
-        // Initialize selectable from the component state
+        auto selectable = std::make_shared<CPhysicsComponentSelectable>(pc);
         selectable->UpdateFromComponent();
         m_componentSelectables.push_back(selectable);
         m_selectionManager.AddSelectable(selectable);
@@ -165,11 +163,11 @@ void EntityComponentVisualizer::RegisterPhysicsComponents(ComponentSystem::Compo
 }
 
 void EntityComponentVisualizer::CollectPhysicsComponents(ComponentSystem::Component* comp,
-    std::vector<CPhysicsBodyComponent*>& out)
+    std::vector<CPhysicsComponent*>& out)
 {
     if (!comp) return;
 
-    if (auto* pc = dynamic_cast<CPhysicsBodyComponent*>(comp))
+    if (auto* pc = dynamic_cast<CPhysicsComponent*>(comp))
     {
         out.push_back(pc);
     }
@@ -193,46 +191,39 @@ void EntityComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, Bg
         }
     }
 
-    // If this is a physics body component, call its DebugRender so it can draw its collision shape.
-    if (auto* physComp = dynamic_cast<CPhysicsBodyComponent*>(comp))
+    // For other physics components (e.g. CCharacterComponent), call DebugRender
+    // using the sibling RenderComponent's model matrix as the world base,
+    // matching the same approach used for CPhysicsBodyComponent above.
+    if (auto* physComp = dynamic_cast<CPhysicsComponent*>(comp))
     {
-        if (physComp->IsActive())
+        Matrix4f transform = physComp->GetObjectMatrix();
+        ComponentSystem::Component* parent = comp->GetParent();
+        if (parent)
         {
-            CPhysicsBodyResource* res = physComp->GetBodyResource();
-            if (res)
+            for (auto* sibling : parent->GetChildren())
             {
-                Matrix4f transform = res->GetTransform();
-
-                // If the owning entity has a CRenderComponent, multiply by its model matrix
-                ComponentSystem::Component* parent = comp->GetParent();
-                if (parent)
+                if (auto* renderComp = dynamic_cast<CRenderComponent*>(sibling))
                 {
-                    for (auto* sibling : parent->GetChildren())
-                    {
-                        if (auto* renderComp = dynamic_cast<CRenderComponent*>(sibling))
-                        {
-                            transform = (*renderComp->GetModelMatrix()) * transform;
-                            break;
-                        }
-                    }
+                    auto modelMatrix = renderComp->GetModelMatrix();
+                    if (modelMatrix)
+                        transform = (*modelMatrix) * transform;
+                    break;
                 }
-
-                physComp->DebugRender(viewId, transform);
             }
         }
-    }
 
+        physComp->DebugRender(viewId, transform);
+    }
     // Update any selectable associated with this physics component so the
     // selection system has up-to-date transform / bounding-sphere data.
-    if (auto* physComp2 = dynamic_cast<CPhysicsBodyComponent*>(comp))
+    if (auto* physComp = dynamic_cast<CPhysicsComponent*>(comp))
     {
         for (auto& sel : m_componentSelectables)
         {
             if (!sel) continue;
-            if (sel->GetOwner() == physComp2)
+            if (sel->GetOwner() == physComp)
             {
-                // Try to cast to our physics selectable and update
-                auto physSel = std::dynamic_pointer_cast<CPhysicsBodySelectable>(sel);
+                auto physSel = std::dynamic_pointer_cast<CPhysicsComponentSelectable>(sel);
                 if (physSel)
                     physSel->UpdateFromComponent();
                 break;
@@ -312,9 +303,9 @@ void EntityComponentVisualizer::RenderInspectorPanel()
         auto physSel = std::dynamic_pointer_cast<CPhysicsBodySelectable>(lastSelected);
         if (physSel && physSel->GetComponent())
         {
-            CPhysicsBodyResource* res = physSel->GetComponent()->GetBodyResource();
-            if (res)
-                inspectorTarget = res;
+            // The component now contains the serialised data; point the inspector
+            // at the component so property edits modify the inlined fields.
+            inspectorTarget = physSel->GetComponent();
         }
         if (!inspectorTarget)
             inspectorTarget = lastSelected->GetOwner();

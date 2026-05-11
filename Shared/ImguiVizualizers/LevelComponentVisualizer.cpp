@@ -3,7 +3,9 @@
 #include "CoreSystem/AppConfig.h"
 #include "FileSystem/FileSystemManager.h"
 #include "EntityComponent.h"
+#include "TransformComponent.h"
 #include "PhysicsBodyComponent.h"
+#include "CharacterComponent.h"
 #include "DeleteEntityCommand.h"
 #include <bx/bounds.h>
 #include <algorithm>
@@ -205,34 +207,28 @@ namespace ImGuiVisualizers {
 			}
 		}
 
-		// If this is a physics body component, debug-render its collision shape
-		// using the sibling RenderComponent's model matrix (if one exists).
-		if (auto* physComp = dynamic_cast<CPhysicsBodyComponent*>(comp))
+		// For other physics components (e.g. CCharacterComponent), call DebugRender
+		// using the sibling RenderComponent's model matrix as the world base,
+		// matching the same approach used for CPhysicsBodyComponent above.
+		if (auto* physComp = dynamic_cast<CPhysicsComponent*>(comp))
 		{
-			if (physComp->IsActive())
+			Matrix4f transform = physComp->GetObjectMatrix();
+
+			ComponentSystem::Component* parent = comp->GetParent();
+			if (parent)
 			{
-				CPhysicsBodyResource* res = physComp->GetBodyResource();
-				if (res)
+				for (auto* sibling : parent->GetChildren())
 				{
-					Matrix4f transform = res->GetTransform();
-
-					// Look for a sibling CRenderComponent and multiply its model matrix
-					ComponentSystem::Component* parent = comp->GetParent();
-					if (parent)
+					if (auto* renderComp = dynamic_cast<CTransformComponent*>(sibling))
 					{
-						for (auto* sibling : parent->GetChildren())
-						{
-							if (auto* renderComp = dynamic_cast<CRenderComponent*>(sibling))
-							{
-								transform = (*renderComp->GetModelMatrix()) * transform;
-								break;
-							}
-						}
+						auto modelMatrix = renderComp->GetTransform();
+						transform = (modelMatrix)*transform;
+						break;
 					}
-
-					physComp->DebugRender(viewId, transform);
 				}
 			}
+
+			physComp->DebugRender(viewId, transform);
 		}
 
 		for (auto* child : comp->GetChildren())
@@ -248,6 +244,7 @@ namespace ImGuiVisualizers {
 
 		if (auto* rc = dynamic_cast<CRenderComponent*>(comp))
 		{
+			rc->OnInitialize(); // Ensure the component is initialized before rendering or selection
 			out.push_back(rc);
 		}
 
@@ -274,7 +271,9 @@ namespace ImGuiVisualizers {
 			if (!comp || !comp->IsActive()) continue;
 
 			const Vector4f bs = *comp->GetBoundingSphere();
-			const float* m = comp->GetModelMatrix()->data();
+			auto modelMatrixPtr = comp->GetModelMatrix();
+			if (!modelMatrixPtr) continue;
+			const float* m = modelMatrixPtr->data();
 
 			const float cx = m[0] * bs.x + m[4] * bs.y + m[8] * bs.z + m[12];
 			const float cy = m[1] * bs.x + m[5] * bs.y + m[9] * bs.z + m[13];

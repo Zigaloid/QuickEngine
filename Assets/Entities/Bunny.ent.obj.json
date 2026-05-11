@@ -24,29 +24,7 @@
                         },
                         "Type": 4,
                         "Size": 56
-                    },
-                    "m_modelMatrix": {
-                        "Value": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0
-                        ],
-                        "Type": 8,
-                        "Size": 64
-                    },
+                    },                   
                     "m_active": {
                         "Value": true,
                         "Type": 12,
@@ -78,6 +56,42 @@
                     },
                     "m_children": {
                         "Value": "CPhysicsBodyComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CTransformComponent",
+                    "m_matrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CTransformComponent",
                         "Elements": [],
                         "Type": 19,
                         "Size": 24

@@ -1,0 +1,69 @@
+{
+    "RootObject": {
+        "m_materialColor": {
+            "Value": [
+                1.0,
+                1.0,
+                1.0,
+                1.0
+            ],
+            "Type": 7,
+            "Size": 16
+        },
+        "m_ambientColor": {
+            "Value": [
+                0.30000001192092896,
+                0.30000001192092896,
+                0.30000001192092896,
+                1.0
+            ],
+            "Type": 7,
+            "Size": 16
+        },
+        "m_vertexShaderResource": {
+            "Value": "CShaderResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/shaders/vs_basictextured.shader.bin",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 56
+        },
+        "m_fragmentShaderResource": {
+            "Value": "CShaderResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/shaders/fs_basictextured.shader.bin",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 56
+        },
+        "m_textureResources": {
+            "Value": "CMaterialResource",
+            "Elements": [
+                {
+                    "Value": "CTextureResourceReference",
+                    "m_resourceFileName": {
+                        "Value": "./assets/textures/Tree.dds",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                }
+            ],
+            "Type": 6,
+            "Size": 24
+        },
+        "m_textureFlags": {
+            "Value": [],
+            "Type": 14,
+            "Size": 24
+        },
+        "m_textureStages": {
+            "Value": [],
+            "Type": 14,
+            "Size": 24
+        }
+    }
+}

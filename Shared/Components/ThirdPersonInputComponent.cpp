@@ -28,7 +28,7 @@ CThirdPersonInputComponent::~CThirdPersonInputComponent()
 
 bool CThirdPersonInputComponent::OnInitialize()
 {
-    m_physicsBody = FindPhysicsBody();
+    m_character = FindCharacter();
     // Attempt to locate an InputActionManager created by the application.
     if (!m_actionManager)
     {
@@ -43,19 +43,14 @@ bool CThirdPersonInputComponent::OnInitialize()
 
 void CThirdPersonInputComponent::OnUpdate(double /*deltaTime*/)
 {
-    if (!m_physicsBody)
+    if (!m_character)
     {
-        // Try again each frame until the sibling body is ready.
-        m_physicsBody = FindPhysicsBody();
-        if (!m_physicsBody)
+        // Try again each frame until the sibling character is ready.
+        m_character = FindCharacter();
+        if (!m_character)
             return;
     }
-
-    JPH::BodyID bodyId = JPH::BodyID();
-    if (auto pbody = dynamic_cast<CPhysicsBodyComponent*>(m_physicsBody))
-        bodyId = pbody->GetBodyID();
-    else if (auto cbody = dynamic_cast<CCharacterComponent*>(m_physicsBody))
-        bodyId = cbody->GetBodyID();
+    JPH::BodyID bodyId = m_character->GetBodyID();
 
     if (bodyId.IsInvalid())
         return;
@@ -94,9 +89,7 @@ void CThirdPersonInputComponent::OnUpdate(double /*deltaTime*/)
     {
         m_jumpQueued = false;
         if (m_allowAirJump || IsGrounded())
-        {
             bi.AddLinearVelocity(bodyId, JPH::Vec3(0.0f, m_jumpImpulse, 0.0f));
-        }
     }
 }
 
@@ -114,7 +107,7 @@ void CThirdPersonInputComponent::OnShutdown()
     }
 
     m_context.reset();
-    m_physicsBody = nullptr;
+    m_character = nullptr;
 }
 
 // ?? Action manager wiring ?????????????????????????????????????????????????????
@@ -206,28 +199,21 @@ void CThirdPersonInputComponent::Unsubscribe()
 
 // ?? Private helpers ???????????????????????????????????????????????????????????
 
-ComponentSystem::Component* CThirdPersonInputComponent::FindPhysicsBody() const
+CCharacterComponent* CThirdPersonInputComponent::FindCharacter() const
 {
     ComponentSystem::Component* parent = GetParent();
     if (!parent)
         return nullptr;
 
-    // Prefer the legacy physics body component, but fall back to the character component if present.
-    if (auto p = parent->FindChild<CPhysicsBodyComponent>())
-        return p;
+    // Prefer the character component (new behavior).
     return parent->FindChild<CCharacterComponent>();
 }
 
 bool CThirdPersonInputComponent::IsGrounded() const
 {
-    if (!m_physicsBody)
+    if (!m_character)
         return false;
-
-    JPH::BodyID bodyId = JPH::BodyID();
-    if (auto pbody = dynamic_cast<CPhysicsBodyComponent*>(m_physicsBody))
-        bodyId = pbody->GetBodyID();
-    else if (auto cbody = dynamic_cast<CCharacterComponent*>(m_physicsBody))
-        bodyId = cbody->GetBodyID();
+    JPH::BodyID bodyId = m_character->GetBodyID();
     if (bodyId.IsInvalid())
         return false;
 

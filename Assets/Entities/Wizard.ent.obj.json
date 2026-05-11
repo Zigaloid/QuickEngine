@@ -25,28 +25,6 @@
                         "Type": 4,
                         "Size": 56
                     },
-                    "m_modelMatrix": {
-                        "Value": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0
-                        ],
-                        "Type": 8,
-                        "Size": 64
-                    },
                     "m_active": {
                         "Value": true,
                         "Type": 12,
@@ -61,15 +39,57 @@
                 },
                 {
                     "Value": "CPhysicsBodyComponent",
-                    "m_bodyResource": {
-                        "Value": "CPhysicsBodyResourceReference",
-                        "m_resourceFileName": {
-                            "Value": "./assets/physics/wizard.phys.obj.json",
-                            "Type": 3,
-                            "Size": 32
-                        },
-                        "Type": 4,
-                        "Size": 56
+                    "m_shapeType": {
+                        "Value": 3,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_motionType": {
+                        "Value": 2,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_friction": {
+                        "Value": 0.20000000298023224,
+                        "Type": 2,
+                        "Size": 4
+                    },
+                    "m_restitution": {
+                        "Value": 0.0,
+                        "Type": 2,
+                        "Size": 4
+                    },
+                    "m_linearDamping": {
+                        "Value": 0.05000000074505806,
+                        "Type": 2,
+                        "Size": 4
+                    },
+                    "m_angularDamping": {
+                        "Value": 0.05000000074505806,
+                        "Type": 2,
+                        "Size": 4
+                    },
+                    "m_objectMatrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.548147439956665,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
                     },
                     "m_active": {
                         "Value": true,

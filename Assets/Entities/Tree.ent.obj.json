@@ -1,9 +1,9 @@
 {
     "RootObject": {
         "m_name": {
-            "Value": "SimpleTree",
+            "Value": "Bunny",
             "Type": 3,
-            "Size": 40
+            "Size": 32
         },
         "m_active": {
             "Value": true,
@@ -20,12 +20,50 @@
                         "m_resourceFileName": {
                             "Value": "./assets/staticmeshes/tree.smesh.obj.json",
                             "Type": 3,
-                            "Size": 40
+                            "Size": 32
                         },
                         "Type": 4,
-                        "Size": 64
+                        "Size": 56
                     },
-                    "m_modelMatrix": {
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CMeshComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CPhysicsBodyComponent",
+                    "m_bodyResource": {
+                        "Value": "CPhysicsBodyResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/physics/tree.phys.obj.json",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "Type": 4,
+                        "Size": 56
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CTransformComponent",
+                    "m_matrix": {
                         "Value": [
                             1.0,
                             0.0,
@@ -53,39 +91,15 @@
                         "Size": 1
                     },
                     "m_children": {
-                        "Value": "CMeshComponent",
+                        "Value": "CTransformComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 32
-                    }
-                },
-                {
-                    "Value": "CPhysicsBodyComponent",
-                    "m_bodyResource": {
-                        "Value": "CPhysicsBodyResourceReference",
-                        "m_resourceFileName": {
-                            "Value": "./assets/physics/tree.phys.obj.json",
-                            "Type": 3,
-                            "Size": 40
-                        },
-                        "Type": 4,
-                        "Size": 64
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CPhysicsBodyComponent",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 32
+                        "Size": 24
                     }
                 }
             ],
             "Type": 19,
-            "Size": 32
+            "Size": 24
         }
     }
 }

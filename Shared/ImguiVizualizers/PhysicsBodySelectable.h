@@ -29,20 +29,16 @@ public:
         // physics shape's offset relative to the mesh — no physics simulation
         // sync is needed in the editor context.
 
-        // Update bounding sphere from the resource transform's scale.
+        // Update bounding sphere from the component's local transform scale.
         auto bsPtr = GetBoundingSpherePtr();
-        if (bsPtr)
+        if (bsPtr && m_component)
         {
-            CPhysicsBodyResource* res = m_component->GetBodyResource();
-            if (res)
-            {
-                Vector3f scale = res->GetTransform().ExtractScale();
-                float maxScale = scale.GetX();
-                if (scale.GetY() > maxScale) maxScale = scale.GetY();
-                if (scale.GetZ() > maxScale) maxScale = scale.GetZ();
+            Vector3f scale = m_component->GetScale();
+            float maxScale = scale.GetX();
+            if (scale.GetY() > maxScale) maxScale = scale.GetY();
+            if (scale.GetZ() > maxScale) maxScale = scale.GetZ();
 
-                *bsPtr = Vector4f(0.0f, 0.0f, 0.0f, maxScale * 0.5f);
-            }
+            *bsPtr = Vector4f(0.0f, 0.0f, 0.0f, maxScale * 0.5f);
         }
     }
 
