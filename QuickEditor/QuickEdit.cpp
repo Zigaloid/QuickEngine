@@ -9,6 +9,11 @@
 #include "CoreSystem\CoreSystem.h"
 #include "MeshComponent.h"
 #include "imgui.h"
+#include "ComponentSystem/ComponentDependencyDefinition.h"
+
+ComponentDependencyDefinitionList g_Test;
+
+
 
 std::shared_ptr<CShaderResource> testShader;
 bool QuickEditApp::Initialize()

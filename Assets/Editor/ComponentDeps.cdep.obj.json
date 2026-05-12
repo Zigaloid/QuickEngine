@@ -1,0 +1,37 @@
+{
+    "RootObject": {
+        "m_dependencies": {
+            "Value": "ComponentDependencyDefinitionList",
+            "Elements": [
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CEntityComponent",
+                        "Type": 3,
+                        "Size": 40
+                    },
+                    "m_dependsOn": {
+                        "Value": "CPhysBodyComponent",
+                        "Type": 3,
+                        "Size": 40
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 40
+                    },
+                    "m_dependsOn": {
+                        "Value": "CCharacterComponent",
+                        "Type": 3,
+                        "Size": 40
+                    }
+                }
+            ],
+            "Type": 6,
+            "Size": 32
+        }
+    }
+}

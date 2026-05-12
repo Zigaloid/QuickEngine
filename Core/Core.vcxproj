@@ -94,6 +94,7 @@
     <ClInclude Include="App\AppInterface.h" />
     <ClInclude Include="App\ApplicationComponent.h" />
     <ClInclude Include="ClassFactory\ClassFactory.h" />
+    <ClInclude Include="ComponentSystem\ComponentDependencyDefinition.h" />
     <ClInclude Include="ComponentSystem\ComponentRegistry.h" />
     <ClInclude Include="ComponentSystem\ComponentSystem.h" />
     <ClInclude Include="ComponentSystem\ComponentSystemScheduler.h" />
@@ -162,6 +163,7 @@
     <ClCompile Include="Analysis\HeatMapContainer.cpp" />
     <ClCompile Include="App\ApplicationComponent.cpp" />
     <ClCompile Include="ClassFactory\ClassFactory.cpp" />
+    <ClCompile Include="ComponentSystem\ComponentDependencyDefinition.cpp" />
     <ClCompile Include="ComponentSystem\ComponentRegistry.cpp" />
     <ClCompile Include="ComponentSystem\ComponentSystem.cpp" />
     <ClCompile Include="ComponentSystem\ComponentSystemScheduler.cpp" />

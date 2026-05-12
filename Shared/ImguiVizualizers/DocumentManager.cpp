@@ -4,6 +4,7 @@
 #include "LevelComponentVisualizer.h"
 #include "EntityComponentVisualizer.h"
 #include "PropertyWidgetMapEditor.h"
+#include "ComponentDependencyGraphVisualizer.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -168,6 +169,42 @@ WidgetEditorLauncher::Create(const std::string& assetPath, const std::string& cl
     return editor;
 }
 
+// -- ComponentDependencyGraph launcher implementation ---------------------
+
+ComponentDependencyGraphLauncher::ComponentDependencyGraphLauncher(
+    DocumentManager& manager, const std::string& suffix)
+    : m_manager(manager), m_suffix(suffix)
+{
+}
+
+void ComponentDependencyGraphLauncher::Launch(const std::string& assetPath)
+{
+    // Use the asset path itself as a stable, unique window key.
+    std::string key = "cdep::" + assetPath;
+
+    if (m_manager.m_openEditorKeys.contains(key)) {
+        m_manager.m_visualizerManager.SetVisible(key, true);
+        return;
+    }
+
+    m_manager.EnqueueEditor(key, assetPath, "", this);
+}
+
+std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+ComponentDependencyGraphLauncher::Create(const std::string& assetPath,
+                                          const std::string& /*className*/)
+{
+    // Derive a short window title from the filename.
+    std::string title = assetPath;
+    if (auto slash = title.find_last_of("/\\"); slash != std::string::npos)
+        title = title.substr(slash + 1);
+
+    auto vis = std::make_unique<ImGuiVisualizers::ComponentDependencyGraphVisualizer>(
+        title.c_str());
+    vis->LoadFromFile(assetPath);
+    return vis;
+}
+
 void NoOpLauncher::Launch(const std::string& assetPath)
 {
 #ifdef _WIN32
@@ -206,6 +243,7 @@ void DocumentManager::InitializeLaunchers()
     m_launchers["EntityObjJson"] = std::make_unique<EntityComponentLauncher>(*this, ".ent.obj.json", "CEntityComponent");
     m_launchers["StaticMeshObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".smesh.obj.json", "CStaticMeshResource");
     m_launchers["PhysicsBodyObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".phys.obj.json", "CPhysicsBodyResource");
+    m_launchers["ComponentDependencyObjJson"] = std::make_unique<ComponentDependencyGraphLauncher>(*this, ".cdep.obj.json");
     // Texture launcher (TODO)
     m_launchers["Texture"] = std::make_unique<NoOpLauncher>();
 }
@@ -228,7 +266,8 @@ std::vector<DocumentManager::AssetTypeConfig> DocumentManager::GetAssetTypeConfi
         { ".lvl.obj.json",      "Level Component",        IM_COL32(100, 200, 255, 255),   "O",  "LevelObjJson",   true, false },
         { ".ent.obj.json",      "Entity Component",       IM_COL32(100, 200, 255, 255),   "O",  "EntityObjJson",  true, false },
         { ".smesh.obj.json",    "Static Mesh Resource",   IM_COL32(100, 200, 255, 255),   "O",  "StaticMeshObjJson", true, false },
-        { ".phys.obj.json",     "Physics Body Resource", IM_COL32(100, 200, 255, 255),   "O",  "PhysicsBodyObjJson", true, false },
+        { ".phys.obj.json",     "Physics Body Resource",  IM_COL32(100, 200, 255, 255),   "O",  "PhysicsBodyObjJson", true, false },
+		{ ".cdep.obj.json",     "Component Dependencies", IM_COL32(100, 200, 255, 255),   "O",  "ComponentDependencyObjJson", true, false },
         { ".png",               "PNG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
         { ".bmp",               "BMP Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
         { ".jpg",               "JPG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },

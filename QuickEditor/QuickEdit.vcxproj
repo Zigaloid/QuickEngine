@@ -96,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\External\ufbx\ufbx.h" />
+    <ClInclude Include="..\Shared\Components\CameraComponent.h" />
     <ClInclude Include="..\Shared\Components\CharacterComponent.h" />
     <ClInclude Include="..\Shared\Components\EntityComponent.h" />
     <ClInclude Include="..\Shared\Components\LevelComponent.h" />
@@ -116,6 +117,9 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\NodeGraphNode.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.h" />
@@ -239,6 +243,7 @@
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="..\External\ufbx\ufbx.c" />
+    <ClCompile Include="..\Shared\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Shared\Components\CharacterComponent.cpp" />
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp" />
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp" />
@@ -254,6 +259,8 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.cpp" />
@@ -331,3 +338,4 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
+

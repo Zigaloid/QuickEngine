@@ -28,6 +28,7 @@ class DocumentManager
     friend class LevelComponentLauncher;
     friend class EntityComponentLauncher;
     friend class WidgetEditorLauncher;
+    friend class ComponentDependencyGraphLauncher;
 public:
     explicit DocumentManager(ImGuiVisualizers::ImGuiVisualizerManager& visualizerManager);
 
@@ -206,6 +207,29 @@ private:
     DocumentManager& m_manager;
     std::string m_suffix;
     std::string m_className;
+};
+
+/**
+ * @brief Launcher for ComponentDependencyGraphVisualizer (.cdep.obj.json files).
+ *
+ * Opens the file directly in a ComponentDependencyGraphVisualizer window,
+ * showing an auto-laid-out directed graph of the component dependency
+ * definitions stored in the JSON asset.
+ */
+class ComponentDependencyGraphLauncher : public IAssetLauncher
+{
+public:
+    ComponentDependencyGraphLauncher(DocumentManager& manager,
+        const std::string& suffix);
+
+    void Launch(const std::string& assetPath) override;
+
+    std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) override;
+
+private:
+    DocumentManager& m_manager;
+    std::string       m_suffix;
 };
 
 /**

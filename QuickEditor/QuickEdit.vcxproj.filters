@@ -78,6 +78,12 @@
     <ClInclude Include="..\External\ufbx\ufbx.h">
       <Filter>..\External\ufbx</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\CameraComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\CharacterComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\EntityComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
@@ -88,6 +94,9 @@
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\PhysicsComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\ThirdPersonInputComponent.h">
@@ -425,11 +434,9 @@
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="QuickEdit.h" />
-    <ClInclude Include="..\Shared\Components\CharacterComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\PhysicsComponent.h">
-      <Filter>..\Shared\Components</Filter>
+    <ClInclude Include="..\Shared\ImguiVizualizers\NodeGraphNode.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -499,6 +506,12 @@
     <ClCompile Include="..\External\ufbx\ufbx.c">
       <Filter>..\External\ufbx</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\CameraComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\CharacterComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
@@ -509,6 +522,9 @@
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\ThirdPersonInputComponent.cpp">
@@ -682,11 +698,8 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
-    <ClCompile Include="..\Shared\Components\CharacterComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
+    <ClCompile Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

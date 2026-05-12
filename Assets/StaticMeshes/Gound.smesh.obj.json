@@ -5,20 +5,20 @@
             "m_resourceFileName": {
                 "Value": "./assets/meshes/groundpiece.mesh.bin",
                 "Type": 3,
-                "Size": 40
+                "Size": 32
             },
             "Type": 4,
-            "Size": 64
+            "Size": 56
         },
         "m_materialResource": {
             "Value": "CMaterialResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/materials/bunny.mat.obj.json",
+                "Value": "./assets/materials/ground.mat.obj.json",
                 "Type": 3,
-                "Size": 40
+                "Size": 32
             },
             "Type": 4,
-            "Size": 64
+            "Size": 56
         }
     }
 }

@@ -15,6 +15,7 @@
 #include "MeshComponent.h"
 #include "PhysicsBodyComponent.h"
 #include "TransformComponent.h"
+#include "CameraComponent.h"
 #include "Input\MouseManager.h"
 #include "Input\WindowsMouse.h"
 #include "Input\GamepadManager.h"
@@ -23,8 +24,6 @@
 #include "entry\entry.h"
 #include "imgui.h"
 
-
-std::shared_ptr<CShaderResource> testShader;
 bool GameApp::Initialize()
 {	
 	CTextureResourceReference testTextureRef;
@@ -75,8 +74,6 @@ bool GameApp::Initialize()
 	inputActionManager->AttachMouseManager(mouseManager);
 	inputActionManager->AttachGamepadManager(gamepadManager);
 
-
-
 	PhysicsManager::Config physicsConfig;
 	physicsConfig.maxBodies = 1024;
 	physicsConfig.gravity   = -9.81f;
@@ -103,6 +100,15 @@ bool GameApp::Initialize()
 	}
 
 	NEXUS_SUBSCRIBE_CALLBACK(GAME_PIPE, "ANY", HandleQuickEditCommand);
+
+	// Search the level hierarchy for a camera component and attach it
+	if (m_RootLevel)
+	{
+		if (auto* levelCamera = m_RootLevel->FindDescendant<CCameraComponent>())
+		{
+			SetActiveCamera(levelCamera);
+		}
+	}
 
 	return true;
 }
@@ -149,7 +155,10 @@ void GameApp::RegisterComponents()
 
 	componentManager->RegisterComponentType<CTransformComponent>();
 	scheduler->RegisterComponentType<CTransformComponent>(0, "Transform");
-	
+
+	componentManager->RegisterComponentType<CCameraComponent>();
+	scheduler->RegisterComponentType<CCameraComponent>(0, "Camera");
+
 
 }
 
@@ -171,17 +180,26 @@ void GameApp::Update(double deltaTime)
 void GameApp::Render(double deltaTime)
 {
 	DECLARE_FUNC_VLOW();
-	// Apply the game camera to view 0 (the main backbuffer).
+	// Apply the active camera to view 0 (the main backbuffer).
 	float viewMtx[16];
 	float projMtx[16];
 
 	const bgfx::Stats* stats  = bgfx::getStats();
 	const float        aspect = static_cast<float>(stats->width)
-	                          / static_cast<float>(stats->height);
+							  / static_cast<float>(stats->height);
 
-	m_camera.GetViewMatrix(viewMtx);
-	m_camera.GetProjectionMatrix(projMtx, aspect);
-	
+	// Use active camera component if set, otherwise use default m_camera
+	if (m_activeCamera)
+	{
+		m_activeCamera->GetViewMatrix(viewMtx);
+		m_activeCamera->GetProjectionMatrix(projMtx, aspect);
+	}
+	else
+	{
+		m_camera.GetViewMatrix(viewMtx);
+		m_camera.GetProjectionMatrix(projMtx, aspect);
+	}
+
 	bgfx::setViewTransform(0, viewMtx, projMtx);
 
 	Rendering::BgfxRenderPrimitives::Instance().RenderGrid(0, 100.0f, 1.0f, 0xff808080);
@@ -189,7 +207,7 @@ void GameApp::Render(double deltaTime)
 #ifdef JPH_DEBUG_RENDERER
 	m_physicsManager.DebugDraw(viewMtx);
 #endif
-	
+
 }
 
 void GameApp::ImguiUpdate()
@@ -218,6 +236,20 @@ void GameApp::LoadLevel(std::string filePath)
 	m_RootLevel->SafeRead(resolvedPath);
 	m_RootLevel->Initialize();
 	m_lastLevelPath = resolvedPath;
+
+	// Search the new level hierarchy for a camera component and attach it
+	if (m_RootLevel)
+	{
+		if (auto* levelCamera = m_RootLevel->FindDescendant<CCameraComponent>())
+		{
+			SetActiveCamera(levelCamera);
+		}
+		else
+		{
+			// No camera found in level, revert to default
+			SetActiveCamera(nullptr);
+		}
+	}
 }
 
 void GameApp::ReloadLevel()
@@ -237,6 +269,20 @@ void GameApp::ReloadLevel()
 	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
 	m_RootLevel->SafeRead(m_lastLevelPath);
 	m_RootLevel->Initialize();
+
+	// Search the reloaded level hierarchy for a camera component and attach it
+	if (m_RootLevel)
+	{
+		if (auto* levelCamera = m_RootLevel->FindDescendant<CCameraComponent>())
+		{
+			SetActiveCamera(levelCamera);
+		}
+		else
+		{
+			// No camera found in level, revert to default
+			SetActiveCamera(nullptr);
+		}
+	}
 }
 
 void GameApp::RegisterConsoleCommands()

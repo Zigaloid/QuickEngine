@@ -70,6 +70,12 @@
     <Filter Include="..\Shared\utils">
       <UniqueIdentifier>{2707D659-9392-431E-9CA3-C61208AE9F1E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core\Input">
+      <UniqueIdentifier>{AD4E7BCD-9906-BD1A-020E-9676EEE4570B}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
@@ -77,6 +83,12 @@
     </ClInclude>
     <ClInclude Include="..\External\ufbx\ufbx.h">
       <Filter>..\External\ufbx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\CameraComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\CharacterComponent.h">
+      <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\EntityComponent.h">
       <Filter>..\Shared\Components</Filter>
@@ -88,6 +100,9 @@
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\PhysicsComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\ThirdPersonInputComponent.h">
@@ -354,14 +369,20 @@
     <ClInclude Include="..\Shared\utils\StringUtils.h">
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Input\ActionContext.h">
+      <Filter>Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Input\InputAction.h">
+      <Filter>Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Input\InputActionManager.h">
+      <Filter>Core\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Input\InputBinding.h">
+      <Filter>Core\Input</Filter>
+    </ClInclude>
     <ClInclude Include="Game.h" />
     <ClInclude Include="logo.h" />
-    <ClInclude Include="..\Shared\Components\CharacterComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\PhysicsComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -430,6 +451,12 @@
     <ClCompile Include="..\External\ufbx\ufbx.c">
       <Filter>..\External\ufbx</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\CameraComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\CharacterComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
@@ -440,6 +467,9 @@
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\ThirdPersonInputComponent.cpp">
@@ -565,13 +595,58 @@
     <ClCompile Include="..\Shared\utils\MathUtils.cpp">
       <Filter>..\Shared\utils</Filter>
     </ClCompile>
+    <ClCompile Include="Core\Input\ActionContext.cpp">
+      <Filter>Core\Input</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\Input\InputBinding.cpp">
+      <Filter>Core\Input</Filter>
+    </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="..\Shared\Components\CharacterComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Game_ActiveCamera_Usage.md" />
+    <None Include="GameApp_Camera_Integration_Summary.md" />
+    <None Include="GameApp_Camera_QuickRef.md" />
+    <None Include="GameApp_LevelCamera_AutoDiscovery.md" />
+    <None Include="GameApp_LevelCamera_QuickRef.md" />
+    <None Include="GameApp_LevelCamera_Discovery_Summary.md" />
+    <None Include="GameApp_LevelCamera_APIRef.md" />
+    <None Include="LEVEL_CAMERA_DISCOVERY_COMPLETE.md" />
+    <None Include="LEVEL_CAMERA_DISCOVERY_VISUAL_GUIDE.md" />
+    <None Include="IMPLEMENTATION_COMPLETE.md" />
+    <None Include="DOCUMENTATION_INDEX.md" />
+    <None Include="COMPONENT_HIERARCHY_SEARCH_API.md" />
+    <None Include="COMPONENT_HIERARCHY_SEARCH_QUICK_REF.md" />
+    <None Include="COMPONENT_HIERARCHY_SEARCH_SUMMARY.md" />
+    <None Include="REFACTORING_COMPLETE.md" />
+    <None Include="COMPONENT_HIERARCHY_VISUAL_GUIDE.md" />
+    <None Include="THIRD_PERSON_CAMERA_RELATIVE_MOVEMENT.md" />
+    <None Include="CAMERA_RELATIVE_MOVEMENT_QUICK_REF.md" />
+    <None Include="CAMERA_RELATIVE_MOVEMENT_IMPLEMENTATION.md" />
+    <None Include="CAMERA_RELATIVE_MOVEMENT_VISUAL_GUIDE.md" />
+    <None Include="CAMERA_RELATIVE_MOVEMENT_COMPLETE.md" />
+    <None Include="CAMERA_RELATIVE_QUICK_START.md" />
+    <None Include="CAMERA_ORBIT_INPUT_GUIDE.md" />
+    <None Include="CAMERA_ORBIT_QUICK_START.md" />
+    <None Include="CAMERA_ORBIT_INPUT_COMPLETE.md" />
+    <None Include="CAMERA_ORBIT_VISUAL_GUIDE.md" />
+    <None Include="LEFT_STICK_DIRECTION_FIX.md" />
+    <None Include="LEFT_STICK_REAL_BUG_FIX.md" />
+    <None Include="LEFT_STICK_MOTION_FINAL_FIX.md" />
+    <None Include="JUMP_INPUT_INCONSISTENCY_FIX.md" />
+    <None Include="JUMP_BUTTON_FIX_QUICK_REF.md" />
+    <None Include="DEPENDENCY_STRING_NAME_SETUP.md" />
+    <None Include="DEPENDENCY_STRING_NAME_QUICKREF.md" />
+    <None Include="DEPENDENCY_STRING_NAME_EXAMPLES.md" />
+    <None Include="DEPENDENCY_STRING_NAME_IMPLEMENTATION_SUMMARY.md" />
+    <None Include="DEPENDENCY_STRING_NAME_VISUAL_GUIDE.md" />
+    <None Include="DEPENDENCY_STRING_NAME_INDEX.md" />
+    <None Include="DELIVERY_SUMMARY.md" />
+    <None Include="VERIFICATION_CHECKLIST.md" />
+    <None Include="COMPLETE_DELIVERABLES.md" />
+    <None Include="PROJECT_COMPLETE.md" />
+    <None Include="FINAL_DELIVERY_SUMMARY.md" />
+    <None Include="README.md" />
   </ItemGroup>
 </Project>

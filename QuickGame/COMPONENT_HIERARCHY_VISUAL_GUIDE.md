@@ -1,0 +1,312 @@
+# Component Hierarchy Search - Visual Reference
+
+## Method Overview Diagram
+
+```
+Component Base Class
+??? Direct Children Methods (existing)
+?   ??? FindChild<T>()              Single    Direct Only
+?   ??? FindChildren<T>()           Multiple  Direct Only
+?   ??? FindActiveChild<T>()        Single    Direct Only, Active
+?   ??? FindActiveChildren<T>()     Multiple  Direct Only, Active
+?
+??? Hierarchy Methods (NEW) ???
+    ??? FindDescendant<T>()         Single    Entire Tree, Any
+    ??? FindDescendants<T>()        Multiple  Entire Tree, Any
+    ??? FindActiveDescendant<T>()   Single    Entire Tree, Active
+    ??? FindActiveDescendants<T>()  Multiple  Entire Tree, Active
+```
+
+## Search Scope Comparison
+
+```
+Direct Child              Hierarchy
+???????????????          ????????????????
+?   Parent    ?          ?    Root      ?
+???????????????          ????????????????
+? Child 1 ?   ?          ? Child 1 ?    ?
+? Child 2     ?          ? Child 2      ?
+???????????????          ????????????????
+                         ? Grandchild ? ?
+FindChild()             ? Great... ?   ?
+only searches           ????????????????
+direct children         FindDescendant()
+                        searches entire
+                        subtree
+```
+
+## Return Type Summary
+
+```
+SINGLE RESULT                MULTIPLE RESULTS
+?????????????????????????????????????????????
+T*                          std::vector<T*>
+?                           ?
+?? Not found ? nullptr      ?? None found ? empty
+?? Found ? pointer          ?? Some found ? populated
+?? Early exit on match
+```
+
+## Method Decision Tree
+
+```
+Need to find components?
+?
+?? Just direct children?
+?  ?? YES
+?  ?  ?? Want first only?
+?  ?  ?  ?? YES ? FindChild<T>()
+?  ?  ?  ?? NO ? FindChildren<T>()
+?  ?  ?
+?  ?  ?? Only active?
+?  ?     ?? YES
+?  ?     ?  ?? Single ? FindActiveChild<T>()
+?  ?     ?  ?? Multi ? FindActiveChildren<T>()
+?  ?     ?? NO ? (see above)
+?  ?
+?  ?? NO - Need entire hierarchy? (continue)
+?
+?? Entire hierarchy search
+   ?? Want first only?
+   ?  ?? YES ? FindDescendant<T>()
+   ?  ?? NO ? FindDescendants<T>()
+   ?
+   ?? Only active?
+      ?? YES
+      ?  ?? Single ? FindActiveDescendant<T>()
+      ?  ?? Multi ? FindActiveDescendants<T>()
+      ?? NO ? (see above)
+```
+
+## Execution Flow Diagram
+
+### FindDescendant<T>() Flow
+
+```
+FindDescendant<T>(root)
+    ?
+    ?? Check root's children
+    ?  ?? Child1: Not T ? continue
+    ?  ?? Child2: Is T ? RETURN Child2 ?
+    ?  ?? (no more checks, early exit)
+```
+
+### FindDescendants<T>() Flow
+
+```
+FindDescendants<T>(root)
+    ?
+    ?? Check root's children
+    ?  ?? Child1: Not T ? skip
+    ?  ?? Child2: Is T ? ADD to results
+    ?  ?? Child3: Not T ? skip
+    ?
+    ?? For each child, recurse
+    ?  ?? Child1.FindDescendants<T>()
+    ?  ?  ?? Grandchild1: Is T ? add
+    ?  ?  ?? Grandchild2: Not T ? skip
+    ?  ?
+    ?  ?? Child2.FindDescendants<T>()
+    ?  ?  ?? (no matches)
+    ?  ?
+    ?  ?? Child3.FindDescendants<T>()
+    ?     ?? (no matches)
+    ?
+    ?? RETURN [Child2, Grandchild1]
+```
+
+## Hierarchy Example
+
+### Component Tree
+
+```
+Level (CLevelComponent)
+?
+??? Player (CEntityComponent)           [1]
+?   ??? CCharacterComponent            [2]
+?   ??? CThirdPersonInputComponent     [3]
+?   ??? CCameraComponent ?             [4] ? FindDescendant<CCameraComponent>()
+?
+??? Enemy (CEntityComponent)            [5]
+?   ??? CCharacterComponent ?          [6]
+?   ??? CMeshComponent                 [7]
+?
+??? Terrain (CEntityComponent)          [8]
+    ??? CMeshComponent ?               [9]
+```
+
+### Search Results
+
+```
+FindDescendant<CCameraComponent>()
+  ? [4] Camera (first found)
+
+FindDescendant<CCharacterComponent>()
+  ? [2] Character (first found)
+
+FindDescendants<CMeshComponent>()
+  ? [7] Mesh, [9] Mesh (all found)
+
+FindDescendants<CEntityComponent>()
+  ? [1] Player, [5] Enemy, [8] Terrain (all found)
+```
+
+## Performance Profile
+
+```
+Operation Cost (n = component count)
+?????????????????????????????????????
+
+FindDescendant<T>()
+    Best case:   O(1) - First child is match
+    Avg case:    O(n/2)
+    Worst case:  O(n) - Not found
+    ?? Early exit = efficiency
+
+FindDescendants<T>()
+    All cases:   O(n) - Must visit all
+    ?? No early exit possible
+
+Active filtering:
+    Cost per component: O(depth)
+    Total: O(n × depth)
+    ?? Usually negligible (depth << n)
+```
+
+## Code Pattern Examples
+
+### Pattern 1: Simple Search
+
+```cpp
+auto* cam = level->FindDescendant<CCameraComponent>();
+if (cam) {
+    cam->SetDistance(5.0f);
+}
+```
+
+### Pattern 2: Multiple Results
+
+```cpp
+auto meshes = level->FindDescendants<CMeshComponent>();
+for (auto* mesh : meshes) {
+    mesh->Render();
+}
+```
+
+### Pattern 3: Active Filter
+
+```cpp
+auto active = level->FindActiveDescendants<CCharacterComponent>();
+if (active.size() > 0) {
+    active[0]->OnFocus();
+}
+```
+
+### Pattern 4: Nested Searches
+
+```cpp
+if (auto* player = level->FindDescendant<CEntityComponent>()) {
+    auto* camera = player->FindDescendant<CCameraComponent>();
+}
+```
+
+## Method Matrix
+
+```
+               Single Result          Multiple Results
+        ???????????????????????????????????????
+Any     ?FindDescendant<T>()?FindDescendants<T>?
+State   ?                  ?                  ?
+        ???????????????????????????????????????
+Active  ?FindActiveDescend-?FindActiveDescend-?
+Only    ?ant<T>()          ?ants<T>()         ?
+        ???????????????????????????????????????
+
+        ????? Searches entire hierarchy ?????
+        ????? Recursive depth-first search ???
+        ????? Type-safe (template) ???????????
+```
+
+## Comparison with DirectChildren
+
+```
+Direct Children          Entire Hierarchy
+?????????????????????????????????????????
+
+Parent                   Root
+  ?                        ?
+  ?? Child 1 ?         ?? Branch 1 ?
+  ?? Child 2           ?   ?? Leaf A ?
+  ?? Child 3           ?? Branch 2
+                        ?   ?? Leaf B
+FindChild()            ?? Branch 3
+searches only              ?? Leaf C ?
+immediate
+children             FindDescendant()
+                     searches all
+                     descendants
+```
+
+## Typical Usage Flow
+
+```
+Start: Need to find a component
+   ?
+Is it a direct child?
+   ?? YES ? Use FindChild<T>() / FindChildren<T>()
+   ?? NO ? Continue
+   ?
+Need only the first one?
+   ?? YES ? Use FindDescendant<T>()
+   ?? NO ? Use FindDescendants<T>()
+   ?
+Only care about active?
+   ?? YES ? Add Active: FindActiveDescendant<T>()
+   ?? NO ? Already chosen above
+   ?
+Done - Execute search
+```
+
+## Memory Layout Visualization
+
+```
+Component Hierarchy in Memory:
+
+Root [Level]
+?? Children Vector: [Child1*, Child2*, Child3*]
+?
+?? Child1 [Player]
+?  ?? Children: [Grandchild1*, Grandchild2*]
+?  ?
+?  ?? Grandchild1 [Camera]
+?     ?? Children: []
+?
+?? Child2 [Enemy]
+?  ?? Children: [Grandchild3*]
+?  ?
+?  ?? Grandchild3 [Mesh]
+?     ?? Children: []
+?
+?? Child3 [Terrain]
+   ?? Children: [Grandchild4*]
+      ?
+      ?? Grandchild4 [Mesh]
+         ?? Children: []
+
+Recursion Stack Depth: max 4 (height of tree)
+```
+
+---
+
+## Quick Lookup Table
+
+| Need | Use |
+|------|-----|
+| First direct child | `FindChild<T>()` |
+| All direct children | `FindChildren<T>()` |
+| **First anywhere** | **`FindDescendant<T>()`** |
+| **All anywhere** | **`FindDescendants<T>()`** |
+| First active direct | `FindActiveChild<T>()` |
+| All active direct | `FindActiveChildren<T>()` |
+| **First active anywhere** | **`FindActiveDescendant<T>()`** |
+| **All active anywhere** | **`FindActiveDescendants<T>()`** |

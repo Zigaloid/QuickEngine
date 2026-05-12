@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <cassert>
 #include "ComponentSystem\ComponentSystem.h"
+#include "ComponentDependencyDefinition.h"
 #include "Profiler\Profiler.h"
 #include "Jobsystem\JobSystem.h"
 #include <unordered_set>
@@ -231,6 +232,56 @@ namespace ComponentSystem {
 			{
 				m_phases[it->second].dependencies.push_back(depIndex);
 			}
+		}
+
+		/** @brief Declares that the component type matching dependentClassName must wait for 
+		 *  the component type matching dependencyClassName to finish before updating.
+		 *  Both component types must be registered with the ComponentManager.
+		 *  @param dependentClassName The class name of the component that has the dependency.
+		 *  @param dependencyClassName The class name of the component it depends on.
+		 *  @return true if the dependency was successfully added, false if either type is not registered. */
+		bool AddDependencyByName(const std::string& dependentClassName, const std::string& dependencyClassName)
+		{
+			if (!m_componentManager)
+			{
+				return false;
+			}
+
+			// Look up the type indices for both class names
+			auto depTypeOpt = m_componentManager->GetTypeIndexByClassName(dependentClassName);
+			auto dependencyTypeOpt = m_componentManager->GetTypeIndexByClassName(dependencyClassName);
+
+			if (!depTypeOpt || !dependencyTypeOpt)
+			{
+				return false;  // One or both types not registered
+			}
+
+			// Find the phase index for the dependent type
+			auto it = m_typeToPhaseIndex.find(*depTypeOpt);
+			if (it != m_typeToPhaseIndex.end())
+			{
+				m_phases[it->second].dependencies.push_back(*dependencyTypeOpt);
+				return true;
+			}
+
+			return false;
+		}
+
+		/** @brief Applies a list of dependency definitions to the scheduler.
+		 *  @param dependencyList The list of component dependency definitions (typically loaded from JSON).
+		 *  @return The number of dependencies successfully added. */
+		size_t AddDependencies(const ComponentDependencyDefinitionList& dependencyList)
+		{
+			size_t successCount = 0;
+			for (size_t i = 0; i < dependencyList.GetDependencyCount(); ++i)
+			{
+				const auto& dep = dependencyList.GetDependency(i);
+				if (AddDependencyByName(dep.m_dependent, dep.m_dependsOn))
+				{
+					successCount++;
+				}
+			}
+			return successCount;
 		}
 
 		/** @param policy The desired dispatch strategy for this scheduler. */

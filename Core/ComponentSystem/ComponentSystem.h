@@ -11,6 +11,7 @@
 #include <cassert>
 #include <algorithm>
 #include <functional>
+#include <optional>
 
 
 namespace ComponentSystem {
@@ -181,6 +182,28 @@ namespace ComponentSystem {
 		Component* GetParent() const { return m_parent; }
 		const std::vector<Component*>& GetChildren() const { return m_children; }
 
+		// ── Sibling search ────────────────────────────────────────────────────────────
+
+		/** @brief Finds the first sibling component of type T (excluding self).
+		 *  Searches among the parent's children for a component matching type T. */
+		template<typename T>
+		T* FindSibling() const
+		{
+			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+			if (!m_parent) return nullptr;
+			for (const auto& child : m_parent->m_children)
+			{
+				if (child != this)
+				{
+					if (auto* typedChild = dynamic_cast<T*>(child))
+					{
+						return typedChild;
+					}
+				}
+			}
+			return nullptr;
+		}
+
 		// ── Child search ──────────────────────────────────────────────────────────
 
 		/** @brief Finds the first direct child component of type T. */
@@ -248,6 +271,128 @@ namespace ComponentSystem {
 					}
 				}
 			}
+			return result;
+		}
+
+		/** @brief Recursively finds the first descendant component of type T using depth-first search.
+		 *  Searches the entire hierarchy tree, not just direct children. */
+		template<typename T>
+		T* FindDescendant() const
+		{
+			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+
+			// Check direct children first
+			for (const auto& child : m_children)
+			{
+				if (auto* typedChild = dynamic_cast<T*>(child))
+				{
+					return typedChild;
+				}
+			}
+
+			// Recursively search deeper in the hierarchy
+			for (const auto& child : m_children)
+			{
+				if (auto* found = child->FindDescendant<T>())
+				{
+					return found;
+				}
+			}
+
+			return nullptr;
+		}
+
+		/** @brief Recursively finds all descendant components of type T using depth-first search.
+		 *  Searches the entire hierarchy tree, not just direct children. */
+		template<typename T>
+		std::vector<T*> FindDescendants() const
+		{
+			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+			std::vector<T*> result;
+
+			// Check direct children
+			for (const auto& child : m_children)
+			{
+				if (auto* typedChild = dynamic_cast<T*>(child))
+				{
+					result.push_back(typedChild);
+				}
+			}
+
+			// Recursively search deeper
+			for (const auto& child : m_children)
+			{
+				auto childResults = child->FindDescendants<T>();
+				result.insert(result.end(), childResults.begin(), childResults.end());
+			}
+
+			return result;
+		}
+
+		/** @brief Recursively finds the first active descendant component of type T using depth-first search.
+		 *  Searches the entire hierarchy tree respecting active state. */
+		template<typename T>
+		T* FindActiveDescendant() const
+		{
+			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+
+			// Check direct children first
+			for (const auto& child : m_children)
+			{
+				if (child->IsActive())
+				{
+					if (auto* typedChild = dynamic_cast<T*>(child))
+					{
+						return typedChild;
+					}
+				}
+			}
+
+			// Recursively search deeper in the hierarchy
+			for (const auto& child : m_children)
+			{
+				if (child->IsActive())
+				{
+					if (auto* found = child->FindActiveDescendant<T>())
+					{
+						return found;
+					}
+				}
+			}
+
+			return nullptr;
+		}
+
+		/** @brief Recursively finds all active descendant components of type T using depth-first search.
+		 *  Searches the entire hierarchy tree respecting active state. */
+		template<typename T>
+		std::vector<T*> FindActiveDescendants() const
+		{
+			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+			std::vector<T*> result;
+
+			// Check direct children
+			for (const auto& child : m_children)
+			{
+				if (child->IsActive())
+				{
+					if (auto* typedChild = dynamic_cast<T*>(child))
+					{
+						result.push_back(typedChild);
+					}
+				}
+			}
+
+			// Recursively search deeper
+			for (const auto& child : m_children)
+			{
+				if (child->IsActive())
+				{
+					auto childResults = child->FindActiveDescendants<T>();
+					result.insert(result.end(), childResults.begin(), childResults.end());
+				}
+			}
+
 			return result;
 		}
 	};
@@ -697,6 +842,19 @@ namespace ComponentSystem {
 					return sp;
 			}
 			return nullptr;
+		}
+
+		/** @brief Retrieves the type index for a registered component by its reflection class name.
+		 *  @param className The reflection class name (e.g. from GetRflClassName()).
+		 *  @return Optional type_index if found; empty optional otherwise. */
+		std::optional<std::type_index> GetTypeIndexByClassName(const std::string& className) const
+		{
+			auto it = m_nameToTypeIndex.find(className);
+			if (it != m_nameToTypeIndex.end())
+			{
+				return it->second;
+			}
+			return std::nullopt;
 		}
 	};
 
