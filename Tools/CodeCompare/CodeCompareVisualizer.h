@@ -130,6 +130,11 @@ private:
                                               const std::set<std::string>& exts);
     bool                         PassesVisibilityFilter(FileCompareResult::Status s) const;
 
+    // Settings persistence
+    void LoadSettings();
+    void SaveSettings() const;
+    bool m_settingsLoaded = false;
+
     // AI integration
     AIAssistantService* m_aiService      = nullptr;
     std::string         m_aiResponse;

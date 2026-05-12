@@ -14,6 +14,8 @@
 #include "Input\InputActionManager.h"
 #include "MeshComponent.h"
 #include "PhysicsBodyComponent.h"
+#include "ComponentSystem/ComponentDependencyDefinition.h"
+#include "ComponentSystem/ComponentDependencyDefinition.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
 #include "Input\MouseManager.h"
@@ -39,6 +41,14 @@ bool GameApp::Initialize()
 
 	// App setup component types.
 	RegisterComponents();
+
+	// Load component dependency definitions and apply to the scheduler.
+	{
+		ComponentDependencyDefinitionList depList;
+		std::string depPath = Core::AppConfig::Instance().ResolvePath("./Assets/Editor/ComponentDeps.cdep.obj.json");
+		depList.SafeRead(depPath);
+		Core::CoreSystem::GetJobSystemScheduler()->AddDependencies(depList);
+	}
 	// Create and initialize a MouseManager instance so it is discoverable
 	// and receives OnUpdate calls via the scheduler each frame.
 	auto* componentManager = Core::CoreSystem::GetComponentManager();

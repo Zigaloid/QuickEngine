@@ -6,14 +6,53 @@
                 {
                     "Value": "ComponentDependencyDefinition",
                     "m_dependent": {
-                        "Value": "CEntityComponent",
+                        "Value": "InputActionManager",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
                     },
                     "m_dependsOn": {
-                        "Value": "CPhysBodyComponent",
+                        "Value": "MouseManager",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "InputActionManager",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "GamepadManager",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CMeshComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CRenderComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 32
                     }
                 },
                 {
@@ -21,17 +60,147 @@
                     "m_dependent": {
                         "Value": "CPhysicsBodyComponent",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
                     },
                     "m_dependsOn": {
                         "Value": "CCharacterComponent",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CEntityComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CThirdPersonInputComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CCameraComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CCharacterComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CLevelComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CLevelComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "InputActionManager",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CEntityComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CLevelComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CThirdPersonInputComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CLevelComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CCameraComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CLevelComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CTransformComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CCharacterComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CTransformComponent",
+                        "Type": 3,
+                        "Size": 32
                     }
                 }
             ],
             "Type": 6,
-            "Size": 32
+            "Size": 24
         }
     }
 }

@@ -105,10 +105,24 @@ public:
     void SetZoom(float zoom);
     float GetZoom() const { return m_zoom; }
 
+    /// Called when the user right-clicks on empty canvas space (no node or link hovered).
+    /// The argument is the canvas-space position of the mouse at click time.
+    using OnCanvasContextMenu = std::function<void(ImVec2 canvasPos)>;
+    /// Called after a node has been removed from the graph (e.g. via right-click Delete).
+    using OnNodeDeleted = std::function<void(int nodeId)>;
+
     // ?? Callbacks ?????????????????????????????????????????????????????
-    void SetOnLinkCreated    (OnLinkCreated     cb) { m_onLinkCreated     = std::move(cb); }
-    void SetOnLinkDeleted    (OnLinkDeleted     cb) { m_onLinkDeleted     = std::move(cb); }
-    void SetOnNodeContextMenu(OnNodeContextMenu cb) { m_onNodeContextMenu = std::move(cb); }
+    void SetOnLinkCreated      (OnLinkCreated       cb) { m_onLinkCreated       = std::move(cb); }
+    void SetOnLinkDeleted      (OnLinkDeleted       cb) { m_onLinkDeleted       = std::move(cb); }
+    void SetOnNodeContextMenu  (OnNodeContextMenu   cb) { m_onNodeContextMenu   = std::move(cb); }
+    void SetOnCanvasContextMenu(OnCanvasContextMenu cb) { m_onCanvasContextMenu = std::move(cb); }
+    void SetOnNodeDeleted      (OnNodeDeleted       cb) { m_onNodeDeleted       = std::move(cb); }
+
+    // ?? Coordinate helper (public) ?????????????????????????????????????
+    ImVec2 ScreenToCanvas(ImVec2 s) const {
+        return { (s.x - m_canvasOrigin.x - m_scrollOffset.x) / m_zoom,
+                 (s.y - m_canvasOrigin.y - m_scrollOffset.y) / m_zoom };
+    }
 
     // ?? Style tweaks ???????????????????????????????????????????????????
     struct Style {
@@ -160,10 +174,6 @@ private:
     ImVec2 CanvasToScreen(ImVec2 c) const {
         return { c.x * m_zoom + m_canvasOrigin.x + m_scrollOffset.x,
                  c.y * m_zoom + m_canvasOrigin.y + m_scrollOffset.y };
-    }
-    ImVec2 ScreenToCanvas(ImVec2 s) const {
-        return { (s.x - m_canvasOrigin.x - m_scrollOffset.x) / m_zoom,
-                 (s.y - m_canvasOrigin.y - m_scrollOffset.y) / m_zoom };
     }
 
     // Interaction
@@ -229,9 +239,14 @@ private:
     Style m_style;
 
     // Callbacks
-    OnLinkCreated      m_onLinkCreated;
-    OnLinkDeleted      m_onLinkDeleted;
-    OnNodeContextMenu  m_onNodeContextMenu;
+    OnLinkCreated        m_onLinkCreated;
+    OnLinkDeleted        m_onLinkDeleted;
+    OnNodeContextMenu    m_onNodeContextMenu;
+    OnCanvasContextMenu  m_onCanvasContextMenu;
+    OnNodeDeleted        m_onNodeDeleted;
+
+    // Canvas-space mouse position stored when the canvas context menu was opened.
+    ImVec2 m_contextMenuCanvasPos = { 0.f, 0.f };
 
     // Layout constants
     static constexpr float k_titleBarH   = 26.f;

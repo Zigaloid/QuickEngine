@@ -438,6 +438,9 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -699,6 +702,9 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
   </ItemGroup>

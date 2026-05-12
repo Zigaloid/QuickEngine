@@ -2,6 +2,7 @@
 #include "InputActionManager.h"
 #include "MouseManager.h"
 #include "GamepadManager.h"
+#include "Profiler/Profiler.h"
 
 #include <algorithm>
 #include <cmath>
@@ -24,11 +25,13 @@ InputActionManager::~InputActionManager()
 
 bool InputActionManager::OnInitialize()
 {
+    DECLARE_FUNC_VLOW();
     return true;
 }
 
 void InputActionManager::OnShutdown()
 {
+    DECLARE_FUNC_VLOW();
     DetachMouseManager();
     DetachGamepadManager();
     m_stack.clear();
@@ -39,6 +42,7 @@ void InputActionManager::OnShutdown()
 
 void InputActionManager::OnUpdate(double deltaTime)
 {
+    DECLARE_FUNC_LOW();
     m_totalTime += deltaTime;
     ProcessStack(deltaTime);
 }
@@ -149,6 +153,7 @@ void InputActionManager::ProcessStack(double deltaTime)
 
 bool InputActionManager::ProcessContext(const StackEntry& entry, double deltaTime)
 {
+    DECLARE_FUNC_MEDIUM();
     const ActionContext& ctx      = *entry.context;
     const auto&          bindings = ctx.GetBindings();
 

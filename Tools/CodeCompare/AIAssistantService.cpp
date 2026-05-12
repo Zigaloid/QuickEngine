@@ -54,7 +54,7 @@ void AIAssistantService::ExecuteQuery(const std::string& prompt, ResponseCallbac
     bool isError = false;
     try
     {
-        result = PostToClaudeAPI(prompt);
+        result = PostToLMStudioAPI(prompt);
     }
     catch (const std::exception& e) { result = std::string("Exception: ") + e.what(); isError = true; }
     catch (...)                      { result = "Unknown error during API call.";       isError = true; }
@@ -66,37 +66,33 @@ void AIAssistantService::ExecuteQuery(const std::string& prompt, ResponseCallbac
     m_isQuerying.store(false);
 }
 
-std::string AIAssistantService::PostToClaudeAPI(const std::string& prompt)
+std::string AIAssistantService::PostToLMStudioAPI(const std::string& prompt)
 {
-    // Read Anthropic API key from environment. Get a key at: console.anthropic.com
-    char keyBuf[256] = {};
-    DWORD keyLen = GetEnvironmentVariableA("ANTHROPIC_API_KEY", keyBuf, sizeof(keyBuf));
-    if (keyLen == 0 || keyLen >= sizeof(keyBuf))
-        return "Error: ANTHROPIC_API_KEY environment variable not set. Get a key at console.anthropic.com";
-
-    const std::string apiKey(keyBuf, keyLen);
-
+    // LM Studio local server — no API key required, uses whatever model is currently loaded.
+    // Default endpoint: http://localhost:1234/v1/chat/completions
     const std::string body =
-        "{\"model\":\"claude-opus-4-5\",\"max_tokens\":2048,"
+        "{\"model\":\"local-model\",\"max_tokens\":2048,"
         "\"messages\":[{\"role\":\"user\",\"content\":\"" + EscapeJsonString(prompt) + "\"}]}";
 
     HINTERNET hSession = WinHttpOpen(L"QuickScope-CodeCompare/1.0",
-        WINHTTP_ACCESS_TYPE_DEFAULT_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
+        WINHTTP_ACCESS_TYPE_NO_PROXY, WINHTTP_NO_PROXY_NAME, WINHTTP_NO_PROXY_BYPASS, 0);
     if (!hSession)
         return "Error: WinHttpOpen failed (" + std::to_string(GetLastError()) + ").";
 
-    HINTERNET hConnect = WinHttpConnect(hSession, L"api.anthropic.com", INTERNET_DEFAULT_HTTPS_PORT, 0);
+    // LM Studio can be slow to respond depending on model size — use a 5-minute timeout.
+    // Args: resolve, connect, send, receive (all in milliseconds)
+    WinHttpSetTimeouts(hSession, 10000, 10000, 300000, 300000);
+
+    // Plain HTTP on port 1234 — LM Studio's default local server port
+    HINTERNET hConnect = WinHttpConnect(hSession, L"localhost", 1234, 0);
     if (!hConnect) { WinHttpCloseHandle(hSession); return "Error: WinHttpConnect failed (" + std::to_string(GetLastError()) + ")."; }
 
-    HINTERNET hRequest = WinHttpOpenRequest(hConnect, L"POST", L"/v1/messages",
-        nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, WINHTTP_FLAG_SECURE);
+    // No WINHTTP_FLAG_SECURE — plain HTTP
+    HINTERNET hRequest = WinHttpOpenRequest(hConnect, L"POST", L"/v1/chat/completions",
+        nullptr, WINHTTP_NO_REFERER, WINHTTP_DEFAULT_ACCEPT_TYPES, 0);
     if (!hRequest) { WinHttpCloseHandle(hConnect); WinHttpCloseHandle(hSession); return "Error: WinHttpOpenRequest failed (" + std::to_string(GetLastError()) + ")."; }
 
-    const std::wstring headers =
-        L"x-api-key: " + std::wstring(apiKey.begin(), apiKey.end()) + L"\r\n"
-        L"anthropic-version: 2023-06-01\r\n"
-        L"Content-Type: application/json\r\n";
-
+    const std::wstring headers = L"Content-Type: application/json\r\n";
     WinHttpAddRequestHeaders(hRequest, headers.c_str(), (DWORD)-1L, WINHTTP_ADDREQ_FLAG_ADD);
 
     BOOL sent = WinHttpSendRequest(hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0,
@@ -106,6 +102,10 @@ std::string AIAssistantService::PostToClaudeAPI(const std::string& prompt)
     {
         DWORD err = GetLastError();
         WinHttpCloseHandle(hRequest); WinHttpCloseHandle(hConnect); WinHttpCloseHandle(hSession);
+        if (err == 12029) // ERROR_WINHTTP_CANNOT_CONNECT
+            return "Error: Cannot connect to LM Studio (12029). Make sure LM Studio is running, a model is loaded, and the local server is started on port 1234.";
+        if (err == 12002) // ERROR_WINHTTP_TIMEOUT
+            return "Error: LM Studio took too long to respond (12002). The model may be overloaded or the prompt too large.";
         return "Error: Failed to send request (" + std::to_string(err) + ").";
     }
 
@@ -125,8 +125,8 @@ std::string AIAssistantService::PostToClaudeAPI(const std::string& prompt)
 
 std::string AIAssistantService::ParseResponseText(const std::string& jsonBody)
 {
-    // Anthropic format: "content":[{"type":"text","text":"..."}]
-    const std::string key = "\"text\":";
+    // OpenAI-compatible format: "choices":[{"message":{"content":"..."}}]
+    const std::string key = "\"content\":";
     size_t pos = jsonBody.find(key);
     if (pos != std::string::npos)
     {
@@ -138,6 +138,7 @@ std::string AIAssistantService::ParseResponseText(const std::string& jsonBody)
 
     if (pos == std::string::npos || pos >= jsonBody.size())
     {
+        // Check if LM Studio returned an error object
         const std::string errKey = "\"message\":";
         size_t epos = jsonBody.find(errKey);
         if (epos != std::string::npos)
@@ -148,6 +149,8 @@ std::string AIAssistantService::ParseResponseText(const std::string& jsonBody)
             size_t end = jsonBody.find('"', epos);
             return "API Error: " + jsonBody.substr(epos, end - epos);
         }
+        if (jsonBody.empty())
+            return "Error: No response from LM Studio. Is a model loaded and the server running on localhost:1234?";
         return "Error: Unexpected response format. Raw body:\n" + jsonBody;
     }
 

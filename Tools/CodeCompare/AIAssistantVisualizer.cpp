@@ -37,7 +37,7 @@ bool AIAssistantVisualizer::Render(bool* isOpen)
     // ── Buttons ───────────────────────────────────────────────────────────────
     if (querying) ImGui::BeginDisabled();
 
-    if (ImGui::Button("Ask Claude"))
+    if (ImGui::Button("Submit"))
         SubmitQuery();
 
     if (m_diffLines && !m_diffLines->empty())

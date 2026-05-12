@@ -59,14 +59,14 @@ namespace
 
 				// Get timer at start of frame to get accurate delta time for job system scheduling and other time-based operations							
 				ImguiUpdate();
-				BgfxUpdateView();
+				
 
 				Core::CoreSystem::GetResourceManager()->UpdateFinalization();
 				auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
 				scheduler->UpdateAllAsync(m_deltaTime);
-				scheduler->WaitForCompletion();
-
+				scheduler->WaitForCompletion();								
 				theApp.Update(m_deltaTime);
+				BgfxUpdateView();
 				UpdateDeltaTime();
 				NEXUS_SEND_MESSAGE(FPS_PIPE, MSG_TYPE_FRAME_TIME, std::to_string(m_deltaTime).c_str());
 				

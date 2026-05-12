@@ -608,6 +608,8 @@ namespace ComponentSystem {
 				auto factory = std::make_unique<TypedComponentFactory<T>>();
 				auto pool = std::make_unique<ComponentPool>(std::move(factory), initialPoolSize, maxPoolSize);
 				m_pools[typeIndex] = std::move(pool);
+				// Auto-register the reflection class name so AddDependencyByName can resolve it
+				m_nameToTypeIndex.emplace(T::ClassName(), typeIndex);
 			}
 		}
 

@@ -38,6 +38,7 @@ namespace ComponentSystem {
 
 	std::vector<std::vector<std::type_index>> ComponentSystemScheduler::ResolveDependencies() const
 	{
+		DECLARE_FUNC_LOW();
 		std::vector<std::vector<std::type_index>> batches;
 		std::unordered_set<std::type_index> processed;
 
@@ -53,14 +54,19 @@ namespace ComponentSystem {
 				}
 
 				bool canExecute = true;
-				for (const auto& dep : phase.dependencies)
-				{
-					if (processed.find(dep) == processed.end())
+					for (const auto& dep : phase.dependencies)
 					{
-						canExecute = false;
-						break;
+						// A dep type with no registered phase will never appear in 'processed'.
+						// Treat it as already satisfied so it doesn't permanently block this phase.
+						if (m_typeToPhaseIndex.find(dep) == m_typeToPhaseIndex.end())
+							continue;
+
+						if (processed.find(dep) == processed.end())
+						{
+							canExecute = false;
+							break;
+						}
 					}
-				}
 
 				if (canExecute)
 				{
@@ -153,6 +159,7 @@ namespace ComponentSystem {
 
 	void ComponentSystemScheduler::UpdateWithDependencies(double deltaTime)
 	{
+		DECLARE_FUNC_LOW();
 		auto dependencyBatches = ResolveDependencies();
 
 		for (const auto& batch : dependencyBatches)

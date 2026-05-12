@@ -779,8 +779,64 @@ void CodeCompareVisualizer::RenderAIPanel()
     ImGui::End();
 }
 
+// ─── Settings persistence ────────────────────────────────────────────────────
+
+static std::string GetSettingsPath()
+{
+    char appData[MAX_PATH] = {};
+    DWORD len = GetEnvironmentVariableA("APPDATA", appData, sizeof(appData));
+    if (len == 0 || len >= sizeof(appData))
+        return {};
+    return std::string(appData) + "\\QuickScope\\CodeCompare.ini";
+}
+
+void CodeCompareVisualizer::LoadSettings()
+{
+    const std::string path = GetSettingsPath();
+    if (path.empty()) return;
+
+    std::ifstream f(path);
+    if (!f.is_open()) return;
+
+    std::string line;
+    while (std::getline(f, line))
+    {
+        if (line.empty() || line[0] == ';') continue;
+        const auto eq = line.find('=');
+        if (eq == std::string::npos) continue;
+        const std::string key   = line.substr(0, eq);
+        const std::string value = line.substr(eq + 1);
+        if      (key == "PathA")  strncpy_s(m_pathA,    sizeof(m_pathA),    value.c_str(), _TRUNCATE);
+        else if (key == "PathB")  strncpy_s(m_pathB,    sizeof(m_pathB),    value.c_str(), _TRUNCATE);
+        else if (key == "Filter") strncpy_s(m_filterStr, sizeof(m_filterStr), value.c_str(), _TRUNCATE);
+    }
+}
+
+void CodeCompareVisualizer::SaveSettings() const
+{
+    const std::string path = GetSettingsPath();
+    if (path.empty()) return;
+
+    // Ensure the directory exists
+    fs::create_directories(fs::path(path).parent_path());
+
+    std::ofstream f(path, std::ios::trunc);
+    if (!f.is_open()) return;
+
+    f << "; QuickScope CodeCompare settings — auto-generated, do not edit by hand\n";
+    f << "PathA="  << m_pathA    << '\n';
+    f << "PathB="  << m_pathB    << '\n';
+    f << "Filter=" << m_filterStr << '\n';
+}
+
 bool CodeCompareVisualizer::Render(bool* isOpen)
 {
+    if (!m_settingsLoaded)
+    {
+        LoadSettings();
+        m_settingsLoaded = true;
+    }
+
     ImGui::SetNextWindowSize({ 1200.f, 800.f }, ImGuiCond_FirstUseEver);
 
     const ImGuiWindowFlags mainFlags =
@@ -837,7 +893,10 @@ bool CodeCompareVisualizer::Render(bool* isOpen)
     const bool busy = m_isComparing.load();
     if (busy) ImGui::BeginDisabled();
     if (ImGui::Button("  Compare  ", { 140.f, 0.f }))
+    {
+        SaveSettings();
         StartComparison();
+    }
     if (busy) ImGui::EndDisabled();
 
     ImGui::SameLine(0, 16.f);

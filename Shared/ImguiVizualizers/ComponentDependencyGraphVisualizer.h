@@ -147,17 +147,12 @@ private:
     // True when the graph has unsaved changes.
     bool m_isDirty = false;
 
-    // Cached list of all registered class names (for the combo boxes).
+    // Cached list of all registered class names (for the right-click add menu).
     std::vector<std::string> m_classNames;
 
-    // Selected indices in the "Add dependency" combo boxes.
-    int m_addFromIdx = 0; // dependsOn
-    int m_addToIdx   = 0; // dependent
-
-    // Filter buffers for the two combo box search fields.
+    // Search filter buffer for the canvas right-click "Add Node" popup.
     static constexpr int k_filterBufSize = 128;
-    char m_fromFilter[k_filterBufSize] = {};
-    char m_toFilter  [k_filterBufSize] = {};
+    char m_canvasCtxFilter[k_filterBufSize] = {};
 
     // Path input buffer for the inline file loader UI.
     static constexpr int k_pathBufSize = 512;

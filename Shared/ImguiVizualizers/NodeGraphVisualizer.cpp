@@ -54,6 +54,8 @@ void NodeGraphVisualizer::RemoveNode(int nodeId)
 
     if (m_selectedNodeId == nodeId) m_selectedNodeId = -1;
     if (m_dragNodeId     == nodeId) m_dragNodeId     = -1;
+
+    if (m_onNodeDeleted) m_onNodeDeleted(nodeId);
 }
 
 int NodeGraphVisualizer::AddLink(int outNodeId, int outPinId,
@@ -696,20 +698,24 @@ bool NodeGraphVisualizer::TryBeginLinkFrom(NodePin* pin, NodeGraphNode* node)
 
 bool NodeGraphVisualizer::TryCompleteLinkAt(NodePin* pin, NodeGraphNode* node)
 {
+    // Capture source state before CancelLinkDrag() clears it.
+    const int          srcPinId  = m_dragSourcePinId;
+    const int          srcNodeId = m_dragSourceNodeId;
+    const PinDirection srcDir    = m_dragSourceDir;
     CancelLinkDrag();
 
-    if (pin->id == m_dragSourcePinId) return false; // same pin
-    if (node->GetId() == m_dragSourceNodeId) return false; // same node
+    if (pin->id == srcPinId)       return false; // same pin
+    if (node->GetId() == srcNodeId) return false; // same node
 
     // Determine which is output, which is input.
     int outNode, outPin, inNode, inPin;
 
-    if (m_dragSourceDir == PinDirection::Output && pin->direction == PinDirection::Input) {
-        outNode = m_dragSourceNodeId; outPin = m_dragSourcePinId;
-        inNode  = node->GetId();      inPin  = pin->id;
-    } else if (m_dragSourceDir == PinDirection::Input && pin->direction == PinDirection::Output) {
-        outNode = node->GetId();      outPin = pin->id;
-        inNode  = m_dragSourceNodeId; inPin  = m_dragSourcePinId;
+    if (srcDir == PinDirection::Output && pin->direction == PinDirection::Input) {
+        outNode = srcNodeId;      outPin = srcPinId;
+        inNode  = node->GetId(); inPin  = pin->id;
+    } else if (srcDir == PinDirection::Input && pin->direction == PinDirection::Output) {
+        outNode = node->GetId(); outPin = pin->id;
+        inNode  = srcNodeId;      inPin  = srcPinId;
     } else {
         return false; // same direction – invalid
     }
@@ -748,6 +754,10 @@ void NodeGraphVisualizer::HandleContextMenus()
             ImGui::OpenPopup("##NodeCtx");
         else if (m_contextLinkId != -1)
             ImGui::OpenPopup("##LinkCtx");
+        else if (m_onCanvasContextMenu) {
+            m_contextMenuCanvasPos = ScreenToCanvas(ImGui::GetMousePos());
+            ImGui::OpenPopup("##CanvasCtx");
+        }
     }
 
     if (ImGui::BeginPopup("##NodeCtx")) {
@@ -773,6 +783,11 @@ void NodeGraphVisualizer::HandleContextMenus()
             RemoveLink(m_contextLinkId);
             m_contextLinkId = -1;
         }
+        ImGui::EndPopup();
+    }
+
+    if (m_onCanvasContextMenu && ImGui::BeginPopup("##CanvasCtx")) {
+        m_onCanvasContextMenu(m_contextMenuCanvasPos);
         ImGui::EndPopup();
     }
 }

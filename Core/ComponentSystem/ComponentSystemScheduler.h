@@ -150,7 +150,7 @@ namespace ComponentSystem {
 	public:
 		explicit ComponentSystemScheduler(ComponentManager* componentManager)
 			: m_componentManager(componentManager)
-			, m_executionPolicy(ExecutionPolicy::Sequential)
+			, m_executionPolicy(ExecutionPolicy::Custom)
 			, m_initialized(false)
 		{
 			assert(m_componentManager && "ComponentManager cannot be null");

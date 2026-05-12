@@ -31,6 +31,55 @@ ComponentDependencyGraphVisualizer::ComponentDependencyGraphVisualizer(
     SetOnLinkCreated([this](const NodeLink&) { m_isDirty = true; });
     SetOnLinkDeleted([this](int)             { m_isDirty = true; });
 
+    // Keep m_nodeIdByClassName in sync when a node is deleted via right-click.
+    SetOnNodeDeleted([this](int nodeId) {
+        for (auto it = m_nodeIdByClassName.begin(); it != m_nodeIdByClassName.end(); ++it) {
+            if (it->second == nodeId) {
+                m_nodeIdByClassName.erase(it);
+                break;
+            }
+        }
+        m_isDirty = true;
+    });
+
+    // Right-click on empty canvas: show a filtered list of component classes.
+    // The selected class is spawned as a new node at the click position.
+    SetOnCanvasContextMenu([this](ImVec2 canvasPos) {
+        ImGui::TextDisabled("Add Component Node");
+        ImGui::Separator();
+
+        // Search filter — auto-focus when the popup first opens.
+        ImGui::SetNextItemWidth(-1.f);
+        if (ImGui::IsWindowAppearing())
+            ImGui::SetKeyboardFocusHere();
+        ImGui::InputText("##addnodefilter", m_canvasCtxFilter, k_filterBufSize);
+
+        ImGui::BeginChild("##addnodelist", ImVec2(260.f, 280.f), false);
+        std::string_view filter(m_canvasCtxFilter);
+        for (const std::string& className : m_classNames) {
+            if (!filter.empty()) {
+                auto it = std::search(
+                    className.begin(), className.end(),
+                    filter.begin(), filter.end(),
+                    [](char a, char b) {
+                        return std::tolower(static_cast<unsigned char>(a)) ==
+                               std::tolower(static_cast<unsigned char>(b));
+                    });
+                if (it == className.end()) continue;
+            }
+            if (ImGui::MenuItem(className.c_str())) {
+                int nodeId = GetOrCreateNode(className);
+                NodeGraphNode* node = FindNode(nodeId);
+                if (node) node->SetPosition(canvasPos);
+                m_isDirty = true;
+                // Clear the filter for the next time the menu opens.
+                m_canvasCtxFilter[0] = '\0';
+                ImGui::CloseCurrentPopup();
+            }
+        }
+        ImGui::EndChild();
+    });
+
     RefreshClassNames();
 }
 
@@ -85,7 +134,7 @@ void ComponentDependencyGraphVisualizer::RenderLoadBar()
 }
 
 // ?? Edit bar UI ???????????????????????????????????????????????????????
-// Renders the "Add dependency" row and the Save / Refresh buttons.
+// Renders the Save and Refresh buttons.
 
 void ComponentDependencyGraphVisualizer::RenderEditBar()
 {
@@ -112,86 +161,8 @@ void ComponentDependencyGraphVisualizer::RenderEditBar()
     if (ImGui::Button("Refresh Classes")) RefreshClassNames();
     ImGui::SameLine();
     ImGui::TextDisabled("%d classes", static_cast<int>(m_classNames.size()));
-
-    ImGui::Spacing();
-
-    if (m_classNames.empty()) {
-        ImGui::TextDisabled("No registered classes found.");
-        return;
-    }
-
-    // ?? Helper: filtered combo ????????????????????????????????????????
-    // Returns true and updates *selectedIdx when the user picks an item.
-    auto FilteredCombo = [&](const char* label, int* selectedIdx,
-                              char* filterBuf, int filterBufSz) -> bool
-    {
-        bool changed = false;
-        const std::string& current = (*selectedIdx >= 0 &&
-                                      *selectedIdx < static_cast<int>(m_classNames.size()))
-                                   ? m_classNames[*selectedIdx] : "";
-
-        ImGui::SetNextItemWidth(220.f);
-        if (ImGui::BeginCombo(label, current.c_str()))
-        {
-            // Search filter
-            ImGui::SetNextItemWidth(-1.f);
-            ImGui::InputText("##filter", filterBuf, filterBufSz);
-            ImGui::SetItemDefaultFocus();
-
-            std::string_view filter(filterBuf);
-            for (int i = 0; i < static_cast<int>(m_classNames.size()); ++i)
-            {
-                const std::string& name = m_classNames[i];
-                // Case-insensitive substring filter
-                if (!filter.empty()) {
-                    auto it = std::search(
-                        name.begin(), name.end(),
-                        filter.begin(), filter.end(),
-                        [](char a, char b) {
-                            return std::tolower(static_cast<unsigned char>(a)) ==
-                                   std::tolower(static_cast<unsigned char>(b));
-                        });
-                    if (it == name.end()) continue;
-                }
-                bool selected = (i == *selectedIdx);
-                if (ImGui::Selectable(name.c_str(), selected)) {
-                    *selectedIdx = i;
-                    changed = true;
-                }
-                if (selected) ImGui::SetItemDefaultFocus();
-            }
-            ImGui::EndCombo();
-        }
-        return changed;
-    };
-
-    // ?? Dependency row: [dependsOn] --> [dependent] [Add] ????????????
-    ImGui::Text("Add dependency:");
     ImGui::SameLine();
-
-    FilteredCombo("##from", &m_addFromIdx, m_fromFilter, k_filterBufSize);
-    ImGui::SameLine();
-    ImGui::TextUnformatted(" must finish before ");
-    ImGui::SameLine();
-    FilteredCombo("##to",   &m_addToIdx,   m_toFilter,   k_filterBufSize);
-    ImGui::SameLine();
-
-    bool canAdd = (m_addFromIdx != m_addToIdx) && !m_classNames.empty();
-    if (!canAdd) ImGui::BeginDisabled();
-    bool addClicked = ImGui::Button("Add");
-    if (!canAdd) ImGui::EndDisabled();
-
-    if (addClicked && canAdd) {
-        const std::string& dependsOn = m_classNames[m_addFromIdx];
-        const std::string& dependent = m_classNames[m_addToIdx];
-        if (!AddDependency(dependsOn, dependent)) {
-            m_statusMessage = "Dependency already exists: "
-                            + dependsOn + " -> " + dependent;
-        } else {
-            m_statusMessage = "Added: " + dependsOn + " -> " + dependent;
-            m_lastError.clear();
-        }
-    }
+    ImGui::TextDisabled("  |  Right-click canvas to add a node");
 }
 
 // ?? SaveToFile ????????????????????????????????????????????????????????
@@ -267,16 +238,6 @@ void ComponentDependencyGraphVisualizer::RefreshClassNames()
 {
     m_classNames = ClassFactory::GetRegisteredClassNames();
     std::sort(m_classNames.begin(), m_classNames.end());
-
-    // Clamp selection indices in case the list shrank.
-    auto clamp = [&](int& idx) {
-        if (!m_classNames.empty())
-            idx = std::max(0, std::min(idx, static_cast<int>(m_classNames.size()) - 1));
-        else
-            idx = 0;
-    };
-    clamp(m_addFromIdx);
-    clamp(m_addToIdx);
 }
 
 // ?? LoadFromFile ??????????????????????????????????????????????????????

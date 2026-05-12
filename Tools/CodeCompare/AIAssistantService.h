@@ -8,13 +8,13 @@
 #include <thread>
 
 /**
- * @brief Async interface to the Anthropic Claude API via WinHTTP.
+ * @brief Async interface to the LM Studio local API via WinHTTP.
  *
  * Call Query() from any thread. The response callback is queued and
  * dispatched safely on the main thread during Update().
  *
- * Requires the ANTHROPIC_API_KEY environment variable to be set.
- * Get a key at: console.anthropic.com
+ * Requires LM Studio to be running with a model loaded.
+ * The default endpoint is http://localhost:1234/v1/chat/completions.
  */
 class AIAssistantService
 {
@@ -29,7 +29,7 @@ public:
     AIAssistantService& operator=(const AIAssistantService&) = delete;
 
     /**
-     * @brief Submit a prompt to Claude asynchronously.
+     * @brief Submit a prompt to the locally running LM Studio model asynchronously.
      *        Returns immediately; callback fires during the next Update() call.
      * @param prompt   The user prompt to send.
      * @param callback Invoked on the main thread with the response text or an error message.
@@ -55,7 +55,7 @@ private:
     };
 
     void        ExecuteQuery(const std::string& prompt, ResponseCallback callback);
-    std::string PostToClaudeAPI(const std::string& prompt);
+    std::string PostToLMStudioAPI(const std::string& prompt);
     std::string ParseResponseText(const std::string& jsonBody);
     std::string EscapeJsonString(const std::string& input);
 
