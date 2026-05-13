@@ -67,6 +67,12 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
         m_selectedLayer = layer;
     }
 
+    // Open context menu on right-click of the tree node arrow/area
+    if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+    {
+        ImGui::OpenPopup("##LayerContextMenu");
+    }
+
     ImGui::SameLine();
 
     // Layer name (with rename support)
@@ -91,10 +97,15 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
     else
     {
         ImGui::Text("%s", layer->GetName().c_str());
-        // Clicking the label should select the layer as well
+        // Clicking or right-clicking the label should also trigger selection / context menu
         if (ImGui::IsItemClicked())
         {
             m_selectedLayer = layer;
+        }
+        if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+        {
+            m_selectedLayer = layer;
+            ImGui::OpenPopup("##LayerContextMenu");
         }
     }
 
@@ -110,8 +121,8 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
         ImGui::SetTooltip("Toggle layer visibility");
     }
 
-    // Context menu — allow right-click on the last rendered item for this row
-    if (ImGui::BeginPopupContextItem())
+    // Context menu — bound to an explicit ID so it is not hijacked by the last item (checkbox)
+    if (ImGui::BeginPopup("##LayerContextMenu"))
     {
         if (ImGui::MenuItem("Add Child Layer"))
         {

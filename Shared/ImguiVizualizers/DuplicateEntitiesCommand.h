@@ -44,16 +44,25 @@ public:
         , m_registerFn(std::move(registerFn))
         , m_deregisterFn(std::move(deregisterFn))
     {
-        // Snapshot each source entity before duplication.
-        m_jsonSnapshots.reserve(sourceEntities.size());
+        // Snapshot each source entity and its parent layer before duplication.
+        m_snapshots.reserve(sourceEntities.size());
         for (auto* entity : sourceEntities)
         {
             auto result = entity->WriteToJsonString();
-            m_jsonSnapshots.push_back(result.IsSuccess() ? result.GetValue() : std::string{});
+            // Store the direct parent (layer) so duplicates land in the same layer.
+            // Fall back to the root level if the parent is not a CLevelComponent.
+            CLevelComponent* parentLayer = dynamic_cast<CLevelComponent*>(entity->GetParent());
+            if (!parentLayer)
+                parentLayer = level;
+
+            m_snapshots.push_back({
+                result.IsSuccess() ? result.GetValue() : std::string{},
+                parentLayer
+            });
         }
     }
 
-    // ICommand ?????????????????????????????????????????????????????????
+    // ICommand ————————————————————————————————————————————————————————————————
 
     /// Creates duplicate entities from the JSON snapshots, registers their
     /// selectables, and makes them the active selection.
@@ -62,22 +71,24 @@ public:
         m_newEntities.clear();
         std::vector<std::shared_ptr<CSelectable>> allNewSelectables;
 
-        for (const auto& snapshot : m_jsonSnapshots)
+        for (const auto& snap : m_snapshots)
         {
-            if (snapshot.empty())
+            if (snap.json.empty())
                 continue;
 
-            CEntityComponent* entity = m_level->CreateChild<CEntityComponent>();
+            // Create the duplicate inside the same layer as the original.
+            CLevelComponent* targetParent = snap.parentLayer ? snap.parentLayer : m_level;
+            CEntityComponent* entity = targetParent->CreateChild<CEntityComponent>();
             if (!entity)
                 continue;
 
-            if (!entity->ReadFromJsonString(snapshot))
+            if (!entity->ReadFromJsonString(snap.json))
             {
-                m_level->RemoveChild(entity);
+                targetParent->RemoveChild(entity);
                 continue;
             }
 
-            m_newEntities.push_back(entity);
+            m_newEntities.push_back({ entity, targetParent });
 
             auto newSelectables = m_registerFn(entity);
             allNewSelectables.insert(allNewSelectables.end(),
@@ -93,10 +104,11 @@ public:
     {
         m_selectionMgr->ClearSelection();
 
-        for (CEntityComponent* entity : m_newEntities)
+        for (auto& [entity, parent] : m_newEntities)
         {
             m_deregisterFn(entity);
-            m_level->RemoveChild(entity);
+            CLevelComponent* targetParent = parent ? parent : m_level;
+            targetParent->RemoveChild(entity);
         }
         m_newEntities.clear();
     }
@@ -104,12 +116,24 @@ public:
     const char* GetLabel() const override { return "Duplicate Entities"; }
 
 private:
+    struct EntitySnapshot
+    {
+        std::string      json;
+        CLevelComponent* parentLayer = nullptr;
+    };
+
+    struct CreatedEntity
+    {
+        CEntityComponent* entity = nullptr;
+        CLevelComponent*  parent = nullptr;
+    };
+
     CLevelComponent*               m_level        = nullptr;
     CSelectionManager*             m_selectionMgr = nullptr;
     RegisterFn                     m_registerFn;
     DeregisterFn                   m_deregisterFn;
-    std::vector<std::string>       m_jsonSnapshots;
-    std::vector<CEntityComponent*> m_newEntities;
+    std::vector<EntitySnapshot>    m_snapshots;
+    std::vector<CreatedEntity>     m_newEntities;
 };
 
 } // namespace ImGuiVisualizers
