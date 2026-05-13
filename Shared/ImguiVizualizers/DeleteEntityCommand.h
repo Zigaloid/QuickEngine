@@ -45,6 +45,11 @@ public:
         , m_registerFn(std::move(registerFn))
         , m_deregisterFn(std::move(deregisterFn))
     {
+        // Capture the entity's actual parent (may be a layer, not the root level).
+        m_entityParent = entity ? dynamic_cast<CLevelComponent*>(entity->GetParent()) : nullptr;
+        if (!m_entityParent)
+            m_entityParent = level; // fallback to root
+
         // Snapshot the full entity state before it is ever deleted.
         auto result = entity->WriteToJsonString();
         if (result.IsSuccess())
@@ -56,29 +61,29 @@ public:
     /// Removes the entity from the level and clears related selectables.
     void Execute() override
     {
-        if (!m_entity || !m_level)
+        if (!m_entity || !m_entityParent)
             return;
 
         m_deregisterFn(m_entity);
         m_selectionMgr->ClearSelection();
-        m_level->RemoveChild(m_entity);
+        m_entityParent->RemoveChild(m_entity);
         m_entity = nullptr;   // entity is now destroyed
     }
 
     /// Recreates the entity from the JSON snapshot and re-registers its selectables.
     void Undo() override
     {
-        if (!m_level || m_jsonSnapshot.empty())
+        if (!m_entityParent || m_jsonSnapshot.empty())
             return;
 
-        m_entity = m_level->CreateChild<CEntityComponent>();
+        m_entity = m_entityParent->CreateChild<CEntityComponent>();
         if (!m_entity)
             return;
 
         if (!m_entity->ReadFromJsonString(m_jsonSnapshot))
         {
             // Snapshot restore failed — remove the empty shell we just created.
-            m_level->RemoveChild(m_entity);
+            m_entityParent->RemoveChild(m_entity);
             m_entity = nullptr;
             return;
         }
@@ -89,8 +94,9 @@ public:
     const char* GetLabel() const override { return "Delete Entity"; }
 
 private:
-    CLevelComponent*   m_level       = nullptr;
-    CEntityComponent*  m_entity      = nullptr;   ///< Valid only between Undo/Execute pairs.
+    CLevelComponent*   m_level        = nullptr;
+    CLevelComponent*   m_entityParent = nullptr;  ///< Actual parent (may be a layer, not root).
+    CEntityComponent*  m_entity       = nullptr;  ///< Valid only between Undo/Execute pairs.
     CSelectionManager* m_selectionMgr = nullptr;
     RegisterFn         m_registerFn;
     DeregisterFn       m_deregisterFn;

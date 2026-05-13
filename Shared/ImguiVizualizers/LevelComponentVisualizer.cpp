@@ -62,6 +62,10 @@ namespace ImGuiVisualizers {
 
 		RegisterRenderComponents(m_levelComp);
 
+		// Initialize the layers panel with the level component
+		m_layersPanel.SetLevelComponent(m_levelComp);
+		m_layersPanel.SetSelectionManager(&m_selectionManager);
+
 		// Trigger entity asset refresh
 		m_entityAssetsNeedRefresh = true;
 
@@ -198,37 +202,53 @@ namespace ImGuiVisualizers {
 	void LevelComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, ComponentSystem::Component* comp)
 	{
 		if (!comp) return;
-
-		if (auto* renderComp = dynamic_cast<CRenderComponent*>(comp))
+	// Helper to test whether the component belongs to a visible-in-editor layer.
+	auto IsInVisibleLayer = [](ComponentSystem::Component* c) -> bool
+	{
+		ComponentSystem::Component* cur = c;
+		while (cur)
 		{
-			if (renderComp->IsActive())
-			{
-				renderComp->Render(viewId);
-			}
+			if (auto* lvl = dynamic_cast<CLevelComponent*>(cur))
+				return lvl->IsVisibleInEditor();
+			cur = cur->GetParent();
 		}
+		return true;
+	};
 
-		// For other physics components (e.g. CCharacterComponent), call DebugRender
-		// using the sibling RenderComponent's model matrix as the world base,
-		// matching the same approach used for CPhysicsBodyComponent above.
+	if (auto* renderComp = dynamic_cast<CRenderComponent*>(comp))
+	{
+		if (renderComp->IsActive() && IsInVisibleLayer(renderComp))
+		{
+			renderComp->Render(viewId);
+		}
+	}
+
+        // For other physics components (e.g. CCharacterComponent), call DebugRender
+		// using the sibling CTransformComponent's model matrix as the world base.
+		// Skip debug rendering when the physics component (or its ancestors)
+		// are inactive so layer visibility is respected.
 		if (auto* physComp = dynamic_cast<CPhysicsComponent*>(comp))
 		{
-			Matrix4f transform = physComp->GetObjectMatrix();
-
-			ComponentSystem::Component* parent = comp->GetParent();
-			if (parent)
+			// Respect component active state in the hierarchy (covers layer on/off)
+			if (!physComp->IsActive() || !physComp->IsActiveInHierarchy())
 			{
-				for (auto* sibling : parent->GetChildren())
-				{
-					if (auto* renderComp = dynamic_cast<CTransformComponent*>(sibling))
-					{
-						auto modelMatrix = renderComp->GetTransform();
-						transform = (modelMatrix)*transform;
-						break;
-					}
-				}
+				// Do not render debug for inactive components
 			}
+			else
+			{
+				Matrix4f transform = physComp->GetObjectMatrix();
 
-			physComp->DebugRender(viewId, transform);
+				// Use FindSibling helper to locate a CTransformComponent sibling if present
+				if (auto* transformComp = comp->FindSibling<CTransformComponent>())
+				{
+					auto modelMatrix = transformComp->GetTransform();
+					transform = modelMatrix * transform;
+				}
+
+                // Also respect editor visibility of containing layer
+				if (IsInVisibleLayer(physComp))
+					physComp->DebugRender(viewId, transform);
+			}
 		}
 
 		for (auto* child : comp->GetChildren())
@@ -262,13 +282,27 @@ namespace ImGuiVisualizers {
 
 		const std::shared_ptr<CSelectable> lastSelected = m_selectionManager.GetSelected();
 
-		for (const auto& selectable : allSelected)
+	// Helper to test whether the component belongs to a visible-in-editor layer.
+	auto IsInVisibleLayer = [](ComponentSystem::Component* c) -> bool
+	{
+		ComponentSystem::Component* cur = c;
+		while (cur)
+		{
+			if (auto* lvl = dynamic_cast<CLevelComponent*>(cur))
+				return lvl->IsVisibleInEditor();
+			cur = cur->GetParent();
+		}
+		return true;
+	};
+
+	for (const auto& selectable : allSelected)
 		{
 			auto rc = std::dynamic_pointer_cast<CRenderComponentSelectable>(selectable);
 			if (!rc) continue;
 
 			CRenderComponent* comp = rc->GetComponent();
-			if (!comp || !comp->IsActive()) continue;
+        if (!comp || !comp->IsActive()) continue;
+		if (!IsInVisibleLayer(comp)) continue;
 
 			const Vector4f bs = *comp->GetBoundingSphere();
 			auto modelMatrixPtr = comp->GetModelMatrix();
@@ -370,12 +404,6 @@ namespace ImGuiVisualizers {
 		if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Z)) m_history.Undo();
 		if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Y)) m_history.Redo();
 
-		// Delete selected entities when the Delete key is pressed inside the viewport.
-		if (ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
-			m_levelComp && !m_selectionManager.IsGizmoDragging())
-		{
-			DeleteSelectedEntities();
-		}
 
 		// Build window title
 		std::string title = m_windowName;
@@ -412,6 +440,7 @@ namespace ImGuiVisualizers {
 			ImGui::SetTooltip("Gizmo Mode");
 		}
 
+
 		// Refresh entity assets if needed
 		if (m_entityAssetsNeedRefresh) {
 			RefreshEntityAssets();
@@ -441,20 +470,20 @@ namespace ImGuiVisualizers {
 
 		ImGui::SameLine();
 
-		// Calculate remaining width for the right side (3D view + inspector)
+		// Calculate remaining width for the right side (3D view + right panels)
 		float remainingWidth = avail.x - m_entityPanelWidth - 8.0f; // Account for splitter
-		float leftW = remainingWidth * 0.65f;
-		float rightW = remainingWidth - leftW;
+		float centerW = remainingWidth * 0.65f;
+		float rightW = remainingWidth - centerW;
 
 		ImGui::BeginChild("##ContentArea", ImVec2(remainingWidth, avail.y), false);
 
-		// 3D View on the left
-		ImGui::BeginChild("##Left3D", ImVec2(leftW, 0), false);
-		ImVec2 leftAvail = ImGui::GetContentRegionAvail();
-		if (leftAvail.x < 1.0f) leftAvail.x = 1.0f;
-		if (leftAvail.y < 1.0f) leftAvail.y = 1.0f;
+		// 3D View in the center
+		ImGui::BeginChild("##Center3D", ImVec2(centerW, 0), false);
+		ImVec2 centerAvail = ImGui::GetContentRegionAvail();
+		if (centerAvail.x < 1.0f) centerAvail.x = 1.0f;
+		if (centerAvail.y < 1.0f) centerAvail.y = 1.0f;
 
-		m_view.RenderContent(leftAvail);
+		m_view.RenderContent(centerAvail);
 
 		// Record the exact screen rect of the rendered image.
 		m_viewportMin = ImGui::GetItemRectMin();
@@ -462,6 +491,22 @@ namespace ImGuiVisualizers {
 
 		// Update the manager with current view state
 		m_selectionManager.SetViewInfo(Get3DView().GetCamera(), m_viewportMin, m_viewportSize);
+
+		// Allow Delete key to remove selected entities only when the mouse is inside
+		// the 3D viewport. This prevents deletions when hovering other panels.
+		{
+			const ImVec2 mouse = ImGui::GetMousePos();
+			const bool inViewportForDelete = mouse.x >= m_viewportMin.x &&
+				mouse.y >= m_viewportMin.y &&
+				mouse.x < m_viewportMin.x + m_viewportSize.x &&
+				mouse.y < m_viewportMin.y + m_viewportSize.y;
+
+			if (inViewportForDelete && ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
+				m_levelComp && !m_selectionManager.IsGizmoDragging())
+			{
+				DeleteSelectedEntities();
+			}
+		}
 
 		// Left-click inside the viewport (not a drag) → pick
 		// Camera movement is only applied when the Alt key is held
@@ -489,9 +534,46 @@ namespace ImGuiVisualizers {
 
 		ImGui::SameLine();
 
-		// Inspector on the right
-		ImGui::BeginChild("##RightInspector", ImVec2(rightW, 0), false);
-		RenderInspectorPanel();
+		// Splitter handle between center and right panels
+		ImGui::Button("##CenterSplitter", ImVec2(4.0f, 0));
+		if (ImGui::IsItemActive()) {
+			centerW += ImGui::GetIO().MouseDelta.x;
+			rightW -= ImGui::GetIO().MouseDelta.x;
+			if (centerW < 300.0f) centerW = 300.0f;
+			if (rightW < 150.0f) rightW = 150.0f;
+		}
+		if (ImGui::IsItemHovered()) {
+			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
+		}
+
+		ImGui::SameLine();
+
+		// Right panel with tabs for Layers and Properties
+		ImGui::BeginChild("##RightPanel", ImVec2(rightW, 0), false);
+		if (ImGui::BeginTabBar("##RightTabs"))
+		{
+			// Layers tab
+			if (ImGui::BeginTabItem("Layers"))
+			{
+				m_layersPanel.Render();
+				ImGui::EndTabItem();
+			}
+
+			// Properties tab
+			if (ImGui::BeginTabItem("Properties"))
+			{
+				RenderInspectorPanel();
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("Object"))
+			{
+				m_editor.RenderInspectorInline();
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
 		ImGui::EndChild();
 
 		ImGui::EndChild(); // ContentArea
@@ -574,8 +656,13 @@ namespace ImGuiVisualizers {
 			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_ASSET")) {
 				const char* entityPath = static_cast<const char*>(payload->Data);
 
-				// Create a new EntityComponent as a child of the level
-				CEntityComponent* newEntity = m_levelComp->CreateChild<CEntityComponent>();
+				// Add to the selected layer if one is active, otherwise fall back to the level root
+				CLevelComponent* targetParent = m_layersPanel.GetSelectedLayer();
+				if (!targetParent)
+					targetParent = m_levelComp;
+
+				// Create a new EntityComponent as a child of the target layer
+				CEntityComponent* newEntity = targetParent->CreateChild<CEntityComponent>();
 				if (newEntity) {
 					// Load the entity definition from file using SafeRead
 					auto result = newEntity->SafeRead(entityPath);
@@ -609,26 +696,10 @@ namespace ImGuiVisualizers {
 		if (owner != m_propertyInspector.GetObject())
 			m_propertyInspector.SetObject(owner);
 
-		if (ImGui::BeginTabBar("##InspectorTabs"))
-		{
-
-			if (ImGui::BeginTabItem("Properties"))
-			{
-				if (owner)
-					m_propertyInspector.RenderContent();
-				else
-					ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "No object selected");
-				ImGui::EndTabItem();
-			}
-
-			if (ImGui::BeginTabItem("Object"))
-			{
-				m_editor.RenderInspectorInline();
-				ImGui::EndTabItem();
-			}
-
-			ImGui::EndTabBar();
-		}
+		if (owner)
+			m_propertyInspector.RenderContent();
+		else
+			ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "No object selected");
 	}
 
 } // namespace ImGuiVisualizers

@@ -124,7 +124,13 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/ImGui3DViewVisualizer.h" }
 	files { "../Shared/ImguiVizualizers/LevelComponentVisualizer.cpp" }
 	files { "../Shared/ImguiVizualizers/LevelComponentVisualizer.h" }
-		
+	files { "../Shared/ImguiVizualizers/ComponentDependencyGraphVisualizer.cpp" }
+	files { "../Shared/ImguiVizualizers/ComponentDependencyGraphVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/NodeGraphVisualizer.cpp" }
+	files { "../Shared/ImguiVizualizers/NodeGraphVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/LayersPanel.cpp" }
+	files { "../Shared/ImguiVizualizers/LayersPanel.h" }
+	
 	files { "../Shared/ImguiVizualizers/CommandHistory.cpp" }
 	files { "../Shared/ImguiVizualizers/CommandHistory.h" }
 	files { "../Shared/ImguiVizualizers/DeleteEntityCommand.h" }

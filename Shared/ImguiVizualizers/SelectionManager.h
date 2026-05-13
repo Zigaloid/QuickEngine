@@ -78,6 +78,12 @@ namespace ImGuiVisualizers {
 
 		// ── Selection state ────────────────────────────────────────────────
 
+		/// Returns all registered selectables (read-only).
+		const std::vector<std::shared_ptr<CSelectable>>& GetAllSelectables() const { return m_selectables; }
+
+		/// Adds a selectable to the current selection if not already present.
+		void AddToSelection(const std::shared_ptr<CSelectable>& selectable);
+
 		std::shared_ptr<CSelectable>                     GetSelected()    const { return m_lastSelected; }
 		const std::vector<std::shared_ptr<CSelectable>>& GetAllSelected() const { return m_selection; }
 
@@ -115,8 +121,9 @@ namespace ImGuiVisualizers {
 		Ray       BuildPickRay()   const;
 		bool      IsMouseInViewport() const;
 
-		void      AddToSelection(const std::shared_ptr<CSelectable>& selectable);
 		void      RemoveFromSelection(const std::shared_ptr<CSelectable>& selectable);
+		void      UpdateBoxDragSelect();
+		void      RenderBoxDragSelection();
 
 		GizmoAxis HitTestGizmo(GizmoMode mode, const Matrix4f& gizmoMtx, float effectiveSize) const;
 
@@ -156,6 +163,15 @@ namespace ImGuiVisualizers {
 		};
 
 		DragState        m_drag;
+		struct BoxDragState
+		{
+			bool    active = false;
+			ImVec2  start  = { 0.0f, 0.0f };
+			ImVec2  current= { 0.0f, 0.0f };
+		};
+		BoxDragState      m_boxDrag;
+    // True if the most recent left-mouse down occurred inside the viewport.
+	bool              m_mouseDownStartedInViewport = false;
 		CCommandHistory*   m_commandHistory    = nullptr;   // ← new: non-owning
 		ShiftDragCallback  m_shiftDragCallback;              ///< Called on SHIFT+drag start.
 	};

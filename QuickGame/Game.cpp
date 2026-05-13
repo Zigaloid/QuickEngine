@@ -91,7 +91,7 @@ bool GameApp::Initialize()
 	PhysicsManager::SetInstance(&m_physicsManager);
 
 	m_RootLevel = componentManager->CreateComponent<CLevelComponent>();
-	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/NewTest.lvl.obj.json");
+	std::string levelPath = Core::AppConfig::Instance().ResolvePath("./Assets/Levels/World.lvl.obj.json");
 	m_RootLevel->SafeRead(levelPath);
 	m_lastLevelPath = levelPath;
 

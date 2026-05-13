@@ -19,7 +19,10 @@ public:
 	bool OnInitialize() override;
 	void OnUpdate(double deltaTime) override;
 	void OnShutdown() override;
-		
+
+	const std::string& GetName() const { return m_name; }
+	void SetName(const std::string& name) { m_name = name; }
+
 private:
 	std::string m_name;   
 };

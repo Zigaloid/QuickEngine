@@ -112,18 +112,18 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\CombinedObjJson3DVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandHistory.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\DeleteEntityCommand.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\DocumentManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
-    <ClInclude Include="..\Shared\ImguiVizualizers\NodeGraphNode.h" />
-    <ClInclude Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.h" />
-    <ClInclude Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\LayersPanel.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ObjJsonEditor.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyInspector.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.h" />
@@ -256,15 +256,16 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\BgfxGizmoRenderer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandHistory.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
-    <ClCompile Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.cpp" />
-    <ClCompile Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\LayersPanel.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\LevelComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\MeshComponentVisualizer.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\NodeGraphVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyInspector_TypeRenderers.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMap.cpp" />
@@ -338,4 +339,3 @@
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
 </Project>
-
