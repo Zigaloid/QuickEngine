@@ -33,9 +33,19 @@ namespace
 			DECLARE_FUNC_VLOW();
 			InitializeCoreEngine();
 			m_profilerController.Init();
+
+			// Restore window size from last session if available.
+			const auto& cfg = Core::AppConfig::Instance();
+			if (cfg.GetWindowWidth() > 0 && cfg.GetWindowHeight() > 0)
+			{
+				_width  = static_cast<uint32_t>(cfg.GetWindowWidth());
+				_height = static_cast<uint32_t>(cfg.GetWindowHeight());
+				entry::setWindowSize(entry::kDefaultWindowHandle, _width, _height);
+			}
+
 			InitializeBgfxView(Args(_argc, _argv), _width, _height);
 			imguiCreate();
-			
+
 			Core::CoreSystem::GetNexusClient()->EnableAutoReconnect();
 
 			theApp.Initialize();
@@ -44,9 +54,15 @@ namespace
 		virtual int shutdown() override
 		{
 			DECLARE_FUNC_VLOW();
+
+			// Persist the current window size for next session.
+			auto& cfg = Core::AppConfig::Instance();
+			cfg.SetWindowSize(static_cast<int>(m_width), static_cast<int>(m_height));
+			cfg.Write("AppConfig.json");
+
 			theApp.Shutdown();
 			ShutdownCoreEngine();
-			imguiDestroy();
+			imguiDestroy();   // this now also saves imgui.ini
 			bgfx::shutdown();
 			return 0;
 		}
@@ -128,38 +144,40 @@ namespace
 			// process submitted rendering primitives.
 			bgfx::frame();
 		}
-		void SetupDockspace()
-		{
-			DECLARE_FUNC_VLOW();
-			ImGuiViewport* viewport = ImGui::GetMainViewport();
-			ImGui::SetNextWindowPos(viewport->WorkPos);
-			ImGui::SetNextWindowSize(viewport->WorkSize);
-			ImGui::SetNextWindowViewport(viewport->ID);
+        void SetupDockspace()
+        {
+            DECLARE_FUNC_VLOW();
+            ImGuiViewport* viewport = ImGui::GetMainViewport();
+            ImGui::SetNextWindowPos(viewport->WorkPos);
+            ImGui::SetNextWindowSize(viewport->WorkSize);
+            ImGui::SetNextWindowViewport(viewport->ID);
 
-			ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
-			window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
-			window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
-			window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
-			window_flags |= ImGuiWindowFlags_NoBackground;
+            ImGuiWindowFlags window_flags = ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoDocking;
+            window_flags |= ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoCollapse;
+            window_flags |= ImGuiWindowFlags_NoResize | ImGuiWindowFlags_NoMove;
+            window_flags |= ImGuiWindowFlags_NoBringToFrontOnFocus | ImGuiWindowFlags_NoNavFocus;
+            window_flags |= ImGuiWindowFlags_NoBackground;
 
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-			ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
-			ImGui::Begin("DockSpace", nullptr, window_flags);
-			ImGui::PopStyleVar(3);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowRounding, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
+            ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0.0f, 0.0f));
+            ImGui::Begin("DockSpace", nullptr, window_flags);
+            ImGui::PopStyleVar(3);
 
-			ImGuiID dockspace_id = ImGui::GetID("GameAppDockSpace");
-			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f), ImGuiDockNodeFlags_PassthruCentralNode);
+            // Use a stable string ID so ImGui can match this node to its
+            // [Docking][Data] entry in imgui.ini across sessions.
+            ImGuiID dockspace_id = ImGui::GetID("GameAppDockSpace");
+            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f),
+                ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
 
-			// Menu bar within the dockspace window
-			if (ImGui::BeginMenuBar())
-			{
-				theApp.ImguiMainMenu();
-				ImGui::EndMenuBar();
-			}
+            if (ImGui::BeginMenuBar())
+            {
+                theApp.ImguiMainMenu();
+                ImGui::EndMenuBar();
+            }
 
-			ImGui::End();
-		}
+            ImGui::End();
+        }
 		void ImguiUpdate()
 		{
 			DECLARE_FUNC_LOW();

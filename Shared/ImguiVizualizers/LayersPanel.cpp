@@ -1,5 +1,6 @@
 #include "imgui.h"
 #include <algorithm>
+#include <functional>
 #include "LayersPanel.h"
 namespace ImGuiVisualizers {
 
@@ -17,6 +18,44 @@ void LayersPanel::Render()
     if (ImGui::Button("+ Add Layer", addBtnSize))
     {
         CreateNewLayer(m_levelComponent);
+    }
+
+    ImGui::SameLine();
+
+    // Expand / Collapse all buttons
+    if (ImGui::SmallButton("Expand All"))
+    {
+        // Recursively add every layer to m_expandedLayers
+        std::function<void(CLevelComponent*)> expandRec = [&](CLevelComponent* layer)
+        {
+            if (!layer) return;
+            if (std::find(m_expandedLayers.begin(), m_expandedLayers.end(), layer) == m_expandedLayers.end())
+                m_expandedLayers.push_back(layer);
+            for (auto* child : layer->GetChildren())
+            {
+                if (auto* childLayer = dynamic_cast<CLevelComponent*>(child))
+                    expandRec(childLayer);
+            }
+        };
+        expandRec(m_levelComponent);
+    }
+    ImGui::SameLine();
+    if (ImGui::SmallButton("Collapse All"))
+    {
+        // Recursively remove every layer from m_expandedLayers
+        std::function<void(CLevelComponent*)> collapseRec = [&](CLevelComponent* layer)
+        {
+            if (!layer) return;
+            auto it = std::find(m_expandedLayers.begin(), m_expandedLayers.end(), layer);
+            if (it != m_expandedLayers.end())
+                m_expandedLayers.erase(it);
+            for (auto* child : layer->GetChildren())
+            {
+                if (auto* childLayer = dynamic_cast<CLevelComponent*>(child))
+                    collapseRec(childLayer);
+            }
+        };
+        collapseRec(m_levelComponent);
     }
 
     ImGui::Separator();
@@ -44,8 +83,8 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
     ImGui::PushID(layer);
 
     const auto& childLayers = layer->GetChildren();
-    bool hasChildren = std::any_of(childLayers.begin(), childLayers.end(),
-        [](ComponentSystem::Component* child) { return dynamic_cast<CLevelComponent*>(child) != nullptr; });
+    // Consider a node to have children if it has any children (layers or entities).
+    bool hasChildren = !childLayers.empty();
 
     // Determine if this node is expanded
     bool isExpanded = std::find(m_expandedLayers.begin(), m_expandedLayers.end(), layer) 
@@ -59,32 +98,29 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
     if (layer == m_selectedLayer)
         flags |= ImGuiTreeNodeFlags_Selected;
 
-    bool nodeOpen = ImGui::TreeNodeEx(layer, flags, "");
+    // Improve interaction: arrow click and double-click on label toggle.
+    flags |= ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
 
-    // Handle selection when clicking the tree node arrow/area
-    if (ImGui::IsItemClicked())
-    {
-        m_selectedLayer = layer;
-    }
+    // Honor our stored expansion state (e.g. when CreateNewLayer pushed a parent)
+    if (isExpanded)
+        flags |= ImGuiTreeNodeFlags_DefaultOpen;
 
-    // Open context menu on right-click of the tree node arrow/area
-    if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-    {
-        ImGui::OpenPopup("##LayerContextMenu");
-    }
-
-    ImGui::SameLine();
-
-    // Layer name (with rename support)
+    // Render the tree node using the layer name as the label when not renaming so
+    // clicking the name toggles expand/collapse. When renaming, show an InputText
+    // on the same line instead.
+    bool nodeOpen = false;
     if (m_renamingLayer == layer)
     {
+        // Create a tree node with an empty label (so the InputText won't be duplicated)
+        nodeOpen = ImGui::TreeNodeEx(layer, flags, "");
+        ImGui::SameLine();
         ImGui::SetKeyboardFocusHere();
         if (ImGui::InputText("##LayerName", m_renameBuffer, sizeof(m_renameBuffer),
             ImGuiInputTextFlags_AutoSelectAll | ImGuiInputTextFlags_EnterReturnsTrue))
         {
             FinishRenaming();
         }
-        // Also allow clicking the input text to select the layer
+        // Allow clicking the input text to select the layer
         if (ImGui::IsItemClicked())
         {
             m_selectedLayer = layer;
@@ -96,21 +132,27 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
     }
     else
     {
-        ImGui::Text("%s", layer->GetName().c_str());
-        // Clicking or right-clicking the label should also trigger selection / context menu
+        // Show the layer name inside the TreeNode so clicking it toggles expansion
+        nodeOpen = ImGui::TreeNodeEx(layer, flags, "%s", layer->GetName().c_str());
+
+        // Handle selection when clicking the tree node arrow/area or label
         if (ImGui::IsItemClicked())
         {
             m_selectedLayer = layer;
         }
+
+        // Open context menu on right-click of the tree node arrow/area or label
         if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
         {
-            m_selectedLayer = layer;
             ImGui::OpenPopup("##LayerContextMenu");
         }
     }
 
-    // Visibility toggle (eye icon) — editor-only visibility separate from component active state
+    // Context menu — bound to an explicit ID so it is not hijacked by the last item (checkbox)
+    // Note: we allow opening via both the tree node and the label above.
     ImGui::SameLine();
+
+    // Visibility toggle (eye icon) — editor-only visibility separate from component active state
     bool isVisible = layer->IsVisibleInEditor();
     if (ImGui::Checkbox(("##Visible" + std::to_string(nodeId)).c_str(), &isVisible))
     {
@@ -121,7 +163,6 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
         ImGui::SetTooltip("Toggle layer visibility");
     }
 
-    // Context menu — bound to an explicit ID so it is not hijacked by the last item (checkbox)
     if (ImGui::BeginPopup("##LayerContextMenu"))
     {
         if (ImGui::MenuItem("Add Child Layer"))

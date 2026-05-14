@@ -7,6 +7,7 @@
 #include "PhysicsBodyComponent.h"
 #include "CharacterComponent.h"
 #include "DeleteEntityCommand.h"
+#include <imgui-docking/imgui_internal.h>   // DockBuilder API
 #include <bx/bounds.h>
 #include <algorithm>
 #include <cfloat>
@@ -404,181 +405,183 @@ namespace ImGuiVisualizers {
 		if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Z)) m_history.Undo();
 		if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Y)) m_history.Redo();
 
-
 		// Build window title
 		std::string title = m_windowName;
-		if (!m_fileName.empty()) {
+		if (!m_fileName.empty())
 			title += " - " + m_fileName;
-		}
 
-		if (!ImGui::Begin(title.c_str(), isOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+		ImGuiWindowFlags hostFlags =
+			ImGuiWindowFlags_MenuBar          |
+			ImGuiWindowFlags_NoScrollbar      |
+			ImGuiWindowFlags_NoScrollWithMouse;
+
+		if (!ImGui::Begin(title.c_str(), isOpen, hostFlags))
+		{
 			ImGui::End();
 			return false;
 		}
 
-		// Render menu bar (includes View > GizmoMode submenu)
+		// ── Menu bar ─────────────────────────────────────────────────────────
 		if (ImGui::BeginMenuBar())
 		{
 			m_editor.GetActionManager().RenderMenuBar();
+
+			if (ImGui::BeginMenu("View"))
+			{
+				if (ImGui::MenuItem("Reset Layout"))
+					m_dockInitialized = false;
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMenuBar();
 		}
 
-		// Toolbar
+		// ── Toolbar ───────────────────────────────────────────────────────────
 		m_editor.GetActionManager().RenderToolbar();
 
-		// Gizmo mode combo — rendered inline on the same toolbar row
 		ImGui::SameLine();
 		ImGui::SetNextItemWidth(110.0f);
 		static constexpr const char* k_gizmoModeLabels[] = { "Translate", "Scale", "Rotate" };
 		int gizmoModeIdx = static_cast<int>(m_gizmoMode);
 		if (ImGui::Combo("##GizmoMode", &gizmoModeIdx, k_gizmoModeLabels, 3))
-		{
 			m_gizmoMode = static_cast<GizmoMode>(gizmoModeIdx);
-		}
 		if (ImGui::IsItemHovered())
-		{
 			ImGui::SetTooltip("Gizmo Mode");
-		}
 
-
-		// Refresh entity assets if needed
-		if (m_entityAssetsNeedRefresh) {
+		// ── Refresh entity assets ─────────────────────────────────────────────
+		if (m_entityAssetsNeedRefresh)
+		{
 			RefreshEntityAssets();
 			m_entityAssetsNeedRefresh = false;
 		}
 
-		// Main content area
+		// ── DockSpace ─────────────────────────────────────────────────────────
+		// Derive the dockspace ID directly from the host window so the ID is
+		// stable and absolute — not relative to whatever is on the ID stack.
+		// ImGui::GetID() inside a window produces a window-relative hash; using
+		// ImHashStr on a fixed string gives a context-independent value that
+		// matches what imgui.ini records under [Docking][Data].
+		m_dockspaceId = ImHashStr("LevelEditorDockSpace");
+
 		ImVec2 avail = ImGui::GetContentRegionAvail();
+		ImGui::DockSpace(m_dockspaceId, avail, ImGuiDockNodeFlags_None);
 
-		// Left panel: Entity Assets
-		ImGui::BeginChild("##EntityAssets", ImVec2(m_entityPanelWidth, avail.y), true);
-		RenderEntityAssetPanel();
-		ImGui::EndChild();
+		// Only seed the default layout when no layout was restored from imgui.ini.
+		if (!m_dockInitialized)
+		{  
+			ImGuiDockNode* node = ImGui::DockBuilderGetNode(m_dockspaceId);
+			const bool restoredFromIni = node != nullptr && !node->IsEmpty();
 
-		ImGui::SameLine();
-
-		// Splitter handle
-		ImGui::Button("##EntitySplitter", ImVec2(4.0f, avail.y));
-		if (ImGui::IsItemActive()) {
-			m_entityPanelWidth += ImGui::GetIO().MouseDelta.x;
-			if (m_entityPanelWidth < 100.0f) m_entityPanelWidth = 100.0f;
-			if (m_entityPanelWidth > avail.x * 0.5f) m_entityPanelWidth = avail.x * 0.5f;
-		}
-		if (ImGui::IsItemHovered()) {
-			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
-		}
-
-		ImGui::SameLine();
-
-		// Calculate remaining width for the right side (3D view + right panels)
-		float remainingWidth = avail.x - m_entityPanelWidth - 8.0f; // Account for splitter
-		float centerW = remainingWidth * 0.65f;
-		float rightW = remainingWidth - centerW;
-
-		ImGui::BeginChild("##ContentArea", ImVec2(remainingWidth, avail.y), false);
-
-		// 3D View in the center
-		ImGui::BeginChild("##Center3D", ImVec2(centerW, 0), false);
-		ImVec2 centerAvail = ImGui::GetContentRegionAvail();
-		if (centerAvail.x < 1.0f) centerAvail.x = 1.0f;
-		if (centerAvail.y < 1.0f) centerAvail.y = 1.0f;
-
-		m_view.RenderContent(centerAvail);
-
-		// Record the exact screen rect of the rendered image.
-		m_viewportMin = ImGui::GetItemRectMin();
-		m_viewportSize = ImGui::GetItemRectSize();
-
-		// Update the manager with current view state
-		m_selectionManager.SetViewInfo(Get3DView().GetCamera(), m_viewportMin, m_viewportSize);
-
-		// Allow Delete key to remove selected entities only when the mouse is inside
-		// the 3D viewport. This prevents deletions when hovering other panels.
-		{
-			const ImVec2 mouse = ImGui::GetMousePos();
-			const bool inViewportForDelete = mouse.x >= m_viewportMin.x &&
-				mouse.y >= m_viewportMin.y &&
-				mouse.x < m_viewportMin.x + m_viewportSize.x &&
-				mouse.y < m_viewportMin.y + m_viewportSize.y;
-
-			if (inViewportForDelete && ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
-				m_levelComp && !m_selectionManager.IsGizmoDragging())
+			if (!restoredFromIni)
 			{
-				DeleteSelectedEntities();
+				ImGui::DockBuilderRemoveNode(m_dockspaceId);
+				ImGui::DockBuilderAddNode(m_dockspaceId, ImGuiDockNodeFlags_DockSpace);
+				ImGui::DockBuilderSetNodeSize(m_dockspaceId, avail);
+
+				ImGui::DockBuilderDockWindow("Entity Assets", m_dockspaceId);
+				ImGui::DockBuilderDockWindow("3D Viewport",   m_dockspaceId);
+				ImGui::DockBuilderDockWindow("Layers",        m_dockspaceId);
+				ImGui::DockBuilderDockWindow("Properties",    m_dockspaceId);
+				ImGui::DockBuilderDockWindow("Object",        m_dockspaceId);
+
+				ImGui::DockBuilderFinish(m_dockspaceId);
 			}
+
+			m_dockInitialized = true;
 		}
 
-		// Left-click inside the viewport (not a drag) → pick
-		// Camera movement is only applied when the Alt key is held
-		if (!ImGui::GetIO().KeyAlt)
+		ImGui::End(); // host window must end before child windows are submitted
+
+		// ── Entity Assets panel ───────────────────────────────────────────────
+		ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(250.0f, 400.0f), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Entity Assets", nullptr, ImGuiWindowFlags_NoCollapse))
 		{
-			if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
-				!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+			RenderEntityAssetPanel();
+		}
+		ImGui::End();
+
+		// ── 3-D Viewport panel ────────────────────────────────────────────────
+		ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(800.0f, 600.0f), ImGuiCond_FirstUseEver);
+		ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
+		if (ImGui::Begin("3D Viewport", nullptr, ImGuiWindowFlags_NoCollapse | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+		{
+			ImVec2 vpAvail = ImGui::GetContentRegionAvail();
+			if (vpAvail.x < 1.0f) vpAvail.x = 1.0f;
+			if (vpAvail.y < 1.0f) vpAvail.y = 1.0f;
+
+			m_view.RenderContent(vpAvail);
+
+			m_viewportMin  = ImGui::GetItemRectMin();
+			m_viewportSize = ImGui::GetItemRectSize();
+
+			m_selectionManager.SetViewInfo(Get3DView().GetCamera(), m_viewportMin, m_viewportSize);
+
+			// Delete key — only when mouse is over the viewport
 			{
 				const ImVec2 mouse = ImGui::GetMousePos();
-				const bool inViewport = mouse.x >= m_viewportMin.x &&
-					mouse.y >= m_viewportMin.y &&
-					mouse.x < m_viewportMin.x + m_viewportSize.x &&
-					mouse.y < m_viewportMin.y + m_viewportSize.y;
-				if (inViewport)
+				const bool inViewport =
+					mouse.x >= m_viewportMin.x && mouse.y >= m_viewportMin.y &&
+					mouse.x <  m_viewportMin.x + m_viewportSize.x &&
+					mouse.y <  m_viewportMin.y + m_viewportSize.y;
+
+				if (inViewport &&
+					ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
+					m_levelComp && !m_selectionManager.IsGizmoDragging())
 				{
-					m_selectionManager.PickAtCursor();
+					DeleteSelectedEntities();
 				}
 			}
-		}
 
-		// Handle entity drop onto the 3D view
-		HandleEntityDrop();
-
-		ImGui::EndChild();
-
-		ImGui::SameLine();
-
-		// Splitter handle between center and right panels
-		ImGui::Button("##CenterSplitter", ImVec2(4.0f, 0));
-		if (ImGui::IsItemActive()) {
-			centerW += ImGui::GetIO().MouseDelta.x;
-			rightW -= ImGui::GetIO().MouseDelta.x;
-			if (centerW < 300.0f) centerW = 300.0f;
-			if (rightW < 150.0f) rightW = 150.0f;
-		}
-		if (ImGui::IsItemHovered()) {
-			ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
-		}
-
-		ImGui::SameLine();
-
-		// Right panel with tabs for Layers and Properties
-		ImGui::BeginChild("##RightPanel", ImVec2(rightW, 0), false);
-		if (ImGui::BeginTabBar("##RightTabs"))
-		{
-			// Layers tab
-			if (ImGui::BeginTabItem("Layers"))
+			// Left-click pick (Alt = camera pan, skip picking)
+			if (!ImGui::GetIO().KeyAlt)
 			{
-				m_layersPanel.Render();
-				ImGui::EndTabItem();
+				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
+					!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+				{
+					const ImVec2 mouse = ImGui::GetMousePos();
+					const bool inViewport =
+						mouse.x >= m_viewportMin.x && mouse.y >= m_viewportMin.y &&
+						mouse.x <  m_viewportMin.x + m_viewportSize.x &&
+						mouse.y <  m_viewportMin.y + m_viewportSize.y;
+					if (inViewport)
+						m_selectionManager.PickAtCursor();
+				}
 			}
 
-			// Properties tab
-			if (ImGui::BeginTabItem("Properties"))
-			{
-				RenderInspectorPanel();
-				ImGui::EndTabItem();
-			}
-
-			if (ImGui::BeginTabItem("Object"))
-			{
-				m_editor.RenderInspectorInline();
-				ImGui::EndTabItem();
-			}
-
-			ImGui::EndTabBar();
+			HandleEntityDrop();
 		}
-		ImGui::EndChild();
-
-		ImGui::EndChild(); // ContentArea
-
 		ImGui::End();
+		ImGui::PopStyleVar();
+
+		// ── Layers panel ──────────────────────────────────────────────────────
+		ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(250.0f, 400.0f), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Layers", nullptr, ImGuiWindowFlags_NoCollapse))
+		{
+			m_layersPanel.Render();
+		}
+		ImGui::End();
+
+		// ── Properties panel ──────────────────────────────────────────────────
+		ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(250.0f, 400.0f), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Properties", nullptr, ImGuiWindowFlags_NoCollapse))
+		{
+			RenderInspectorPanel();
+		}
+		ImGui::End();
+
+		// ── Object panel ──────────────────────────────────────────────────────
+		ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(250.0f, 400.0f), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Object", nullptr, ImGuiWindowFlags_NoCollapse))
+		{
+			m_editor.RenderInspectorInline();
+		}
+		ImGui::End();
+
 		return true;
 	}
 

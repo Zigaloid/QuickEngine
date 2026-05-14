@@ -29,12 +29,18 @@ public:
      *  Paths that do not begin with "./" are returned unchanged. */
     std::string ResolvePath(const std::string& path) const;
 
+    int GetWindowWidth()  const { return m_windowWidth; }
+    int GetWindowHeight() const { return m_windowHeight; }
+    void SetWindowSize(int w, int h) { m_windowWidth = w; m_windowHeight = h; }
+
 private:
     AppConfig();
 
     /** @brief Working directory prepended to asset paths that begin with "./".
      *  Must end with a '/' (or '\' on Windows).  Default: "./" */
     std::string m_workingDirectory = "../";
+    int         m_windowWidth      = 1280;
+    int         m_windowHeight     = 720;
 };
 
 } // namespace Core

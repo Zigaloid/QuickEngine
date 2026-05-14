@@ -1,5 +1,19 @@
 {
-    "AppConfig": {
-        "workingDirectory": "../"
+    "RootObject": {
+        "m_workingDirectory": {
+            "Value": "../",
+            "Type": 3,
+            "Size": 32
+        },
+        "m_windowWidth": {
+            "Value": 2560,
+            "Type": 1,
+            "Size": 4
+        },
+        "m_windowHeight": {
+            "Value": 1369,
+            "Type": 1,
+            "Size": 4
+        }
     }
 }

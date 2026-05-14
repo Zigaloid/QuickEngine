@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "CombinedObjJson3DVisualizer.h"
 #include "SelectionManager.h"
 #include "RenderComponentSelectable.h"
@@ -29,8 +29,6 @@ namespace ImGuiVisualizers {
         explicit LevelComponentVisualizer(const char* name = "Level Editor")
             : CombinedObjJson3DVisualizer(name)
             , m_levelComp(nullptr)
-            , m_entityPanelWidth(250.0f)
-            , m_layersPanelWidth(200.0f)
             , m_gizmoMode(GizmoMode::Translate)
         {
         }
@@ -92,22 +90,26 @@ namespace ImGuiVisualizers {
             std::string fullPath;
         };
 
-        CLevelComponent* m_levelComp;
+        CLevelComponent*   m_levelComp;
         CSelectionManager  m_selectionManager;
         GizmoMode          m_gizmoMode;
 
         std::vector<std::shared_ptr<CRenderComponentSelectable>> m_componentSelectables;
 
-        ImVec2 m_viewportMin = { 0.0f, 0.0f };
+        ImVec2 m_viewportMin  = { 0.0f, 0.0f };
         ImVec2 m_viewportSize = { 1.0f, 1.0f };
 
         std::vector<EntityAssetEntry> m_entityAssets;
         bool  m_entityAssetsNeedRefresh = true;
-        float m_entityPanelWidth;
-        float m_layersPanelWidth;
-        CCommandHistory  m_history{ 100 };
+
+        // Docking ─────────────────────────────────────────────────────────────
+        bool        m_dockInitialized = false;
+        ImGuiID     m_dockspaceId     = 0;
+        // ─────────────────────────────────────────────────────────────────────
+
+        CCommandHistory   m_history{ 100 };
         PropertyInspector m_propertyInspector;
-        LayersPanel m_layersPanel;
+        LayersPanel       m_layersPanel;
     };
 
 } // namespace ImGuiVisualizers

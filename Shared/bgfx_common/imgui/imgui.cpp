@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright 2014-2015 Daniel Collin. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
@@ -271,9 +271,9 @@ struct OcornutImguiContext
 			m_allocator = &allocator;
 		}
 
-		m_viewId = 255;
+		m_viewId    = 255;
 		m_lastScroll = 0;
-		m_last = bx::getHPCounter();
+		m_last       = bx::getHPCounter();
 
 		ImGui::SetAllocatorFunctions(memAlloc, memFree, NULL);
 
@@ -281,9 +281,19 @@ struct OcornutImguiContext
 
 		ImGuiIO& io = ImGui::GetIO();
 
+		// ── Docking + ini MUST be configured before LoadIniSettingsFromDisk ──
+		// ImGui loads the ini file lazily on the first NewFrame() call, but
+		// ConfigFlags must already include DockingEnable at that point or the
+		// dock node data in the ini file is silently discarded.
+		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+
+		// Use an explicit filename so the ini lands predictably next to the exe.
+		// The default ("imgui.ini") resolves relative to the process working
+		// directory which may vary depending on how the app is launched.
+		io.IniFilename = "imgui.ini";
+
 		io.DisplaySize = ImVec2(1280.0f, 720.0f);
 		io.DeltaTime   = 1.0f / 60.0f;
-		
 
 		setupStyle(true);
 
@@ -292,9 +302,6 @@ struct OcornutImguiContext
 			| ImGuiBackendFlags_RendererHasTextures
 			;
 		io.ConfigDebugHighlightIdConflicts = !!BX_CONFIG_DEBUG;
-
-		// Enable built-in docking support
-		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
 
 #if USE_ENTRY
 		for (int32_t ii = 0; ii < (int32_t)entry::Key::Count; ++ii)
