@@ -138,7 +138,8 @@ private:
     struct Entry {
         std::string key;
         std::unique_ptr<IImGuiVisualizer> visualizer;
-        bool visible = false;
+        bool visible     = false;
+        bool wasVisible  = false;
         bool initialized = false;
     };
 

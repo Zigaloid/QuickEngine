@@ -154,20 +154,25 @@ std::string ImGuiVisualizerManager::ShortcutName(const std::string& key)
 
 void ImGuiVisualizerManager::RenderAll()
 {
-    // Get the dockspace ID
-    // with the same name ("MainDockSpace"), this will return a non-zero ImGuiID.
     ImGuiID mainDockId = ImGui::GetID("MainDockSpace");
 
     for (auto& entry : m_entries)
     {
-        if (entry.visible && entry.initialized) {
-            // Request docking into the main dockspace on first use.
-            // Using ImGuiCond_FirstUseEver lets the user rearrange later.
-            if (mainDockId != 0) {
-                ImGui::SetNextWindowDockID(mainDockId, ImGuiCond_FirstUseEver);
+        if (entry.visible && entry.initialized)
+        {
+            if (mainDockId != 0)
+            {
+                // Re-dock into the main dockspace whenever the window becomes
+                // visible again (transitions from hidden → visible), so the
+                // user can always drag it back and re-open it docked.
+                ImGuiCond dockCond = (!entry.wasVisible)
+                    ? ImGuiCond_Always
+                    : ImGuiCond_FirstUseEver;
+                ImGui::SetNextWindowDockID(mainDockId, dockCond);
             }
             entry.visualizer->Render(&entry.visible);
         }
+        entry.wasVisible = entry.visible;
     }
 }
 
