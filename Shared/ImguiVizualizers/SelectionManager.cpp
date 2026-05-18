@@ -727,14 +727,16 @@ namespace ImGuiVisualizers {
             };
 
         // ── 4. Hover detection and drag initiation (idle only) ────────────
-        if (!m_drag.active)
+        if (!m_drag.active && !ImGui::GetIO().KeyAlt )
         {
             if (hasSelection)
             {
                 m_hoveredGizmoAxis = HitTestGizmo(mode, gizmo, effectiveSize);
 
                 if (mousePressed && m_hoveredGizmoAxis != GizmoAxis::None && IsMouseInViewport())
+                {
                     BeginGizmoDrag(mode, gizmo);
+                }
                 else if (ImGui::IsMouseDragging(ImGuiMouseButton_Left) && m_hoveredGizmoAxis == GizmoAxis::None && m_mouseDownStartedInViewport && IsMouseInViewport())
                 {
                     // Begin a selection box drag only once dragging is detected (prevents click->clear).
@@ -831,4 +833,39 @@ namespace ImGuiVisualizers {
         m_gizmoRenderer.RenderGizmo(gizmo.data(), mode, m_hoveredGizmoAxis, effectiveSize);
     }
 
-} // namespace ImGuiVisualizers
+    // ── Camera focus ──────────────────────────────────────────────────────────
+
+    void CSelectionManager::FocusCameraOnSelection()
+    {
+        if (!m_camera || m_selection.empty())
+            return;
+
+        // Compute the gizmo centre (centroid of selected objects).
+        Vector3f centroid;
+        for (const auto& sel : m_selection)
+            centroid += sel->GetTransform().ExtractTranslation();
+        centroid = centroid * (1.0f / static_cast<float>(m_selection.size()));
+
+        // Compute the bounding radius: largest distance from centroid to
+        // the far edge (centre offset + world-space bounding radius) of any selected object.
+        float maxRadius = 0.0f;
+        for (const auto& sel : m_selection)
+        {
+            const Vector4f  bs  = sel->GetBoundingSphere();
+            const Matrix4f& mtx = sel->GetTransform();
+            const Vector3f  worldCentre = mtx.TransformPoint(Vector3f(bs.x, bs.y, bs.z));
+            const Vector3f  scale       = mtx.ExtractScale();
+            const float     worldRadius = bs.w * std::max({ scale.x, scale.y, scale.z, 0.5f });
+            const float     dist        = (worldCentre - centroid).Length() + worldRadius;
+            if (dist > maxRadius)
+                maxRadius = dist;
+        }
+
+        if (maxRadius < 0.001f)
+            maxRadius = 1.0f;
+
+        m_camera->SetTarget(centroid.x, centroid.y, centroid.z);
+        m_camera->SetDistance(maxRadius * 2.0f);
+    }
+
+    } // namespace ImGuiVisualizers

@@ -5,6 +5,7 @@
 #include "EntityComponentVisualizer.h"
 #include "PropertyWidgetMapEditor.h"
 #include "ComponentDependencyGraphVisualizer.h"
+#include "HeightFieldMeshComponentVisualizer.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -105,7 +106,6 @@ LevelComponentLauncher::Create(const std::string& assetPath, const std::string& 
     combined->OpenObjectFile(assetPath, className);
     return combined;
 }
-
 // -- Entity launcher implementation ------------------------------------------------
 
 EntityComponentLauncher::EntityComponentLauncher(DocumentManager& manager,
@@ -133,6 +133,38 @@ std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
 EntityComponentLauncher::Create(const std::string& assetPath, const std::string& className)
 {
     auto combined = std::make_unique<ImGuiVisualizers::EntityComponentVisualizer>();
+    // Combined visualizer exposes OpenObjectFile(...)
+    combined->OpenObjectFile(assetPath, className);
+    return combined;
+}
+
+// -- HeightFieldMesh launcher implementation ------------------------------------------------
+
+HeightFieldMeshLauncher::HeightFieldMeshLauncher(DocumentManager& manager,
+    const std::string& suffix,
+    const std::string& className)
+    : m_manager(manager)
+    , m_suffix(suffix)
+    , m_className(className)
+{
+}
+void HeightFieldMeshLauncher::Launch(const std::string& assetPath)
+{
+    std::string key = ImGuiVisualizers::HeightFieldMeshComponentVisualizer::MakeDocumentKey(assetPath);
+
+    // If already open, just bring it to front
+    if (m_manager.m_openEditorKeys.contains(key)) {
+        m_manager.m_visualizerManager.SetVisible(key, true);
+        return;
+    }
+    // Defer registration to avoid mutating m_entries during RenderAll
+    m_manager.EnqueueEditor(key, assetPath, m_className, this);
+}
+
+std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+HeightFieldMeshLauncher::Create(const std::string& assetPath, const std::string& className)
+{
+    auto combined = std::make_unique<ImGuiVisualizers::HeightFieldMeshComponentVisualizer>();
     // Combined visualizer exposes OpenObjectFile(...)
     combined->OpenObjectFile(assetPath, className);
     return combined;
@@ -168,6 +200,9 @@ WidgetEditorLauncher::Create(const std::string& assetPath, const std::string& cl
     editor->SetPath(assetPath);
     return editor;
 }
+
+// -- HeightFieldMesh launcher implementation ---------------------
+
 
 // -- ComponentDependencyGraph launcher implementation ---------------------
 
@@ -244,6 +279,7 @@ void DocumentManager::InitializeLaunchers()
     m_launchers["StaticMeshObjJson"] = std::make_unique<MeshComponentLauncher>(*this, ".smesh.obj.json", "CStaticMeshResource");
     m_launchers["PhysicsBodyObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".phys.obj.json", "CPhysicsBodyResource");
     m_launchers["ComponentDependencyObjJson"] = std::make_unique<ComponentDependencyGraphLauncher>(*this, ".cdep.obj.json");
+    m_launchers["HeightFieldObjJson"] = std::make_unique<HeightFieldMeshLauncher>(*this, ".hfield.obj.json", "CHeightFieldMeshComponent");
     // Texture launcher (TODO)
     m_launchers["Texture"] = std::make_unique<NoOpLauncher>();
 }
@@ -268,6 +304,7 @@ std::vector<DocumentManager::AssetTypeConfig> DocumentManager::GetAssetTypeConfi
         { ".smesh.obj.json",    "Static Mesh Resource",   IM_COL32(100, 200, 255, 255),   "O",  "StaticMeshObjJson", true, false },
         { ".phys.obj.json",     "Physics Body Resource",  IM_COL32(100, 200, 255, 255),   "O",  "PhysicsBodyObjJson", true, false },
 		{ ".cdep.obj.json",     "Component Dependencies", IM_COL32(100, 200, 255, 255),   "O",  "ComponentDependencyObjJson", true, false },
+        { ".hfield.obj.json",   "Height Field Mesh",      IM_COL32(100, 200, 255, 255),   "O",  "HeightFieldObjJson", true, false },
         { ".png",               "PNG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
         { ".bmp",               "BMP Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
         { ".jpg",               "JPG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },

@@ -3,15 +3,15 @@
         "m_workingDirectory": {
             "Value": "../",
             "Type": 3,
-            "Size": 32
+            "Size": 40
         },
         "m_windowWidth": {
-            "Value": 2560,
+            "Value": 2513,
             "Type": 1,
             "Size": 4
         },
         "m_windowHeight": {
-            "Value": 1369,
+            "Value": 1321,
             "Type": 1,
             "Size": 4
         }

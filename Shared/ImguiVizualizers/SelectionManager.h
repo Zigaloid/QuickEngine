@@ -115,6 +115,15 @@ namespace ImGuiVisualizers {
 		/// True while the user is actively dragging a gizmo handle.
 		bool IsGizmoDragging() const { return m_drag.active; }
 
+		// ── Camera focus ───────────────────────────────────────────────────
+
+		/// Moves the camera's focal point to the gizmo's world position and sets
+		/// the orbit distance to twice the selection's bounding radius.
+		/// No-op when there is no selection or no camera.
+		void FocusCameraOnSelection();
+
+
+
 	private:
 		// ── Internal helpers ───────────────────────────────────────────────
 

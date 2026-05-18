@@ -63,11 +63,11 @@ namespace ObjMeshConverter
     // - Meshes with more than 65535 unique vertices are split into multiple groups
     //   (triangles are never split) because the bgfx Mesh::load chunk format uses
     //   16-bit index buffers.
-    inline bool ConvertObjToBgfxBinary(const char*              objPath,
-                                       const FbxConvertOptions& opts,
-                                       std::vector<uint8_t>&    outBinary)
+    inline bool ConvertObjToBgfxMesh(const char*              objPath,
+                                     const FbxConvertOptions& opts,
+                                     BinaryMeshData&          outMeshData)
     {
-        outBinary.clear();
+        outMeshData.groups.clear();
 
         std::ifstream ifs(objPath);
         if (!ifs)
@@ -179,9 +179,37 @@ namespace ObjMeshConverter
                 // Triangle fan triangulation for polygon faces.
                 if (face.size() >= 3)
                 {
+                    const bool needsFlatNormals = opts.includeNormals
+                                               && normals.empty()
+                                               && opts.generateFlatNormals;
+
                     for (size_t f = 1; f + 1 < face.size(); ++f)
                     {
                         const FaceIndex tris[3] = { face[0], face[f], face[f + 1] };
+
+                        // ── Compute flat (face) normal once per triangle ─────
+                        float fnx = 0.0f, fny = 1.0f, fnz = 0.0f;
+                        if (needsFlatNormals)
+                        {
+                            float p[3][3] = {};
+                            for (int k = 0; k < 3; ++k)
+                            {
+                                if (tris[k].vi >= 0 && static_cast<size_t>(tris[k].vi) < positions.size())
+                                {
+                                    p[k][0] = positions[tris[k].vi].x;
+                                    p[k][1] = positions[tris[k].vi].y;
+                                    p[k][2] = positions[tris[k].vi].z;
+                                }
+                            }
+                            const float e0x = p[1][0] - p[0][0], e0y = p[1][1] - p[0][1], e0z = p[1][2] - p[0][2];
+                            const float e1x = p[2][0] - p[0][0], e1y = p[2][1] - p[0][1], e1z = p[2][2] - p[0][2];
+                            fnx = e0y * e1z - e0z * e1y;
+                            fny = e0z * e1x - e0x * e1z;
+                            fnz = e0x * e1y - e0y * e1x;
+                            const float len = std::sqrt(fnx * fnx + fny * fny + fnz * fnz);
+                            if (len > 1e-6f) { fnx /= len; fny /= len; fnz /= len; }
+                        }
+
                         for (int k = 0; k < 3; ++k)
                         {
                             PackedVertex pv = {};
@@ -193,11 +221,20 @@ namespace ObjMeshConverter
                                 pv.pz = positions[tris[k].vi].z;
                             }
 
-                            if (opts.includeNormals && tris[k].ni >= 0 && static_cast<size_t>(tris[k].ni) < normals.size())
+                            if (opts.includeNormals)
                             {
-                                pv.nx = normals[tris[k].ni].x;
-                                pv.ny = normals[tris[k].ni].y;
-                                pv.nz = normals[tris[k].ni].z;
+                                if (tris[k].ni >= 0 && static_cast<size_t>(tris[k].ni) < normals.size())
+                                {
+                                    pv.nx = normals[tris[k].ni].x;
+                                    pv.ny = normals[tris[k].ni].y;
+                                    pv.nz = normals[tris[k].ni].z;
+                                }
+                                else if (needsFlatNormals)
+                                {
+                                    pv.nx = fnx;
+                                    pv.ny = fny;
+                                    pv.nz = fnz;
+                                }
                             }
 
                             if (opts.includeUVs && tris[k].ti >= 0 && static_cast<size_t>(tris[k].ti) < texcoords.size())
@@ -273,8 +310,8 @@ namespace ObjMeshConverter
         if (opts.includeTangents)  layout.add(bgfx::Attrib::Tangent,   4, bgfx::AttribType::Float);
         layout.end();
 
-        BinaryMeshData meshData;
-        meshData.layout = layout;
+        outMeshData.groups.clear();
+        outMeshData.layout = layout;
 
         const uint16_t stride = layout.getStride();
 
@@ -344,41 +381,54 @@ namespace ObjMeshConverter
             group.vertexData.resize(group.numVertices * stride);
             group.indexData   = gs.localIndices;
 
+            // Build a contiguous local vertex array so PMP decimation and bounds
+            // computation can work without indirecting through globalVerts.
+            std::vector<PackedVertex> groupVerts;
+            groupVerts.reserve(gs.globalVerts.size());
+            for (uint32_t gvi : gs.globalVerts)
+                groupVerts.push_back(allVerts[gvi]);
+
+            std::vector<uint16_t> groupIndices = gs.localIndices;
+
+            group.numVertices = static_cast<uint16_t>(groupVerts.size());
+            group.numIndices  = static_cast<uint32_t>(groupIndices.size());
+            group.vertexData.resize(group.numVertices * stride);
+            group.indexData   = std::move(groupIndices);
+
             // Pack interleaved vertex buffer.
             void* vbPtr = group.vertexData.data();
             for (uint16_t vi = 0; vi < group.numVertices; ++vi)
             {
-                const PackedVertex& v = allVerts[gs.globalVerts[vi]];
+                const PackedVertex& v = groupVerts[vi];
 
                 float pos[4] = { v.px, v.py, v.pz, 0.0f };
-                bgfx::vertexPack(pos, false, bgfx::Attrib::Position, meshData.layout, vbPtr, vi);
+                bgfx::vertexPack(pos, false, bgfx::Attrib::Position, outMeshData.layout, vbPtr, vi);
 
                 if (opts.includeNormals)
                 {
                     float nrm[4] = { v.nx, v.ny, v.nz, 0.0f };
-                    bgfx::vertexPack(nrm, true, bgfx::Attrib::Normal, meshData.layout, vbPtr, vi);
+                    bgfx::vertexPack(nrm, true, bgfx::Attrib::Normal, outMeshData.layout, vbPtr, vi);
                 }
                 if (opts.includeUVs)
                 {
                     float uv[4] = { v.u, v.v, 0.0f, 0.0f };
-                    bgfx::vertexPack(uv, true, bgfx::Attrib::TexCoord0, meshData.layout, vbPtr, vi);
+                    bgfx::vertexPack(uv, true, bgfx::Attrib::TexCoord0, outMeshData.layout, vbPtr, vi);
                 }
                 if (opts.includeTangents)
                 {
                     float tan[4] = { v.tx, v.ty, v.tz, v.tw };
-                    bgfx::vertexPack(tan, true, bgfx::Attrib::Tangent, meshData.layout, vbPtr, vi);
+                    bgfx::vertexPack(tan, true, bgfx::Attrib::Tangent, outMeshData.layout, vbPtr, vi);
                 }
             }
 
             // Compute AABB, bounding sphere, and OBB from the group's positions.
             {
-                const PackedVertex& first = allVerts[gs.globalVerts[0]];
-                float mnx = first.px, mny = first.py, mnz = first.pz;
-                float mxx = mnx,      mxy = mny,      mxz = mnz;
+                float mnx = groupVerts[0].px, mny = groupVerts[0].py, mnz = groupVerts[0].pz;
+                float mxx = mnx,              mxy = mny,              mxz = mnz;
 
                 for (uint16_t vi = 1; vi < group.numVertices; ++vi)
                 {
-                    const PackedVertex& vv = allVerts[gs.globalVerts[vi]];
+                    const PackedVertex& vv = groupVerts[vi];
                     mnx = bx::min(mnx, vv.px); mny = bx::min(mny, vv.py); mnz = bx::min(mnz, vv.pz);
                     mxx = bx::max(mxx, vv.px); mxy = bx::max(mxy, vv.py); mxz = bx::max(mxz, vv.pz);
                 }
@@ -394,7 +444,7 @@ namespace ObjMeshConverter
                 float maxDistSq = 0.0f;
                 for (uint16_t vi = 0; vi < group.numVertices; ++vi)
                 {
-                    const PackedVertex& vv = allVerts[gs.globalVerts[vi]];
+                    const PackedVertex& vv = groupVerts[vi];
                     const float dx = vv.px - scx, dy = vv.py - scy, dz = vv.pz - scz;
                     maxDistSq = bx::max(maxDistSq, dx * dx + dy * dy + dz * dz);
                 }
@@ -423,13 +473,23 @@ namespace ObjMeshConverter
             group.materialName = "default";
             group.primitives.push_back(std::move(prim));
 
-            meshData.groups.push_back(std::move(group));
+            outMeshData.groups.push_back(std::move(group));
         }
 
-        if (meshData.groups.empty())
-            return false;
+        return !outMeshData.groups.empty();
+    }
 
+    /// Convenience: convert an OBJ file directly to an in-memory bgfx binary blob.
+    inline bool ConvertObjToBgfxBinary(const char*              objPath,
+                                       const FbxConvertOptions& opts,
+                                       std::vector<uint8_t>&    outBinary)
+    {
+        outBinary.clear();
+        BinaryMeshData meshData;
+        if (!ConvertObjToBgfxMesh(objPath, opts, meshData))
+            return false;
         return WriteBgfxBinaryMesh(meshData, outBinary);
     }
+
 
 } // namespace ObjMeshConverter

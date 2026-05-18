@@ -43,6 +43,66 @@ void FbxToBgfxMesh::Render(double deltaTime)
 
 }
 
+// ── Async mesh preview ───────────────────────────────────────────────────────
+
+void FbxToBgfxMesh::RequestMeshPreview()
+{
+	if (std::strlen(m_sourcePath) == 0)
+		return;
+
+	m_isPreviewing.store(true);
+	{
+		std::lock_guard<std::mutex> lk(m_previewMutex);
+		m_previewStats = {};
+	}
+
+	std::string srcPath(m_sourcePath);
+	FbxConvertOptions opts = m_convertOptions;
+	InputType inputType    = m_inputType;
+
+	std::thread([this,
+		srcPath   = std::move(srcPath),
+		opts      = std::move(opts),
+		inputType]() mutable
+		{
+			PreviewStats result{};
+
+			if (inputType == InputType::FBX)
+			{
+				FbxMeshPreviewStats s = PreviewFbxMeshStats(srcPath.c_str(), opts);
+				if (s.valid)
+				{
+					result.vertexCount   = s.totalVertices;
+					result.triangleCount = s.totalTriangles;
+					result.valid         = true;
+				}
+			}
+			else // OBJ
+			{
+				FbxConvertOptions previewOpts = opts;
+				BinaryMeshData meshData;
+				if (ObjMeshConverter::ConvertObjToBgfxMesh(srcPath.c_str(), previewOpts, meshData))
+				{
+					for (const auto& g : meshData.groups)
+					{
+						result.vertexCount   += g.numVertices;
+						result.triangleCount += g.numIndices / 3;
+					}
+					result.valid = true;
+				}
+			}
+
+			{
+				std::lock_guard<std::mutex> lk(m_previewMutex);
+				m_previewStats = result;
+			}
+			m_isPreviewing.store(false);
+		}).detach();
+}
+
+// ── Decimation panel ─────────────────────────────────────────────────────────
+
+
 void FbxToBgfxMesh::ImguiUpdate()
 {
 	// Render registered visualizers first
@@ -62,6 +122,8 @@ void FbxToBgfxMesh::ImguiUpdate()
 		if (ImGui::Combo("Input Type", &current, items, IM_ARRAYSIZE(items)))
 		{
 			m_inputType = static_cast<InputType>(current);
+			std::lock_guard<std::mutex> lk(m_previewMutex);
+			m_previewStats = {};
 		}
 
 		ImGui::Separator();
@@ -81,7 +143,12 @@ void FbxToBgfxMesh::ImguiUpdate()
 			if (openFileSelectionDialog(fp, FileSelectionDialogType::Open, title, filter))
 			{
 				const char* sel = fp.getCPtr();
-				if (sel) std::strncpy(m_sourcePath, sel, sizeof(m_sourcePath) - 1);
+				if (sel)
+				{
+					std::strncpy(m_sourcePath, sel, sizeof(m_sourcePath) - 1);
+					std::lock_guard<std::mutex> lk(m_previewMutex);
+					m_previewStats = {};
+				}
 			}
 		}
 
@@ -131,6 +198,14 @@ void FbxToBgfxMesh::ImguiUpdate()
 
 		// Conversion options
 		ImGui::Checkbox("Include Normals", &m_convertOptions.includeNormals);
+		if (m_convertOptions.includeNormals)
+		{
+			ImGui::Indent();
+			ImGui::Checkbox("Generate Flat Normals (if missing)", &m_convertOptions.generateFlatNormals);
+			if (m_convertOptions.generateFlatNormals)
+				ImGui::TextDisabled("Computes a face normal from each triangle's geometry. Each face will appear faceted.");
+			ImGui::Unindent();
+		}
 		ImGui::Checkbox("Include UVs", &m_convertOptions.includeUVs);
 		if (m_convertOptions.includeUVs)
 		{
@@ -147,10 +222,10 @@ void FbxToBgfxMesh::ImguiUpdate()
 		}
 		ImGui::Checkbox("Include Tangents", &m_convertOptions.includeTangents);
 		ImGui::InputFloat("Scale Factor", &m_convertOptions.scaleFactor, 0.1f, 1.0f, "%.4f");
-
+	
 		ImGui::Separator();
 
-		bool disableConvert = m_isConverting.load();
+		bool disableConvert = m_isConverting.load() || m_isPreviewing.load();
 		if (disableConvert) ImGui::BeginDisabled();
 
 		if (ImGui::Button("Convert"))
@@ -186,60 +261,75 @@ void FbxToBgfxMesh::ImguiUpdate()
 					opts = std::move(opts),
 					inputType, outFmt]() mutable
 					{
-						std::vector<uint8_t> outBinary;
-						bool ok = false;
-						if (inputType == InputType::FBX)
-						{
-							ok = ConvertFbxToBgfxBinary(srcPath.c_str(), opts, outBinary);
-						}
-						else // OBJ
-						{
-							ok = ObjMeshConverter::ConvertObjToBgfxBinary(srcPath.c_str(), opts, outBinary);
-						}
-
-						if (!ok || outBinary.empty())
-						{
-							std::lock_guard<std::mutex> lock(m_statusMutex);
-							m_statusMessage = "Conversion failed or produced no output.";
-							m_isConverting.store(false);
-							return;
-						}
-
-						// Build output file path from source stem and selected extension
-						std::string outFile;
 						try
 						{
-							std::filesystem::path src(srcPath);
-							std::string base = src.stem().string();
-							std::string ext = (outFmt == OutputFormat::BGFX) ? ".bgfx" : ".bin";
-							std::filesystem::path outPath = std::filesystem::path(outDir) / (base + ext);
-							outFile = outPath.string();
-							if (!std::filesystem::exists(outPath.parent_path()))
-								std::filesystem::create_directories(outPath.parent_path());
+							std::vector<uint8_t> outBinary;
+							bool ok = false;
+							if (inputType == InputType::FBX)
+							{
+								ok = ConvertFbxToBgfxBinary(srcPath.c_str(), opts, outBinary);
+							}
+							else // OBJ
+							{
+								ok = ObjMeshConverter::ConvertObjToBgfxBinary(srcPath.c_str(), opts, outBinary);
+							}
+
+							if (!ok || outBinary.empty())
+							{
+								std::lock_guard<std::mutex> lock(m_statusMutex);
+								m_statusMessage = "Conversion failed or produced no output.";
+								m_isConverting.store(false);
+								return;
+							}
+
+							// Build output file path from source stem and selected extension
+							std::string outFile;
+							try
+							{
+								std::filesystem::path src(srcPath);
+								std::string base = src.stem().string();
+								std::string ext = (outFmt == OutputFormat::BGFX) ? ".bgfx" : ".bin";
+								std::filesystem::path outPath = std::filesystem::path(outDir) / (base + ext);
+								outFile = outPath.string();
+								if (!std::filesystem::exists(outPath.parent_path()))
+									std::filesystem::create_directories(outPath.parent_path());
+							}
+							catch (...)
+							{
+								std::lock_guard<std::mutex> lock(m_statusMutex);
+								m_statusMessage = "Failed to build output path.";
+								m_isConverting.store(false);
+								return;
+							}
+
+							// Write file
+							std::ofstream ofs(outFile, std::ios::binary);
+							if (!ofs)
+							{
+								std::lock_guard<std::mutex> lock(m_statusMutex);
+								m_statusMessage = "Failed to open target file for writing: " + outFile;
+								m_isConverting.store(false);
+								return;
+							}
+							ofs.write(reinterpret_cast<const char*>(outBinary.data()), static_cast<std::streamsize>(outBinary.size()));
+							ofs.close();
+
+							std::lock_guard<std::mutex> lock(m_statusMutex);
+							m_statusMessage = ok ? ("Conversion completed successfully: " + outFile) : "Conversion failed while writing output.";
+							m_isConverting.store(false);
+						}
+						catch (const std::exception& e)
+						{
+							std::lock_guard<std::mutex> lock(m_statusMutex);
+							m_statusMessage = std::string("Conversion error: ") + e.what();
+							m_isConverting.store(false);
 						}
 						catch (...)
 						{
 							std::lock_guard<std::mutex> lock(m_statusMutex);
-							m_statusMessage = "Failed to build output path.";
+							m_statusMessage = "Conversion error: unknown exception.";
 							m_isConverting.store(false);
-							return;
 						}
-
-						// Write file
-						std::ofstream ofs(outFile, std::ios::binary);
-						if (!ofs)
-						{
-							std::lock_guard<std::mutex> lock(m_statusMutex);
-							m_statusMessage = "Failed to open target file for writing: " + outFile;
-							m_isConverting.store(false);
-							return;
-						}
-						ofs.write(reinterpret_cast<const char*>(outBinary.data()), static_cast<std::streamsize>(outBinary.size()));
-						ofs.close();
-
-						std::lock_guard<std::mutex> lock(m_statusMutex);
-						m_statusMessage = ok ? ("Conversion completed successfully: " + outFile) : "Conversion failed while writing output.";
-						m_isConverting.store(false);
 					}).detach();
 			}
 		}
@@ -251,7 +341,6 @@ void FbxToBgfxMesh::ImguiUpdate()
 			ImGui::SameLine();
 			ImGui::TextUnformatted("Converting...");
 		}
-
 		ImGui::Separator();
 
 		{

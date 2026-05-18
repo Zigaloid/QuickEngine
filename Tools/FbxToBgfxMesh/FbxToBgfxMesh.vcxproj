@@ -58,7 +58,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\..\core;..\..\External\bgfx\include;..\..\External\bimg\include;..\..\External\bx\include;..\..\External\bgfx;..\..\External;..\..\Shared\ImguiVizualizers;..\..\Shared\bgfx_common;..\..\Shared\utils;..\..\External\imgui-docking;..\..\External\bx\include\compat\msvc;..\..\External\OpenGL\Include;..\..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\core;..\..\External\bgfx\include;..\..\External\bimg\include;..\..\External\bx\include;..\..\External\bgfx;..\..\External;..\..\Shared\ImguiVizualizers;..\..\Shared\bgfx_common;..\..\Shared\utils;..\..\Shared\Rendering;..\..\External\imgui-docking;..\..\External\bx\include\compat\msvc;..\..\External\OpenGL\Include;..\..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -76,7 +76,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\..\core;..\..\External\bgfx\include;..\..\External\bimg\include;..\..\External\bx\include;..\..\External\bgfx;..\..\External;..\..\Shared\ImguiVizualizers;..\..\Shared\bgfx_common;..\..\Shared\utils;..\..\External\imgui-docking;..\..\External\bx\include\compat\msvc;..\..\External\OpenGL\Include;..\..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\..\core;..\..\External\bgfx\include;..\..\External\bimg\include;..\..\External\bx\include;..\..\External\bgfx;..\..\External;..\..\Shared\ImguiVizualizers;..\..\Shared\bgfx_common;..\..\Shared\utils;..\..\Shared\Rendering;..\..\External\imgui-docking;..\..\External\bx\include\compat\msvc;..\..\External\OpenGL\Include;..\..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>

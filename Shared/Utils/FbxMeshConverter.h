@@ -1,7 +1,6 @@
 #pragma once
 
 #include "BgfxBinaryMeshWriter.h"
-
 #include <ufbx.h>
 #include <bgfx/bgfx.h>
 #include <bx/bounds.h>
@@ -27,6 +26,12 @@ struct FbxConvertOptions
     bool  generateSphericalUVs = false;
     /// Uniform scale applied to the generated spherical UV coordinates.
     float sphericalUVScale     = 1.0f;
+    /// When true and the source mesh has no normal data, flat (face) normals
+    /// are computed from each triangle's geometry via a cross-product.
+    bool  generateFlatNormals  = false;
+    /// Fraction of triangles to KEEP after decimation (0.01 – 1.0).
+    /// e.g. 0.5 = keep 50% of the original triangle count.
+    float decimationKeepRatio = 0.5f;
 };
 
 // ── Internal helpers ────────────────────────────────────────────────────
@@ -200,8 +205,8 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
     }
 
     FbxConvertOptions effectiveOpts = opts;
-    if (opts.includeNormals  && !anyNormals)                                effectiveOpts.includeNormals  = false;
-    if (opts.includeUVs      && !anyUVs && !opts.generateSphericalUVs)      effectiveOpts.includeUVs      = false;
+    if (opts.includeNormals  && !anyNormals  && !opts.generateFlatNormals)   effectiveOpts.includeNormals  = false;
+    if (opts.includeUVs      && !anyUVs      && !opts.generateSphericalUVs) effectiveOpts.includeUVs      = false;
     if (opts.includeTangents && !anyTangents)                               effectiveOpts.includeTangents = false;
 
     // Build the vertex layout.
@@ -249,94 +254,132 @@ inline bool ConvertFbxToBgfxMesh(const char*            fbxPath,
         std::unordered_map<PackedVertex, uint16_t,
                            VertexHasher, VertexEqual> vertexMap;
 
+        const bool needsFlatNormals = effectiveOpts.includeNormals
+                                   && !fbxMesh->vertex_normal.exists
+                                   && effectiveOpts.generateFlatNormals;
+
         for (size_t fi = 0; fi < fbxMesh->num_faces; ++fi)
         {
             ufbx_face face = fbxMesh->faces.data[fi];
             uint32_t numTris = ufbx_triangulate_face(
                 triIndices.data(), maxTriIndices, fbxMesh, face);
 
-            for (uint32_t ti = 0; ti < numTris * 3; ++ti)
+            for (uint32_t ti = 0; ti < numTris; ++ti)
             {
-                uint32_t idx = triIndices[ti];
-
-                PackedVertex pv = {};
-
-                // Position
-                ufbx_vec3 pos = ufbx_get_vertex_vec3(&fbxMesh->vertex_position, idx);
-                pv.px = static_cast<float>(pos.x) * effectiveOpts.scaleFactor;
-                pv.py = static_cast<float>(pos.y) * effectiveOpts.scaleFactor;
-                pv.pz = static_cast<float>(pos.z) * effectiveOpts.scaleFactor;
-
-                // Normal
-                if (effectiveOpts.includeNormals && fbxMesh->vertex_normal.exists)
+                // ── Compute flat (face) normal once per triangle ─────────────
+                float fnx = 0.0f, fny = 1.0f, fnz = 0.0f;
+                if (needsFlatNormals)
                 {
-                    ufbx_vec3 n = ufbx_get_vertex_vec3(&fbxMesh->vertex_normal, idx);
-                    pv.nx = static_cast<float>(n.x);
-                    pv.ny = static_cast<float>(n.y);
-                    pv.nz = static_cast<float>(n.z);
+                    float p[3][3] = {};
+                    for (int k = 0; k < 3; ++k)
+                    {
+                        ufbx_vec3 pos = ufbx_get_vertex_vec3(
+                            &fbxMesh->vertex_position, triIndices[ti * 3 + k]);
+                        p[k][0] = static_cast<float>(pos.x) * effectiveOpts.scaleFactor;
+                        p[k][1] = static_cast<float>(pos.y) * effectiveOpts.scaleFactor;
+                        p[k][2] = static_cast<float>(pos.z) * effectiveOpts.scaleFactor;
+                    }
+                    const float e0x = p[1][0] - p[0][0], e0y = p[1][1] - p[0][1], e0z = p[1][2] - p[0][2];
+                    const float e1x = p[2][0] - p[0][0], e1y = p[2][1] - p[0][1], e1z = p[2][2] - p[0][2];
+                    fnx = e0y * e1z - e0z * e1y;
+                    fny = e0z * e1x - e0x * e1z;
+                    fnz = e0x * e1y - e0y * e1x;
+                    const float len = std::sqrt(fnx * fnx + fny * fny + fnz * fnz);
+                    if (len > 1e-6f) { fnx /= len; fny /= len; fnz /= len; }
                 }
 
-                // UV — use mesh data when available, fall back to spherical projection.
-                if (effectiveOpts.includeUVs)
+                for (int k = 0; k < 3; ++k)
                 {
-                    if (fbxMesh->vertex_uv.exists)
-                    {
-                        ufbx_vec2 uv = ufbx_get_vertex_vec2(&fbxMesh->vertex_uv, idx);
-                        pv.u = static_cast<float>(uv.x);
-                        pv.v = 1.0f - static_cast<float>(uv.y); // flip V for D3D / bgfx
-                    }
-                    else if (effectiveOpts.generateSphericalUVs)
-                    {
-                        ComputeSphericalUV(pv.px, pv.py, pv.pz,
-                                           meshCX, meshCY, meshCZ,
-                                           effectiveOpts.sphericalUVScale,
-                                           pv.u, pv.v);
-                    }
-                }
+                    const uint32_t idx = triIndices[ti * 3 + k];
 
-                // Tangent
-                if (effectiveOpts.includeTangents && fbxMesh->vertex_tangent.exists)
-                {
-                    ufbx_vec3 t = ufbx_get_vertex_vec3(&fbxMesh->vertex_tangent, idx);
-                    pv.tx = static_cast<float>(t.x);
-                    pv.ty = static_cast<float>(t.y);
-                    pv.tz = static_cast<float>(t.z);
+                    PackedVertex pv = {};
 
-                    // Bitangent sign
-                    if (fbxMesh->vertex_bitangent.exists)
+                    // Position
+                    ufbx_vec3 pos = ufbx_get_vertex_vec3(&fbxMesh->vertex_position, idx);
+                    pv.px = static_cast<float>(pos.x) * effectiveOpts.scaleFactor;
+                    pv.py = static_cast<float>(pos.y) * effectiveOpts.scaleFactor;
+                    pv.pz = static_cast<float>(pos.z) * effectiveOpts.scaleFactor;
+
+                    // Normal — use mesh data when present, otherwise flat-generated.
+                    if (effectiveOpts.includeNormals)
                     {
-                        ufbx_vec3 bt = ufbx_get_vertex_vec3(
-                            &fbxMesh->vertex_bitangent, idx);
-                        ufbx_vec3 n = fbxMesh->vertex_normal.exists
-                            ? ufbx_get_vertex_vec3(&fbxMesh->vertex_normal, idx)
-                            : ufbx_vec3{0, 1, 0};
-                        // cross(N, T) · B < 0 → handedness = -1
-                        float cx = static_cast<float>(n.y * t.z - n.z * t.y);
-                        float cy = static_cast<float>(n.z * t.x - n.x * t.z);
-                        float cz = static_cast<float>(n.x * t.y - n.y * t.x);
-                        float dot = cx * static_cast<float>(bt.x)
-                                  + cy * static_cast<float>(bt.y)
-                                  + cz * static_cast<float>(bt.z);
-                        pv.tw = (dot < 0.0f) ? -1.0f : 1.0f;
+                        if (fbxMesh->vertex_normal.exists)
+                        {
+                            ufbx_vec3 n = ufbx_get_vertex_vec3(&fbxMesh->vertex_normal, idx);
+                            pv.nx = static_cast<float>(n.x);
+                            pv.ny = static_cast<float>(n.y);
+                            pv.nz = static_cast<float>(n.z);
+                        }
+                        else if (needsFlatNormals)
+                        {
+                            pv.nx = fnx;
+                            pv.ny = fny;
+                            pv.nz = fnz;
+                        }
+                    }
+
+                    // UV — use mesh data when available, fall back to spherical projection.
+                    if (effectiveOpts.includeUVs)
+                    {
+                        if (fbxMesh->vertex_uv.exists)
+                        {
+                            ufbx_vec2 uv = ufbx_get_vertex_vec2(&fbxMesh->vertex_uv, idx);
+                            pv.u = static_cast<float>(uv.x);
+                            pv.v = 1.0f - static_cast<float>(uv.y); // flip V for D3D / bgfx
+                        }
+                        else if (effectiveOpts.generateSphericalUVs)
+                        {
+                            ComputeSphericalUV(pv.px, pv.py, pv.pz,
+                                               meshCX, meshCY, meshCZ,
+                                               effectiveOpts.sphericalUVScale,
+                                               pv.u, pv.v);
+                        }
+                    }
+
+                    // Tangent
+                    if (effectiveOpts.includeTangents && fbxMesh->vertex_tangent.exists)
+                    {
+                        ufbx_vec3 t = ufbx_get_vertex_vec3(&fbxMesh->vertex_tangent, idx);
+                        pv.tx = static_cast<float>(t.x);
+                        pv.ty = static_cast<float>(t.y);
+                        pv.tz = static_cast<float>(t.z);
+
+                        // Bitangent sign
+                        if (fbxMesh->vertex_bitangent.exists)
+                        {
+                            ufbx_vec3 bt = ufbx_get_vertex_vec3(
+                                &fbxMesh->vertex_bitangent, idx);
+                            ufbx_vec3 n = fbxMesh->vertex_normal.exists
+                                ? ufbx_get_vertex_vec3(&fbxMesh->vertex_normal, idx)
+                                : ufbx_vec3{0, 1, 0};
+                            // cross(N, T) · B < 0 → handedness = -1
+                            float cx = static_cast<float>(n.y * t.z - n.z * t.y);
+                            float cy = static_cast<float>(n.z * t.x - n.x * t.z);
+                            float cz = static_cast<float>(n.x * t.y - n.y * t.x);
+                            float dot = cx * static_cast<float>(bt.x)
+                                      + cy * static_cast<float>(bt.y)
+                                      + cz * static_cast<float>(bt.z);
+                            pv.tw = (dot < 0.0f) ? -1.0f : 1.0f;
+                        }
+                        else
+                        {
+                            pv.tw = 1.0f;
+                        }
+                    }
+
+                    // De-duplicate vertex
+                    auto it = vertexMap.find(pv);
+                    if (it != vertexMap.end())
+                    {
+                        indices.push_back(it->second);
                     }
                     else
                     {
-                        pv.tw = 1.0f;
+                        uint16_t newIdx = static_cast<uint16_t>(uniqueVerts.size());
+                        uniqueVerts.push_back(pv);
+                        vertexMap[pv] = newIdx;
+                        indices.push_back(newIdx);
                     }
-                }
-
-                // De-duplicate vertex
-                auto it = vertexMap.find(pv);
-                if (it != vertexMap.end())
-                {
-                    indices.push_back(it->second);
-                }
-                else
-                {
-                    uint16_t newIdx = static_cast<uint16_t>(uniqueVerts.size());
-                    uniqueVerts.push_back(pv);
-                    vertexMap[pv] = newIdx;
-                    indices.push_back(newIdx);
                 }
             }
         }
@@ -418,4 +461,32 @@ inline bool ConvertFbxToBgfxBinary(const char*             fbxPath,
         return false;
 
     return WriteBgfxBinaryMesh(meshData, outBinary);
+}
+
+/// Lightweight stats returned by PreviewFbxMeshStats.
+struct FbxMeshPreviewStats
+{
+    uint32_t totalVertices  = 0;
+    uint32_t totalTriangles = 0;
+    bool     valid          = false;
+};
+
+/// Load an FBX and count vertices/triangles without running decimation.
+/// Useful for displaying polygon counts in the UI before a full conversion.
+inline FbxMeshPreviewStats PreviewFbxMeshStats(const char*              fbxPath,
+                                               const FbxConvertOptions& opts)
+{
+    FbxConvertOptions previewOpts = opts;
+    BinaryMeshData meshData;
+    FbxMeshPreviewStats stats;
+    if (!ConvertFbxToBgfxMesh(fbxPath, previewOpts, meshData))
+        return stats;
+
+    for (const auto& g : meshData.groups)
+    {
+        stats.totalVertices  += g.numVertices;
+        stats.totalTriangles += g.numIndices / 3;
+    }
+    stats.valid = true;
+    return stats;
 }

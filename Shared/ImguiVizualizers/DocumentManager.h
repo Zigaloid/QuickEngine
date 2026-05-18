@@ -27,8 +27,9 @@ class DocumentManager
     friend class MeshComponentLauncher;
     friend class LevelComponentLauncher;
     friend class EntityComponentLauncher;
-    friend class WidgetEditorLauncher;
+    friend class WidgetEditorLauncher;    
     friend class ComponentDependencyGraphLauncher;
+    friend class HeightFieldMeshLauncher;
 public:
     explicit DocumentManager(ImGuiVisualizers::ImGuiVisualizerManager& visualizerManager);
 
@@ -208,6 +209,26 @@ private:
     std::string m_suffix;
     std::string m_className;
 };
+
+class HeightFieldMeshLauncher : public IAssetLauncher
+{
+public:
+    HeightFieldMeshLauncher(DocumentManager& manager,
+        const std::string& suffix,
+        const std::string& className);
+
+    void Launch(const std::string& assetPath) override;
+
+    std::unique_ptr<ImGuiVisualizers::IImGuiVisualizer>
+        Create(const std::string& assetPath, const std::string& className) override;
+
+private:
+    DocumentManager& m_manager;
+    std::string m_suffix;
+    std::string m_className;
+};
+
+
 
 /**
  * @brief Launcher for ComponentDependencyGraphVisualizer (.cdep.obj.json files).

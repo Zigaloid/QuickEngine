@@ -1,0 +1,40 @@
+{
+    "RootObject": {
+        "m_xSteps": {
+            "Value": 100,
+            "Type": 1,
+            "Size": 4
+        },
+        "m_zSteps": {
+            "Value": 100,
+            "Type": 1,
+            "Size": 4
+        },
+        "m_stepSize": {
+            "Value": 1.0,
+            "Type": 2,
+            "Size": 4
+        },
+        "m_materialResource": {
+            "Value": "CMaterialResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/materials/bunny.mat.obj.json",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 56
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CHeightFieldMeshComponent",
+            "Elements": [],
+            "Type": 19,
+            "Size": 24
+        }
+    }
+}

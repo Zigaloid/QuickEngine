@@ -1,0 +1,64 @@
+#pragma once
+
+
+#include "CombinedObjJson3DVisualizer.h"
+#include "PropertyInspector.h"
+#include "SelectionManager.h"
+#include "HeightFieldPointSelectable.h"
+#include "CommandHistory.h"
+#include "HeightFieldEditCommand.h" // added
+
+#include "HeightFieldMeshComponent.h"
+#include "../Components/EntityComponent.h"
+#include "../Components/TransformComponent.h"
+#include "CoreSystem/CoreSystem.h"
+
+namespace ImGuiVisualizers {
+
+class HeightFieldMeshComponentVisualizer : public CombinedObjJson3DVisualizer
+{
+public:
+    explicit HeightFieldMeshComponentVisualizer(const char* name = "Height Field Mesh Editor")
+        : CombinedObjJson3DVisualizer(name)
+        , m_heightFieldComp(nullptr)
+        , m_history{100}
+    {
+    }
+
+    ~HeightFieldMeshComponentVisualizer() override
+    {
+        ReleaseHeightFieldComponent();
+    }
+
+    // Override render to use custom property inspector
+    bool Render(bool* isOpen) override;
+
+    void Initialize() override
+    {
+        CombinedObjJson3DVisualizer::Initialize();
+        m_selectionManager.SetCommandHistory(&m_history);
+    }
+
+protected:
+    bool AttachMeshFromPath(const std::string& meshPath) override;
+    void ReleaseHeightFieldComponent();
+
+private:
+    CHeightFieldMeshComponent* m_heightFieldComp;
+    PropertyInspector m_propertyInspector;
+    CSelectionManager m_selectionManager;
+    std::vector<std::shared_ptr<CHeightFieldPointSelectable>> m_pointSelectables;
+
+    CCommandHistory m_history; // command history
+
+    // Gizmo drag undo state:
+    bool m_wasGizmoDragging = false;
+    std::vector<CHeightFieldEditCommand::Entry> m_gizmoInitialEntries;
+
+    void RegisterHeightFieldPoints();
+    void ClearHeightFieldPoints();
+    void RenderHeightFieldPointSelection(bgfx::ViewId viewId, Rendering::BgfxRenderPrimitives& prims);
+    void UpdateHeightFieldFromGizmoDrag();
+};
+
+} // namespace ImGuiVisualizers

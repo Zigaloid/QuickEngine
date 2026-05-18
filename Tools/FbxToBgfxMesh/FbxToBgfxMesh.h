@@ -44,4 +44,22 @@ private:
 	std::atomic<bool> m_isConverting{ false };
 	std::string        m_statusMessage;
 	std::mutex         m_statusMutex;
+
+	// ── Mesh preview / polygon-count state ──────────────────────────────
+	std::atomic<bool> m_isPreviewing{ false };
+
+	struct PreviewStats
+	{
+		uint32_t vertexCount   = 0;
+		uint32_t triangleCount = 0;
+		bool     valid         = false;
+	};
+	PreviewStats m_previewStats;
+	std::mutex   m_previewMutex;
+
+	/// Kick off an async load that populates m_previewStats (no decimation).
+	void RequestMeshPreview();
+
+	/// Render the polygon-count display and decimation controls sub-panel.
+	void RenderDecimationPanel();
 };

@@ -8,6 +8,10 @@
 #include "bgfx_utils.h"
 #include "logo.h"
 #include "imgui/imgui.h"
+#include <cstring>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
 #include "CoreSystem/CoreSystem.h"
 #include "CoreSystem/Timer.h"
 #include "ResourceManager/ResourceManager.h"
@@ -18,6 +22,107 @@
 
 namespace
 {
+	struct CliConversionArgs
+	{
+		std::string inputPath;
+		std::string outputPath;
+		FbxConvertOptions options;
+	};
+
+	bool ParseCliConversionArgs(int32_t argc, const char* const* argv, CliConversionArgs& outArgs)
+	{
+		std::vector<std::string> positional;
+
+		for (int32_t i = 1; i < argc; ++i)
+		{
+			const char* arg = argv[i];
+			if (arg == nullptr || arg[0] == '\0')
+				continue;
+
+			if ((std::strcmp(arg, "--input") == 0 || std::strcmp(arg, "-i") == 0) && i + 1 < argc)
+			{
+				outArgs.inputPath = argv[++i];
+				continue;
+			}
+
+			if ((std::strcmp(arg, "--output") == 0 || std::strcmp(arg, "-o") == 0) && i + 1 < argc)
+			{
+				outArgs.outputPath = argv[++i];
+				continue;
+			}
+
+			if ((std::strcmp(arg, "--normals") == 0) || (std::strcmp(arg, "-n") == 0))
+			{
+				outArgs.options.generateFlatNormals = true;
+				continue;
+			}
+
+			if (std::strcmp(arg, "--uvs") == 0)
+			{
+				outArgs.options.generateSphericalUVs = true;
+				continue;
+			}
+
+			if (arg[0] != '-')
+			{
+				positional.emplace_back(arg);
+			}
+		}
+
+		if (outArgs.inputPath.empty() && outArgs.outputPath.empty() && positional.size() >= 2)
+		{
+			outArgs.inputPath = positional[0];
+			outArgs.outputPath = positional[1];
+		}
+
+		return !outArgs.inputPath.empty() && !outArgs.outputPath.empty();
+	}
+
+	bool ConvertObjFileToBin(
+		const std::string& inputPath,
+		const std::string& outputPath,
+		const FbxConvertOptions& options,
+		std::string& errorMessage)
+	{
+		std::vector<uint8_t> outBinary;
+
+		if (!ObjMeshConverter::ConvertObjToBgfxBinary(inputPath.c_str(), options, outBinary))
+		{
+			errorMessage = "Failed to convert OBJ mesh: " + inputPath;
+			return false;
+		}
+
+		try
+		{
+			std::filesystem::path outPath(outputPath);
+			if (outPath.has_parent_path())
+			{
+				std::filesystem::create_directories(outPath.parent_path());
+			}
+
+			std::ofstream ofs(outPath, std::ios::binary);
+			if (!ofs)
+			{
+				errorMessage = "Failed to open output file: " + outputPath;
+				return false;
+			}
+
+			ofs.write(reinterpret_cast<const char*>(outBinary.data()), static_cast<std::streamsize>(outBinary.size()));
+			if (!ofs)
+			{
+				errorMessage = "Failed to write output file: " + outputPath;
+				return false;
+			}
+		}
+		catch (const std::exception& e)
+		{
+			errorMessage = std::string("Failed to write output file: ") + e.what();
+			return false;
+		}
+
+		return true;
+	}
+
 	FbxToBgfxMesh theApp;
 	class ToolApp: public entry::AppI
 	{
@@ -30,6 +135,33 @@ namespace
 		void init(int32_t _argc, const char* const* _argv, uint32_t _width, uint32_t _height) override
 		{
 			DECLARE_FUNC_VLOW();
+			std::cout << "argc=" << __argc << '\n';
+			for (int i = 0; i < __argc; ++i)
+			{
+				std::cout << "argv[" << i << "]=" << (__argv[i] ? __argv[i] : "<null>") << '\n';
+			}
+
+			CliConversionArgs cliArgs;
+			ParseCliConversionArgs(__argc, __argv, cliArgs);
+
+			if (!cliArgs.inputPath.empty() && !cliArgs.outputPath.empty())
+			{
+				m_cliMode = true;
+				std::string errorMessage;
+				if (ConvertObjFileToBin(cliArgs.inputPath, cliArgs.outputPath, cliArgs.options, errorMessage))
+				{
+					m_exitCode = 0;
+					std::cout << "Converted OBJ to BIN: " << cliArgs.inputPath << " -> " << cliArgs.outputPath << '\n';
+				}
+				else
+				{
+					m_exitCode = 1;
+					std::cerr << errorMessage << '\n';
+				}
+ 				exit(m_exitCode);
+				return;
+			}
+
 			InitializeCoreEngine();
 			m_profilerController.Init();
 			InitializeBgfxView(Args(_argc, _argv), _width, _height);
@@ -40,16 +172,24 @@ namespace
 		virtual int shutdown() override
 		{
 			DECLARE_FUNC_VLOW();
-			ShutdownCoreEngine();
-			imguiDestroy();
-			bgfx::shutdown();
-			theApp.Shutdown();
-			return 0;
+			if (!m_cliMode)
+			{
+				ShutdownCoreEngine();
+				imguiDestroy();
+				bgfx::shutdown();
+				theApp.Shutdown();
+			}
+			return m_exitCode;
 		}
 
 		bool update() override
 		{
 			DECLARE_FUNC_LOW();
+			if (m_cliMode)
+			{
+				return false;
+			}
+
 			if (!entry::processEvents(m_width, m_height, m_debug, m_reset, &m_mouseState))
 			{
 				theApp.Update(m_deltaTime);
@@ -220,6 +360,8 @@ namespace
 		// Dockable window visibility states
 		bool m_showExampleDialog = true;
 		bool m_showStats = false;
+		bool m_cliMode = false;
+		int m_exitCode = 0;
 	};
 	void TestDebugText()
 	{

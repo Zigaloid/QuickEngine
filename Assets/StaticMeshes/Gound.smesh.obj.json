@@ -3,7 +3,7 @@
         "m_meshResource": {
             "Value": "CMeshResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/meshes/groundpiece.mesh.bin",
+                "Value": "./assets/meshes/ground.mesh.bin",
                 "Type": 3,
                 "Size": 32
             },

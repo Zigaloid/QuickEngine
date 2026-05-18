@@ -25,6 +25,7 @@ externalproject "bx"
    location(path.join(engineRootPath, "External/bgfx/.build/projects/vs2019/"))  
    kind "StaticLib"
    language "C++"
+   
 project "FbxToBgfxMesh"  
    kind "ConsoleApp"
    language "C"
@@ -54,6 +55,7 @@ project "FbxToBgfxMesh"
 	includedirs { path.join(engineRootPath, "Shared/ImguiVizualizers") }  
 	includedirs { path.join(engineRootPath, "Shared/bgfx_common") }   
 	includedirs { path.join(engineRootPath, "Shared/utils/") }
+	includedirs { path.join(engineRootPath, "Shared/Rendering/") } 
 
 	includedirs { path.join(engineRootPath, "External/imgui-docking") }   	
 	includedirs { path.join(engineRootPath, "External/bx/include/compat/msvc") }   
@@ -75,6 +77,7 @@ project "FbxToBgfxMesh"
 
 	files { path.join(engineRootPath, "Shared/utils/**.cpp") }
 	files { path.join(engineRootPath, "Shared/utils/**.h") }
+
 	files { path.join(engineRootPath, "Shared/bgfx_common/**.cpp") }
 	files { path.join(engineRootPath, "Shared/bgfx_common/**.h") }
 	

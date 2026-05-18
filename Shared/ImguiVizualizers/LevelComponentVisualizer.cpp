@@ -133,6 +133,15 @@ namespace ImGuiVisualizers {
 			.sortPriority = 30
 			});
 		am.RegisterAction({
+			.path = "View.FocusOnSelection",
+			.description = "Move the camera to focus on the selected objects",
+			.shortcutHint = "F",
+			.targets = UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback = [this]() { m_selectionManager.FocusCameraOnSelection(); },
+			.isEnabled = [this]() { return !m_selectionManager.GetAllSelected().empty(); },
+			.sortPriority = 40
+			});
+		am.RegisterAction({
 			.path = "File.Save",
 			.description = "Save the current level.",
 			.targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
@@ -527,11 +536,16 @@ namespace ImGuiVisualizers {
 					mouse.y <  m_viewportMin.y + m_viewportSize.y;
 
 				if (inViewport &&
-					ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
-					m_levelComp && !m_selectionManager.IsGizmoDragging())
-				{
-					DeleteSelectedEntities();
-				}
+						ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
+						m_levelComp && !m_selectionManager.IsGizmoDragging())
+					{
+						DeleteSelectedEntities();
+					}
+
+					if (inViewport && ImGui::IsKeyPressed(ImGuiKey_F, /*repeat=*/false))
+					{
+						m_selectionManager.FocusCameraOnSelection();
+					}
 			}
 
 			// Left-click pick (Alt = camera pan, skip picking)

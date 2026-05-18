@@ -443,6 +443,12 @@
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="QuickEdit.h" />
+    <ClInclude Include="..\Shared\Components\HeightFieldMeshComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ImguiVizualizers\HeightFieldMeshComponentVisualizer.h">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -712,5 +718,11 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
+    <ClCompile Include="..\Shared\Components\HeightFieldMeshComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ImguiVizualizers\HeightFieldMeshComponentVisualizer.cpp">
+      <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
