@@ -124,6 +124,11 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/ImGui3DViewVisualizer.h" }
 	files { "../Shared/ImguiVizualizers/LevelComponentVisualizer.cpp" }
 	files { "../Shared/ImguiVizualizers/LevelComponentVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/HeightFieldMeshComponentVisualizer.cpp" }
+	files { "../Shared/ImguiVizualizers/HeightFieldMeshComponentVisualizer.h" }
+	files { "../Shared/ImguiVizualizers/HeightFieldEditCommand.cpp" }
+	files { "../Shared/ImguiVizualizers/HeightFieldEditCommand.h" }
+	
 	files { "../Shared/ImguiVizualizers/ComponentDependencyGraphVisualizer.cpp" }
 	files { "../Shared/ImguiVizualizers/ComponentDependencyGraphVisualizer.h" }
 	files { "../Shared/ImguiVizualizers/NodeGraphVisualizer.cpp" }

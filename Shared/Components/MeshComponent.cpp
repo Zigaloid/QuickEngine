@@ -5,6 +5,7 @@
 #include "TransformComponent.h"
 #include "ShaderResource.h"
 #include "MeshResource.h"
+#include "MaterialResource.h"
 #include "PhysicsBodyComponent.h"
 #include "Physics/PhysicsManager.h"
 #include "Math/Quaternion.h"
@@ -16,7 +17,8 @@ REGISTER_COMPONENT(CRenderComponent, "RenComp", "Graphics");
 REGISTER_COMPONENT(CMeshComponent, "Mesh", "Graphics");
 
 REFL_DEFINE_OBJECT(CMeshComponent)
-	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_meshResource)
+	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_meshResource),
+	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_materialResource)
 REFL_DEFINE_END
 
 REFL_DEFINE_OBJECT(CRenderComponent)
@@ -70,7 +72,7 @@ bool CMeshComponent::OnInitialize()
 void CMeshComponent::OnUpdate(double deltaTime)
 {	
 	DECLARE_FUNC_MEDIUM();
-	CRenderComponent::OnUpdate(deltaTime); // Update the model matrix from physics each frame
+	CRenderComponent::OnUpdate(deltaTime);
 
 	auto* renderFunctionQueue = Core::CoreSystem::GetRenderFunctionQueue();
 	if (renderFunctionQueue)
@@ -85,8 +87,9 @@ void CMeshComponent::OnUpdate(double deltaTime)
 void CMeshComponent::OnShutdown()
 {
 	DECLARE_FUNC_VLOW();
-	// Replace resource references with default-constructed objects to clear stored resource/shared_ptr
-	m_meshResource = CStaticMeshResourceReference();	
+	
+	m_materialResource = CMaterialResourceReference();
+	m_meshResource = CMeshResourceReference();
 	
     bgfx::destroy(m_lightDir);
 	bgfx::destroy(m_lightColor);
@@ -102,6 +105,21 @@ void CMeshComponent::OnShutdown()
 	m_ambient = BGFX_INVALID_HANDLE;
 	m_materialColor = BGFX_INVALID_HANDLE;
 	m_meshStateInitialized = false;
+	
+	CRenderComponent::OnShutdown();
+}
+
+std::shared_ptr<CMaterialResource> CMeshComponent::GetMaterialResource() const
+{
+	if (!m_materialResource.GetResource())
+		return nullptr;
+	return m_materialResource.GetResourceAs<CMaterialResource>();
+}
+
+void CMeshComponent::SetMaterialResource(const CMaterialResourceReference& matRef)
+{
+	m_materialResource = matRef;
+	OnMeshResourceChanged();
 }
 
 void CMeshComponent::Render(bgfx::ViewId viewId)
@@ -111,101 +129,28 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 	{	
 		if (m_meshStateInitialized == false)
 		{
-			// set uniform values (adjust values as needed)
-			const float lightDir[4] = { 0.57735f, -0.57735f, 0.57735f, 0.0f }; // normalized direction
-			const float lightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
-            bgfx::setUniform(m_lightDir, lightDir);
-			bgfx::setUniform(m_lightColor, lightColor);
-
-			auto matRes = m_meshResource.GetResourceAs<CStaticMeshResource>()->GetMaterialResource();
-			if (!matRes)
-			{
-				// Material not available — bail out of state init.
-				return;
-			}
-
-			bgfx::setUniform(m_ambient, matRes->GetAmbientColor().data());
-			bgfx::setUniform(m_materialColor, matRes->GetMaterialColor().data());
-
-			// assign the sampler handle (don't recreate each frame)
-			int numTextures = matRes->GetNumberOfTextures();
-			if (numTextures > 4) numTextures = 4; // cap to available slots
-
-			// populate textures [0, numTextures)
-			for (int i = 0; i < numTextures; i++)
-			{
-				m_texture[i].m_texture = matRes->GetTexture(i);
-				m_texture[i].m_flags = 0;
-				m_texture[i].m_stage = i;
-                m_texture[i].m_sampler = m_samplers[i];
-				m_meshState.m_textures[i] = m_texture[i];
-			}
-
-			m_meshState.m_numTextures = numTextures > 0 ? numTextures : 0;
-			m_meshState.m_state = BGFX_STATE_WRITE_RGB
-			                    | BGFX_STATE_WRITE_A
-			                    | BGFX_STATE_WRITE_Z
-			                    | BGFX_STATE_DEPTH_TEST_LESS
-			                    | BGFX_STATE_CULL_CCW
-			                    | BGFX_STATE_MSAA;
-			m_meshState.m_program = matRes->GetShaderProgram();
-			m_meshState.m_viewId = viewId;
-			m_meshStateInitialized = true;
-
-            auto staticMeshRes = m_meshResource.GetResourceAs<CStaticMeshResource>();
-            auto meshRes = staticMeshRes->GetMeshResource();
-            const Mesh* mesh = meshRes->GetMesh();
-
-			// Seed with the first group's sphere, then expand to enclose each subsequent one.
-            bx::Sphere result = mesh->m_groups[0].m_sphere;
-
-            for (uint32_t i = 1; i < mesh->m_groups.size(); ++i)
-            {
-                const bx::Sphere& s = mesh->m_groups[i].m_sphere;
-
-                const bx::Vec3 diff = bx::sub(s.center, result.center);
-                const float dist = bx::length(diff);
-
-                // Check if 's' is already contained within 'result'.
-                if (dist + s.radius <= result.radius)
-                    continue;
-
-                // Check if 'result' is fully inside 's'.
-                if (dist + result.radius <= s.radius)
-                {
-                    result = s;
-                    continue;
-                }
-
-                // Merge: new radius spans both spheres along their axis.
-                const float newRadius = (dist + result.radius + s.radius) * 0.5f;
-                const float t = (newRadius - result.radius) / dist;
-                result.center = bx::mad(diff, t, result.center);
-                result.radius = newRadius;
-            }
-
-            // Set and return the sphere. This is shitty. We should cache this.
-            *CRenderComponent::GetBoundingSphere() = Vector4f(result.center.x, result.center.y, result.center.z, result.radius);
-
+			InitializeMesh(GetMeshResource(), viewId);
 		}
 		
 		if (m_meshStateInitialized)
 		{
-			auto matshRes = m_meshResource.GetResourceAs<CStaticMeshResource>()->GetMeshResource();
-			const MeshState* statePtr = &m_meshState;
-            if (matshRes->GetMesh())
+			auto meshRes = GetMeshResource();
+			const Mesh* mesh = meshRes->GetMesh();
+
+			if (mesh)
 			{
+				const MeshState* statePtr = &m_meshState;
 				auto modelMatrix = GetModelMatrix();
 				if (modelMatrix)
-					matshRes->GetMesh()->submit(&statePtr, 1, modelMatrix->GetData().data(), 1);
+					mesh->submit(&statePtr, 1, modelMatrix->GetData().data(), 1);
 			}
 		}
-        // Render the physics body if available (for debugging)
+        
+		// Render the physics body if available (for debugging)
         Component* parent = GetParent();
         if (!parent)
             return;
 #ifdef PHYSICS_DEBUG_RENDER
-        // Re-acquires only when the cache is empty or the referenced component was released.
         auto physBody = m_physicsBodyRef.Get();
 		if (physBody)
 		{
@@ -220,14 +165,102 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 				physBody->DebugRender(0, matrix);
 			}
 		}
-#endif	// End physics debug render
+#endif
 	}
+}
+
+void CMeshComponent::InitializeMesh(std::shared_ptr<CMeshResource> meshRes, bgfx::ViewId viewId)
+{
+	if (!meshRes || !meshRes->GetMesh())
+		return;
+
+	Mesh* mesh = meshRes->GetMesh();
+	if (mesh->m_groups.empty())
+		return;
+
+	// set uniform values
+	const float lightDir[4] = { 0.57735f, -0.57735f, 0.57735f, 0.0f };
+	const float lightColor[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+	bgfx::setUniform(m_lightDir, lightDir);
+	bgfx::setUniform(m_lightColor, lightColor);
+
+	auto matRes = GetMaterialResource();
+	if (!matRes)
+	{
+		// Material not available — bail out of state init.
+		return;
+	}
+
+	bgfx::setUniform(m_ambient, matRes->GetAmbientColor().data());
+	bgfx::setUniform(m_materialColor, matRes->GetMaterialColor().data());
+
+	// assign the sampler handle (don't recreate each frame)
+	int numTextures = matRes->GetNumberOfTextures();
+	if (numTextures > 4) numTextures = 4;
+
+	// populate textures [0, numTextures)
+	for (int i = 0; i < numTextures; i++)
+	{
+		m_texture[i].m_texture = matRes->GetTexture(i);
+		m_texture[i].m_flags = 0;
+		m_texture[i].m_stage = i;
+        m_texture[i].m_sampler = m_samplers[i];
+		m_meshState.m_textures[i] = m_texture[i];
+	}
+
+	m_meshState.m_numTextures = numTextures > 0 ? numTextures : 0;
+	m_meshState.m_state = BGFX_STATE_WRITE_RGB
+	                    | BGFX_STATE_WRITE_A
+	                    | BGFX_STATE_WRITE_Z
+	                    | BGFX_STATE_DEPTH_TEST_LESS
+	                    | BGFX_STATE_CULL_CCW
+	                    | BGFX_STATE_MSAA;
+	m_meshState.m_program = matRes->GetShaderProgram();
+	m_meshState.m_viewId = viewId;
+	m_meshStateInitialized = true;
+
+	// Seed with the first group's sphere, then expand to enclose each subsequent one.
+	bx::Sphere result = mesh->m_groups[0].m_sphere;
+
+	for (uint32_t i = 1; i < mesh->m_groups.size(); ++i)
+	{
+		const bx::Sphere& s = mesh->m_groups[i].m_sphere;
+
+		const bx::Vec3 diff = bx::sub(s.center, result.center);
+		const float dist = bx::length(diff);
+
+		// Check if 's' is already contained within 'result'.
+		if (dist + s.radius <= result.radius)
+			continue;
+
+		// Check if 'result' is fully inside 's'.
+		if (dist + result.radius <= s.radius)
+		{
+			result = s;
+			continue;
+		}
+
+		// Merge: new radius spans both spheres along their axis.
+		const float newRadius = (dist + result.radius + s.radius) * 0.5f;
+		const float t = (newRadius - result.radius) / dist;
+		result.center = bx::mad(diff, t, result.center);
+		result.radius = newRadius;
+	}
+
+	// Set the bounding sphere
+	*CRenderComponent::GetBoundingSphere() = Vector4f(result.center.x, result.center.y, result.center.z, result.radius);
 }
 
 bool CMeshComponent::IsLoaded() const
 {	
 	if (!m_meshResource.GetResource()) return false;
-	if (!m_meshResource.GetResourceAs<CStaticMeshResource>()->IsFinalized()) return false;
+	auto meshRes = m_meshResource.GetResourceAs<CMeshResource>();
+	if (!meshRes || !meshRes->IsLoaded() || !meshRes->IsFinalized()) return false;
+	
+	if (!m_materialResource.GetResource()) return false;
+	auto matRes = m_materialResource.GetResourceAs<CMaterialResource>();
+	if (!matRes || !matRes->IsLoaded() || !matRes->IsFinalized()) return false;
+	
 	return true;
 }
 

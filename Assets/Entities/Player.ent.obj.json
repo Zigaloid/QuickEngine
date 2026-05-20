@@ -3,7 +3,7 @@
         "m_name": {
             "Value": "Player",
             "Type": 3,
-            "Size": 32
+            "Size": 40
         },
         "m_active": {
             "Value": true,
@@ -16,14 +16,24 @@
                 {
                     "Value": "CMeshComponent",
                     "m_meshResource": {
-                        "Value": "CStaticMeshResourceReference",
+                        "Value": "CMeshResourceReference",
                         "m_resourceFileName": {
-                            "Value": "./assets/staticmeshes/warrior.smesh.obj.json",
+                            "Value": "./assets/meshes/warrior.mesh.bin",
                             "Type": 3,
-                            "Size": 32
+                            "Size": 40
                         },
                         "Type": 4,
-                        "Size": 56
+                        "Size": 64
+                    },
+                    "m_materialResource": {
+                        "Value": "CMaterialResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/materials/warrior.mat.obj.json",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 64
                     },
                     "m_active": {
                         "Value": true,
@@ -34,7 +44,7 @@
                         "Value": "CMeshComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
                     }
                 },
                 {
@@ -70,7 +80,7 @@
                         "Value": "CCharacterComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
                     }
                 },
                 {
@@ -106,7 +116,7 @@
                         "Value": "CTransformComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
                     }
                 },
                 {
@@ -120,7 +130,7 @@
                         "Value": "CThirdPersonInputComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
                     }
                 },
                 {
@@ -134,12 +144,12 @@
                         "Value": "CCameraComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
                     }
                 }
             ],
             "Type": 19,
-            "Size": 24
+            "Size": 32
         }
     }
 }

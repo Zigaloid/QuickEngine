@@ -3,7 +3,7 @@
         "m_name": {
             "Value": "Tree",
             "Type": 3,
-            "Size": 32
+            "Size": 40
         },
         "m_active": {
             "Value": true,
@@ -16,14 +16,24 @@
                 {
                     "Value": "CMeshComponent",
                     "m_meshResource": {
-                        "Value": "CStaticMeshResourceReference",
+                        "Value": "CMeshResourceReference",
                         "m_resourceFileName": {
-                            "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                            "Value": "./assets/meshes/tree.mesh.bin",
                             "Type": 3,
-                            "Size": 32
+                            "Size": 40
                         },
                         "Type": 4,
-                        "Size": 56
+                        "Size": 64
+                    },
+                    "m_materialResource": {
+                        "Value": "CMaterialResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/materials/tree.mat.obj.json",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 64
                     },
                     "m_active": {
                         "Value": true,
@@ -34,7 +44,7 @@
                         "Value": "CMeshComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
                     }
                 },
                 {
@@ -100,7 +110,7 @@
                         "Value": "CPhysicsBodyComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
                     }
                 },
                 {
@@ -136,12 +146,12 @@
                         "Value": "CTransformComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 24
+                        "Size": 32
                     }
                 }
             ],
             "Type": 19,
-            "Size": 24
+            "Size": 32
         }
     }
 }

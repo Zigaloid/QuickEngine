@@ -2,26 +2,26 @@
 
 #include "ICommand.h"
 #include "HeightFieldMeshComponent.h"
+#include "Math/Vector3f.h"
 #include <vector>
 
 namespace ImGuiVisualizers {
 
 /**
- * @brief Undoable edit that records before/after heights for one or more points.
+ * @brief Undoable edit that records before/after positions for one or more vertices.
  *
- * Execute() writes the 'after' values, Undo() writes the 'before' values.
- * Both operations rebuild the mesh and reset render state so the visual update
- * is immediate.
+ * Execute() writes the 'after' positions, Undo() writes the 'before' positions.
+ * Both operations update the mesh vertex data and reset render state so the visual
+ * update is immediate.
  */
 class CHeightFieldEditCommand final : public ICommand
 {
 public:
 	struct Entry
 	{
-		uint32_t xIndex = 0;
-		uint32_t zIndex = 0;
-		float    before = 0.0f;
-		float    after  = 0.0f;
+		uint16_t vertexIndex = 0;  // Index within the mesh group
+		Vector3f before;            // Position before edit
+		Vector3f after;             // Position after edit
 	};
 
 	explicit CHeightFieldEditCommand(CHeightFieldMeshComponent* comp, std::vector<Entry> entries, const char* label = "Edit Height Field")
@@ -32,30 +32,22 @@ public:
 
 	void Execute() override
 	{
-		if (!m_component) return;
-		for (const auto& e : m_entries)
-			m_component->SetHeightAt(e.xIndex, e.zIndex, e.after);
-
-		m_component->RebuildMesh();
-		m_component->ForceRenderStateReset();
+		ApplyPositions(m_entries, true);
 	}
 
 	void Undo() override
 	{
-		if (!m_component) return;
-		for (const auto& e : m_entries)
-			m_component->SetHeightAt(e.xIndex, e.zIndex, e.before);
-
-		m_component->RebuildMesh();
-		m_component->ForceRenderStateReset();
+		ApplyPositions(m_entries, false);
 	}
 
-	const char* GetLabel() const override { return m_label; }
+	const char* GetLabel() const override { return m_label.c_str(); }
 
 private:
+	void ApplyPositions(const std::vector<Entry>& entries, bool useAfter);
+
 	CHeightFieldMeshComponent* m_component = nullptr;
-	std::vector<Entry>         m_entries;
-	const char*                m_label = "Edit Height Field";
+	std::vector<Entry> m_entries;
+	std::string m_label;
 };
 
 } // namespace ImGuiVisualizers

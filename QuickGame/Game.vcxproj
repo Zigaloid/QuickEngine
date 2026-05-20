@@ -99,6 +99,7 @@
     <ClInclude Include="..\Shared\Components\CameraComponent.h" />
     <ClInclude Include="..\Shared\Components\CharacterComponent.h" />
     <ClInclude Include="..\Shared\Components\EntityComponent.h" />
+    <ClInclude Include="..\Shared\Components\HeightFieldMeshComponent.h" />
     <ClInclude Include="..\Shared\Components\LevelComponent.h" />
     <ClInclude Include="..\Shared\Components\MeshComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h" />
@@ -224,6 +225,7 @@
     <ClCompile Include="..\Shared\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Shared\Components\CharacterComponent.cpp" />
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\HeightFieldMeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp" />
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp" />
@@ -295,51 +297,6 @@
     <ProjectReference Include="..\External\bgfx\.build\projects\vs2019\bimg_decode.vcxproj">
       <Project>{A7B931CA-136F-AABF-9C63-A4960818A1C3}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="CAMERA_ORBIT_INPUT_COMPLETE.md" />
-    <None Include="CAMERA_ORBIT_INPUT_GUIDE.md" />
-    <None Include="CAMERA_ORBIT_QUICK_START.md" />
-    <None Include="CAMERA_ORBIT_VISUAL_GUIDE.md" />
-    <None Include="CAMERA_RELATIVE_MOVEMENT_COMPLETE.md" />
-    <None Include="CAMERA_RELATIVE_MOVEMENT_IMPLEMENTATION.md" />
-    <None Include="CAMERA_RELATIVE_MOVEMENT_QUICK_REF.md" />
-    <None Include="CAMERA_RELATIVE_MOVEMENT_VISUAL_GUIDE.md" />
-    <None Include="CAMERA_RELATIVE_QUICK_START.md" />
-    <None Include="COMPLETE_DELIVERABLES.md" />
-    <None Include="COMPONENT_HIERARCHY_SEARCH_API.md" />
-    <None Include="COMPONENT_HIERARCHY_SEARCH_QUICK_REF.md" />
-    <None Include="COMPONENT_HIERARCHY_SEARCH_SUMMARY.md" />
-    <None Include="COMPONENT_HIERARCHY_VISUAL_GUIDE.md" />
-    <None Include="DELIVERY_SUMMARY.md" />
-    <None Include="DEPENDENCY_STRING_NAME_EXAMPLES.md" />
-    <None Include="DEPENDENCY_STRING_NAME_IMPLEMENTATION_SUMMARY.md" />
-    <None Include="DEPENDENCY_STRING_NAME_INDEX.md" />
-    <None Include="DEPENDENCY_STRING_NAME_QUICKREF.md" />
-    <None Include="DEPENDENCY_STRING_NAME_SETUP.md" />
-    <None Include="DEPENDENCY_STRING_NAME_VISUAL_GUIDE.md" />
-    <None Include="DOCUMENTATION_INDEX.md" />
-    <None Include="FINAL_DELIVERY_SUMMARY.md" />
-    <None Include="GameApp_Camera_Integration_Summary.md" />
-    <None Include="GameApp_Camera_QuickRef.md" />
-    <None Include="GameApp_LevelCamera_APIRef.md" />
-    <None Include="GameApp_LevelCamera_AutoDiscovery.md" />
-    <None Include="GameApp_LevelCamera_Discovery_Summary.md" />
-    <None Include="GameApp_LevelCamera_QuickRef.md" />
-    <None Include="Game_ActiveCamera_Usage.md" />
-    <None Include="IMPLEMENTATION_COMPLETE.md" />
-    <None Include="JUMP_BUTTON_FIX_QUICK_REF.md" />
-    <None Include="JUMP_INPUT_INCONSISTENCY_FIX.md" />
-    <None Include="LEFT_STICK_DIRECTION_FIX.md" />
-    <None Include="LEFT_STICK_MOTION_FINAL_FIX.md" />
-    <None Include="LEFT_STICK_REAL_BUG_FIX.md" />
-    <None Include="LEVEL_CAMERA_DISCOVERY_COMPLETE.md" />
-    <None Include="LEVEL_CAMERA_DISCOVERY_VISUAL_GUIDE.md" />
-    <None Include="PROJECT_COMPLETE.md" />
-    <None Include="README.md" />
-    <None Include="REFACTORING_COMPLETE.md" />
-    <None Include="THIRD_PERSON_CAMERA_RELATIVE_MOVEMENT.md" />
-    <None Include="VERIFICATION_CHECKLIST.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

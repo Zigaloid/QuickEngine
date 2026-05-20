@@ -63,8 +63,7 @@ namespace ResourceSystem {
 
 		/** @return true on success. */
 		virtual bool Initialize()
-		{
-			ResourceManagerDebug.SetEnabled(RESOURCE_MANAGER_DEBUG);			
+		{			
 			m_isInitialized = true;
 			return true;
 		}
@@ -219,6 +218,7 @@ namespace ResourceSystem {
 		explicit ResourceManager(FileSystem::FileSystemManager* fileSystemManager)
 			: m_fileSystemManager(fileSystemManager)
 		{
+			ResourceManagerDebug.SetEnabled(RESOURCE_MANAGER_DEBUG);
 		}
 
 		~ResourceManager()

@@ -1,22 +1,19 @@
-#pragma once
+﻿#pragma once
 
 #include "ComponentSystem/ComponentSystem.h"
 #include "ResourceManager/ResourceManager.h"
 #include "MaterialResource.h"
+#include "MeshResource.h"
 #include "MeshComponent.h"
 #include "Math/Matrix4f.h"
 #include "Math/Vector3f.h"
 #include "bgfx/bgfx.h"
 #include "bgfx_common/bgfx_utils.h"
 
-// Forward-declare to avoid pulling in the full physics header here.
-class CPhysicsBodyComponent;
-class CTransformComponent;
-
-class CHeightFieldMeshComponent : public CRenderComponent
+class CHeightFieldMeshComponent : public CMeshComponent
 {
 public:
-    REFL_DECLARE_OBJECT(CHeightFieldMeshComponent, CRenderComponent);
+    REFL_DECLARE_OBJECT(CHeightFieldMeshComponent, CMeshComponent);
     DECLARE_COMPONENT();
 
     // -- Constructor with parameters -------------------------------------
@@ -45,7 +42,7 @@ public:
     // -- Public API ------------------------------------------------------
 
     void Render(bgfx::ViewId viewId);
-    bool IsLoaded() const;
+    bool IsLoaded() const override;
 
     // Getters and setters for height field parameters
     uint32_t GetXSteps() const { return m_xSteps; }
@@ -78,53 +75,20 @@ public:
         }
     }
 
-    // Material property
-    std::shared_ptr<CMaterialResource> GetMaterialResource() const { return m_materialResource.GetResourceAs<CMaterialResource>(); }
-    void SetMaterialResource(const CMaterialResourceReference& matRef) { m_materialResource = matRef; m_meshStateInitialized = false; }
+    virtual std::shared_ptr<Vector4f> GetBoundingSphere() const override;
+     
+	// Mesh persistence
+	bool SaveMesh(const std::string& filePath);
+	bool isMeshInitialized() const { return m_meshStateInitialized; }
 
-    virtual std::shared_ptr<Vector4f> GetBoundingSphere() const;
-
-    // Height field data management
-    float GetHeightAt(uint32_t xIndex, uint32_t zIndex) const;
-    void SetHeightAt(uint32_t xIndex, uint32_t zIndex, float height);
-    void RebuildMesh();
-    void ForceRenderStateReset() { m_meshStateInitialized = false; }
-
-    // Mesh persistence
-    bool SaveMesh(const std::string& filePath);
+protected:
+	// ── Override parent's mesh initialization ───────────────────────────
+	void InitializeMesh(std::shared_ptr<CMeshResource> meshRes, bgfx::ViewId viewId) override;
 
 private:
-    // Height field parameters
-    uint32_t m_xSteps;
-    uint32_t m_zSteps;
-    float m_stepSize;
-    bool m_isDirty;
-
-    // Height data: stored as a flattened array [z * width + x]
-    std::vector<float> m_heightData;
-
-    // Material
-    CMaterialResourceReference m_materialResource;
-
-
-
-    // Mesh for storing geometry
-    Mesh m_mesh;
-
-    // Material and rendering uniforms
-    MeshState m_meshState;
-    MeshState::Texture m_texture[4];
-    bgfx::UniformHandle m_samplers[4] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
-    bgfx::UniformHandle m_lightDir = BGFX_INVALID_HANDLE;
-    bgfx::UniformHandle m_lightColor = BGFX_INVALID_HANDLE;
-    bgfx::UniformHandle m_ambient = BGFX_INVALID_HANDLE;
-    bgfx::UniformHandle m_materialColor = BGFX_INVALID_HANDLE;
-    bool m_meshStateInitialized = false;
-
-    // Rendering state
-    uint64_t m_renderState = 0;
-    bgfx::ProgramHandle m_program = BGFX_INVALID_HANDLE;
-
-    void GenerateHeightFieldGeometry();
-    void ClearGeometry();
+	// Height field parameters
+	uint32_t m_xSteps;
+	uint32_t m_zSteps;
+	float m_stepSize;
+	bool m_isDirty;
 };

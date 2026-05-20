@@ -117,6 +117,7 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\DeleteEntityCommand.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\DocumentManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.h" />
+    <ClInclude Include="..\Shared\ImguiVizualizers\HeightFieldEditCommand.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\HeightFieldMeshComponentVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.h" />
@@ -262,6 +263,7 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\ComponentDependencyGraphVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\DocumentManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\EntityComponentVisualizer.cpp" />
+    <ClCompile Include="..\Shared\ImguiVizualizers\HeightFieldEditCommand.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\HeightFieldMeshComponentVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGui3DViewVisualizer.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />

@@ -38,7 +38,7 @@ public:
 	// path_ should be the mesh binary path, e.g. "meshes/bunny.mesh.bin".
 	void Finalize() override
 	{
-		m_mesh = meshLoad(m_path.c_str());
+		m_mesh = meshLoad(m_path.c_str(), true);  // true = keep vertex data in RAM for CPU access
 		m_isFinalized = (m_mesh != nullptr);
 	}
 
