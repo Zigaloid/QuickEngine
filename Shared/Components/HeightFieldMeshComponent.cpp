@@ -15,23 +15,23 @@
 REGISTER_COMPONENT(CHeightFieldMeshComponent, "HeightFieldMesh", "Graphics");
 
 REFL_DEFINE_OBJECT(CHeightFieldMeshComponent)
-    REFL_DEFINE_INT_MEMBER(CHeightFieldMeshComponent, m_xSteps),
-    REFL_DEFINE_INT_MEMBER(CHeightFieldMeshComponent, m_zSteps),
-    REFL_DEFINE_FLOAT_MEMBER(CHeightFieldMeshComponent, m_stepSize),
-    REFL_DEFINE_OBJECT_MEMBER(CHeightFieldMeshComponent, m_materialResource),
-    REFL_DEFINE_OBJECT_MEMBER(CHeightFieldMeshComponent, m_meshResource)    
+REFL_DEFINE_INT_MEMBER(CHeightFieldMeshComponent, m_xSteps),
+REFL_DEFINE_INT_MEMBER(CHeightFieldMeshComponent, m_zSteps),
+REFL_DEFINE_FLOAT_MEMBER(CHeightFieldMeshComponent, m_stepSize),
+REFL_DEFINE_VECTOR4_MEMBER(CHeightFieldMeshComponent, m_blendHeights),
+REFL_DEFINE_FLOAT_MEMBER(CHeightFieldMeshComponent, m_blendTransition)
 REFL_DEFINE_END
 
 
 bool CHeightFieldMeshComponent::OnInitialize()
-{	
+{
     DECLARE_FUNC_VLOW();
     CMeshComponent::OnInitialize();
     return true;
 }
 
 void CHeightFieldMeshComponent::OnUpdate(double deltaTime)
-{	
+{
     DECLARE_FUNC_MEDIUM();
     CMeshComponent::OnUpdate(deltaTime);
 }
@@ -44,19 +44,31 @@ void CHeightFieldMeshComponent::OnShutdown()
 
 void CHeightFieldMeshComponent::Render(bgfx::ViewId viewId)
 {
-	DECLARE_FUNC_MEDIUM();
+    DECLARE_FUNC_MEDIUM();
 
-	auto meshRes = GetMeshResource();
-	if (!meshRes)
-		return;
+    auto meshRes = GetMeshResource();
+    if (!meshRes)
+        return;
 
-	if (m_meshStateInitialized == false && IsLoaded())
-	{
+    if (m_meshStateInitialized == false && IsLoaded())
+    {
         InitializeMesh(meshRes, viewId);
-	}
-    
-	if (m_meshStateInitialized)
-	{
+    }
+
+    if (m_meshStateInitialized)
+    {
+        // Set height-based texture blending uniforms
+        if (bgfx::isValid(m_blendHeightsUniform))
+        {
+            bgfx::setUniform(m_blendHeightsUniform, m_blendHeights.data());
+        }
+
+        if (bgfx::isValid(m_blendTransitionUniform))
+        {
+            float blendTransitionData[4] = { m_blendTransition, 0.0f, 0.0f, 0.0f };
+            bgfx::setUniform(m_blendTransitionUniform, blendTransitionData);
+        }
+
         Mesh* mesh = meshRes->GetMesh();
         if (mesh && !mesh->m_groups.empty())
         {
@@ -64,7 +76,7 @@ void CHeightFieldMeshComponent::Render(bgfx::ViewId viewId)
             const MeshState* meshStatePtr = &m_meshState;
             mesh->submit(&meshStatePtr, 1, modelMatrix.GetData().data(), 1);
         }
-	}
+    }
 }
 
 void CHeightFieldMeshComponent::InitializeMesh(std::shared_ptr<CMeshResource> meshRes, bgfx::ViewId viewId)
@@ -72,6 +84,16 @@ void CHeightFieldMeshComponent::InitializeMesh(std::shared_ptr<CMeshResource> me
     Mesh* mesh = meshRes->GetMesh();
     if (!mesh)
         return;
+
+    // Create uniform handles for height-based texture blending if not already created
+    if (!bgfx::isValid(m_blendHeightsUniform))
+    {
+        m_blendHeightsUniform = bgfx::createUniform("u_blendHeights", bgfx::UniformType::Vec4);
+    }
+    if (!bgfx::isValid(m_blendTransitionUniform))
+    {
+        m_blendTransitionUniform = bgfx::createUniform("u_blendTransition", bgfx::UniformType::Vec4);
+    }
 
     // set uniform values (adjust values as needed)
     const float lightDir[4] = { 0.57735f, -1.0f, 0.57735f, 0.0f };
@@ -144,7 +166,7 @@ void CHeightFieldMeshComponent::InitializeMesh(std::shared_ptr<CMeshResource> me
 
 
 bool CHeightFieldMeshComponent::IsLoaded() const
-{	
+{
     if (!GetMaterialResource()) return false;
     if (!GetMaterialResource()->IsLoaded()) return false;
     if (!GetMaterialResource()->IsFinalized()) return false;
@@ -232,11 +254,11 @@ bool CHeightFieldMeshComponent::SaveMesh(const std::string& filePath)
         return false;
     }
 
-    const Core::AppConfig& config = Core::AppConfig::Instance();    
-	std::string finalPath = config.ResolvePath(filePath);
+    const Core::AppConfig& config = Core::AppConfig::Instance();
+    std::string finalPath = config.ResolvePath(filePath);
 
     std::ofstream outFile(finalPath, std::ios::binary);
-    
+
     if (!outFile.is_open())
     {
         std::cerr << "CHeightFieldMeshComponent::SaveMesh: Failed to open file for writing: " << filePath << std::endl;

@@ -14,6 +14,7 @@
 #include "Input\InputActionManager.h"
 #include "MeshComponent.h"
 #include "PhysicsBodyComponent.h"
+#include "HeightFieldPhysicsComponent.h"
 #include "ComponentSystem/ComponentDependencyDefinition.h"
 #include "ComponentSystem/ComponentDependencyDefinition.h"
 #include "TransformComponent.h"
@@ -169,6 +170,8 @@ void GameApp::RegisterComponents()
 	componentManager->RegisterComponentType<CCameraComponent>();
 	scheduler->RegisterComponentType<CCameraComponent>(0, "Camera");
 
+	componentManager->RegisterComponentType<CHeightFieldPhysicsComponent>();
+	scheduler->RegisterComponentType<CHeightFieldPhysicsComponent>(0, "HeightFieldPhysics");
 
 }
 

@@ -100,6 +100,7 @@
     <ClInclude Include="..\Shared\Components\CharacterComponent.h" />
     <ClInclude Include="..\Shared\Components\EntityComponent.h" />
     <ClInclude Include="..\Shared\Components\HeightFieldMeshComponent.h" />
+    <ClInclude Include="..\Shared\Components\HeightFieldPhysicsComponent.h" />
     <ClInclude Include="..\Shared\Components\LevelComponent.h" />
     <ClInclude Include="..\Shared\Components\MeshComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h" />
@@ -250,6 +251,7 @@
     <ClCompile Include="..\Shared\Components\CharacterComponent.cpp" />
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp" />
     <ClCompile Include="..\Shared\Components\HeightFieldMeshComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\HeightFieldPhysicsComponent.cpp" />
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp" />
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp" />

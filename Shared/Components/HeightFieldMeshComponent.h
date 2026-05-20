@@ -75,11 +75,18 @@ public:
         }
     }
 
-    virtual std::shared_ptr<Vector4f> GetBoundingSphere() const override;
-     
+	virtual std::shared_ptr<Vector4f> GetBoundingSphere() const override;
+
 	// Mesh persistence
 	bool SaveMesh(const std::string& filePath);
 	bool isMeshInitialized() const { return m_meshStateInitialized; }
+
+	// Height-based texture blending parameters
+	void SetBlendHeights(const Vector4f& heights) { m_blendHeights = heights; }
+	Vector4f GetBlendHeights() const { return m_blendHeights; }
+
+	void SetBlendTransition(float transition) { m_blendTransition = transition; }
+	float GetBlendTransition() const { return m_blendTransition; }
 
 protected:
 	// ── Override parent's mesh initialization ───────────────────────────
@@ -91,4 +98,10 @@ private:
 	uint32_t m_zSteps;
 	float m_stepSize;
 	bool m_isDirty;
+
+	// Height-based texture blending
+	Vector4f m_blendHeights = Vector4f(-2.0f, 0.0f, 2.0f, 4.0f);
+	float m_blendTransition = 0.5f;
+	bgfx::UniformHandle m_blendHeightsUniform = BGFX_INVALID_HANDLE;
+	bgfx::UniformHandle m_blendTransitionUniform = BGFX_INVALID_HANDLE;
 };

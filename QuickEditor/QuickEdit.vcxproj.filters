@@ -90,6 +90,9 @@
     <ClInclude Include="..\Shared\Components\HeightFieldMeshComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\HeightFieldPhysicsComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\LevelComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
@@ -530,6 +533,9 @@
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\HeightFieldMeshComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\HeightFieldPhysicsComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp">

@@ -14,40 +14,6 @@
             "Value": "CEntityComponent",
             "Elements": [
                 {
-                    "Value": "CMeshComponent",
-                    "m_meshResource": {
-                        "Value": "CMeshResourceReference",
-                        "m_resourceFileName": {
-                            "Value": "./assets/heightfields/test.mesh.bin",
-                            "Type": 3,
-                            "Size": 40
-                        },
-                        "Type": 4,
-                        "Size": 64
-                    },
-                    "m_materialResource": {
-                        "Value": "CMaterialResourceReference",
-                        "m_resourceFileName": {
-                            "Value": "./assets/materials/bunny.mat.obj.json",
-                            "Type": 3,
-                            "Size": 40
-                        },
-                        "Type": 4,
-                        "Size": 64
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CMeshComponent",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 32
-                    }
-                },
-                {
                     "Value": "CTransformComponent",
                     "m_matrix": {
                         "Value": [
@@ -78,6 +44,131 @@
                     },
                     "m_children": {
                         "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CHeightFieldMeshComponent",
+                    "m_xSteps": {
+                        "Value": 40,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_zSteps": {
+                        "Value": 40,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_stepSize": {
+                        "Value": 0.5,
+                        "Type": 2,
+                        "Size": 4
+                    },
+                    "m_blendHeights": {
+                        "Value": [
+                            -2.0,
+                            0.0,
+                            2.0,
+                            4.0
+                        ],
+                        "Type": 7,
+                        "Size": 16
+                    },
+                    "m_blendTransition": {
+                        "Value": 0.5,
+                        "Type": 2,
+                        "Size": 4
+                    },
+                    "m_meshResource": {
+                        "Value": "CMeshResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/heightfields/test.mesh.bin",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 64
+                    },
+                    "m_materialResource": {
+                        "Value": "CMaterialResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/materials/height.mat.obj.json",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CHeightFieldMeshComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CHeightFieldPhysicsComponent",
+                    "m_motionType": {
+                        "Value": 0,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_friction": {
+                        "Value": 0.20000000298023224,
+                        "Type": 2,
+                        "Size": 4
+                    },
+                    "m_restitution": {
+                        "Value": 0.0,
+                        "Type": 2,
+                        "Size": 4
+                    },
+                    "m_terrainSizeX": {
+                        "Value": 0,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_terrainSizeZ": {
+                        "Value": 0,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_objectMatrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CHeightFieldPhysicsComponent",
                         "Elements": [],
                         "Type": 19,
                         "Size": 32
