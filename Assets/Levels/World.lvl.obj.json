@@ -3,7 +3,7 @@
         "m_name": {
             "Value": "",
             "Type": 3,
-            "Size": 40
+            "Size": 32
         },
         "m_visibleInEditor": {
             "Value": true,
@@ -23,7 +23,7 @@
                     "m_name": {
                         "Value": "SetDeck",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
                     },
                     "m_visibleInEditor": {
                         "Value": true,
@@ -39,7 +39,7 @@
                         "Value": "CLevelComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 32
+                        "Size": 24
                     }
                 },
                 {
@@ -47,7 +47,7 @@
                     "m_name": {
                         "Value": "Characters",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
                     },
                     "m_visibleInEditor": {
                         "Value": true,
@@ -67,7 +67,7 @@
                                 "m_name": {
                                     "Value": "Player",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -84,20 +84,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/warrior.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/warrior.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -108,7 +108,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -144,7 +144,7 @@
                                                 "Value": "CCharacterComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -180,7 +180,7 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -194,7 +194,7 @@
                                                 "Value": "CThirdPersonInputComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -208,12 +208,12 @@
                                                 "Value": "CCameraComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -221,7 +221,7 @@
                                 "m_name": {
                                     "Value": "Wizard",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -238,20 +238,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/wizard.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/wizard.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -262,7 +262,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -328,7 +328,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -364,12 +364,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -377,7 +377,7 @@
                                 "m_name": {
                                     "Value": "Wizard",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -394,20 +394,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/wizard.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/wizard.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -418,7 +418,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -484,7 +484,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -520,12 +520,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -533,7 +533,7 @@
                                 "m_name": {
                                     "Value": "Wizard",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -550,20 +550,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/wizard.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/wizard.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -574,7 +574,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -640,7 +640,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -676,12 +676,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -689,7 +689,7 @@
                                 "m_name": {
                                     "Value": "Wizard",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -706,20 +706,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/wizard.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/wizard.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -730,7 +730,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -796,7 +796,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -832,12 +832,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -845,7 +845,7 @@
                                 "m_name": {
                                     "Value": "Wizard",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -862,20 +862,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/wizard.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/wizard.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -886,7 +886,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -952,7 +952,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -988,12 +988,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -1001,7 +1001,7 @@
                                 "m_name": {
                                     "Value": "Wizard",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -1018,20 +1018,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/wizard.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/wizard.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1042,7 +1042,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1108,7 +1108,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1144,12 +1144,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -1157,7 +1157,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -1174,20 +1174,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/tree.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/tree.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1198,7 +1198,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1264,7 +1264,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1300,12 +1300,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -1313,7 +1313,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -1330,20 +1330,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/tree.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/tree.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1354,7 +1354,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1420,7 +1420,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1456,12 +1456,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -1469,7 +1469,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -1486,20 +1486,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/tree.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/tree.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1510,7 +1510,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1576,7 +1576,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1612,12 +1612,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -1625,7 +1625,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -1642,20 +1642,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/tree.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/tree.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1666,7 +1666,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1732,7 +1732,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1768,12 +1768,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -1781,7 +1781,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -1798,20 +1798,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/tree.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/tree.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1822,7 +1822,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1888,7 +1888,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -1924,12 +1924,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -1937,7 +1937,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -1954,20 +1954,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/tree.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/tree.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1978,7 +1978,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -2044,7 +2044,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -2080,12 +2080,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -2093,7 +2093,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -2110,20 +2110,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/tree.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/tree.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2134,7 +2134,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -2200,7 +2200,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -2236,12 +2236,12 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -2249,7 +2249,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -2266,20 +2266,20 @@
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/meshes/tree.mesh.bin",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_materialResource": {
                                                 "Value": "CMaterialResourceReference",
                                                 "m_resourceFileName": {
                                                     "Value": "./assets/materials/tree.mat.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2290,7 +2290,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -2356,7 +2356,7 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -2392,17 +2392,17 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 19,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             }
                         ],
                         "Type": 19,
-                        "Size": 32
+                        "Size": 24
                     }
                 },
                 {
@@ -2410,7 +2410,7 @@
                     "m_name": {
                         "Value": "Terrain",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
                     },
                     "m_visibleInEditor": {
                         "Value": true,
@@ -2426,7 +2426,7 @@
                         "Value": "CLevelComponent",
                         "Elements": [],
                         "Type": 19,
-                        "Size": 32
+                        "Size": 24
                     }
                 },
                 {
@@ -2434,7 +2434,7 @@
                     "m_name": {
                         "Value": "Height",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
                     },
                     "m_active": {
                         "Value": true,
@@ -2448,21 +2448,21 @@
                                 "Value": "CTransformComponent",
                                 "m_matrix": {
                                     "Value": [
-                                        1.0,
+                                        1.508284330368042,
                                         0.0,
-                                        0.0,
-                                        0.0,
-                                        0.0,
-                                        1.0,
-                                        0.0,
-                                        0.0,
+                                        0.3915875554084778,
                                         0.0,
                                         0.0,
                                         1.0,
                                         0.0,
                                         0.0,
+                                        -0.3431869149208069,
                                         0.0,
+                                        1.3218587636947632,
                                         0.0,
+                                        -4.536408424377441,
+                                        0.0,
+                                        -7.921358585357666,
                                         1.0
                                     ],
                                     "Type": 8,
@@ -2477,7 +2477,7 @@
                                     "Value": "CTransformComponent",
                                     "Elements": [],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -2517,20 +2517,20 @@
                                     "m_resourceFileName": {
                                         "Value": "./assets/heightfields/test.mesh.bin",
                                         "Type": 3,
-                                        "Size": 40
+                                        "Size": 32
                                     },
                                     "Type": 4,
-                                    "Size": 64
+                                    "Size": 56
                                 },
                                 "m_materialResource": {
                                     "Value": "CMaterialResourceReference",
                                     "m_resourceFileName": {
                                         "Value": "./assets/materials/height.mat.obj.json",
                                         "Type": 3,
-                                        "Size": 40
+                                        "Size": 32
                                     },
                                     "Type": 4,
-                                    "Size": 64
+                                    "Size": 56
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -2541,7 +2541,7 @@
                                     "Value": "CHeightFieldMeshComponent",
                                     "Elements": [],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -2602,17 +2602,17 @@
                                     "Value": "CHeightFieldPhysicsComponent",
                                     "Elements": [],
                                     "Type": 19,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             }
                         ],
                         "Type": 19,
-                        "Size": 32
+                        "Size": 24
                     }
                 }
             ],
             "Type": 19,
-            "Size": 32
+            "Size": 24
         }
     }
 }

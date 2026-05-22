@@ -72,9 +72,15 @@ void CHeightFieldMeshComponent::Render(bgfx::ViewId viewId)
         Mesh* mesh = meshRes->GetMesh();
         if (mesh && !mesh->m_groups.empty())
         {
-            Matrix4f modelMatrix = Matrix4f::GetIdentity();
             const MeshState* meshStatePtr = &m_meshState;
-            mesh->submit(&meshStatePtr, 1, modelMatrix.GetData().data(), 1);
+            std::shared_ptr<Matrix4f> modelMatrix = GetModelMatrix();
+            if (!modelMatrix)
+            {
+                Matrix4f identity = Matrix4f::GetIdentity();
+                modelMatrix = std::make_shared<Matrix4f>(identity);
+                
+            }
+            mesh->submit(&meshStatePtr, 1, modelMatrix->GetData().data(), 1);          
         }
     }
 }

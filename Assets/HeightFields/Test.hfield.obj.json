@@ -35,20 +35,20 @@
             "m_resourceFileName": {
                 "Value": "./assets/heightfields/test.mesh.bin",
                 "Type": 3,
-                "Size": 40
+                "Size": 32
             },
             "Type": 4,
-            "Size": 64
+            "Size": 56
         },
         "m_materialResource": {
             "Value": "CMaterialResourceReference",
             "m_resourceFileName": {
                 "Value": "./assets/materials/height.mat.obj.json",
                 "Type": 3,
-                "Size": 40
+                "Size": 32
             },
             "Type": 4,
-            "Size": 64
+            "Size": 56
         },
         "m_active": {
             "Value": true,
@@ -59,7 +59,7 @@
             "Value": "CHeightFieldMeshComponent",
             "Elements": [],
             "Type": 19,
-            "Size": 32
+            "Size": 24
         }
     }
 }
