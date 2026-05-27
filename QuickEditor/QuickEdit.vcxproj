@@ -102,6 +102,8 @@
     <ClInclude Include="..\Shared\Components\HeightFieldMeshComponent.h" />
     <ClInclude Include="..\Shared\Components\HeightFieldPhysicsComponent.h" />
     <ClInclude Include="..\Shared\Components\LevelComponent.h" />
+    <ClInclude Include="..\Shared\Components\LightComponent.h" />
+    <ClInclude Include="..\Shared\Components\LightManagerComponent.h" />
     <ClInclude Include="..\Shared\Components\MeshComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsComponent.h" />
@@ -253,6 +255,8 @@
     <ClCompile Include="..\Shared\Components\HeightFieldMeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\HeightFieldPhysicsComponent.cpp" />
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\LightComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\LightManagerComponent.cpp" />
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp" />
@@ -319,6 +323,7 @@
     <ClCompile Include="..\Shared\bgfx_common\nanovg\nanovg_bgfx.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\ps\particle_system.cpp" />
     <ClCompile Include="..\Shared\utils\MathUtils.cpp" />
+    <ClCompile Include="..\Shared\Utils\StringUtils.cpp" />
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />

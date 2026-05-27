@@ -7,6 +7,7 @@
 // Forward-declare to avoid pulling in the full physics header here.
 class CPhysicsBodyComponent;
 class CTransformComponent;
+class CLightManagerComponent;
 
 class CRenderComponent : public ComponentSystem::Component
 {
@@ -38,6 +39,36 @@ protected:
 	Matrix4f m_scale;
 	/** @brief Cached weak reference to the sibling physics body — resolved once on first use. */
 	ComponentSystem::CachedComponentRef<CPhysicsBodyComponent> m_physicsBodyRef;
+};
+
+class CDebugRenderComponent : public CRenderComponent
+{
+public:
+	/** @brief The primitive shape drawn by this component. */
+	enum class EDebugShape
+	{
+		WireBox,
+		WireSphere,
+		WireCone,
+	};
+
+	REFL_DECLARE_OBJECT(CDebugRenderComponent, CRenderComponent);
+	DECLARE_COMPONENT();
+
+	void Render(bgfx::ViewId viewId) override;
+	bool OnInitialize() override;
+	void OnUpdate(double deltaTime) override;
+	void OnShutdown() override;
+
+	EDebugShape GetShape() const { return m_shape; }
+	void SetShape(EDebugShape shape) { m_shape = shape; }
+
+	const Vector4f& GetColor() const { return m_color; }
+	void SetColor(Vector4f color) { m_color = color; }
+
+private:
+	EDebugShape m_shape = EDebugShape::WireBox;
+	Vector4f    m_color = { 1.0f, 1.0f, 1.0f, 1.0f };
 };
 
 class CMeshComponent : public CRenderComponent
@@ -74,7 +105,10 @@ protected:
 	/** @brief Called when mesh or material resource changes. Can be overridden by subclasses. */
 	virtual void OnMeshResourceChanged() { m_meshStateInitialized = false; }
 
-	// ── Protected mesh state members ────────────────────────────────────
+	/** @brief Pushes the current light uniform values to bgfx. Called every frame from Render(). */
+	void ApplyLightUniforms();
+
+	// ── Protected mesh state members ────────────────────────────────────────
 
 	CMaterialResourceReference m_materialResource;
 	CMeshResourceReference m_meshResource;
@@ -88,6 +122,8 @@ protected:
 	bgfx::UniformHandle m_materialColor = BGFX_INVALID_HANDLE;
 	bool m_meshStateInitialized = false;
 
+	/** @brief Cached pointer to the scene light manager — resolved once on initialize. */
+	CLightManagerComponent* m_lightManager = nullptr;
 private:
 	CMeshResourceReference m_staticMeshResource;
 };

@@ -18,9 +18,9 @@
         "m_blendHeights": {
             "Value": [
                 -0.4000000059604645,
-                0.0,
-                0.6000000238418579,
-                2.0
+                2.0,
+                5.0,
+                3.0
             ],
             "Type": 7,
             "Size": 16
@@ -35,20 +35,20 @@
             "m_resourceFileName": {
                 "Value": "./assets/heightfields/test.mesh.bin",
                 "Type": 3,
-                "Size": 32
+                "Size": 40
             },
             "Type": 4,
-            "Size": 56
+            "Size": 64
         },
         "m_materialResource": {
             "Value": "CMaterialResourceReference",
             "m_resourceFileName": {
                 "Value": "./assets/materials/height.mat.obj.json",
                 "Type": 3,
-                "Size": 32
+                "Size": 40
             },
             "Type": 4,
-            "Size": 56
+            "Size": 64
         },
         "m_active": {
             "Value": true,
@@ -59,7 +59,7 @@
             "Value": "CHeightFieldMeshComponent",
             "Elements": [],
             "Type": 19,
-            "Size": 24
+            "Size": 32
         }
     }
 }

@@ -98,10 +98,18 @@ public:
                     float x1, float y1, float z1,
                     uint32_t abgrColor);
 
+
     void RenderWireBox(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
     void RenderWireSphere(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
     void RenderWireCylinder(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
     void RenderWireCapsule(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
+
+    /**
+     * @brief Submit a wireframe unit cone at the given transform.
+     *        The cone has its apex at (0, +0.5, 0) and its base circle
+     *        at y = -0.5 with radius 0.5, all in local space.
+     */
+    void RenderWireCone(bgfx::ViewId viewId, const float* worldMtx, uint32_t color);
 
 private:
     void CreateCubeBuffers();

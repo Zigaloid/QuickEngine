@@ -6,8 +6,9 @@
 #include "TransformComponent.h"
 #include "PhysicsBodyComponent.h"
 #include "CharacterComponent.h"
+#include "LightManagerComponent.h"
 #include "DeleteEntityCommand.h"
-#include <imgui-docking/imgui_internal.h>   // DockBuilder API
+#include <imgui-docking/imgui_internal.h>
 #include <bx/bounds.h>
 #include <algorithm>
 #include <cfloat>
@@ -57,9 +58,15 @@ namespace ImGuiVisualizers {
 		Get3DView().SetRenderCallback([this](bgfx::ViewId viewId, BgfxRenderPrimitives& prims) {
 			if (!m_levelComp) return;
 			if (!m_levelComp->IsReady()) return;
+
+			// Tick the light manager explicitly so its resolved light state is
+			// up to date before any mesh component reads it during rendering.
+			if (auto* lightManager = m_levelComp->FindDescendant<CLightManagerComponent>())
+				lightManager->Update(0.0);
+
 			RenderComponentHierarchy(viewId, m_levelComp);
 			m_selectionManager.RenderSelectionGizmo(Get3DView().GetFrameBuffer(), m_gizmoMode, 2.0f);
-			});
+		});
 
 		RegisterRenderComponents(m_levelComp);
 
@@ -232,7 +239,6 @@ namespace ImGuiVisualizers {
 			renderComp->Render(viewId);
 		}
 	}
-
         // For other physics components (e.g. CCharacterComponent), call DebugRender
 		// using the sibling CTransformComponent's model matrix as the world base.
 		// Skip debug rendering when the physics component (or its ancestors)
@@ -521,48 +527,35 @@ namespace ImGuiVisualizers {
 			if (vpAvail.y < 1.0f) vpAvail.y = 1.0f;
 
 			m_view.RenderContent(vpAvail);
-
-			m_viewportMin  = ImGui::GetItemRectMin();
-			m_viewportSize = ImGui::GetItemRectSize();
-
-			m_selectionManager.SetViewInfo(Get3DView().GetCamera(), m_viewportMin, m_viewportSize);
+				
+			// Viewport bounds are now cached in the 3D view
+			m_selectionManager.SetViewInfo(Get3DView().GetCamera(), Get3DView().GetViewportMin(), Get3DView().GetViewportSize());
 
 			// Delete key — only when mouse is over the viewport
+			const ImVec2 mouse = ImGui::GetMousePos();
+			if (Get3DView().IsPointInViewport(mouse) &&
+ 					ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
+ 					m_levelComp && !m_selectionManager.IsGizmoDragging())
+ 			{
+ 				DeleteSelectedEntities();
+ 			}
+
+			if (Get3DView().IsPointInViewport(mouse) && ImGui::IsKeyPressed(ImGuiKey_F, /*repeat=*/false))
 			{
-				const ImVec2 mouse = ImGui::GetMousePos();
-				const bool inViewport =
-					mouse.x >= m_viewportMin.x && mouse.y >= m_viewportMin.y &&
-					mouse.x <  m_viewportMin.x + m_viewportSize.x &&
-					mouse.y <  m_viewportMin.y + m_viewportSize.y;
-
-				if (inViewport &&
-						ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
-						m_levelComp && !m_selectionManager.IsGizmoDragging())
-					{
-						DeleteSelectedEntities();
-					}
-
-					if (inViewport && ImGui::IsKeyPressed(ImGuiKey_F, /*repeat=*/false))
-					{
-						m_selectionManager.FocusCameraOnSelection();
-					}
+				m_selectionManager.FocusCameraOnSelection();
 			}
 
-			// Left-click pick (Alt = camera pan, skip picking)
-			if (!ImGui::GetIO().KeyAlt)
-			{
-				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
-					!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
-				{
-					const ImVec2 mouse = ImGui::GetMousePos();
-					const bool inViewport =
-						mouse.x >= m_viewportMin.x && mouse.y >= m_viewportMin.y &&
-						mouse.x <  m_viewportMin.x + m_viewportSize.x &&
-						mouse.y <  m_viewportMin.y + m_viewportSize.y;
-					if (inViewport)
-						m_selectionManager.PickAtCursor();
-				}
-			}
+ 			// Left-click pick (Alt = camera pan, skip picking)
+ 			if (!ImGui::GetIO().KeyAlt)
+ 			{
+ 				if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
+ 					!ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+ 				{
+ 					const ImVec2 mouse = ImGui::GetMousePos();
+					if (Get3DView().IsPointInViewport(mouse))
+ 						m_selectionManager.PickAtCursor();
+ 				}
+ 			}
 
 			HandleEntityDrop();
 		}

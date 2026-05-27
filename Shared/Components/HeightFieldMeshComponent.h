@@ -79,7 +79,11 @@ public:
 
 	// Mesh persistence
 	bool SaveMesh(const std::string& filePath);
-	bool isMeshInitialized() const { return m_meshStateInitialized; }
+ 
+     /// Recalculate normals for all mesh groups based on current vertex positions
+     void RecalculateMeshNormals();
+ 
+     bool isMeshInitialized() const { return m_meshStateInitialized; }
 
 	// Height-based texture blending parameters
 	void SetBlendHeights(const Vector4f& heights) { m_blendHeights = heights; }

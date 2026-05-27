@@ -107,6 +107,7 @@
     <ClInclude Include="DebugChannel\DebugChannel.h" />
     <ClInclude Include="FileSystem\FileSystemInterface.h" />
     <ClInclude Include="FileSystem\FileSystemManager.h" />
+    <ClInclude Include="FileSystem\FileWatcher.h" />
     <ClInclude Include="FileSystem\StandardFileSystem.h" />
     <ClInclude Include="Input\ActionContext.h" />
     <ClInclude Include="Input\GamepadInputHandler.h" />
@@ -173,6 +174,7 @@
     <ClCompile Include="CoreSystem\FunctionCallManager.cpp" />
     <ClCompile Include="CoreSystem\FunctionQueue.cpp" />
     <ClCompile Include="DebugChannel\DebugChannel.cpp" />
+    <ClCompile Include="FileSystem\FileWatcher.cpp" />
     <ClCompile Include="FileSystem\StandardFileSystem.cpp" />
     <ClCompile Include="Input\ActionContext.cpp" />
     <ClCompile Include="Input\GamepadInterface.cpp" />

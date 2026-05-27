@@ -120,6 +120,9 @@ void ImGui3DViewVisualizer::RenderContent(const ImVec2& contentSize)
         ImVec2 cursorPos = ImGui::GetCursorScreenPos();
         ImGui::Image(m_viewport.GetColorTexture(), size);
 
+        m_viewportMin = ImGui::GetItemRectMin();
+        m_viewportSize = ImGui::GetItemRectSize();
+
         // place an invisible button exactly over the image so ImGui captures mouse input
         ImGui::SetCursorScreenPos(cursorPos);
         ImGui::InvisibleButton("##viewport", size);

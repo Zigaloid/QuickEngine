@@ -286,3 +286,87 @@ bool CHeightFieldMeshComponent::SaveMesh(const std::string& filePath)
 
     return true;
 }
+
+void CHeightFieldMeshComponent::RecalculateMeshNormals()
+{
+    auto meshRes = GetMeshResource();
+    if (!meshRes || !meshRes->IsLoaded())
+        return;
+
+    Mesh* mesh = meshRes->GetMesh();
+    if (!mesh)
+        return;
+
+    // Iterate through all groups and recalculate normals
+    for (auto& group : mesh->m_groups)
+    {
+        if (!group.m_vertices || !group.m_indices || group.m_numIndices == 0)
+            continue;
+
+        uint16_t stride = mesh->m_layout.getStride();
+
+        // Temporary storage for accumulated normals
+        std::vector<Vector3f> accumulatedNormals(group.m_numVertices, Vector3f(0.0f, 0.0f, 0.0f));
+
+        // Accumulate face normals to vertices
+        for (uint32_t i = 0; i < group.m_numIndices; i += 3)
+        {
+            uint16_t idx0 = group.m_indices[i];
+            uint16_t idx1 = group.m_indices[i + 1];
+            uint16_t idx2 = group.m_indices[i + 2];
+
+            // Validate indices
+            if (idx0 >= group.m_numVertices || idx1 >= group.m_numVertices || idx2 >= group.m_numVertices)
+                continue;
+
+            // Get vertex positions
+            uint8_t* v0Data = group.m_vertices + (idx0 * stride);
+            uint8_t* v1Data = group.m_vertices + (idx1 * stride);
+            uint8_t* v2Data = group.m_vertices + (idx2 * stride);
+
+            const float* p0 = reinterpret_cast<const float*>(v0Data);
+            const float* p1 = reinterpret_cast<const float*>(v1Data);
+            const float* p2 = reinterpret_cast<const float*>(v2Data);
+
+            Vector3f v0(p0[0], p0[1], p0[2]);
+            Vector3f v1(p1[0], p1[1], p1[2]);
+            Vector3f v2(p2[0], p2[1], p2[2]);
+
+            // Calculate face normal
+            Vector3f edge1 = v1 - v0;
+            Vector3f edge2 = v2 - v0;
+            Vector3f faceNormal = edge1.Cross(edge2);
+
+            // Accumulate to all three vertices
+            accumulatedNormals[idx0] += faceNormal;
+            accumulatedNormals[idx1] += faceNormal;
+            accumulatedNormals[idx2] += faceNormal;
+        }
+
+        // Write normalized normals back to vertex buffer
+        for (uint32_t i = 0; i < group.m_numVertices; ++i)
+        {
+            uint8_t* vertexData = group.m_vertices + (i * stride);
+
+            // Normalize the accumulated normal
+            Vector3f normal = accumulatedNormals[i].Normalize();
+
+            // Encode normal as RGBA8
+            uint8_t nx = static_cast<uint8_t>((normal.x * 0.5f + 0.5f) * 255.0f);
+            uint8_t ny = static_cast<uint8_t>((normal.y * 0.5f + 0.5f) * 255.0f);
+            uint8_t nz = static_cast<uint8_t>((normal.z * 0.5f + 0.5f) * 255.0f);
+            uint8_t nw = 0xFF;
+
+            // Pack as ABGR
+            uint32_t packedNormal = (nw << 24) | (nz << 16) | (ny << 8) | nx;
+
+            // Write to the normal attribute
+            if (mesh->m_layout.has(bgfx::Attrib::Normal))
+            {
+                uint16_t offset = mesh->m_layout.getOffset(bgfx::Attrib::Normal);
+                uint32_t* normalPtr = reinterpret_cast<uint32_t*>(vertexData + offset);
+                *normalPtr = packedNormal;
+            }
+        }
+    }
+}

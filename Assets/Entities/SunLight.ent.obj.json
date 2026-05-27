@@ -1,0 +1,129 @@
+{
+    "RootObject": {
+        "m_name": {
+            "Value": "SunLight",
+            "Type": 3,
+            "Size": 40
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CEntityComponent",
+            "Elements": [
+                {
+                    "Value": "CLightComponent",
+                    "m_direction": {
+                        "Value": [
+                            0.5773502588272095,
+                            -0.5773502588272095,
+                            0.5773502588272095
+                        ],
+                        "Type": 13,
+                        "Size": 12
+                    },
+                    "m_color": {
+                        "Value": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Type": 7,
+                        "Size": 16
+                    },
+                    "m_ambientColor": {
+                        "Value": [
+                            0.15000000596046448,
+                            0.15000000596046448,
+                            0.15000000596046448,
+                            1.0
+                        ],
+                        "Type": 7,
+                        "Size": 16
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CLightComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CTransformComponent",
+                    "m_matrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CDebugRenderComponent",
+                    "m_shape": {
+                        "Value": 2,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_color": {
+                        "Value": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Type": 7,
+                        "Size": 16
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CDebugRenderComponent",
+                        "Elements": [],
+                        "Type": 19,
+                        "Size": 32
+                    }
+                }
+            ],
+            "Type": 19,
+            "Size": 32
+        }
+    }
+}

@@ -8,6 +8,7 @@
 #include "CoreSystem\CoreDebugChannels.h"
 #include "CoreSystem\CoreSystem.h"
 #include "MeshComponent.h"
+#include "LightManagerComponent.h"
 #include "imgui.h"
 #include "ComponentSystem/ComponentDependencyDefinition.h"
 
@@ -45,9 +46,6 @@ void QuickEditApp::RegisterComponents()
 {
 	auto* componentManager = Core::CoreSystem::GetComponentManager();
 	auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
-
-	componentManager->RegisterComponentType<CMeshComponent>();
-	scheduler->RegisterComponentType<CMeshComponent>(0, "Mesh");
 }
 
 void QuickEditApp::Update(double deltaTime)

@@ -37,10 +37,11 @@ namespace ImGuiVisualizers {
             RegisterHeightFieldActions();
         }
 
+        void RecalculateMeshNormals(Group& group, const bgfx::VertexLayout& layout);
     protected:
         bool AttachMeshFromPath(const std::string& meshPath) override;
         void ReleaseHeightFieldComponent();
-        void RecalculateMeshNormals(Group& group, const bgfx::VertexLayout& layout);
+        
     private:
         CHeightFieldMeshComponent* m_heightFieldComp;
         PropertyInspector m_propertyInspector;
@@ -60,9 +61,22 @@ namespace ImGuiVisualizers {
         std::vector<uint8_t> m_regeneratedVertexBuffer;
         std::vector<uint16_t> m_regeneratedIndexBuffer;
 
+        // Brush tool state (airbrush for height)
+        float m_brushRadius = 1.0f;       // world units
+        float m_brushIntensity = 0.05f;   // delta Y applied per brush sample
+        bool  m_brushInvert = false;      // raise (false) / lower (true)
+        bool  m_brushPainting = false;    // true while mouse is down and painting
+        std::vector<CHeightFieldEditCommand::Entry> m_brushInitialEntries; // snapshot for undo
+        bool  m_wasBrushMouseDown = false;  // was mouse down last frame
+
+        // Apply the brush at a given world-space position.
+        // If recordInitial==true, the function will snapshot 'before' values for undo.
+        void ApplyBrushAtWorldPosition(const Vector3f& worldPos, float radius, float intensity, bool invert, bool recordInitial);
+
         void RegisterHeightFieldPoints();
         void ClearHeightFieldPoints();
         void RenderHeightFieldPointSelection(bgfx::ViewId viewId, Rendering::BgfxRenderPrimitives& prims);
+        void RenderBrushVisualization(bgfx::ViewId viewId, Rendering::BgfxRenderPrimitives & prims);
         void UpdateHeightFieldFromGizmoDrag();
         void RegisterHeightFieldActions();
         void RegenerateGridMesh();

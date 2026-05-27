@@ -2,6 +2,7 @@
 
 #include "IImGuiVisualizer.h"
 #include "imgui.h"
+#include "../Core/FileSystem/FileWatcher.h"
 
 #include <string>
 #include <vector>
@@ -274,10 +275,14 @@ private:
     // Utility
     std::string FormatFileSize(uint64_t bytes) const;
 
+    // File system watcher
+    void HandleAssetUpdate(const std::string& filePath, FileSystem::FileChangeEvent event);
+
     // ── State ───────────────────────────────────────────────────────────
 
     AssetTypeRegistry m_registry;
     FileSystem::FileSystemManager* m_fileSystem = nullptr;
+    FileSystem::FileWatcher m_fileWatcher;
 
     std::string m_rootPath;
     std::string m_selectedFolder;

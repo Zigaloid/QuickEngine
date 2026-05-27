@@ -15,6 +15,8 @@
 #include "MeshComponent.h"
 #include "PhysicsBodyComponent.h"
 #include "HeightFieldPhysicsComponent.h"
+#include "LightComponent.h"
+#include "LightManagerComponent.h"
 #include "ComponentSystem/ComponentDependencyDefinition.h"
 #include "ComponentSystem/ComponentDependencyDefinition.h"
 #include "TransformComponent.h"
@@ -172,6 +174,12 @@ void GameApp::RegisterComponents()
 
 	componentManager->RegisterComponentType<CHeightFieldPhysicsComponent>();
 	scheduler->RegisterComponentType<CHeightFieldPhysicsComponent>(0, "HeightFieldPhysics");
+
+	componentManager->RegisterComponentType<CLightComponent>();
+	scheduler->RegisterComponentType<CLightComponent>(0, "Light");
+
+	componentManager->RegisterComponentType<CLightManagerComponent>();
+	scheduler->RegisterComponentType<CLightManagerComponent>(0, "LightManager");
 
 }
 

@@ -61,6 +61,20 @@ public:
     Bgfx3DCamera&           GetCamera()        { return m_camera; }
     bgfx::FrameBufferHandle GetFrameBuffer()   const { return m_viewport.GetFrameBuffer(); }
 
+    // Viewport bounds tracking (updated each frame in RenderContent)
+    ImVec2 GetViewportMin() const { return m_viewportMin; }
+    ImVec2 GetViewportSize() const { return m_viewportSize; }
+
+    /// Test whether a screen-space point is inside the viewport.
+    /// @param screenPos Screen-space position (e.g., from ImGui::GetMousePos()).
+    /// @return true if the point is within the viewport bounds.
+    bool IsPointInViewport(const ImVec2& screenPos) const
+    {
+        return screenPos.x >= m_viewportMin.x && screenPos.y >= m_viewportMin.y &&
+               screenPos.x < m_viewportMin.x + m_viewportSize.x &&
+               screenPos.y < m_viewportMin.y + m_viewportSize.y;
+    }
+
     void SetShowGrid(bool v)   { m_showGrid = v; }
     void SetShowAxes(bool v)   { m_showAxes = v; }
 
@@ -103,6 +117,10 @@ private:
     // Mouse drag tracking
     bool     m_orbiting = false;
     bool     m_panning  = false;    
+
+    // Viewport bounds (cached each frame)
+    ImVec2   m_viewportMin = { 0.0f, 0.0f };
+    ImVec2   m_viewportSize = { 0.0f, 0.0f };
 };
 
 } // namespace ImGuiVisualizers

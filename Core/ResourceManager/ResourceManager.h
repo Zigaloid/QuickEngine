@@ -101,6 +101,21 @@ namespace ResourceSystem {
 		bool                        IsInitialized() const { return m_isInitialized; }
 		bool                        IsLoaded()      const { return m_isLoaded; }
 		bool                        IsFinalized()   const { return m_isFinalized; }
+
+		/** @brief Releases the resource's current state and re-initializes it,
+		 *  allowing the async pipeline to reload it via Update() and Finalize().
+		 *  Derived classes may override to release GPU/API handles before reloading.
+		 *  @return true if re-initialization succeeded. */
+		virtual bool Reload()
+		{
+			m_isFinalized   = false;
+			m_isLoaded      = false;
+			m_isInitialized = false;
+			m_data.clear();
+			m_data.shrink_to_fit();
+
+			return Initialize();
+		}
 	};
 
 	// ── ResourceManager ───────────────────────────────────────────────────────────
@@ -385,6 +400,43 @@ namespace ResourceSystem {
 			return m_finalizationQueue.size();
 		}
 
+		/** @brief Finds a resource by path, calls Reload() on it, and re-enqueues it
+		 *  through the async loading pipeline (Update -> Finalize).
+		 *  @param path File path of the resource to reload.
+		 *  @return true if the resource was found and successfully re-initialized. */
+		bool ReloadResource(const std::string& path)
+		{
+			const std::string resolvedPath = Core::AppConfig::Instance().ResolvePath(path);
+			ResourceManagerDebug.printf("Reloading resource: %s\n", resolvedPath.c_str());
+
+			std::shared_ptr<Resource> resource;
+			{
+				std::lock_guard<std::mutex> lock(m_loadedResourcesMutex);
+				auto it = m_loadedResources.find(resolvedPath);
+				if (it == m_loadedResources.end())
+				{
+					ResourceManagerDebug.printf("ReloadResource failed - resource not found: %s\n", resolvedPath.c_str());
+					return false;
+				}
+				resource = it->second;
+			}
+
+			if (!resource->Reload())
+			{
+				ResourceManagerDebug.printf("ReloadResource failed - Reload() returned false: %s\n", resolvedPath.c_str());
+				return false;
+			}
+
+			{
+				ResourceManagerDebug.printf("Re-enqueueing resource for loading: %s\n", resolvedPath.c_str());
+				std::lock_guard<std::mutex> lock(m_loadingQueueMutex);
+				m_loadingQueue.push(resource);
+			}
+			m_loadingQueueCondition.notify_one();
+
+			return true;
+		}
+
 		bool RemoveResource(const std::string& path)
 		{
 			ResourceManagerDebug.printf("Removing resource: %s\n", path.c_str());
@@ -410,18 +462,46 @@ namespace ResourceSystem {
 } // namespace ResourceSystem
 
 
+/** @brief When true, GetResource/GetResourceAs will warn if the loaded resource path
+ *  no longer matches the reference's file name. Can be toggled at runtime. */
+inline bool CResourceReference_MonitorPathChange = true;
+
 class CResourceReference : public CReflectedBase
 {
 public:
 	REFL_DECLARE_OBJECT(CResourceReference, CReflectedBase);
 
 	const std::string GetResourceFileName() const { return m_resourceFileName; }
-	std::shared_ptr<ResourceSystem::Resource> GetResource() const { return m_resource; }
+
+	std::shared_ptr<ResourceSystem::Resource> GetResource() const
+	{
+		if (CResourceReference_MonitorPathChange && m_resource)
+		{
+			const std::string resolvedPath = Core::AppConfig::Instance().ResolvePath(m_resourceFileName);
+			if (m_resource->GetPath() != resolvedPath)
+			{
+				ResourceManagerDebug.warning("CResourceReference path mismatch: loaded '%s', current file name resolves to '%s'. Replacing resource.\n",
+					m_resource->GetPath().c_str(), resolvedPath.c_str());
+				ReloadResource();
+			}
+		}
+		return m_resource;
+	}
 
 	template<typename T>
 	std::shared_ptr<T> GetResourceAs() const
 	{
 		static_assert(std::is_base_of_v<ResourceSystem::Resource, T>, "T must derive from Resource");
+		if (CResourceReference_MonitorPathChange && m_resource)
+		{
+			const std::string resolvedPath = Core::AppConfig::Instance().ResolvePath(m_resourceFileName);
+			if (m_resource->GetPath() != resolvedPath)
+			{
+				ResourceManagerDebug.warning("CResourceReference path mismatch: loaded '%s', current file name resolves to '%s'. Replacing resource.\n",
+					m_resource->GetPath().c_str(), resolvedPath.c_str());
+				ReloadResource();
+			}
+		}
 		return std::dynamic_pointer_cast<T>(m_resource);
 	}
 
@@ -439,8 +519,11 @@ public:
 	{
 	}
 
+	/** @brief Called when a path mismatch is detected; derived types should replace m_resource with the newly requested resource. */
+	virtual void ReloadResource() const {}
+
 protected:
-	std::shared_ptr<ResourceSystem::Resource> m_resource;
+	mutable std::shared_ptr<ResourceSystem::Resource> m_resource;
 private:
 	std::string m_resourceFileName = "undifined";
 
@@ -462,6 +545,20 @@ public:
 			}
 		}
 	}
+
+	void ReloadResource() const override
+	{
+		const std::string fileName = GetResourceFileName();
+		if (!fileName.empty() && fileName != "undifined")
+		{
+			ResourceSystem::ResourceManager* resourceManager = Core::CoreSystem::GetResourceManager();
+			if (resourceManager)
+			{
+				m_resource = resourceManager->RequestResource<TResource>(fileName);
+			}
+		}
+	}
+
 	std::string GetReourceTypeName() const
 	{
 		return typeid(TResource).name();

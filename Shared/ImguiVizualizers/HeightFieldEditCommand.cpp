@@ -46,6 +46,9 @@ namespace ImGuiVisualizers {
 			posPtr[2] = targetPos.z;
 		}
 
+		// Recalculate normals for all groups based on updated vertex positions
+		m_component->RecalculateMeshNormals();
+
 		// Rebuild the GPU vertex buffer with the modified data
 		// First, destroy the old vertex buffer
 		if (bgfx::isValid(group.m_vbh))

@@ -1,7 +1,11 @@
 ﻿#include "AssetBrowser.h"
+#include "AssetBrowser.h"
 #include "CoreSystem/CoreSystem.h"
 #include "CoreSystem/AppConfig.h"
+
+#include "ResourceManager/ResourceManager.h"
 #include "KeyboardShortcutManager.h"
+#include "Utils/StringUtils.h"
 
 #include <sstream>
 #include <iomanip>
@@ -12,6 +16,8 @@
 #ifdef _WIN32
 #include <Windows.h>
 #include <shellapi.h>
+
+
 // Windows.h defines macros that conflict with FileSystemManager method names
 #undef GetCurrentDirectory
 #undef CreateFile
@@ -142,6 +148,11 @@ void AssetBrowser::Initialize()
     m_treeNeedsRebuild  = true;
     m_needsRefresh      = true;
 
+    m_fileWatcher.AddWatch(m_rootPath,
+        [this](const std::string& filePath, FileSystem::FileChangeEvent event) {
+            HandleAssetUpdate(filePath, event);
+        });
+
     // Initialize type filter visibility from existing registrations
     for (const auto& type : m_registry.GetAll()) {
         m_typeFilterVisible[type.extension] = type.visibleByDefault;
@@ -149,6 +160,7 @@ void AssetBrowser::Initialize()
 }
 void AssetBrowser::Shutdown()
 {
+    m_fileWatcher.StopAll();
     m_assets.clear();
     m_rootNode = {};
 }
@@ -236,10 +248,18 @@ const char* AssetBrowser::GetMenuCategory() const
 
 void AssetBrowser::SetRootPath(const std::string& path)
 {
+    if (!m_rootPath.empty())
+        m_fileWatcher.RemoveWatch(m_rootPath);
+
     m_rootPath          = path;
     m_selectedFolder    = path;
     m_treeNeedsRebuild  = true;
     m_needsRefresh      = true;
+
+    m_fileWatcher.AddWatch(m_rootPath,
+        [this](const std::string& filePath, FileSystem::FileChangeEvent event) {
+            HandleAssetUpdate(filePath, event);
+        });
 }
 
 // ── Tree construction ───────────────────────────────────────────────────────
@@ -281,6 +301,39 @@ void AssetBrowser::BuildFolderTreeRecursive(FolderNode& node)
     // Recurse into children
     for (auto& child : node.children) {
         BuildFolderTreeRecursive(child);
+    }
+}
+
+// ── File system watcher ─────────────────────────────────────────────────────
+
+void AssetBrowser::HandleAssetUpdate(const std::string& filePath, FileSystem::FileChangeEvent event)
+{
+    std::string filePathLower = filePath;
+    std::transform(filePathLower.begin(), filePathLower.end(), filePathLower.begin(),
+                   [](unsigned char c) { return static_cast<char>(std::tolower(c)); });
+	
+    pathSanitize(filePathLower);
+
+    // For additions/removals/renames the tree may need rebuilding too      
+    if (event == FileSystem::FileChangeEvent::Added ||
+        event == FileSystem::FileChangeEvent::Removed ||
+        event == FileSystem::FileChangeEvent::RenamedNew ||
+        event == FileSystem::FileChangeEvent::RenamedOld)
+    {
+        m_treeNeedsRebuild = true;
+    }
+            
+    // If the changed file is a loaded resource, trigger a hot-reload
+    if (event == FileSystem::FileChangeEvent::Modified ||
+        event == FileSystem::FileChangeEvent::RenamedNew)
+    {
+        if (auto* resourceManager = Core::CoreSystem::GetResourceManager())
+        {
+            if (resourceManager->IsResourceLoaded(filePathLower))
+            {
+                resourceManager->ReloadResource(filePathLower);
+            }
+        }
     }
 }
 

@@ -265,6 +265,9 @@
     <ClInclude Include="ComponentSystem\ComponentDependencyDefinition.h">
       <Filter>ComponentSystem</Filter>
     </ClInclude>
+    <ClInclude Include="FileSystem\FileWatcher.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp">
@@ -380,6 +383,9 @@
     </ClCompile>
     <ClCompile Include="ComponentSystem\ComponentDependencyDefinition.cpp">
       <Filter>ComponentSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\FileWatcher.cpp">
+      <Filter>FileSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
