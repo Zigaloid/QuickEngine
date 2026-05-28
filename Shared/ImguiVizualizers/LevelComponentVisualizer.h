@@ -10,6 +10,7 @@
 #include "DuplicateEntitiesCommand.h"
 #include "PropertyInspector.h"
 #include "LayersPanel.h"
+#include "NavMesh/NavMeshBuilder.h"
 #include <vector>
 #include <string>
 #include <memory>
@@ -69,8 +70,9 @@ namespace ImGuiVisualizers {
         void RefreshEntityAssets();
         void HandleEntityDrop();
         void RenderInspectorPanel();
+        void RenderNavigationPanel();
 
-        /// Same as RegisterRenderComponents but also returns the newly created selectables.
+        /// Same as RegisterRenderComponents
         std::vector<std::shared_ptr<CSelectable>> RegisterRenderComponentsReturning(ComponentSystem::Component* root);
 
         /// Duplicates the parent entity of every currently selected object,
@@ -110,6 +112,12 @@ namespace ImGuiVisualizers {
         CCommandHistory   m_history{ 100 };
         PropertyInspector m_propertyInspector;
         LayersPanel       m_layersPanel;
+
+        // ── Navigation mesh ───────────────────────────────────────────────────
+        NavMesh::NavMeshConfig  m_navMeshConfig;
+        NavMesh::NavMeshBuilder m_navMeshBuilder;
+        bool                    m_showNavMesh    = false;
+        std::string             m_navBuildStatus;
     };
 
 } // namespace ImGuiVisualizers

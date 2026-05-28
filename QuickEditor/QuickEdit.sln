@@ -15,7 +15,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bimg_decode", "..\External\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "bx", "..\External\bgfx\.build\projects\vs2019\bx.vcxproj", "{5F775900-4B03-880B-B4B1-880BA05C880B}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "detour", "..\External\recastnavigation-main\RecastDemo\Build\vs2022\detour.vcxproj", "{18FEE2AD-04A0-0D84-ED5A-21D8D99B94D4}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Jolt", "..\External\JoltPhysics-master\Build\VS2022_CL\jolt.vcxproj", "{8C474506-F277-32FE-AED6-A3DA533D1639}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "recast", "..\External\recastnavigation-main\RecastDemo\Build\vs2022\recast.vcxproj", "{A7A881CE-934A-ACA4-7C05-C0F8684633F5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -47,10 +51,18 @@ Global
 		{5F775900-4B03-880B-B4B1-880BA05C880B}.Debug|x64.Build.0 = Debug|x64
 		{5F775900-4B03-880B-B4B1-880BA05C880B}.Release|x64.ActiveCfg = Release|x64
 		{5F775900-4B03-880B-B4B1-880BA05C880B}.Release|x64.Build.0 = Release|x64
+		{18FEE2AD-04A0-0D84-ED5A-21D8D99B94D4}.Debug|x64.ActiveCfg = Debug|x64
+		{18FEE2AD-04A0-0D84-ED5A-21D8D99B94D4}.Debug|x64.Build.0 = Debug|x64
+		{18FEE2AD-04A0-0D84-ED5A-21D8D99B94D4}.Release|x64.ActiveCfg = Release|x64
+		{18FEE2AD-04A0-0D84-ED5A-21D8D99B94D4}.Release|x64.Build.0 = Release|x64
 		{8C474506-F277-32FE-AED6-A3DA533D1639}.Debug|x64.ActiveCfg = Debug|x64
 		{8C474506-F277-32FE-AED6-A3DA533D1639}.Debug|x64.Build.0 = Debug|x64
 		{8C474506-F277-32FE-AED6-A3DA533D1639}.Release|x64.ActiveCfg = Release|x64
 		{8C474506-F277-32FE-AED6-A3DA533D1639}.Release|x64.Build.0 = Release|x64
+		{A7A881CE-934A-ACA4-7C05-C0F8684633F5}.Debug|x64.ActiveCfg = Debug|x64
+		{A7A881CE-934A-ACA4-7C05-C0F8684633F5}.Debug|x64.Build.0 = Debug|x64
+		{A7A881CE-934A-ACA4-7C05-C0F8684633F5}.Release|x64.ActiveCfg = Release|x64
+		{A7A881CE-934A-ACA4-7C05-C0F8684633F5}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

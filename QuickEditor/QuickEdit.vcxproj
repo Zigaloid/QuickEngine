@@ -58,7 +58,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;JPH_DEBUG_RENDERER;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_USE_AVX2;JPH_USE_AVX;JPH_USE_SSE4_1;JPH_USE_SSE4_2;JPH_USE_LZCNT;JPH_USE_TZCNT;JPH_USE_F16C;JPH_USE_FMADD;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\JoltPhysics-master;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\Physics;..\Shared\Rendering;..\Shared\bgfx_common;..\Shared\utils;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\JoltPhysics-master;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\Physics;..\Shared\Rendering;..\Shared\bgfx_common;..\Shared\utils;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\recastnavigation-main\Recast\Include;..\External\recastnavigation-main\Detour\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
       <Optimization>Disabled</Optimization>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
@@ -76,7 +76,7 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;JPH_DEBUG_RENDERER;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_USE_AVX2;JPH_USE_AVX;JPH_USE_SSE4_1;JPH_USE_SSE4_2;JPH_USE_LZCNT;JPH_USE_TZCNT;JPH_USE_F16C;JPH_USE_FMADD;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\JoltPhysics-master;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\Physics;..\Shared\Rendering;..\Shared\bgfx_common;..\Shared\utils;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\JoltPhysics-master;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\Physics;..\Shared\Rendering;..\Shared\bgfx_common;..\Shared\utils;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\recastnavigation-main\Recast\Include;..\External\recastnavigation-main\Detour\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <Optimization>Full</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
@@ -96,7 +96,6 @@
   <ItemGroup>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\External\ufbx\ufbx.h" />
-    <ClInclude Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.h" />
     <ClInclude Include="..\Shared\Components\CameraComponent.h" />
     <ClInclude Include="..\Shared\Components\CharacterComponent.h" />
     <ClInclude Include="..\Shared\Components\EntityComponent.h" />
@@ -141,6 +140,8 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\SelectionManager.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\TransformCommand.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
+    <ClInclude Include="..\Shared\NavMesh\NavMeshBuilder.h" />
+    <ClInclude Include="..\Shared\NavMesh\NavMeshDebugDraw.h" />
     <ClInclude Include="..\Shared\Physics\JoltDebugRenderer.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsManager.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsSystem.h" />
@@ -206,6 +207,7 @@
     <ClInclude Include="..\Shared\bgfx_common\imgui\icons_font_awesome.ttf.h" />
     <ClInclude Include="..\Shared\bgfx_common\imgui\icons_kenney.ttf.h" />
     <ClInclude Include="..\Shared\bgfx_common\imgui\imgui.h" />
+    <ClInclude Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.h" />
     <ClInclude Include="..\Shared\bgfx_common\imgui\roboto_regular.ttf.h" />
     <ClInclude Include="..\Shared\bgfx_common\imgui\robotomono_regular.ttf.h" />
     <ClInclude Include="..\Shared\bgfx_common\imgui\vs_imgui_image.bin.h" />
@@ -251,7 +253,6 @@
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="..\External\ufbx\ufbx.c" />
-    <ClCompile Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.cpp" />
     <ClCompile Include="..\Shared\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Shared\Components\CharacterComponent.cpp" />
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp" />
@@ -288,6 +289,8 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\PropertyWidgetMapRegistry.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\SelectionManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp" />
+    <ClCompile Include="..\Shared\NavMesh\NavMeshBuilder.cpp" />
+    <ClCompile Include="..\Shared\NavMesh\NavMeshDebugDraw.cpp" />
     <ClCompile Include="..\Shared\Physics\JoltDebugRenderer.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp" />
@@ -322,11 +325,12 @@
     <ClCompile Include="..\Shared\bgfx_common\imgui\imgui.cpp">
       <ObjectFileName>$(IntDir)\imgui1.obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\nanovg\nanovg.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\nanovg\nanovg_bgfx.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\ps\particle_system.cpp" />
     <ClCompile Include="..\Shared\utils\MathUtils.cpp" />
-    <ClCompile Include="..\Shared\Utils\StringUtils.cpp" />
+    <ClCompile Include="..\Shared\utils\StringUtils.cpp" />
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
@@ -346,6 +350,12 @@
     </ProjectReference>
     <ProjectReference Include="..\External\JoltPhysics-master\Build\VS2022_CL\jolt.vcxproj">
       <Project>{3E16997C-2A4D-9A0D-D339-8010BF4F160F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\External\recastnavigation-main\RecastDemo\Build\vs2022\detour.vcxproj">
+      <Project>{381288F8-24B4-B2CE-0D6F-C622F9AF391F}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\External\recastnavigation-main\RecastDemo\Build\vs2022\recast.vcxproj">
+      <Project>{C7BC2619-B35E-51EF-9C19-6543885AD83F}</Project>
     </ProjectReference>
     <ProjectReference Include="..\External\bgfx\.build\projects\vs2019\bimg_decode.vcxproj">
       <Project>{A7B931CA-136F-AABF-9C63-A4960818A1C3}</Project>

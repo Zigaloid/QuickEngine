@@ -8,6 +8,7 @@
 #include "CharacterComponent.h"
 #include "LightManagerComponent.h"
 #include "DeleteEntityCommand.h"
+#include "NavMesh/NavMeshDebugDraw.h"
 #include <imgui-docking/imgui_internal.h>
 #include <bx/bounds.h>
 #include <algorithm>
@@ -66,6 +67,10 @@ namespace ImGuiVisualizers {
 
 			RenderComponentHierarchy(viewId, m_levelComp);
 			m_selectionManager.RenderSelectionGizmo(Get3DView().GetFrameBuffer(), m_gizmoMode, 2.0f);
+
+			// NavMesh debug overlay
+			if (m_showNavMesh && m_navMeshBuilder.IsBuilt())
+				NavMesh::NavMeshDebugDraw::Draw(viewId, prims, m_navMeshBuilder.GetPolyMesh());
 		});
 
 		RegisterRenderComponents(m_levelComp);
@@ -160,6 +165,23 @@ namespace ImGuiVisualizers {
 			.isEnabled = [this]() { return m_levelComp != nullptr; },
 			.isChecked = [this]() { return m_gizmoMode == GizmoMode::Rotate; },
 			.sortPriority = 30
+			});
+
+		am.RegisterAction({
+			.path = "Tools.BuildNavMesh",
+			.description = "Build a navigation mesh from all height field components.",
+			.targets = UI::ActionTarget::Menu | UI::ActionTarget::Console,
+			.callback = [this]()
+			{
+				if (!m_levelComp) return;
+				const bool ok = m_navMeshBuilder.Build(m_levelComp, m_navMeshConfig);
+				m_navBuildStatus = ok
+					? ("Built: " + std::to_string(m_navMeshBuilder.PolyCount()) + " polys")
+					: ("Failed: " + m_navMeshBuilder.GetLastError());
+				if (ok) m_showNavMesh = true;
+			},
+			.isEnabled = [this]() { return m_levelComp != nullptr; },
+			.sortPriority = 100
 			});
 	}
 
@@ -498,6 +520,7 @@ namespace ImGuiVisualizers {
 				ImGui::DockBuilderDockWindow("Layers",        m_dockspaceId);
 				ImGui::DockBuilderDockWindow("Properties",    m_dockspaceId);
 				ImGui::DockBuilderDockWindow("Object",        m_dockspaceId);
+				ImGui::DockBuilderDockWindow("Navigation",    m_dockspaceId);
 
 				ImGui::DockBuilderFinish(m_dockspaceId);
 			}
@@ -586,6 +609,15 @@ namespace ImGuiVisualizers {
 		if (ImGui::Begin("Object", nullptr, ImGuiWindowFlags_NoCollapse))
 		{
 			m_editor.RenderInspectorInline();
+		}
+		ImGui::End();
+
+		// ── Navigation panel ──────────────────────────────────────────────────
+		ImGui::SetNextWindowDockID(m_dockspaceId, ImGuiCond_FirstUseEver);
+		ImGui::SetNextWindowSize(ImVec2(300.0f, 500.0f), ImGuiCond_FirstUseEver);
+		if (ImGui::Begin("Navigation", nullptr, ImGuiWindowFlags_NoCollapse))
+		{
+			RenderNavigationPanel();
 		}
 		ImGui::End();
 
@@ -710,6 +742,75 @@ namespace ImGuiVisualizers {
 			m_propertyInspector.RenderContent();
 		else
 			ImGui::TextColored(ImVec4(0.6f, 0.6f, 0.6f, 1.0f), "No object selected");
+	}
+
+	void LevelComponentVisualizer::RenderNavigationPanel()
+	{
+		if (!m_levelComp)
+		{
+			ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "No level loaded");
+			return;
+		}
+
+		ImGui::TextColored(ImVec4(0.6f, 1.0f, 0.7f, 1.0f), "Navigation Mesh");
+		ImGui::Separator();
+
+		// ── Agent parameters ──────────────────────────────────────────────────
+		if (ImGui::CollapsingHeader("Agent", ImGuiTreeNodeFlags_DefaultOpen))
+		{
+			ImGui::DragFloat("Cell Size",       &m_navMeshConfig.cellSize,       0.01f, 0.05f, 2.0f,  "%.2f");
+			ImGui::DragFloat("Cell Height",     &m_navMeshConfig.cellHeight,     0.01f, 0.05f, 2.0f,  "%.2f");
+			ImGui::DragFloat("Agent Height",    &m_navMeshConfig.agentHeight,    0.05f, 0.1f,  10.0f, "%.2f");
+			ImGui::DragFloat("Agent Radius",    &m_navMeshConfig.agentRadius,    0.01f, 0.0f,  5.0f,  "%.2f");
+			ImGui::DragFloat("Max Climb",       &m_navMeshConfig.agentMaxClimb,  0.01f, 0.0f,  5.0f,  "%.2f");
+			ImGui::DragFloat("Max Slope",       &m_navMeshConfig.agentMaxSlope,  0.5f,  0.0f,  90.0f, "%.1f deg");
+		}
+
+		// ── Advanced parameters ───────────────────────────────────────────────
+		if (ImGui::CollapsingHeader("Advanced"))
+		{
+			ImGui::DragFloat("Region Min Size",   &m_navMeshConfig.regionMinSize,   0.5f,  0.0f, 150.0f);
+			ImGui::DragFloat("Region Merge Size", &m_navMeshConfig.regionMergeSize, 0.5f,  0.0f, 150.0f);
+			ImGui::DragFloat("Edge Max Len",      &m_navMeshConfig.edgeMaxLen,      0.1f,  0.0f, 50.0f);
+			ImGui::DragFloat("Edge Max Error",    &m_navMeshConfig.edgeMaxError,    0.01f, 0.1f, 3.0f);
+			ImGui::DragInt  ("Verts Per Poly",    &m_navMeshConfig.vertsPerPoly,    1,     3,    6);
+			ImGui::DragFloat("Detail Sample Dist",&m_navMeshConfig.detailSampleDist,0.1f,  0.0f, 16.0f);
+			ImGui::DragFloat("Detail Max Error",  &m_navMeshConfig.detailSampleMaxError, 0.01f, 0.0f, 16.0f);
+		}
+
+		ImGui::Separator();
+
+		// ── Build / overlay controls ──────────────────────────────────────────
+		if (ImGui::Button("Build NavMesh", ImVec2(-1.0f, 0.0f)))
+		{
+			const bool ok = m_navMeshBuilder.Build(m_levelComp, m_navMeshConfig);
+			m_navBuildStatus = ok
+				? ("Built: " + std::to_string(m_navMeshBuilder.PolyCount()) + " polys")
+				: ("Failed: " + m_navMeshBuilder.GetLastError());
+			if (ok)
+				m_showNavMesh = true;
+		}
+
+		if (!m_navBuildStatus.empty())
+		{
+			const bool failed = m_navBuildStatus.rfind("Failed", 0) == 0;
+			ImVec4 statusColor = failed
+				? ImVec4(1.0f, 0.4f, 0.4f, 1.0f)
+				: ImVec4(0.4f, 1.0f, 0.6f, 1.0f);
+			ImGui::TextColored(statusColor, "%s", m_navBuildStatus.c_str());
+		}
+
+		if (m_navMeshBuilder.IsBuilt())
+		{
+			ImGui::Checkbox("Show NavMesh Overlay", &m_showNavMesh);
+
+			if (ImGui::Button("Clear NavMesh", ImVec2(-1.0f, 0.0f)))
+			{
+				m_navMeshBuilder.Clear();
+				m_showNavMesh    = false;
+				m_navBuildStatus.clear();
+			}
+		}
 	}
 
 } // namespace ImGuiVisualizers

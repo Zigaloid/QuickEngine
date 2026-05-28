@@ -37,6 +37,9 @@
     <Filter Include="..\Shared\ImguiVizualizers">
       <UniqueIdentifier>{F90243E0-E512-EFB0-4ECC-53CF3AFBDD49}</UniqueIdentifier>
     </Filter>
+    <Filter Include="..\Shared\NavMesh">
+      <UniqueIdentifier>{083ADD41-7450-DBD7-BDC7-66F9291DAC5F}</UniqueIdentifier>
+    </Filter>
     <Filter Include="..\Shared\Physics">
       <UniqueIdentifier>{D9FE70EC-4515-6F82-8E8C-FAA3FAE13F0A}</UniqueIdentifier>
     </Filter>
@@ -94,6 +97,12 @@
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\LevelComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\LightComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\LightManagerComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\MeshComponent.h">
@@ -203,6 +212,12 @@
     </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\NavMesh\NavMeshBuilder.h">
+      <Filter>..\Shared\NavMesh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\NavMesh\NavMeshDebugDraw.h">
+      <Filter>..\Shared\NavMesh</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Physics\JoltDebugRenderer.h">
       <Filter>..\Shared\Physics</Filter>
@@ -399,6 +414,9 @@
     <ClInclude Include="..\Shared\bgfx_common\imgui\imgui.h">
       <Filter>..\Shared\bgfx_common\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.h">
+      <Filter>..\Shared\bgfx_common\imgui</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\bgfx_common\imgui\roboto_regular.ttf.h">
       <Filter>..\Shared\bgfx_common\imgui</Filter>
     </ClInclude>
@@ -455,15 +473,6 @@
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="QuickEdit.h" />
-    <ClInclude Include="..\Shared\Components\LightComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\LightManagerComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.h">
-      <Filter>..\Shared\bgfx_common</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -517,6 +526,9 @@
     <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_opengl3.cpp">
       <Filter>..\External\imgui-docking\backends</Filter>
     </ClCompile>
+    <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_win32.cpp">
+      <Filter>..\External\imgui-docking\backends</Filter>
+    </ClCompile>
     <ClCompile Include="..\External\imgui-docking\imgui.cpp">
       <Filter>..\External\imgui-docking</Filter>
     </ClCompile>
@@ -548,6 +560,12 @@
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\LevelComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\LightComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\LightManagerComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp">
@@ -633,6 +651,12 @@
     </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\NavMesh\NavMeshBuilder.cpp">
+      <Filter>..\Shared\NavMesh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\NavMesh\NavMeshDebugDraw.cpp">
+      <Filter>..\Shared\NavMesh</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Physics\JoltDebugRenderer.cpp">
       <Filter>..\Shared\Physics</Filter>
@@ -730,6 +754,9 @@
     <ClCompile Include="..\Shared\bgfx_common\imgui\imgui.cpp">
       <Filter>..\Shared\bgfx_common\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.cpp">
+      <Filter>..\Shared\bgfx_common\imgui</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\bgfx_common\nanovg\nanovg.cpp">
       <Filter>..\Shared\bgfx_common\nanovg</Filter>
     </ClCompile>
@@ -742,23 +769,11 @@
     <ClCompile Include="..\Shared\utils\MathUtils.cpp">
       <Filter>..\Shared\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\utils\StringUtils.cpp">
+      <Filter>..\Shared\utils</Filter>
+    </ClCompile>
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
-    <ClCompile Include="..\Shared\Components\LightComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\LightManagerComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Utils\StringUtils.cpp">
-      <Filter>..\Shared\utils</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.cpp">
-      <Filter>..\Shared\bgfx_common</Filter>
-    </ClCompile>
-    <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_win32.cpp">
-      <Filter>..\External\imgui-docking\backends</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

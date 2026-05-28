@@ -29,6 +29,15 @@ externalproject "bx"
    kind "StaticLib"
    language "C++"
    
+externalproject "recast"
+   location "../External/recastnavigation-main/RecastDemo/Build/vs2022"  
+   kind "StaticLib"
+   language "C++"
+
+externalproject "detour"
+   location "../External/recastnavigation-main/RecastDemo/Build/vs2022"  
+   kind "StaticLib"
+   language "C++"
    
 project "QuickEdit"  
    kind "ConsoleApp"
@@ -83,7 +92,8 @@ project "QuickEdit"
 	includedirs { "../External/imgui-docking" }   	
 	includedirs { "../External/bx/include/compat/msvc" }   
 	includedirs { "../External/OpenGL/Include" }  
-
+	includedirs { "../External/recastnavigation-main/Recast/Include" }  
+	includedirs { "../External/recastnavigation-main/Detour/Include" }  
 	includedirs { "../External/ufbx" }   	
 	
 	files { "../AssetClasses/**.cpp" }
@@ -92,6 +102,7 @@ project "QuickEdit"
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.h" }
 	files { "../External/imgui-docking/imgui.cpp" }
 	files { "../External/imgui-docking/backends/imgui_impl_opengl3.cpp" }
+	files { "../External/imgui-docking/backends/imgui_impl_win32.cpp" }
 	files { "../External/imgui-docking/imgui_tables.cpp" }
 	files { "../External/imgui-docking/imgui_Widgets.cpp" }
 	files { "../External/imgui-docking/imgui_draw.cpp" }
@@ -135,6 +146,8 @@ project "QuickEdit"
 	files { "../Shared/ImguiVizualizers/NodeGraphVisualizer.h" }
 	files { "../Shared/ImguiVizualizers/LayersPanel.cpp" }
 	files { "../Shared/ImguiVizualizers/LayersPanel.h" }
+	files { "../Shared/NavMesh/*.cpp" }
+	files { "../Shared/NavMesh/*.h" }
 	
 	files { "../Shared/ImguiVizualizers/CommandHistory.cpp" }
 	files { "../Shared/ImguiVizualizers/CommandHistory.h" }
@@ -179,9 +192,11 @@ project "QuickEdit"
 	  links { "bimg" }
 	  links { "bx" }
 	  links { "jolt" }
+	  links { "detour" }
+	  links { "recast" }
 	  staticruntime "on" -- Use /MT
 	  links { "bimg_decode" }
-	  
+	  	  
 	filter "configurations:Release"
 	  defines { "NDEBUG" }
 	  optimize "On"	  
@@ -190,5 +205,7 @@ project "QuickEdit"
 	  links { "bimg" }
 	  links { "bx" }
 	  links { "jolt" }
+	  links { "detour" }
+	  links { "recast" }
 	  staticruntime "on" -- Use /MTd
 	  links { "bimg_decode" }
