@@ -627,5 +627,11 @@
     <ClCompile Include="..\Shared\Components\LightManagerComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.cpp">
+      <Filter>..\Shared\bgfx_common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_win32.cpp">
+      <Filter>..\External\imgui-docking\backends</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

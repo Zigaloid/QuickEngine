@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -220,6 +220,8 @@
     <ClCompile Include="..\..\Shared\bgfx_common\imgui\imgui.cpp">
       <ObjectFileName>$(IntDir)\imgui1.obj</ObjectFileName>
     </ClCompile>
+    <ClCompile Include="..\..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.cpp" />
+    <ClCompile Include="..\..\External\imgui-docking\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\nanovg\nanovg.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\nanovg\nanovg_bgfx.cpp" />
     <ClCompile Include="..\..\Shared\bgfx_common\ps\particle_system.cpp" />

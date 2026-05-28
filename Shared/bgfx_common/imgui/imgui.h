@@ -29,6 +29,13 @@ inline uint32_t imguiRGBA(uint8_t _r, uint8_t _g, uint8_t _b, uint8_t _a = 255)
 namespace bx { struct AllocatorI; }
 
 void imguiCreate(float _fontSize = 18.0f, bx::AllocatorI* _allocator = NULL);
+
+// Preferred entry point when multi-viewport support is needed.
+// _hwnd is the application's main window HWND (cast to void*).
+// Initialises the Win32 platform backend and registers BGFX renderer
+// callbacks so that docked panels can be torn out into separate OS windows.
+void imguiCreateWithHwnd(void* _hwnd, float _fontSize = 18.0f, bx::AllocatorI* _allocator = NULL);
+
 void imguiDestroy();
 
 void imguiBeginFrame(int32_t _mx, int32_t _my, uint8_t _button, int32_t _scroll, uint16_t _width, uint16_t _height, int _inputChar = -1, bgfx::ViewId _view = 255);

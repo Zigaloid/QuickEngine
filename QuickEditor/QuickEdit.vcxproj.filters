@@ -461,6 +461,9 @@
     <ClInclude Include="..\Shared\Components\LightManagerComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.h">
+      <Filter>..\Shared\bgfx_common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -750,6 +753,12 @@
     </ClCompile>
     <ClCompile Include="..\Shared\Utils\StringUtils.cpp">
       <Filter>..\Shared\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.cpp">
+      <Filter>..\Shared\bgfx_common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_win32.cpp">
+      <Filter>..\External\imgui-docking\backends</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

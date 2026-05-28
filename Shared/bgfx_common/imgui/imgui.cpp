@@ -1,7 +1,15 @@
-﻿/*
+/*
  * Copyright 2014-2015 Daniel Collin. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE
  */
+
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+
+// Forward declaration as instructed by imgui_impl_win32.h (the declaration
+// is intentionally inside #if 0 there to avoid pulling windows.h into headers).
+extern LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
 #include <bgfx/bgfx.h>
 #include <bgfx/embedded_shader.h>
@@ -10,8 +18,10 @@
 #include <bx/timer.h>
 #include <imgui-docking/imgui.h>
 #include <imgui-docking/imgui_internal.h>
+#include <imgui-docking/backends/imgui_impl_win32.h>
 
 #include "imgui.h"
+#include "imgui_bgfx_viewport.h"
 #include "../bgfx_utils.h"
 
 #ifndef USE_ENTRY
@@ -62,6 +72,28 @@ static FontRangeMerge s_fontRangeMerge[] =
 
 static void* memAlloc(size_t _size, void* _userData);
 static void memFree(void* _ptr, void* _userData);
+
+// ---------------------------------------------------------------------------
+// Debug helpers — output goes to the Visual Studio Output window.
+// Remove this block once the multi-viewport drag issue is resolved.
+// ---------------------------------------------------------------------------
+#if defined(_DEBUG)
+#include <cstdio>
+static void ImguiDbg(const char* fmt, ...)
+{
+	char buf[512];
+	va_list ap;
+	va_start(ap, fmt);
+	vsnprintf(buf, sizeof(buf), fmt, ap);
+	va_end(ap);
+	OutputDebugStringA("[ImguiMV] ");
+	OutputDebugStringA(buf);
+	OutputDebugStringA("\n");
+}
+#else
+static void ImguiDbg(const char*, ...) {}
+#endif
+// ---------------------------------------------------------------------------
 
 struct OcornutImguiContext
 {
@@ -263,6 +295,8 @@ struct OcornutImguiContext
 	{
 		IMGUI_CHECKVERSION();
 
+		InitializeCriticalSection(&m_inputLock);
+
 		m_allocator = _allocator;
 
 		if (NULL == _allocator)
@@ -286,6 +320,7 @@ struct OcornutImguiContext
 		// ConfigFlags must already include DockingEnable at that point or the
 		// dock node data in the ini file is silently discarded.
 		io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+		io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;
 
 		// Use an explicit filename so the ini lands predictably next to the exe.
 		// The default ("imgui.ini") resolves relative to the process working
@@ -300,6 +335,7 @@ struct OcornutImguiContext
 		io.BackendFlags |= 0
 			| ImGuiBackendFlags_RendererHasVtxOffset
 			| ImGuiBackendFlags_RendererHasTextures
+			| ImGuiBackendFlags_RendererHasViewports
 			;
 		io.ConfigDebugHighlightIdConflicts = !!BX_CONFIG_DEBUG;
 
@@ -467,6 +503,21 @@ struct OcornutImguiContext
 
 	void destroy()
 	{
+		imguiBgfxViewportShutdown();
+
+		if (m_win32BackendInitialized)
+		{
+			// Restore the original bgfx WndProc before shutting down.
+			if (m_mainHwnd && m_origWndProc)
+			{
+				SetWindowLongPtrW(m_mainHwnd, GWLP_WNDPROC,
+					reinterpret_cast<LONG_PTR>(m_origWndProc));
+				m_origWndProc = nullptr;
+			}
+			ImGui_ImplWin32_Shutdown();
+			m_win32BackendInitialized = false;
+		}
+
 		for (ImTextureData* texData : ImGui::GetPlatformIO().Textures)
 		{
 			if (1 == texData->RefCount)
@@ -487,6 +538,8 @@ struct OcornutImguiContext
 		bgfx::destroy(m_program);
 
 		m_allocator = NULL;
+
+		DeleteCriticalSection(&m_inputLock);
 	}
 
 	void setupStyle(bool _dark)
@@ -505,7 +558,16 @@ struct OcornutImguiContext
 
 		style.FrameRounding    = 4.0f;
 		style.WindowBorderSize = 0.0f;
-	}
+
+		// Multi-viewport: secondary OS windows must not have rounded corners
+		// and their background must be fully opaque so the desktop doesn't
+		// bleed through.
+		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+			{
+				style.WindowRounding = 0.0f;
+				style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+			}
+		}
 
 	void beginFrame(
 		  int32_t _mx
@@ -534,11 +596,38 @@ struct OcornutImguiContext
 		const double freq = double(bx::getHPFrequency() );
 		io.DeltaTime = float(frameTime/freq);
 
-		io.AddMousePosEvent( (float)_mx, (float)_my);
-		io.AddMouseButtonEvent(ImGuiMouseButton_Left,   0 != (_button & IMGUI_MBUT_LEFT  ) );
-		io.AddMouseButtonEvent(ImGuiMouseButton_Right,  0 != (_button & IMGUI_MBUT_RIGHT ) );
-		io.AddMouseButtonEvent(ImGuiMouseButton_Middle, 0 != (_button & IMGUI_MBUT_MIDDLE) );
-		io.AddMouseWheelEvent(0.0f, (float)(_scroll - m_lastScroll) );
+		// When the Win32 platform backend is active it fully owns all mouse
+		// input (position, buttons, wheel) via WM_* messages on all viewports.
+		// Injecting bgfx's client-space state on top causes double-events, which
+		// breaks re-dragging of torn-out windows and corrupts secondary viewports.
+		if (m_win32BackendInitialized)
+		{
+			// bgfx runs its Win32 message pump on the OS thread, but ImGui
+			// creates secondary viewport windows on the app/entry thread.
+			// Win32 binds windows to the thread that created them, so those
+			// secondary HWNDs never receive messages from the OS thread's pump.
+			// Draining the queue here (on the app thread) delivers WM_MOUSEMOVE,
+			// WM_LBUTTONDOWN, etc. to secondary viewport windows so that
+			// dragging and input work correctly.
+			EnterCriticalSection(&m_inputLock);
+			MSG wMsg;
+			while (PeekMessageW(&wMsg, NULL, 0U, 0U, PM_REMOVE))
+			{
+				TranslateMessage(&wMsg);
+				DispatchMessageW(&wMsg);
+			}
+
+			ImGui_ImplWin32_NewFrame();
+			LeaveCriticalSection(&m_inputLock);
+		}
+		else
+		{
+			io.AddMousePosEvent( (float)_mx, (float)_my);
+			io.AddMouseButtonEvent(ImGuiMouseButton_Left,   0 != (_button & IMGUI_MBUT_LEFT  ) );
+			io.AddMouseButtonEvent(ImGuiMouseButton_Right,  0 != (_button & IMGUI_MBUT_RIGHT ) );
+			io.AddMouseButtonEvent(ImGuiMouseButton_Middle, 0 != (_button & IMGUI_MBUT_MIDDLE) );
+			io.AddMouseWheelEvent(0.0f, (float)(_scroll - m_lastScroll) );
+		}
 		m_lastScroll = _scroll;
 
 #if USE_ENTRY
@@ -561,12 +650,51 @@ struct OcornutImguiContext
 #endif // USE_ENTRY
 
 		ImGui::NewFrame();
+
+#if defined(_DEBUG)
+		// Log ImGui multi-viewport state once per second to the Output window.
+		{
+			static float s_dbgTimer = 0.0f;
+			s_dbgTimer += io.DeltaTime;
+			if (s_dbgTimer >= 1.0f)
+			{
+				s_dbgTimer = 0.0f;
+				const ImGuiPlatformIO& pio = ImGui::GetPlatformIO();
+				ImguiDbg("--- Per-second state ---");
+				ImguiDbg("  ConfigFlags=0x%08X  BackendFlags=0x%08X",
+					(unsigned)io.ConfigFlags, (unsigned)io.BackendFlags);
+				ImguiDbg("  ViewportsEnable=%d  PlatformHasViewports=%d  RendererHasViewports=%d",
+					!!(io.ConfigFlags  & ImGuiConfigFlags_ViewportsEnable),
+					!!(io.BackendFlags & ImGuiBackendFlags_PlatformHasViewports),
+					!!(io.BackendFlags & ImGuiBackendFlags_RendererHasViewports));
+				ImguiDbg("  Platform_CreateWindow=%s  Renderer_CreateWindow=%s",
+					pio.Platform_CreateWindow ? "SET" : "NULL",
+					pio.Renderer_CreateWindow ? "SET" : "NULL");
+				ImguiDbg("  Viewport count=%d  MousePos=(%.1f,%.1f)",
+					pio.Viewports.Size, io.MousePos.x, io.MousePos.y);
+				ImguiDbg("  WantCaptureMouse=%d  MouseDown[0]=%d",
+					io.WantCaptureMouse, io.MouseDown[0]);
+				// Report active drag operation if any.
+				ImGuiContext* ctx = ImGui::GetCurrentContext();
+				ImguiDbg("  MovingWindow=%s  DragDropActive=%d",
+					ctx->MovingWindow ? ctx->MovingWindow->Name : "none",
+					ctx->DragDropActive);
+			}
+		}
+#endif
 	}
 
 	void endFrame()
 	{
 		ImGui::Render();
 		render(ImGui::GetDrawData() );
+
+		// Render secondary OS windows (torn-out docked panels).
+		if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+		{
+			ImGui::UpdatePlatformWindows();
+			ImGui::RenderPlatformWindowsDefault();
+		}
 	}
 
 	ImGuiContext*       m_imgui;
@@ -580,12 +708,50 @@ struct OcornutImguiContext
 	int64_t m_last;
 	int32_t m_lastScroll;
 	bgfx::ViewId m_viewId;
+	bool m_win32BackendInitialized = false;
+	HWND          m_mainHwnd      = nullptr;
+	WNDPROC       m_origWndProc   = nullptr;
+	// Guards ImGui's InputEventsQueue against concurrent access from the bgfx
+	// OS thread (via imguiWndProcHook) and the app thread (via beginFrame).
+	CRITICAL_SECTION m_inputLock;
 #if USE_ENTRY
 	ImGuiKey m_keyMap[(int)entry::Key::Count];
 #endif // USE_ENTRY
 };
 
 static OcornutImguiContext s_ctx;
+
+// WndProc hook installed on the bgfx main window so that
+// ImGui_ImplWin32_WndProcHandler receives all OS messages.
+static LRESULT CALLBACK imguiWndProcHook(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	// Log messages that are critical for drag-to-new-window.
+	switch (msg)
+	{
+	case WM_LBUTTONDOWN:  ImguiDbg("WndProc: WM_LBUTTONDOWN  x=%d y=%d", LOWORD(lParam), HIWORD(lParam)); break;
+	case WM_LBUTTONUP:    ImguiDbg("WndProc: WM_LBUTTONUP    x=%d y=%d", LOWORD(lParam), HIWORD(lParam)); break;
+	case WM_MOUSEMOVE:    ImguiDbg("WndProc: WM_MOUSEMOVE     x=%d y=%d", LOWORD(lParam), HIWORD(lParam)); break;
+	case WM_NCMOUSEMOVE:  ImguiDbg("WndProc: WM_NCMOUSEMOVE   x=%d y=%d", LOWORD(lParam), HIWORD(lParam)); break;
+	case WM_CAPTURECHANGED: ImguiDbg("WndProc: WM_CAPTURECHANGED"); break;
+	default: break;
+	}
+
+	LRESULT r = 0;
+	{
+		EnterCriticalSection(&s_ctx.m_inputLock);
+		r = ImGui_ImplWin32_WndProcHandler(hwnd, msg, wParam, lParam);
+		LeaveCriticalSection(&s_ctx.m_inputLock);
+	}
+	if (r)
+	{
+		ImguiDbg("WndProc: ImGui consumed msg=0x%04X", msg);
+		return 1;
+	}
+	WNDPROC orig = s_ctx.m_origWndProc;
+	if (orig)
+		return CallWindowProcW(orig, hwnd, msg, wParam, lParam);
+	return DefWindowProcW(hwnd, msg, wParam, lParam);
+}
 
 static void* memAlloc(size_t _size, void* _userData)
 {
@@ -602,6 +768,48 @@ static void memFree(void* _ptr, void* _userData)
 void imguiCreate(float _fontSize, bx::AllocatorI* _allocator)
 {
 	s_ctx.create(_fontSize, _allocator);
+}
+
+void imguiCreateWithHwnd(void* _hwnd, float _fontSize, bx::AllocatorI* _allocator)
+{
+	s_ctx.create(_fontSize, _allocator);
+
+	// Win32 platform backend — provides window management for secondary viewports.
+	ImGui_ImplWin32_Init(_hwnd);
+	s_ctx.m_win32BackendInitialized = true;
+
+	// Subclass the bgfx main window so ImGui_ImplWin32_WndProcHandler
+	// receives all OS messages (mouse, keyboard, focus, etc.).
+	// Without this, dragging tabs into new windows never completes because
+	// ImGui never sees WM_LBUTTONDOWN / WM_MOUSEMOVE on the main window.
+	s_ctx.m_mainHwnd    = static_cast<HWND>(_hwnd);
+	s_ctx.m_origWndProc = reinterpret_cast<WNDPROC>(
+		SetWindowLongPtrW(s_ctx.m_mainHwnd, GWLP_WNDPROC,
+			reinterpret_cast<LONG_PTR>(imguiWndProcHook)));
+
+	ImguiDbg("imguiCreateWithHwnd: hwnd=%p  origWndProc=%p  hookInstalled=%s",
+		(void*)s_ctx.m_mainHwnd,
+		(void*)s_ctx.m_origWndProc,
+		s_ctx.m_origWndProc ? "YES" : "NO -- SetWindowLongPtrW FAILED");
+
+	const ImGuiIO& io = ImGui::GetIO();
+	ImguiDbg("ImGui ConfigFlags=0x%08X  BackendFlags=0x%08X",
+		(unsigned)io.ConfigFlags, (unsigned)io.BackendFlags);
+	ImguiDbg("  DockingEnable=%d  ViewportsEnable=%d",
+		!!(io.ConfigFlags & ImGuiConfigFlags_DockingEnable),
+		!!(io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable));
+	ImguiDbg("  PlatformHasViewports=%d  RendererHasViewports=%d",
+		!!(io.BackendFlags & ImGuiBackendFlags_PlatformHasViewports),
+		!!(io.BackendFlags & ImGuiBackendFlags_RendererHasViewports));
+
+	// BGFX renderer callbacks for secondary viewports.
+	imguiBgfxViewportInit();
+}
+
+void imguiBgfxRenderDrawData(ImDrawData* _drawData, bgfx::ViewId _viewId)
+{
+	s_ctx.m_viewId = _viewId;
+	s_ctx.render(_drawData);
 }
 
 void imguiDestroy()

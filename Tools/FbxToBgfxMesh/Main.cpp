@@ -165,7 +165,7 @@ namespace
 			InitializeCoreEngine();
 			m_profilerController.Init();
 			InitializeBgfxView(Args(_argc, _argv), _width, _height);
-			imguiCreate();
+			imguiCreateWithHwnd(entry::getNativeWindowHandle(entry::kDefaultWindowHandle));
 			theApp.Initialize();
 		}
 

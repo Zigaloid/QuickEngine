@@ -3,6 +3,7 @@
 #include "IImGuiVisualizer.h"
 #include "KeyboardShortcutManager.h"
 #include "imgui.h"
+#include "imgui_internal.h"
 
 #include <algorithm>
 #include <cassert>
@@ -152,9 +153,11 @@ std::string ImGuiVisualizerManager::ShortcutName(const std::string& key)
     return "Visualizer.Toggle." + key;
 }
 
+static constexpr const char* k_mainDockSpaceName = "GameAppDockSpace";
+
 void ImGuiVisualizerManager::RenderAll()
 {
-    ImGuiID mainDockId = ImGui::GetID("MainDockSpace");
+    ImGuiID mainDockId = ImHashStr(k_mainDockSpaceName);
 
     for (auto& entry : m_entries)
     {
@@ -162,9 +165,6 @@ void ImGuiVisualizerManager::RenderAll()
         {
             if (mainDockId != 0)
             {
-                // Re-dock into the main dockspace whenever the window becomes
-                // visible again (transitions from hidden → visible), so the
-                // user can always drag it back and re-open it docked.
                 ImGuiCond dockCond = (!entry.wasVisible)
                     ? ImGuiCond_Always
                     : ImGuiCond_FirstUseEver;
@@ -326,3 +326,4 @@ void ImGuiVisualizerManager::RenderFileMenu()
 }
 
 } // namespace ImGuiVisualizers
+

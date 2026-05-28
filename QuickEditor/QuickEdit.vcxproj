@@ -96,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\External\ufbx\ufbx.h" />
+    <ClInclude Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.h" />
     <ClInclude Include="..\Shared\Components\CameraComponent.h" />
     <ClInclude Include="..\Shared\Components\CharacterComponent.h" />
     <ClInclude Include="..\Shared\Components\EntityComponent.h" />
@@ -244,11 +245,13 @@
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vertexfilter.cpp" />
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\vfetchoptimizer.cpp" />
     <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_opengl3.cpp" />
+    <ClCompile Include="..\External\imgui-docking\backends\imgui_impl_win32.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_Widgets.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="..\External\ufbx\ufbx.c" />
+    <ClCompile Include="..\Shared\bgfx_common\imgui\imgui_bgfx_viewport.cpp" />
     <ClCompile Include="..\Shared\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Shared\Components\CharacterComponent.cpp" />
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp" />

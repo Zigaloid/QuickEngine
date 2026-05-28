@@ -118,7 +118,11 @@ namespace ImGuiVisualizers {
         const Vector3f nearPt = invVP.TransformPoint(Vector3f(ndcX, ndcY, nearZ));
         const Vector3f farPt = invVP.TransformPoint(Vector3f(ndcX, ndcY, 1.0f));
 
-        return Ray{ nearPt, (farPt - nearPt).Normalized() };
+        const Vector3f dir = farPt - nearPt;
+        if (dir.MagnitudeSquared() < 1e-12f)
+            return Ray{ nearPt, Vector3f(0.0f, 0.0f, -1.0f) };
+
+        return Ray{ nearPt, dir.Normalized() };
     }
     std::shared_ptr<CSelectable> CSelectionManager::PickAtCursor()
     {
@@ -132,7 +136,7 @@ namespace ImGuiVisualizers {
         if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && m_hoveredGizmoAxis != GizmoAxis::None)
             return nullptr;
 
-        const bool shiftHeld = ImGui::GetIO().KeyShift;
+        const bool shiftHeld = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
 
         // ── Build view-projection matrix ──────────────────────────────────
         const float aspect = m_viewportSize.x / m_viewportSize.y;
@@ -369,7 +373,7 @@ namespace ImGuiVisualizers {
         // If SHIFT is held, invoke the duplicate callback so the caller can
         // replace the selection with fresh duplicates before the drag starts.
         // The callback is expected to update m_selection via SetAllSelected().
-        if (ImGui::GetIO().KeyShift && m_shiftDragCallback)
+        if ((ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift)) && m_shiftDragCallback)
         {
             m_shiftDragCallback();
             // If duplication left us with no selectables, abort the drag.
@@ -727,7 +731,8 @@ namespace ImGuiVisualizers {
             };
 
         // ── 4. Hover detection and drag initiation (idle only) ────────────
-        if (!m_drag.active && !ImGui::GetIO().KeyAlt )
+        const bool altHeld = ImGui::IsKeyDown(ImGuiKey_LeftAlt) || ImGui::IsKeyDown(ImGuiKey_RightAlt);
+        if (!m_drag.active && !altHeld)
         {
             if (hasSelection)
             {
@@ -806,7 +811,7 @@ namespace ImGuiVisualizers {
                     }
                 }
 
-                const bool shiftHeld = ImGui::GetIO().KeyShift;
+                const bool shiftHeld = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
                 if (shiftHeld)
                 {
                     // Add inside items to current selection (if not already present)

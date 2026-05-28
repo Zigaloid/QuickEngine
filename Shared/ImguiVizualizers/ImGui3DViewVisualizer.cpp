@@ -176,8 +176,11 @@ void ImGui3DViewVisualizer::HandleInput(const ImVec2& regionMin,
 
     ImGuiIO& io = ImGui::GetIO();
 
-    // Camera movement is only applied when the Alt key is held
-    if (io.KeyAlt)
+    // Camera movement is only applied when the Alt key is held.
+    // Use IsKeyDown instead of io.KeyAlt so it works correctly when the
+    // viewport is undocked into its own OS window (multi-viewport).
+    const bool altHeld = ImGui::IsKeyDown(ImGuiKey_LeftAlt) || ImGui::IsKeyDown(ImGuiKey_RightAlt);
+    if (altHeld)
     {
 
         // Orbit – left mouse drag (only when our invisible item is active)

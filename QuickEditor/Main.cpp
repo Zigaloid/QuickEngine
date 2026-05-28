@@ -7,6 +7,8 @@
 #include "common.h"
 #include "bgfx_utils.h"
 #include "imgui/imgui.h"
+#include "imgui_internal.h"
+#include <imgui-docking/backends/imgui_impl_win32.h>
 #include "CoreSystem/CoreSystem.h"
 #include "ResourceManager/ResourceManager.h"
 #include "CoreSystem/Timer.h"
@@ -44,7 +46,11 @@ namespace
 			}
 
 			InitializeBgfxView(Args(_argc, _argv), _width, _height);
-			imguiCreate();
+
+			// Pass the main HWND so the Win32 platform backend can manage
+			// secondary OS windows for multi-viewport docking.
+			void* mainHwnd = entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+			imguiCreateWithHwnd(mainHwnd);
 
 			Core::CoreSystem::GetNexusClient()->EnableAutoReconnect();
 
@@ -166,9 +172,9 @@ namespace
 
             // Use a stable string ID so ImGui can match this node to its
             // [Docking][Data] entry in imgui.ini across sessions.
-            ImGuiID dockspace_id = ImGui::GetID("GameAppDockSpace");
-            ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f),
-                ImGuiDockNodeFlags_PassthruCentralNode | ImGuiDockNodeFlags_NoDockingOverCentralNode);
+            ImGuiID dockspace_id = ImHashStr("GameAppDockSpace");
+			ImGui::DockSpace(dockspace_id, ImVec2(0.0f, 0.0f),
+				ImGuiDockNodeFlags_PassthruCentralNode);
 
             if (ImGui::BeginMenuBar())
             {

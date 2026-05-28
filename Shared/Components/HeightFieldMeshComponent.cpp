@@ -39,6 +39,18 @@ void CHeightFieldMeshComponent::OnUpdate(double deltaTime)
 void CHeightFieldMeshComponent::OnShutdown()
 {
     DECLARE_FUNC_VLOW();
+
+    if (bgfx::isValid(m_blendHeightsUniform))
+    {
+        bgfx::destroy(m_blendHeightsUniform);
+        m_blendHeightsUniform = BGFX_INVALID_HANDLE;
+    }
+    if (bgfx::isValid(m_blendTransitionUniform))
+    {
+        bgfx::destroy(m_blendTransitionUniform);
+        m_blendTransitionUniform = BGFX_INVALID_HANDLE;
+    }
+
     CMeshComponent::OnShutdown();
 }
 
