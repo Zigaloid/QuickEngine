@@ -71,6 +71,7 @@ public:
         m_bodyId = JPH::BodyID();
         m_bodyInitialized = false;
         m_parentTransform = nullptr;
+        Component::OnShutdown();
     }
 
 	JPH::BodyID GetBodyID() const { return m_bodyId; }

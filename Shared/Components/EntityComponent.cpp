@@ -23,5 +23,5 @@ void CEntityComponent::OnUpdate(double /*deltaTime*/)
 
 void CEntityComponent::OnShutdown()
 {
-
+	Component::OnShutdown();
 }

@@ -32,7 +32,7 @@ void Component::RemoveChild(Component* child)
 	}
 }
 
-void Component::Shutdown()
+void ComponentSystem::Component::Shutdown()
 {
     auto* manager = Core::CoreSystem::GetComponentManager();
     if (m_initialized)

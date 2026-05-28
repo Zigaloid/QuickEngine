@@ -279,10 +279,10 @@ namespace ImGuiVisualizers {
 		if (!comp) return;
 
 		if (auto* rc = dynamic_cast<CRenderComponent*>(comp))
-		{
-			rc->OnInitialize(); // Ensure the component is initialized before rendering or selection
-			out.push_back(rc);
-		}
+			{
+				rc->Initialize();
+				out.push_back(rc);
+			}
 
 		for (auto* child : comp->GetChildren())
 		{

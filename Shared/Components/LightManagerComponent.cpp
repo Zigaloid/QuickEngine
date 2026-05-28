@@ -20,6 +20,7 @@ void CLightManagerComponent::OnUpdate(double /*deltaTime*/)
 void CLightManagerComponent::OnShutdown()
 {
     m_primaryLight = nullptr;
+    Component::OnShutdown();
 }
 
 CLightManagerComponent* CLightManagerComponent::Get()

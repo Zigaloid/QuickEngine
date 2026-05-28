@@ -24,7 +24,7 @@ void CTransformComponent::OnUpdate(double /*deltaTime*/)
 
 void CTransformComponent::OnShutdown()
 {
-
+	Component::OnShutdown();
 }
 
 bool CTransformComponent::IsLoaded() const

@@ -37,6 +37,13 @@ namespace ImGuiVisualizers {
             RegisterHeightFieldActions();
         }
 
+        void Shutdown() override
+        {
+            if (m_heightFieldComp) m_heightFieldComp->Shutdown();
+            ReleaseHeightFieldComponent();            
+            CombinedObjJson3DVisualizer::Shutdown();
+        }
+
         void RecalculateMeshNormals(Group& group, const bgfx::VertexLayout& layout);
     protected:
         bool AttachMeshFromPath(const std::string& meshPath) override;

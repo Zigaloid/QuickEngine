@@ -58,6 +58,7 @@ void CRenderComponent::OnShutdown()
 {
 	m_physicsBodyRef.Reset();
 	m_physicsTransformInitialized = false;
+	Component::OnShutdown();
 }
 
 // ── CDebugRenderComponent ──────────────────────────────────────────────────
@@ -113,9 +114,10 @@ void CDebugRenderComponent::Render(bgfx::ViewId viewId)
 }
 
 // ── CMeshComponent ─────────────────────────────────────────────────────────
-
+int g_INITCOUNT = 0;
 bool CMeshComponent::OnInitialize()
 {
+	g_INITCOUNT++;
 	DECLARE_FUNC_VLOW();
 	CRenderComponent::OnInitialize();
 
@@ -155,6 +157,7 @@ void CMeshComponent::OnUpdate(double deltaTime)
 
 void CMeshComponent::OnShutdown()
 {
+	g_INITCOUNT--;
 	DECLARE_FUNC_VLOW();
 
 	m_materialResource = CMaterialResourceReference();

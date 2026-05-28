@@ -65,8 +65,8 @@ namespace ImGuiVisualizers {
         m_selectionManager.ShutdownGizmo();
         m_selectionManager.ClearSelectables();
         ClearHeightFieldPoints();
-
-        m_heightFieldComp = nullptr;
+        
+        m_heightFieldComp = nullptr;        
     }
     void HeightFieldMeshComponentVisualizer::RegisterHeightFieldPoints()
     {

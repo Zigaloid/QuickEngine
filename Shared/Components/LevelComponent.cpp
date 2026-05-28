@@ -25,7 +25,7 @@ void CLevelComponent::OnUpdate(double /*deltaTime*/)
 
 void CLevelComponent::OnShutdown()
 {
-
+	Component::OnShutdown();
 }
 
 bool CLevelComponent::IsReady() const

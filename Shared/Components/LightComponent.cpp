@@ -25,6 +25,7 @@ void CLightComponent::OnUpdate(double /*deltaTime*/)
 void CLightComponent::OnShutdown()
 {
     m_transform = nullptr;
+    Component::OnShutdown();
 }
 
 void CLightComponent::UpdateDirectionFromTransform()
