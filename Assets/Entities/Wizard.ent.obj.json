@@ -43,7 +43,7 @@
                     "m_children": {
                         "Value": "CMeshComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 },
@@ -55,7 +55,7 @@
                         "Size": 4
                     },
                     "m_motionType": {
-                        "Value": 2,
+                        "Value": 0,
                         "Type": 1,
                         "Size": 4
                     },
@@ -81,7 +81,7 @@
                     },
                     "m_objectMatrix": {
                         "Value": [
-                            1.0,
+                            0.5,
                             0.0,
                             0.0,
                             0.0,
@@ -91,10 +91,10 @@
                             0.0,
                             0.0,
                             0.0,
-                            1.0,
+                            0.5,
                             0.0,
                             0.0,
-                            0.548147439956665,
+                            0.547233521938324,
                             0.0,
                             1.0
                         ],
@@ -109,7 +109,7 @@
                     "m_children": {
                         "Value": "CPhysicsBodyComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 },
@@ -145,12 +145,12 @@
                     "m_children": {
                         "Value": "CTransformComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 }
             ],
-            "Type": 19,
+            "Type": 22,
             "Size": 32
         }
     }

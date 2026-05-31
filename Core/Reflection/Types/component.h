@@ -101,4 +101,26 @@ public:
     const char* GetTypeAsString() override { return "vector_component_raw_ptr"; }
 };
 
+/** @brief Reflected property descriptor for vector<shared_ptr<Component>> members. */
+class CComponentSharedPtrVectorProperty : public CPropertyBase
+{
+public:
+    CComponentSharedPtrVectorProperty(RFL_Type type, size_t size, unsigned int memberOffset, const char* name)
+        : CPropertyBase(type, size, memberOffset, name)
+    {
+    }
+
+    void Read(IRFL_Parser* doc, CReflectedBase* obj) override
+    {
+        doc->ReadComponentSharedPtrArray(*this, obj);
+    }
+
+    void Write(IRFL_Parser* doc, CReflectedBase* obj) override
+    {
+        doc->WriteComponentSharedPtrArray(*this, obj);
+    }
+
+    const char* GetTypeAsString() override { return "vector_component_shared_ptr"; }
+};
+
 #endif

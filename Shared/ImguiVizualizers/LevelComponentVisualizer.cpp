@@ -343,9 +343,9 @@ namespace ImGuiVisualizers {
 			}
 		}
 
-		for (auto* child : comp->GetChildren())
+		for (auto& child : comp->GetChildren())
 		{
-			RenderComponentHierarchy(viewId, child);
+			RenderComponentHierarchy(viewId, child.get());
 		}
 	}
 
@@ -360,9 +360,9 @@ namespace ImGuiVisualizers {
 				out.push_back(rc);
 			}
 
-		for (auto* child : comp->GetChildren())
+		for (auto& child : comp->GetChildren())
 		{
-			CollectRenderComponents(child, out);
+			CollectRenderComponents(child.get(), out);
 		}
 	}
 

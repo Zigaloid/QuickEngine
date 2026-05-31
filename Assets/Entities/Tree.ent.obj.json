@@ -43,7 +43,43 @@
                     "m_children": {
                         "Value": "CMeshComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CTransformComponent",
+                    "m_matrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 22,
                         "Size": 32
                     }
                 },
@@ -81,20 +117,20 @@
                     },
                     "m_objectMatrix": {
                         "Value": [
-                            1.0,
+                            0.42817801237106323,
                             0.0,
                             0.0,
                             0.0,
                             0.0,
-                            1.0,
+                            0.7828449010848999,
                             0.0,
                             0.0,
                             0.0,
                             0.0,
-                            1.0,
+                            0.46084555983543396,
                             0.0,
                             0.0,
-                            0.5432640910148621,
+                            0.39675241708755493,
                             0.0,
                             1.0
                         ],
@@ -109,48 +145,12 @@
                     "m_children": {
                         "Value": "CPhysicsBodyComponent",
                         "Elements": [],
-                        "Type": 19,
-                        "Size": 32
-                    }
-                },
-                {
-                    "Value": "CTransformComponent",
-                    "m_matrix": {
-                        "Value": [
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            1.0
-                        ],
-                        "Type": 8,
-                        "Size": 64
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CTransformComponent",
-                        "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 }
             ],
-            "Type": 19,
+            "Type": 22,
             "Size": 32
         }
     }

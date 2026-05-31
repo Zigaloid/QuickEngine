@@ -41,6 +41,12 @@ public:
 	virtual void WriteObjectPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
 	virtual void ReadObjectPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
 
+	// shared_ptr support
+	virtual void WriteObjectSharedPtr(const CPropertyBase& property, CReflectedBase* obj) = 0;
+	virtual void ReadObjectSharedPtr(const CPropertyBase& property, CReflectedBase* obj) = 0;
+	virtual void WriteObjectSharedPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
+	virtual void ReadObjectSharedPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
+
 	// New component-specific methods that use ComponentManager
 	virtual void WriteComponent(const CPropertyBase& property, CReflectedBase* obj) = 0;
 	virtual void ReadComponent(const CPropertyBase& property, CReflectedBase* obj) = 0;
@@ -50,6 +56,8 @@ public:
 	virtual void ReadComponentPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
 	virtual void WriteComponentRawPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
 	virtual void ReadComponentRawPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
+	virtual void WriteComponentSharedPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
+	virtual void ReadComponentSharedPtrArray(const CPropertyBase& property, CReflectedBase* obj) = 0;
 
 	// --- Add these for bool support ---
 	virtual void WriteBool(const CPropertyBase& property, CReflectedBase* obj) = 0;

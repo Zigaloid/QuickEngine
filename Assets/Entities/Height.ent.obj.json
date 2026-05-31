@@ -45,24 +45,24 @@
                     "m_children": {
                         "Value": "CTransformComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 },
                 {
                     "Value": "CHeightFieldMeshComponent",
                     "m_xSteps": {
-                        "Value": 40,
+                        "Value": 10,
                         "Type": 1,
                         "Size": 4
                     },
                     "m_zSteps": {
-                        "Value": 40,
+                        "Value": 10,
                         "Type": 1,
                         "Size": 4
                     },
                     "m_stepSize": {
-                        "Value": 0.5,
+                        "Value": 1.0,
                         "Type": 2,
                         "Size": 4
                     },
@@ -109,7 +109,7 @@
                     "m_children": {
                         "Value": "CHeightFieldMeshComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 },
@@ -170,12 +170,12 @@
                     "m_children": {
                         "Value": "CHeightFieldPhysicsComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 }
             ],
-            "Type": 19,
+            "Type": 22,
             "Size": 32
         }
     }

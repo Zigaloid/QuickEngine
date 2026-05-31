@@ -437,6 +437,7 @@ public:
     }
 
     /** @brief Removes a registered function by name. Returns true if it was found and removed. */
+
     bool UnregisterFunction(const std::string& name)
     {
         std::string actualName = m_caseSensitive ? name : ToLower(name);

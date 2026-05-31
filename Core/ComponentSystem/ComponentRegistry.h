@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
 #include <string>
-#include "ComponentSystem.h"
+#include "ComponentManager.h"
 #include "Reflection/ReflectionBase.h"
 
 namespace Core {

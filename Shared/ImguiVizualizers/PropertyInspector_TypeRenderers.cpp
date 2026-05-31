@@ -96,9 +96,10 @@ namespace ImGuiVisualizers {
         case RT_ObjectPtrVec:     return "Vector<Object*>";
         case RT_Component:        return "Component";
         case RT_ComponentPtr:     return "Component*";
-        case RT_ComponentPtrVec:  return "Vector<Component*>";
-        case RT_ComponentRawPtrVec: return "Vector<Component*>";
-        default:                  return "Unknown";
+        case RT_ComponentPtrVec:        return "Vector<Component*>";
+        case RT_ComponentRawPtrVec:     return "Vector<Component*>";
+        case RT_ComponentSharedPtrVec:  return "Vector<shared_ptr<Component>>";
+        default:                        return "Unknown";
         }
     }
 
@@ -127,6 +128,7 @@ namespace ImGuiVisualizers {
         case RT_ComponentPtr:
         case RT_ComponentPtrVec:
         case RT_ComponentRawPtrVec:
+        case RT_ComponentSharedPtrVec:
             return COLOR_TYPE_COMPONENT;
         default:
             return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
@@ -702,10 +704,32 @@ namespace ImGuiVisualizers {
 
     void PropertyInspector::RenderComponentPtrVectorProperty(const CPropertyBase& property, CReflectedBase* object)
     {
-        std::vector<ComponentSystem::Component*>* componentVector =
-            reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
+        // RT_ComponentSharedPtrVec is the post-migration type used by Component::m_children.
+        // All other component-vector tags keep the legacy raw-pointer vector layout.
+        const bool isSharedVec = (property.GetType() == RT_ComponentSharedPtrVec);
 
-        const std::string nodeId = GenerateTreeNodeId(property.GetName(), componentVector);
+        // Obtain a uniform view as shared_ptr<Component> elements regardless of storage.
+        // For the shared-ptr case we read directly; for raw-ptr we build a proxy view.
+        std::vector<std::shared_ptr<ComponentSystem::Component>>* sharedVec = nullptr;
+        std::vector<ComponentSystem::Component*>*                  rawVec   = nullptr;
+
+        if (isSharedVec)
+            sharedVec = reinterpret_cast<std::vector<std::shared_ptr<ComponentSystem::Component>>*>(property.GetAddress(object));
+        else
+            rawVec    = reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
+
+        // Helper lambdas to work uniformly over either storage type.
+        auto vecSize = [&]() -> size_t {
+            return isSharedVec ? sharedVec->size() : rawVec->size();
+        };
+        auto getComp = [&](size_t i) -> ComponentSystem::Component* {
+            return isSharedVec ? (*sharedVec)[i].get() : (*rawVec)[i];
+        };
+        auto vecEmpty = [&]() -> bool { return vecSize() == 0; };
+
+        const void* nodeAddr = isSharedVec ? static_cast<const void*>(sharedVec)
+                                           : static_cast<const void*>(rawVec);
+        const std::string nodeId = GenerateTreeNodeId(property.GetName(), nodeAddr);
         bool expanded = ShouldExpandNode(nodeId);
 
         static std::unordered_map<std::string, int> s_componentSelection;
@@ -744,8 +768,8 @@ namespace ImGuiVisualizers {
                             }
                         },
                         [&]() {
-                            if (!componentVector->empty())
-                                RemoveComponentFromArray(property, object, componentVector->size() - 1);
+                            if (!vecEmpty())
+                                RemoveComponentFromArray(property, object, vecSize() - 1);
                         });
                     ImGui::SameLine();
                     const char* preview = allComponents[std::min(selIdx, static_cast<int>(allComponents.size() - 1))].displayName.c_str();
@@ -763,12 +787,12 @@ namespace ImGuiVisualizers {
                 }
             }
 
-            if (componentVector->size())
-                ImGui::Text("Size: %zu", componentVector->size());
+            if (vecSize())
+                ImGui::Text("Size: %zu", vecSize());
 
-            for (size_t i = 0; i < componentVector->size(); ++i) {
+            for (size_t i = 0; i < vecSize(); ++i) {
                 const std::string elementName   = "[" + std::to_string(i) + "]";
-                const std::string elementNodeId = GenerateTreeNodeId(elementName, (*componentVector)[i]);
+                const std::string elementNodeId = GenerateTreeNodeId(elementName, getComp(i));
                 bool elementExpanded = ShouldExpandNode(elementNodeId);
 
                 bool nodeOpen = ImGui::TreeNodeEx(elementNodeId.c_str(),
@@ -780,8 +804,8 @@ namespace ImGuiVisualizers {
                 if (nodeOpen) {
                     UpdateExpandedState(elementNodeId, true);
 
-                    if ((*componentVector)[i]) {
-                        ComponentSystem::Component* comp = (*componentVector)[i];
+                    ComponentSystem::Component* comp = getComp(i);
+                    if (comp) {
                         WidgetMapScope wms(this, comp);
 
                         if (m_showDetails) {
@@ -800,7 +824,7 @@ namespace ImGuiVisualizers {
                 }
                 else {
                     UpdateExpandedState(elementNodeId, false);
-                    if (!(*componentVector)[i]) {
+                    if (!getComp(i)) {
                         ImGui::SameLine();
                         ImGui::TextColored(ImVec4(0.7f, 0.3f, 0.3f, 1.0f), "(null)");
                     }
@@ -812,7 +836,7 @@ namespace ImGuiVisualizers {
         else {
             UpdateExpandedState(nodeId, false);
             ImGui::SameLine();
-            ImGui::TextColored(GetTypeColor(property.GetType()), "[Vector<Component*>] (%zu)", componentVector->size());
+            ImGui::TextColored(GetTypeColor(property.GetType()), "[Vector<Component*>] (%zu)", vecSize());
 
             {
                 const auto& allComponents = GetComponentRegistry().GetAll();
@@ -836,8 +860,8 @@ namespace ImGuiVisualizers {
                             }
                         },
                         [&]() {
-                            if (!componentVector->empty())
-                                RemoveComponentFromArray(property, object, componentVector->size() - 1);
+                            if (!vecEmpty())
+                                RemoveComponentFromArray(property, object, vecSize() - 1);
                         });
                     ImGui::SameLine();
                     const char* preview = allComponents[std::min(selIdx, static_cast<int>(allComponents.size() - 1))].displayName.c_str();

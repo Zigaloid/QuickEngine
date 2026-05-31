@@ -172,9 +172,9 @@ void EntityComponentVisualizer::CollectPhysicsComponents(ComponentSystem::Compon
         out.push_back(pc);
     }
 
-    for (auto* child : comp->GetChildren())
+    for (auto& child : comp->GetChildren())
     {
-        CollectPhysicsComponents(child, out);
+        CollectPhysicsComponents(child.get(), out);
     }
 }
 
@@ -200,9 +200,9 @@ void EntityComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, Bg
         ComponentSystem::Component* parent = comp->GetParent();
         if (parent)
         {
-            for (auto* sibling : parent->GetChildren())
+            for (auto& sibling : parent->GetChildren())
             {
-                if (auto* renderComp = dynamic_cast<CRenderComponent*>(sibling))
+                if (auto* renderComp = dynamic_cast<CRenderComponent*>(sibling.get()))
                 {
                     auto modelMatrix = renderComp->GetModelMatrix();
                     if (modelMatrix)
@@ -231,9 +231,9 @@ void EntityComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, Bg
         }
     }
 
-    for (auto* child : comp->GetChildren())
+    for (auto& child : comp->GetChildren())
     {
-        RenderComponentHierarchy(viewId, prims, child);
+        RenderComponentHierarchy(viewId, prims, child.get());
     }
 }
 

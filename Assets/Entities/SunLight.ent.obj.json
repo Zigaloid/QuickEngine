@@ -17,9 +17,9 @@
                     "Value": "CLightComponent",
                     "m_direction": {
                         "Value": [
-                            0.5773502588272095,
-                            -0.5773502588272095,
-                            0.5773502588272095
+                            0.5773503184318542,
+                            -0.5773503184318542,
+                            0.5773503184318542
                         ],
                         "Type": 13,
                         "Size": 12
@@ -52,7 +52,7 @@
                     "m_children": {
                         "Value": "CLightComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 },
@@ -88,7 +88,7 @@
                     "m_children": {
                         "Value": "CTransformComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 },
@@ -117,12 +117,12 @@
                     "m_children": {
                         "Value": "CDebugRenderComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 }
             ],
-            "Type": 19,
+            "Type": 22,
             "Size": 32
         }
     }

@@ -618,6 +618,32 @@ struct OcornutImguiContext
 			}
 
 			ImGui_ImplWin32_NewFrame();
+
+#if USE_ENTRY
+			for (const uint8_t* utf8 = inputGetChar(); NULL != utf8; utf8 = inputGetChar() )
+			{
+				io.AddInputCharactersUTF8( (const char*)utf8);
+			}
+
+			const uint8_t modifiers = inputGetModifiersState();
+			io.AddKeyEvent(ImGuiMod_Shift, 0 != (modifiers & (entry::Modifier::LeftShift | entry::Modifier::RightShift) ) );
+			io.AddKeyEvent(ImGuiMod_Ctrl,  0 != (modifiers & (entry::Modifier::LeftCtrl  | entry::Modifier::RightCtrl ) ) );
+			io.AddKeyEvent(ImGuiMod_Alt,   0 != (modifiers & (entry::Modifier::LeftAlt   | entry::Modifier::RightAlt  ) ) );
+			io.AddKeyEvent(ImGuiMod_Super, 0 != (modifiers & (entry::Modifier::LeftMeta  | entry::Modifier::RightMeta ) ) );
+
+			for (int32_t ii = 0; ii < int32_t(entry::Key::Count); ++ii)
+			{
+				io.AddKeyEvent(m_keyMap[ii], inputGetKeyState(entry::Key::Enum(ii) ) );
+				io.SetKeyEventNativeData(m_keyMap[ii], 0, 0, ii);
+			}
+#endif // USE_ENTRY
+
+			// NewFrame must be inside the lock: it calls UpdateInputEvents() which
+			// reads and clears InputEventsQueue, which the OS thread writes to via
+			// AddMousePosEvent inside imguiWndProcHook (also under m_inputLock).
+			// Without this, the two threads race on InputEventsQueue and the
+			// FindLatestInputEvent index assertion fires.
+			ImGui::NewFrame();
 			LeaveCriticalSection(&m_inputLock);
 		}
 		else
@@ -631,25 +657,31 @@ struct OcornutImguiContext
 		m_lastScroll = _scroll;
 
 #if USE_ENTRY
-		for (const uint8_t* utf8 = inputGetChar(); NULL != utf8; utf8 = inputGetChar() )
+		if (!m_win32BackendInitialized)
 		{
-			io.AddInputCharactersUTF8( (const char*)utf8);
-		}
+			for (const uint8_t* utf8 = inputGetChar(); NULL != utf8; utf8 = inputGetChar() )
+			{
+				io.AddInputCharactersUTF8( (const char*)utf8);
+			}
 
-		const uint8_t modifiers = inputGetModifiersState();
-		io.AddKeyEvent(ImGuiMod_Shift, 0 != (modifiers & (entry::Modifier::LeftShift | entry::Modifier::RightShift) ) );
-		io.AddKeyEvent(ImGuiMod_Ctrl,  0 != (modifiers & (entry::Modifier::LeftCtrl  | entry::Modifier::RightCtrl ) ) );
-		io.AddKeyEvent(ImGuiMod_Alt,   0 != (modifiers & (entry::Modifier::LeftAlt   | entry::Modifier::RightAlt  ) ) );
-		io.AddKeyEvent(ImGuiMod_Super, 0 != (modifiers & (entry::Modifier::LeftMeta  | entry::Modifier::RightMeta ) ) );
+			const uint8_t modifiers = inputGetModifiersState();
+			io.AddKeyEvent(ImGuiMod_Shift, 0 != (modifiers & (entry::Modifier::LeftShift | entry::Modifier::RightShift) ) );
+			io.AddKeyEvent(ImGuiMod_Ctrl,  0 != (modifiers & (entry::Modifier::LeftCtrl  | entry::Modifier::RightCtrl ) ) );
+			io.AddKeyEvent(ImGuiMod_Alt,   0 != (modifiers & (entry::Modifier::LeftAlt   | entry::Modifier::RightAlt  ) ) );
+			io.AddKeyEvent(ImGuiMod_Super, 0 != (modifiers & (entry::Modifier::LeftMeta  | entry::Modifier::RightMeta ) ) );
 
-		for (int32_t ii = 0; ii < int32_t(entry::Key::Count); ++ii)
-		{
-			io.AddKeyEvent(m_keyMap[ii], inputGetKeyState(entry::Key::Enum(ii) ) );
-			io.SetKeyEventNativeData(m_keyMap[ii], 0, 0, ii);
+			for (int32_t ii = 0; ii < int32_t(entry::Key::Count); ++ii)
+			{
+				io.AddKeyEvent(m_keyMap[ii], inputGetKeyState(entry::Key::Enum(ii) ) );
+				io.SetKeyEventNativeData(m_keyMap[ii], 0, 0, ii);
+			}
 		}
 #endif // USE_ENTRY
 
-		ImGui::NewFrame();
+		if (!m_win32BackendInitialized)
+		{
+			ImGui::NewFrame();
+		}
 
 #if defined(_DEBUG)
 		// Log ImGui multi-viewport state once per second to the Output window.

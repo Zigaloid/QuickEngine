@@ -25,6 +25,9 @@ enum RFL_Type
     RT_StringVec            = 17,
     RT_StringBoolMap        = 18,
     RT_ComponentRawPtrVec   = 19,
+    RT_SharedObjectPtr          = 20,
+    RT_SharedObjectPtrVec       = 21,
+    RT_ComponentSharedPtrVec    = 22,
 };
 
 class CReflectedBase;

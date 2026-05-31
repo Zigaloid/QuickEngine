@@ -1,0 +1,65 @@
+{
+    "RootObject": {
+        "m_xSteps": {
+            "Value": 40,
+            "Type": 1,
+            "Size": 4
+        },
+        "m_zSteps": {
+            "Value": 40,
+            "Type": 1,
+            "Size": 4
+        },
+        "m_stepSize": {
+            "Value": 0.5,
+            "Type": 2,
+            "Size": 4
+        },
+        "m_blendHeights": {
+            "Value": [
+                -0.4000000059604645,
+                2.0,
+                5.0,
+                3.0
+            ],
+            "Type": 7,
+            "Size": 16
+        },
+        "m_blendTransition": {
+            "Value": 0.5,
+            "Type": 2,
+            "Size": 4
+        },
+        "m_meshResource": {
+            "Value": "CMeshResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/heightfields/test.mesh.bin",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 64
+        },
+        "m_materialResource": {
+            "Value": "CMaterialResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/materials/height.mat.obj.json",
+                "Type": 3,
+                "Size": 40
+            },
+            "Type": 4,
+            "Size": 64
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CHeightFieldMeshComponent",
+            "Elements": [],
+            "Type": 19,
+            "Size": 32
+        }
+    }
+}

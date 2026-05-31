@@ -329,6 +329,7 @@ namespace ImGuiVisualizers
 			break;
 		case RT_ComponentPtrVec:
 		case RT_ComponentRawPtrVec:
+		case RT_ComponentSharedPtrVec:
 			RenderComponentPtrVectorProperty(property, object);
 			break;
 		default:
@@ -838,6 +839,24 @@ namespace ImGuiVisualizers
 
 	bool PropertyInspector::AddComponentToArray(const CPropertyBase& property, CReflectedBase* object, const std::string& componentClassName)
 	{
+		if (property.GetType() == RT_ComponentSharedPtrVec)
+		{
+			// The vector is vector<shared_ptr<Component>> — owned by a Component's m_children.
+			// Use AddChild on the owning component so hierarchy and pool bookkeeping stay consistent.
+			auto* ownerComp = dynamic_cast<ComponentSystem::Component*>(object);
+			if (!ownerComp) return false;
+
+			CReflectedBase* newObject = ClassFactory::CreateObject(componentClassName.c_str());
+			if (!newObject) return false;
+
+			ComponentSystem::Component* newComp = dynamic_cast<ComponentSystem::Component*>(newObject);
+			if (!newComp) { delete newObject; return false; }
+
+			ownerComp->AddChild(newComp);
+			return true;
+		}
+
+		// Legacy raw-pointer vector path.
 		std::vector<ComponentSystem::Component*>* componentVector =
 			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
 
@@ -845,46 +864,49 @@ namespace ImGuiVisualizers
 			return false;
 		}
 
-		// Create the component using ClassFactory
 		CReflectedBase* newObject = ClassFactory::CreateObject(componentClassName.c_str());
 		if (!newObject) {
 			return false;
 		}
 
-		// Ensure it's actually a Component
 		ComponentSystem::Component* newComponent = dynamic_cast<ComponentSystem::Component*>(newObject);
 		if (!newComponent) {
 			delete newObject;
 			return false;
 		}
 
-		// Add to the vector
 		componentVector->push_back(newComponent);
-
 		return true;
 	}
 
 	bool PropertyInspector::RemoveComponentFromArray(const CPropertyBase& property, CReflectedBase* object, size_t index)
 	{
+		if (property.GetType() == RT_ComponentSharedPtrVec)
+		{
+			auto* ownerComp = dynamic_cast<ComponentSystem::Component*>(object);
+			if (!ownerComp) return false;
+
+			const auto& children = ownerComp->GetChildren();
+			if (index >= children.size()) return false;
+
+			ComponentSystem::Component* child = children[index].get();
+			ownerComp->RemoveChild(child);
+			return true;
+		}
+
+		// Legacy raw-pointer vector path.
 		std::vector<ComponentSystem::Component*>* componentVector =
 			reinterpret_cast<std::vector<ComponentSystem::Component*>*>(property.GetAddress(object));
 
-		// Validate index
 		if (!componentVector || index >= componentVector->size()) {
 			return false;
 		}
 
-		// Get the component to delete
 		ComponentSystem::Component* componentToDelete = (*componentVector)[index];
-
-		// Remove from vector
 		componentVector->erase(componentVector->begin() + index);
-
-		// Delete the component object
 		if (componentToDelete) {
 			delete componentToDelete;
 		}
-
 		return true;
 	}
 

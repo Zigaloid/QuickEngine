@@ -31,9 +31,9 @@ void LayersPanel::Render()
             if (!layer) return;
             if (std::find(m_expandedLayers.begin(), m_expandedLayers.end(), layer) == m_expandedLayers.end())
                 m_expandedLayers.push_back(layer);
-            for (auto* child : layer->GetChildren())
+            for (auto& child : layer->GetChildren())
             {
-                if (auto* childLayer = dynamic_cast<CLevelComponent*>(child))
+                if (auto* childLayer = dynamic_cast<CLevelComponent*>(child.get()))
                     expandRec(childLayer);
             }
         };
@@ -49,9 +49,9 @@ void LayersPanel::Render()
             auto it = std::find(m_expandedLayers.begin(), m_expandedLayers.end(), layer);
             if (it != m_expandedLayers.end())
                 m_expandedLayers.erase(it);
-            for (auto* child : layer->GetChildren())
+            for (auto& child : layer->GetChildren())
             {
-                if (auto* childLayer = dynamic_cast<CLevelComponent*>(child))
+                if (auto* childLayer = dynamic_cast<CLevelComponent*>(child.get()))
                     collapseRec(childLayer);
             }
         };
@@ -66,7 +66,7 @@ void LayersPanel::Render()
         const auto& children = m_levelComponent->GetChildren();
         for (size_t i = 0; i < children.size(); ++i)
         {
-            auto* layer = dynamic_cast<CLevelComponent*>(children[i]);
+            auto* layer = dynamic_cast<CLevelComponent*>(children[i].get());
             if (layer)
             {
                 RenderLayerNode(layer, static_cast<int>(i));
@@ -201,14 +201,14 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
         }
 
         int childId = 0;
-        for (auto* child : childLayers)
+        for (auto& child : childLayers)
         {
-            if (auto* childLayer = dynamic_cast<CLevelComponent*>(child))
+            if (auto* childLayer = dynamic_cast<CLevelComponent*>(child.get()))
             {
                 RenderLayerNode(childLayer, nodeId * 100 + childId);
                 ++childId;
             }
-            else if (auto* entity = dynamic_cast<CEntityComponent*>(child))
+            else if (auto* entity = dynamic_cast<CEntityComponent*>(child.get()))
             {
                 RenderEntityNode(entity, nodeId * 100 + childId);
                 ++childId;
@@ -300,9 +300,9 @@ void LayersPanel::SelectAllEntitiesInLayer(CLevelComponent* layer)
     if (!layer || !m_selectionManager) return;
 
     // Collect all CEntityComponent direct children of this layer
-    for (auto* child : layer->GetChildren())
+    for (auto& child : layer->GetChildren())
     {
-        if (auto* entity = dynamic_cast<CEntityComponent*>(child))
+        if (auto* entity = dynamic_cast<CEntityComponent*>(child.get()))
             SelectEntity(entity, /*additive=*/true);
     }
 }

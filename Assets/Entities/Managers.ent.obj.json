@@ -23,12 +23,12 @@
                     "m_children": {
                         "Value": "CLightManagerComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 }
             ],
-            "Type": 19,
+            "Type": 22,
             "Size": 32
         }
     }

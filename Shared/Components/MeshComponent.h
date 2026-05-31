@@ -28,6 +28,19 @@ public:
 	void OnUpdate(double deltaTime) override; 
 	void OnShutdown() override;
 	std::shared_ptr<Matrix4f> GetModelMatrix() const { return m_transformPtr; }
+
+	/// Resets and re-resolves the sibling CTransformComponent reference in-place.
+	/// Call this after the full sibling hierarchy is assembled (e.g. post-deserialisation)
+	/// to ensure m_transformPtr points at the correct transform, not the identity fallback.
+	void RebindTransform()
+	{
+		static Matrix4f identity = Matrix4f::GetIdentity();
+		m_transformComponent.Reset();
+		if (m_transformComponent.Get(this))
+			m_transformPtr = std::shared_ptr<Matrix4f>(&m_transformComponent.Get()->GetTransform(), [](Matrix4f*) {});
+		else
+			m_transformPtr = std::shared_ptr<Matrix4f>(&identity, [](Matrix4f*) {});
+	}
 private:
 	std::shared_ptr<Matrix4f> m_transformPtr;
 	std::shared_ptr<Vector4f> m_boundingSpherePtr;

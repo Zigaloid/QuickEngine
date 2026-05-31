@@ -94,7 +94,12 @@
     <ClInclude Include="App\AppInterface.h" />
     <ClInclude Include="App\ApplicationComponent.h" />
     <ClInclude Include="ClassFactory\ClassFactory.h" />
+    <ClInclude Include="ComponentSystem\Component.h" />
     <ClInclude Include="ComponentSystem\ComponentDependencyDefinition.h" />
+    <ClInclude Include="ComponentSystem\ComponentFactory.h" />
+    <ClInclude Include="ComponentSystem\ComponentManager.h" />
+    <ClInclude Include="ComponentSystem\ComponentPool.h" />
+    <ClInclude Include="ComponentSystem\ComponentReference.h" />
     <ClInclude Include="ComponentSystem\ComponentRegistry.h" />
     <ClInclude Include="ComponentSystem\ComponentSystem.h" />
     <ClInclude Include="ComponentSystem\ComponentSystemScheduler.h" />

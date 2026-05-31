@@ -14,76 +14,6 @@
             "Value": "CEntityComponent",
             "Elements": [
                 {
-                    "Value": "CMeshComponent",
-                    "m_meshResource": {
-                        "Value": "CMeshResourceReference",
-                        "m_resourceFileName": {
-                            "Value": "./assets/meshes/warrior.mesh.bin",
-                            "Type": 3,
-                            "Size": 40
-                        },
-                        "Type": 4,
-                        "Size": 64
-                    },
-                    "m_materialResource": {
-                        "Value": "CMaterialResourceReference",
-                        "m_resourceFileName": {
-                            "Value": "./assets/materials/warrior.mat.obj.json",
-                            "Type": 3,
-                            "Size": 40
-                        },
-                        "Type": 4,
-                        "Size": 64
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CMeshComponent",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 32
-                    }
-                },
-                {
-                    "Value": "CCharacterComponent",
-                    "m_objectMatrix": {
-                        "Value": [
-                            0.6000000238418579,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.7765594720840454,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.0,
-                            0.6000000238418579,
-                            0.0,
-                            0.0,
-                            0.3916104733943939,
-                            -0.1727478802204132,
-                            1.0
-                        ],
-                        "Type": 8,
-                        "Size": 64
-                    },
-                    "m_active": {
-                        "Value": true,
-                        "Type": 12,
-                        "Size": 1
-                    },
-                    "m_children": {
-                        "Value": "CCharacterComponent",
-                        "Elements": [],
-                        "Type": 19,
-                        "Size": 32
-                    }
-                },
-                {
                     "Value": "CTransformComponent",
                     "m_matrix": {
                         "Value": [
@@ -115,21 +45,77 @@
                     "m_children": {
                         "Value": "CTransformComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
                         "Size": 32
                     }
                 },
                 {
-                    "Value": "CThirdPersonInputComponent",
+                    "Value": "CCharacterComponent",
+                    "m_objectMatrix": {
+                        "Value": [
+                            0.6000000238418579,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.032586693763733,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.6000000238418579,
+                            0.0,
+                            0.0,
+                            0.5314801931381226,
+                            -0.19514082372188568,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
                     "m_active": {
                         "Value": true,
                         "Type": 12,
                         "Size": 1
                     },
                     "m_children": {
-                        "Value": "CThirdPersonInputComponent",
+                        "Value": "CCharacterComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CMeshComponent",
+                    "m_meshResource": {
+                        "Value": "CMeshResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/meshes/warrior.mesh.bin",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 64
+                    },
+                    "m_materialResource": {
+                        "Value": "CMaterialResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/materials/warrior.mat.obj.json",
+                            "Type": 3,
+                            "Size": 40
+                        },
+                        "Type": 4,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CMeshComponent",
+                        "Elements": [],
+                        "Type": 22,
                         "Size": 32
                     }
                 },
@@ -143,12 +129,26 @@
                     "m_children": {
                         "Value": "CCameraComponent",
                         "Elements": [],
-                        "Type": 19,
+                        "Type": 22,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CThirdPersonInputComponent",
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CThirdPersonInputComponent",
+                        "Elements": [],
+                        "Type": 22,
                         "Size": 32
                     }
                 }
             ],
-            "Type": 19,
+            "Type": 22,
             "Size": 32
         }
     }

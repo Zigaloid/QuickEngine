@@ -127,6 +127,99 @@ public:
 		}
 	}
 
+	void ReadObjectSharedPtr(const CPropertyBase& property, CReflectedBase* obj) override
+	{
+		Value* valueMember = FindValue(property);
+		if (valueMember)
+		{
+			Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
+			Push(member);
+			ScopedPop guard(*this);
+			std::shared_ptr<CReflectedBase>* subObjPtr =
+				reinterpret_cast<std::shared_ptr<CReflectedBase>*>(property.GetAddress(obj));
+
+			auto subObj = CreateObjectAsUniquePtr(valueMember->GetString());
+			if (subObj) {
+				subObj->ReadMembers(*this);
+				*subObjPtr = std::move(subObj);
+			}
+		}
+	}
+
+	void WriteObjectSharedPtr(const CPropertyBase& property, CReflectedBase* obj) override
+	{
+		std::shared_ptr<CReflectedBase>* subObjPtr =
+			reinterpret_cast<std::shared_ptr<CReflectedBase>*>(property.GetAddress(obj));
+
+		if (*subObjPtr) {
+			CReflectedBase* subObj = subObjPtr->get();
+			BeginObject(subObj->GetRflClassName());
+			subObj->WriteMembers(*this);
+			WriteProperties(property);
+			EndObject(property.GetName().c_str());
+		}
+		else {
+			BeginObject("");
+			WriteProperties(property);
+			EndObject(property.GetName().c_str());
+		}
+	}
+
+	void ReadObjectSharedPtrArray(const CPropertyBase& property, CReflectedBase* obj) override
+	{
+		Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
+		Value* valueMember = FindValue(property);
+		if (valueMember)
+		{
+			std::vector<std::shared_ptr<CReflectedBase>>* vectorOfObject =
+				reinterpret_cast<std::vector<std::shared_ptr<CReflectedBase>>*>(property.GetAddress(obj));
+
+			vectorOfObject->clear();
+
+			Value* arrayMember = &member->FindMember(JTAG_ELELMENTS)->value;
+			if (arrayMember->IsArray())
+			{
+				vectorOfObject->reserve(arrayMember->GetArray().Size());
+
+				for (auto& element : arrayMember->GetArray())
+				{
+					Push(&element);
+					ScopedPop elementGuard(*this);
+					Value* valueMember = &element.FindMember(JTAG_VALUE)->value;
+					auto subObj = CreateObjectAsUniquePtr(valueMember->GetString());
+					if (subObj) {
+						subObj->ReadMembers(*this);
+						vectorOfObject->push_back(std::move(subObj));
+					}
+				}
+			}
+		}
+	}
+
+	void WriteObjectSharedPtrArray(const CPropertyBase& property, CReflectedBase* obj) override
+	{
+		std::vector<std::shared_ptr<CReflectedBase>>* objVector =
+			reinterpret_cast<std::vector<std::shared_ptr<CReflectedBase>>*>(property.GetAddress(obj));
+
+		BeginObject(obj->GetRflClassName());
+		BeginArray();
+		for (const auto& element : *objVector)
+		{
+			if (element) {
+				BeginObject(element->GetRflClassName());
+				element->WriteMembers(*this);
+				EndObject(property.GetName().c_str());
+			}
+			else {
+				BeginObject("");
+				EndObject(property.GetName().c_str());
+			}
+		}
+		EndArray();
+		WriteProperties(property);
+		EndObject(property.GetName().c_str());
+	}
+
 	// Refactored to use vector of unique_ptr
 	void ReadObjectPtrArray(const CPropertyBase& property, CReflectedBase* obj)
 	{
@@ -632,6 +725,70 @@ public:
 		EndObject(property.GetName().c_str());
 	}
 
+	void ReadComponentSharedPtrArray(const CPropertyBase& property, CReflectedBase* obj)
+	{
+		Value* member = &m_currentObject->FindMember(property.GetName().c_str())->value;
+		Value* valueMember = FindValue(property);
+		if (valueMember)
+		{
+			std::vector<std::shared_ptr<ComponentSystem::Component>>* vectorOfComponent =
+				reinterpret_cast<std::vector<std::shared_ptr<ComponentSystem::Component>>*>(property.GetAddress(obj));
+
+			vectorOfComponent->clear();
+
+			Value* arrayMember = &member->FindMember(JTAG_ELELMENTS)->value;
+			if (arrayMember->IsArray())
+			{
+				vectorOfComponent->reserve(arrayMember->GetArray().Size());
+
+				ComponentSystem::Component* parentComponent = dynamic_cast<ComponentSystem::Component*>(obj);
+
+				for (auto& element : arrayMember->GetArray())
+				{
+					Push(&element);
+					ScopedPop elementGuard(*this);
+					Value* elementValue = &element.FindMember(JTAG_VALUE)->value;
+
+					std::string className = elementValue->GetString();
+					auto subObj = CreateComponentAsSharedPtr(className.c_str());
+					if (subObj) {
+						subObj->ReadMembers(*this);
+						if (parentComponent) {
+							parentComponent->AddChild(subObj);
+						}
+						else {
+							vectorOfComponent->push_back(std::move(subObj));
+						}
+					}
+				}
+			}
+		}
+	}
+
+	void WriteComponentSharedPtrArray(const CPropertyBase& property, CReflectedBase* obj)
+	{
+		std::vector<std::shared_ptr<ComponentSystem::Component>>* componentVector =
+			reinterpret_cast<std::vector<std::shared_ptr<ComponentSystem::Component>>*>(property.GetAddress(obj));
+
+		BeginObject(obj->GetRflClassName());
+		BeginArray();
+		for (const auto& element : *componentVector)
+		{
+			if (element) {
+				BeginObject(element->GetRflClassName());
+				element->WriteMembers(*this);
+				EndObject(property.GetName().c_str());
+			}
+			else {
+				BeginObject("");
+				EndObject(property.GetName().c_str());
+			}
+		}
+		EndArray();
+		WriteProperties(property);
+		EndObject(property.GetName().c_str());
+	}
+
 	void ReadBool(const CPropertyBase& property, CReflectedBase* obj)
 	{
 		Value* valueMember = FindValue(property);
@@ -895,17 +1052,48 @@ private:
 	Writer<StringBuffer>* m_writer;
 	StringBuffer m_stringBuffer;
 
-	// Helper function to create components using ComponentManager
+	// Helper function to create components using ComponentManager, with ClassFactory fallback.
 	static std::unique_ptr<ComponentSystem::Component> CreateComponentAsUniquePtr(const char* className)
 	{
 		auto* componentManager = Core::CoreSystem::GetComponentManager();
-		if (!componentManager) {
-			ReflectionDebug.print("ComponentManager not available\n");
-			return nullptr;
+		if (componentManager)
+		{
+			ComponentSystem::Component* component = componentManager->CreateComponentByName(className);
+			if (component)
+				return std::unique_ptr<ComponentSystem::Component>(component);
 		}
-		ComponentSystem::Component* component = componentManager->CreateComponentByName(className);
-		if (component) {
-			return std::unique_ptr<ComponentSystem::Component>(component);
+		// Fallback: class was registered via REFL_DEFINE_OBJECT but not in ComponentManager's string factory.
+		CReflectedBase* rawObj = ClassFactory::CreateObject(className);
+		if (rawObj)
+		{
+			if (auto* comp = dynamic_cast<ComponentSystem::Component*>(rawObj))
+				return std::unique_ptr<ComponentSystem::Component>(comp);
+			delete rawObj;
+		}
+		ReflectionDebug.print("Failed to create component: " + std::string(className) + "\n");
+		return nullptr;
+	}
+
+	static std::shared_ptr<ComponentSystem::Component> CreateComponentAsSharedPtr(const char* className)
+	{
+		auto* componentManager = Core::CoreSystem::GetComponentManager();
+		if (componentManager)
+		{
+			ComponentSystem::Component* component = componentManager->CreateComponentByName(className);
+			if (component)
+			{
+				if (auto sp = componentManager->GetSharedPtr(component))
+					return sp;
+				return std::shared_ptr<ComponentSystem::Component>(component);
+			}
+		}
+		// Fallback: class was registered via REFL_DEFINE_OBJECT but not in ComponentManager's string factory.
+		CReflectedBase* rawObj = ClassFactory::CreateObject(className);
+		if (rawObj)
+		{
+			if (auto* comp = dynamic_cast<ComponentSystem::Component*>(rawObj))
+				return std::shared_ptr<ComponentSystem::Component>(comp);
+			delete rawObj;
 		}
 		ReflectionDebug.print("Failed to create component: " + std::string(className) + "\n");
 		return nullptr;
