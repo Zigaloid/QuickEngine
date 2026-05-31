@@ -1,6 +1,7 @@
 #include "PhysicsComponent.h"
 #include "Reflection/Reflection.h"
 #include "PhysicsComponent.h"
+
 #include "Math/Quaternion.h"
 
 REFL_DEFINE_OBJECT(CPhysicsComponent)
@@ -11,18 +12,19 @@ REFL_DEFINE_END
 
 bool CPhysicsComponent::CreateBodyAtTransform(PhysicsManager* physics)
 {
-	if (!m_parentTransform)
+
+	if (!m_transformComponent.Get(this))
 		return false;
 
-	m_cachedScale = Matrix4f::Scale(m_parentTransform->ExtractScale());
+	m_cachedScale = Matrix4f::Scale(m_transformComponent.Get()->GetTransform().ExtractScale());
 
 	if (m_bodyId.IsInvalid())
 		InitializeShape(m_cachedScale);
 
 	// Strip scale so SetWorldTransform receives a clean rotation+translation matrix.
-	Vector3f scale = m_parentTransform->ExtractScale();
+	Vector3f scale = m_transformComponent.Get()->GetTransform().ExtractScale();
 	Vector3f invScale(1.0f / scale.GetX(), 1.0f / scale.GetY(), 1.0f / scale.GetZ());
-	Matrix4f worldNoScale = *m_parentTransform * Matrix4f::Scale(invScale);
+	Matrix4f worldNoScale = m_transformComponent.Get()->GetTransform() * Matrix4f::Scale(invScale);
 
 	return CreateBody(worldNoScale, physics);
 }

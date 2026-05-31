@@ -864,91 +864,156 @@ namespace ComponentSystem {
 
 	inline ComponentId Component::m_nextId = 1;
 
-	// ── CachedComponentRef ────────────────────────────────────────────────────────
+	// ── CComponentReference ───────────────────────────────────────────────────────
+	/** @brief Defines the search/resolution modes for CComponentReference. */
+	enum EComponentResolutionMode {
+		FIRST_SIBLING,
+		FIRST_DECENDENT,
+		FIRST_IN_HIERARCHY,
+		FIRST_ROOT_SIBLING
+	};
 
-	/** @brief Retains a weak reference to a sibling/child Component of type T.
-	 *
-	 *  On the first call to Get(), the supplied acquire function is invoked to locate
-	 *  the component and the result is cached as a weak_ptr.  Subsequent calls simply
-	 *  lock the weak_ptr.  If the referenced component is ever released back to its
-	 *  pool (and the weak_ptr expires), the next call transparently re-acquires it.
-	 *
-	 *  Usage:
-	 *  @code
-	 *    // Member:
-	 *    CachedComponentRef<CPhysicsBodyComponent> m_physicsBodyRef;
-	 *
-	 *    // In OnUpdate:
-	 *    auto physBody = m_physicsBodyRef.Get([&]() {
-	 *        return GetParent() ? GetParent()->FindChild<CPhysicsBodyComponent>() : nullptr;
-	 *    });
-	 *    if (!physBody) return;
-	 *  @endcode
+	/** @brief Finds and retains a pointer to a component in the component hierarchy.
+	 *  An instance of this class can be added to any component and it will resolve
+	 *  the component's pointer when Get() is called on it. Once resolved, it will
+	 *  retain that pointer and return it on subsequent calls.
 	 */
 	template<typename T>
-	class CachedComponentRef {
-		std::weak_ptr<T> m_weak;
-		T* m_rawFallback = nullptr; // used when the component is not pool-managed
+	class CComponentReference {
+		static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
+
+	private:
+		EComponentResolutionMode m_mode;
+		mutable T* m_resolvedPtr = nullptr;
+		mutable bool m_resolved = false;
 
 	public:
-		/** @brief Returns a shared_ptr to the cached component.
-		 *  @param acquireFn  Called once when the cache is empty or has expired.
-		 *                    May return nullptr if the component is not yet available. */
-		std::shared_ptr<T> Get(std::function<T*()> acquireFn = nullptr)
+		explicit CComponentReference(EComponentResolutionMode mode)
+			: m_mode(mode)
+			, m_resolvedPtr(nullptr)
+			, m_resolved(false)
 		{
-			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
-
-			// Fast path: pool-managed component, weak_ptr still alive.
-			if (auto ptr = m_weak.lock())
-				return ptr;
-
-			// Fast path: non-pool-managed component, raw pointer already cached.
-			if (m_rawFallback)
-				return std::shared_ptr<T>(m_rawFallback, [](T*) {});
-
-			// Cache miss — run the acquire function.
-			if (!acquireFn) return nullptr;
-			T* raw = acquireFn();
-			if (!raw) return nullptr;
-
-			// Try to back the cache with the pool's shared_ptr so expiry is detectable.
-			if (auto* manager = Core::CoreSystem::GetComponentManager())
-			{
-				if (auto sp = std::dynamic_pointer_cast<T>(manager->GetSharedPtr(raw)))
-				{
-					m_weak = sp;
-					return sp;
-				}
-			}
-
-			// Component is not pool-managed: cache the raw pointer and return a
-			// non-owning alias. Lifetime is guaranteed by the component hierarchy.
-			m_rawFallback = raw;
-			return std::shared_ptr<T>(raw, [](T*) {});
 		}
 
-		/** @brief Manually caches an already-located component pointer. */
-		void Set(T* raw)
+		~CComponentReference() = default;
+
+		// Support standard copy and move operations
+		CComponentReference(const CComponentReference&) = default;
+		CComponentReference& operator=(const CComponentReference&) = default;
+		CComponentReference(CComponentReference&&) noexcept = default;
+		CComponentReference& operator=(CComponentReference&&) noexcept = default;
+
+		/** @brief Resolves (if not already resolved) and returns the component pointer.
+		 *  @param owner The component calling this get, used as the starting search context. */
+		T* Get(const Component* owner) const
 		{
-			static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
-			Reset();
-			if (!raw) return;
-			if (auto* manager = Core::CoreSystem::GetComponentManager())
+			if (m_resolved)
 			{
-				if (auto sp = std::dynamic_pointer_cast<T>(manager->GetSharedPtr(raw)))
-				{
-					m_weak = sp;
-					return;
-				}
+				return m_resolvedPtr;
 			}
-			m_rawFallback = raw;
+
+			if (!owner)
+			{
+				return nullptr;
+			}
+
+			m_resolvedPtr = Resolve(owner);
+			m_resolved = true;
+			return m_resolvedPtr;
 		}
 
-		/** @brief Returns true if the cached reference is still alive. */
-		bool IsValid() const { return !m_weak.expired() || m_rawFallback != nullptr; }
+		/** @brief Overload that returns the cached resolved pointer (or nullptr if not resolved). */
+		T* Get()
+		{
+			return m_resolvedPtr;
+		}
 
-		/** @brief Clears the cached reference. */
-		void Reset() { m_weak.reset(); m_rawFallback = nullptr; }
+		/** @brief Clears the cached pointer, forcing re-resolution on next Get. */
+		void Reset() const
+		{
+			m_resolvedPtr = nullptr;
+			m_resolved = false;
+		}
+
+		/** @brief Manually sets/overrides the resolved component pointer. */
+		void Set(T* ptr)
+		{
+			m_resolvedPtr = ptr;
+			m_resolved = true;
+		}
+
+		/** @brief Checks whether the reference has already been successfully resolved. */
+		bool IsResolved() const
+		{
+			return m_resolved;
+		}
+
+		/** @brief Returns preferred resolution mode. */
+		EComponentResolutionMode GetResolutionMode() const
+		{
+			return m_mode;
+		}
+
+	private:
+		T* Resolve(const Component* owner) const
+		{
+			switch (m_mode)
+			{
+			case FIRST_SIBLING:
+			{
+				return owner->FindSibling<T>();
+			}
+			case FIRST_DECENDENT:
+			{
+				return owner->FindDescendant<T>();
+			}
+			case FIRST_IN_HIERARCHY:
+			{
+				// Walk up to find the root of the hierarchy
+				const Component* root = owner;
+				while (root->GetParent() != nullptr)
+				{
+					root = root->GetParent();
+				}
+
+				// Check root itself
+				if (auto* typedRoot = dynamic_cast<const T*>(root))
+				{
+					return const_cast<T*>(typedRoot);
+				}
+
+				// Search descendants of the root
+				return root->FindDescendant<T>();
+			}
+			case FIRST_ROOT_SIBLING:
+			{
+				// Walk up to find the topmost ancestor (root)
+				const Component* root = owner;
+				while (root->GetParent() != nullptr)
+				{
+					root = root->GetParent();
+				}
+
+				// Check if root itself matches the target type
+				if (auto* typedRoot = dynamic_cast<const T*>(root))
+				{
+					return const_cast<T*>(typedRoot);
+				}
+
+				// Look at the root's direct children (siblings at root level)
+				for (const auto& child : root->GetChildren())
+				{
+					if (auto* typedChild = dynamic_cast<T*>(child))
+					{
+						return typedChild;
+					}
+				}
+				return nullptr;
+			}
+			default:
+				return nullptr;
+			}
+		}
 	};
 
 } // namespace ComponentSystem

@@ -26,8 +26,8 @@ REFL_DEFINE_END
 
 bool CHeightFieldPhysicsComponent::OnInitialize()
 {
-    DECLARE_FUNC_VLOW();
-    CacheParentTransform();
+    DECLARE_FUNC_VLOW();    
+    m_transformComponent.Get(this);
     return true;
 }
 
@@ -39,13 +39,13 @@ void CHeightFieldPhysicsComponent::OnUpdate(double deltaTime)
 
     if (!m_bodyInitialized)
     {
-        if (physics && physics->IsInitialized() && IsMeshLoaded() && m_parentTransform)
+        if (physics && physics->IsInitialized() && IsMeshLoaded() && m_transformComponent.Get())
         {
             m_bodyInitialized = CreateBodyAtTransform(physics);
         }
     }
 
-    if (m_bodyInitialized && m_parentTransform && physics && physics->IsInitialized() && !m_bodyId.IsInvalid())
+    if (m_bodyInitialized && m_transformComponent.Get() && physics && physics->IsInitialized() && !m_bodyId.IsInvalid())
     {
         Matrix4f world = ComputeWorldTransform();
         ApplyTransformToParent(world);

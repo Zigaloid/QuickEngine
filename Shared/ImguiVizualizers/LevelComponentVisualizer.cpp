@@ -9,6 +9,8 @@
 #include "LightManagerComponent.h"
 #include "DeleteEntityCommand.h"
 #include "NavMesh/NavMeshDebugDraw.h"
+#include "NavMesh/NavMeshBuilder.h"
+#include "NavigationResource.h"
 #include <imgui-docking/imgui_internal.h>
 #include <bx/bounds.h>
 #include <algorithm>
@@ -18,6 +20,36 @@
 
 // Undefine Windows GDI macro that conflicts with our GetObject() method
 #undef GetObject
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+/// Derives the .lvl.nav.bin path from a .lvl.obj.json level path.
+static std::string NavPathForLevel(const std::string& levelPath)
+{
+	constexpr std::string_view kObjJson = ".obj.json";
+	if (levelPath.size() > kObjJson.size() &&
+		levelPath.compare(levelPath.size() - kObjJson.size(), kObjJson.size(), kObjJson) == 0)
+	{
+		return levelPath.substr(0, levelPath.size() - kObjJson.size()) + ".nav.bin";
+	}
+	return levelPath + ".nav.bin";
+}
+
+/// Saves the built nav mesh to disk and wires the level's resource reference.
+static bool SaveNavMeshForLevel(NavMesh::NavMeshBuilder& builder,
+								CLevelComponent*         level,
+								const std::string&       levelPath)
+{
+	if (!builder.IsBuilt() || !level || levelPath.empty())
+		return false;
+
+	const std::string navPath = NavPathForLevel(levelPath);
+	if (!builder.SaveToFile(navPath))
+		return false;
+
+	level->GetNavMeshResource().SetFromAbsolutePath(navPath);
+	return true;
+}
 
 namespace ImGuiVisualizers {
 
@@ -69,11 +101,25 @@ namespace ImGuiVisualizers {
 			m_selectionManager.RenderSelectionGizmo(Get3DView().GetFrameBuffer(), m_gizmoMode, 2.0f);
 
 			// NavMesh debug overlay
-			if (m_showNavMesh && m_navMeshBuilder.IsBuilt())
-				NavMesh::NavMeshDebugDraw::Draw(viewId, prims, m_navMeshBuilder.GetPolyMesh());
+			if (m_showNavMesh)
+			{
+				if (m_navMeshBuilder.IsBuilt())
+					NavMesh::NavMeshDebugDraw::Draw(viewId, prims, m_navMeshBuilder.GetPolyMesh());
+				else if (const dtNavMesh* loaded = m_levelComp->GetNavMesh())
+					NavMesh::NavMeshDebugDraw::Draw(viewId, prims, loaded);
+			}
 		});
 
 		RegisterRenderComponents(m_levelComp);
+
+		// Restore nav overlay state from a previously loaded nav resource
+		if (!m_navMeshBuilder.IsBuilt())
+		{
+			const dtNavMesh* loaded = m_levelComp->GetNavMesh();
+			m_showNavMesh = (loaded != nullptr);
+			if (loaded)
+				m_navBuildStatus = "Loaded from file";
+		}
 
 		// Initialize the layers panel with the level component
 		m_layersPanel.SetLevelComponent(m_levelComp);
@@ -157,8 +203,12 @@ namespace ImGuiVisualizers {
 			.path = "File.Save",
 			.description = "Save the current level.",
 			.targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
-			.callback = [this]() 
-			{ 				
+			.callback = [this]()
+			{
+				// Persist nav mesh alongside the level if one has been built
+				if (m_navMeshBuilder.IsBuilt())
+					SaveNavMeshForLevel(m_navMeshBuilder, m_levelComp, m_editor.GetFilePath());
+
 				m_editor.Save();
 				NEXUS_SEND_MESSAGE(GAME_PIPE, MSG_TYPE_CONSOLE_COMMAND, "Level_Reload");
 			},
@@ -178,7 +228,11 @@ namespace ImGuiVisualizers {
 				m_navBuildStatus = ok
 					? ("Built: " + std::to_string(m_navMeshBuilder.PolyCount()) + " polys")
 					: ("Failed: " + m_navMeshBuilder.GetLastError());
-				if (ok) m_showNavMesh = true;
+				if (ok)
+				{
+					m_showNavMesh = true;
+					SaveNavMeshForLevel(m_navMeshBuilder, m_levelComp, m_editor.GetFilePath());
+				}
 			},
 			.isEnabled = [this]() { return m_levelComp != nullptr; },
 			.sortPriority = 100
@@ -788,7 +842,10 @@ namespace ImGuiVisualizers {
 				? ("Built: " + std::to_string(m_navMeshBuilder.PolyCount()) + " polys")
 				: ("Failed: " + m_navMeshBuilder.GetLastError());
 			if (ok)
+			{
 				m_showNavMesh = true;
+				SaveNavMeshForLevel(m_navMeshBuilder, m_levelComp, m_editor.GetFilePath());
+			}
 		}
 
 		if (!m_navBuildStatus.empty())
@@ -800,7 +857,7 @@ namespace ImGuiVisualizers {
 			ImGui::TextColored(statusColor, "%s", m_navBuildStatus.c_str());
 		}
 
-		if (m_navMeshBuilder.IsBuilt())
+		if (m_navMeshBuilder.IsBuilt() || m_levelComp->GetNavMesh())
 		{
 			ImGui::Checkbox("Show NavMesh Overlay", &m_showNavMesh);
 

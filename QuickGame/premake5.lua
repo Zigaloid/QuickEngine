@@ -27,7 +27,12 @@ externalproject "jolt"
    location "../External/JoltPhysics-master/Build/VS2022_CL"  
    kind "StaticLib"
    language "C++"   
-      
+
+externalproject "detour"
+   location "../External/recastnavigation-main/RecastDemo/Build/vs2022"  
+   kind "StaticLib"
+   language "C++"
+   
 project "Game"  
    kind "ConsoleApp"
    language "C"
@@ -77,7 +82,7 @@ project "Game"
 	includedirs { "../Shared/Physics" } 
 	includedirs { "../Shared/bgfx_common" }   
 	includedirs { "../Shared/utils/" }
-
+	includedirs { "../External/recastnavigation-main/Detour/Include" }  
 	includedirs { "../External/imgui-docking" }   	
 	includedirs { "../External/bx/include/compat/msvc" }   
 	includedirs { "../External/OpenGL/Include" }  
@@ -90,6 +95,7 @@ project "Game"
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.h" }
 	files { "../External/imgui-docking/imgui.cpp" }
 	files { "../External/imgui-docking/backends/imgui_impl_opengl3.cpp" }
+	files { "../External/imgui-docking/backends/imgui_impl_win32.cpp" }
 	files { "../External/imgui-docking/imgui_tables.cpp" }
 	files { "../External/imgui-docking/imgui_Widgets.cpp" }
 	files { "../External/imgui-docking/imgui_draw.cpp" }
@@ -127,7 +133,8 @@ project "Game"
 	  links { "BGFX" }
 	  links { "bimg" }
 	  links { "bx" }
-	  links { "jolt" }
+	  links { "jolt" }	
+	  links { "detour" }
 	  staticruntime "on" -- Use /MT
 	  links { "bimg_decode" }
 	  
@@ -139,5 +146,6 @@ project "Game"
 	  links { "bimg" }
 	  links { "bx" }
 	  links { "jolt" }
+	  links { "detour" }
 	  staticruntime "on" -- Use /MTd
 	  links { "bimg_decode" }

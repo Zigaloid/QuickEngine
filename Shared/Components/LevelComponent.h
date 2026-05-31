@@ -3,9 +3,11 @@
 #include "ResourceManager/ResourceManager.h"
 #include "MaterialResource.h"
 #include "ComponentResource.h"
+#include "NavigationResource.h"
 
 class CShaderResource;
 class CMeshResource;
+struct dtNavMesh;
 
 class CLevelComponent : public ComponentSystem::Component
 {
@@ -30,8 +32,17 @@ public:
 	bool IsVisibleInEditor() const { return m_visibleInEditor; }
 	void SetVisibleInEditor(bool v) { m_visibleInEditor = v; }
 
+	// ── Navigation ──────────────────────────────────────────────────────
+
+	CNavigationResourceReference&       GetNavMeshResource()       { return m_navMeshResource; }
+	const CNavigationResourceReference& GetNavMeshResource() const { return m_navMeshResource; }
+
+	/// Returns the runtime dtNavMesh if loaded, or nullptr.
+	const dtNavMesh* GetNavMesh() const;
+
 private:
 	std::string m_name;
-	bool m_visibleInEditor = true;
+	bool        m_visibleInEditor = true;
 
+	CNavigationResourceReference m_navMeshResource;
 };

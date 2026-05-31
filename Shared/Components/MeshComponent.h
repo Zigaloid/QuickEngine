@@ -3,10 +3,9 @@
 #include "ResourceManager/ResourceManager.h"
 #include "StaticMeshResource.h"
 #include "Math/Matrix4f.h"
+#include "TransformComponent.h"
 
 // Forward-declare to avoid pulling in the full physics header here.
-class CPhysicsBodyComponent;
-class CTransformComponent;
 class CLightManagerComponent;
 
 class CRenderComponent : public ComponentSystem::Component
@@ -32,13 +31,10 @@ public:
 private:
 	std::shared_ptr<Matrix4f> m_transformPtr;
 	std::shared_ptr<Vector4f> m_boundingSpherePtr;
-	Vector4f m_boundingSphere;
-	CTransformComponent* m_parentTransform = nullptr;
-	bool m_physicsTransformInitialized = false;
-protected:
-	Matrix4f m_scale;
-	/** @brief Cached weak reference to the sibling physics body — resolved once on first use. */
-	ComponentSystem::CachedComponentRef<CPhysicsBodyComponent> m_physicsBodyRef;
+	Vector4f m_boundingSphere;	
+protected:	
+	ComponentSystem::CComponentReference<CTransformComponent> m_transformComponent{ ComponentSystem::FIRST_SIBLING };
+
 };
 
 class CDebugRenderComponent : public CRenderComponent

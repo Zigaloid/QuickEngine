@@ -473,6 +473,10 @@
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="QuickEdit.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\NavigationResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ComponentSystem\ComponentSystem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -775,5 +779,9 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
+    <ClCompile Include="..\Shared\NavMesh\NavMeshSerializer.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\NavigationResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

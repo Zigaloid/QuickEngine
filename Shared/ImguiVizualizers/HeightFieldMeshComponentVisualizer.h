@@ -88,7 +88,7 @@ namespace ImGuiVisualizers {
         void RegisterHeightFieldActions();
         void RegenerateGridMesh();
 
-        // Helper to create a relative asset path from an absolute path
+        // Helper to create a relative asset path from an absolute path (delegates to CResourceReference::MakeAssetPath)
         std::string MakeAssetPath(const std::string& absolutePath) const;
     };
 

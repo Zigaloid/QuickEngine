@@ -27,7 +27,7 @@ public:
 
     bool OnInitialize() override
     {
-        CacheParentTransform();
+        m_transformComponent.Get(this);
 
         PhysicsManager* physics = PhysicsManager::Get();
         if (physics && physics->IsInitialized())
@@ -45,12 +45,12 @@ public:
         // Attempt deferred initialization
         if (!m_bodyInitialized)
         {
-            if (physics && physics->IsInitialized() && m_parentTransform)
+            if (physics && physics->IsInitialized() && m_transformComponent.Get() )
                 m_bodyInitialized = CreateBodyAtTransform(physics);
         }
 
         // Sync simulation pose back to the owning transform
-        if (m_bodyInitialized && m_parentTransform && physics && physics->IsInitialized() && !m_bodyId.IsInvalid())
+        if (m_bodyInitialized && m_transformComponent.Get() && physics && physics->IsInitialized() && !m_bodyId.IsInvalid())
         {
             Matrix4f world = ComputeWorldTransform();
             ApplyTransformToParent(world);
@@ -70,7 +70,7 @@ public:
 
         m_bodyId = JPH::BodyID();
         m_bodyInitialized = false;
-        m_parentTransform = nullptr;
+        m_transformComponent.Reset();
         Component::OnShutdown();
     }
 
@@ -122,8 +122,8 @@ protected:
 	// Override to add extra behaviour (e.g. skip static bodies).
 	virtual void ApplyTransformToParent(const Matrix4f& worldTransform)
 	{
-		if (m_parentTransform)
-			*m_parentTransform = worldTransform * m_cachedScale;
+		if (m_transformComponent.Get() )
+			m_transformComponent.Get()->GetTransform() = worldTransform * m_cachedScale;
 	}
 
     // Helper: compute world transform from the physics body.
@@ -146,22 +146,13 @@ protected:
         return result;
     }
 
-    void CacheParentTransform()
-    {
-        auto* parent = GetParent();
-        if (parent)
-        {
-            CTransformComponent* parentTransform = parent->FindActiveChild<CTransformComponent>();
-            if (parentTransform)
-                m_parentTransform = &parentTransform->GetTransform();
-        }
-    }
 
 protected:
+    ComponentSystem::CComponentReference<CTransformComponent> m_transformComponent{ ComponentSystem::FIRST_SIBLING };
+
 	Matrix4f m_objectMatrix;
 	// Runtime state shared by physics-based components
-	JPH::BodyID    m_bodyId          = JPH::BodyID();
-	Matrix4f*      m_parentTransform = nullptr;
+	JPH::BodyID    m_bodyId          = JPH::BodyID();	
 	bool           m_bodyInitialized = false;
 	JPH::ShapeRefC m_shape;
 	Matrix4f       m_cachedScale;

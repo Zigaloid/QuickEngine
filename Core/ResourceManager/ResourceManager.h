@@ -509,6 +509,35 @@ public:
 	{
 		m_resourceFileName = fileName;
 	}
+
+	/// Converts an absolute file path to a project-relative asset path of
+	/// the form "./assets/...". Returns the original path unchanged if the
+	/// "/assets/" marker cannot be found.
+	static std::string MakeAssetPath(const std::string& absolutePath)
+	{
+		std::string normalized = absolutePath;
+		for (auto& c : normalized)
+		{
+			if (c == '\\') c = '/';
+			c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+		}
+
+		const std::string_view kMarker = "/assets/";
+		const size_t pos = normalized.find(kMarker);
+		if (pos == std::string::npos)
+			return absolutePath;
+
+		return "." + normalized.substr(pos);
+	}
+
+	/// Convenience: converts @p absolutePath to an asset-relative path via
+	/// MakeAssetPath(), sets it as the resource file name, and triggers
+	/// OnLoaded() so the resource manager begins loading immediately.
+	void SetFromAbsolutePath(const std::string& absolutePath)
+	{
+		SetResourceFileName(MakeAssetPath(absolutePath));
+		OnLoaded();
+	}
 	
 	virtual std::string GetReourceTypeName() const
 	{

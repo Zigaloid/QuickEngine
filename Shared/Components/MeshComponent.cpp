@@ -35,18 +35,17 @@ REFL_DEFINE_END
 bool CRenderComponent::OnInitialize()
 {
 	static Matrix4f identity = Matrix4f::GetIdentity();
-	m_parentTransform = FindParentTransform(this);
-	if (!m_parentTransform)
+
+	if( m_transformComponent.Get(this) )
 	{
-		m_transformPtr = std::shared_ptr<Matrix4f>(&identity, [](Matrix4f*) {});
+		m_transformPtr = std::shared_ptr<Matrix4f>(&m_transformComponent.Get()->GetTransform(), [](Matrix4f*) {});
 	}
 	else
 	{
-		m_transformPtr = std::shared_ptr<Matrix4f>(&m_parentTransform->GetTransform(), [](Matrix4f*) {});	
+		m_transformPtr = std::shared_ptr<Matrix4f>(&identity, [](Matrix4f*) {});
 	}
 	m_boundingSphere = Vector4f(0.0f, 0.0f, 0.0f, 1.0f);
 	
-
 	return true;
 }
 
@@ -55,9 +54,7 @@ void CRenderComponent::OnUpdate(double /*deltaTime*/)
 }
 
 void CRenderComponent::OnShutdown()
-{
-	m_physicsBodyRef.Reset();
-	m_physicsTransformInitialized = false;
+{	
 	Component::OnShutdown();
 }
 
@@ -251,27 +248,6 @@ void CMeshComponent::Render(bgfx::ViewId viewId)
 					mesh->submit(&statePtr, 1, modelMatrix->GetData().data(), 1);
 			}
 		}
-
-		// Render the physics body if available (for debugging)
-		Component* parent = GetParent();
-		if (!parent)
-			return;
-#ifdef PHYSICS_DEBUG_RENDER
-		auto physBody = m_physicsBodyRef.Get();
-		if (physBody)
-		{
-			auto res = physBody->GetBodyResource();
-			if (res)
-			{
-				Matrix4f physMatrix = physBody->GetWorldTransform();
-				physMatrix = physMatrix * m_scale;
-				Matrix4f matrix = res->GetTransform();
-				Vector3f resScale = matrix.ExtractScale();
-				matrix = physMatrix * matrix;
-				physBody->DebugRender(0, matrix);
-			}
-		}
-#endif
 	}
 }
 

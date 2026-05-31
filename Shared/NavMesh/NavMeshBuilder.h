@@ -80,6 +80,14 @@ public:
 
     const std::string& GetLastError() const { return m_lastError; }
 
+    /// Serialise the built dtNavMesh tile data to a binary file.
+    /// @returns true on success.  IsBuilt() must be true.
+    bool SaveToFile(const std::string& path);
+
+    /// Deserialise a previously saved .Nav.bin file and restore m_navMesh.
+    /// Does NOT restore rcPolyMesh / rcPolyMeshDetail (editor-only data).
+    bool LoadFromFile(const std::string& path);
+
 private:
     /// Walk the level hierarchy and collect world-space triangles from every
     /// CHeightFieldPhysicsComponent.  Returns false when no geometry is found.

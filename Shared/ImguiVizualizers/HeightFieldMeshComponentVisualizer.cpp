@@ -1169,53 +1169,6 @@ namespace ImGuiVisualizers {
 
     std::string HeightFieldMeshComponentVisualizer::MakeAssetPath(const std::string& absolutePath) const
     {
-        // Get the working directory from AppConfig
-        const Core::AppConfig& config = Core::AppConfig::Instance();
-
-        // Normalize path separators to forward slashes and convert to lowercase
-        std::string normalized = absolutePath;
-        for (auto& c : normalized)
-        {
-            if (c == '\\') c = '/';
-            c = std::tolower(static_cast<unsigned char>(c));
-        }
-
-        // Find the /assets/ substring
-        const std::string assetsMarker = "/assets/";
-        size_t assetsPos = normalized.find(assetsMarker);
-
-        if (assetsPos != std::string::npos)
-        {
-            // Extract from /assets/ onwards (including the /assets/ part)
-            // Use original path to preserve casing
-            size_t originalAssetsPos = absolutePath.find("assets");
-            if (originalAssetsPos != std::string::npos)
-            {
-                // Find the slash before "assets"
-                while (originalAssetsPos > 0 && absolutePath[originalAssetsPos - 1] != '/' && absolutePath[originalAssetsPos - 1] != '\\')
-                {
-                    originalAssetsPos--;
-                }
-            }
-
-            std::string assetPath = originalAssetsPos != std::string::npos
-                ? absolutePath.substr(originalAssetsPos)
-                : normalized.substr(assetsPos + 1);
-
-            // Normalize separators in the result
-            for (auto& c : assetPath)
-            {
-                if (c == '\\') c = '/';
-            }
-
-            // Combine with working directory: use relative './' prefix (consistent with other code)
-            std::string result = ".";
-            result += "/" + assetPath;
-
-            return result;
-        }
-
-        // If /assets/ not found, return the original absolute path unchanged
-        return absolutePath;
+        return CResourceReference::MakeAssetPath(absolutePath);
     }
 } // namespace ImGuiVisualizers

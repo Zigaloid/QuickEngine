@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -142,6 +142,7 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
     <ClInclude Include="..\Shared\NavMesh\NavMeshBuilder.h" />
     <ClInclude Include="..\Shared\NavMesh\NavMeshDebugDraw.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\NavigationResource.h" />
     <ClInclude Include="..\Shared\Physics\JoltDebugRenderer.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsManager.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsSystem.h" />
@@ -227,6 +228,7 @@
     <ClInclude Include="..\Shared\utils\ObjMeshConverter.h" />
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
     <ClInclude Include="AssetBrowser.h" />
+    <ClInclude Include="Core\ComponentSystem\ComponentSystem.h" />
     <ClInclude Include="QuickEdit.h" />
   </ItemGroup>
   <ItemGroup>
@@ -291,6 +293,7 @@
     <ClCompile Include="..\Shared\ImguiVizualizers\UnifiedActionManager.cpp" />
     <ClCompile Include="..\Shared\NavMesh\NavMeshBuilder.cpp" />
     <ClCompile Include="..\Shared\NavMesh\NavMeshDebugDraw.cpp" />
+    <ClCompile Include="..\Shared\NavMesh\NavMeshSerializer.cpp" />
     <ClCompile Include="..\Shared\Physics\JoltDebugRenderer.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp" />
@@ -301,6 +304,7 @@
     <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\NavigationResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\bgfx_utils.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\camera.cpp" />

@@ -4,6 +4,7 @@
 #include <cstdint>
 
 struct rcPolyMesh;
+struct dtNavMesh;
 
 namespace Rendering { class BgfxRenderPrimitives; }
 
@@ -24,6 +25,13 @@ struct NavMeshDebugDraw
     static void Draw(bgfx::ViewId viewId,
                      Rendering::BgfxRenderPrimitives& prims,
                      const rcPolyMesh* polyMesh,
+                     uint32_t abgrColor = 0xcc22ee44);
+
+    /// Draw a loaded dtNavMesh as a wireframe overlay.
+    /// Does nothing when @p navMesh is null.
+    static void Draw(bgfx::ViewId viewId,
+                     Rendering::BgfxRenderPrimitives& prims,
+                     const dtNavMesh* navMesh,
                      uint32_t abgrColor = 0xcc22ee44);
 };
 
