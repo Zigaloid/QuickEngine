@@ -1,8 +1,12 @@
+#include "LayersPanel.h"
 #include "imgui.h"
+
 #include <algorithm>
 #include <functional>
-#include "LayersPanel.h"
+
 namespace ImGuiVisualizers {
+
+// ── Render ───────────────────────────────────────────────────────────────────
 
 void LayersPanel::Render()
 {
@@ -76,6 +80,8 @@ void LayersPanel::Render()
     ImGui::EndChild();
 }
 
+// ── Node rendering ───────────────────────────────────────────────────────────
+
 void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
 {
     if (!layer) return;
@@ -148,11 +154,11 @@ void LayersPanel::RenderLayerNode(CLevelComponent* layer, int nodeId)
         }
     }
 
-    // Context menu � bound to an explicit ID so it is not hijacked by the last item (checkbox)
+    // Context menu � bound to an explicit ID so it is not hijacked by the last item (checkbox)
     // Note: we allow opening via both the tree node and the label above.
     ImGui::SameLine();
 
-    // Visibility toggle (eye icon) � editor-only visibility separate from component active state
+    // Visibility toggle (eye icon) � editor-only visibility separate from component active state
     bool isVisible = layer->IsVisibleInEditor();
     if (ImGui::Checkbox(("##Visible" + std::to_string(nodeId)).c_str(), &isVisible))
     {
@@ -270,6 +276,8 @@ void LayersPanel::RenderEntityNode(CEntityComponent* entity, int nodeId)
     ImGui::PopID();
 }
 
+// ── Selection ────────────────────────────────────────────────────────────────
+
 void LayersPanel::SelectEntity(CEntityComponent* entity, bool additive)
 {
     if (!entity || !m_selectionManager) return;
@@ -306,6 +314,8 @@ void LayersPanel::SelectAllEntitiesInLayer(CLevelComponent* layer)
             SelectEntity(entity, /*additive=*/true);
     }
 }
+
+// ── Layer management ─────────────────────────────────────────────────────────
 
 void LayersPanel::CreateNewLayer(CLevelComponent* parent)
 {
@@ -354,6 +364,8 @@ void LayersPanel::DeleteLayer(CLevelComponent* layer)
         parent->RemoveChild(layer);
     }
 }
+
+// ── Renaming ─────────────────────────────────────────────────────────────────
 
 void LayersPanel::StartRenaming(CLevelComponent* layer)
 {

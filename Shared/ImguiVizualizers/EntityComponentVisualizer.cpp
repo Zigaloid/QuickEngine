@@ -1,16 +1,18 @@
 #include "EntityComponentVisualizer.h"
-#include "CoreSystem/CoreSystem.h"
-#include <bx/bounds.h>
-#include <algorithm>
-#include <cfloat>
 
-// include physics body header to detect and call DebugRender
+#include "CoreSystem/CoreSystem.h"
 #include "PhysicsBodyComponent.h"
 #include "CharacterComponent.h"
 #include "PhysicsBodySelectable.h"
 #include "PhysicsComponentSelectable.h"
 
+#include <bx/bounds.h>
+#include <algorithm>
+#include <cfloat>
+
 namespace ImGuiVisualizers {
+
+// ── Entity lifecycle ─────────────────────────────────────────────────────────
 
 bool EntityComponentVisualizer::AttachMeshFromPath(const std::string& entityPath)
 {
@@ -70,6 +72,8 @@ void EntityComponentVisualizer::ReleaseEntityComponent()
         m_entityComp = nullptr;
     }
 }
+
+// ── Action registration ──────────────────────────────────────────────────────
 
 void EntityComponentVisualizer::RegisterEntityActions()
 {
@@ -131,11 +135,13 @@ void EntityComponentVisualizer::RegisterEntityActions()
         });
 }
 
+// ── Physics components ───────────────────────────────────────────────────────
+
 void EntityComponentVisualizer::SavePhysicsBodyResources()
 {
     if (!m_entityComp) return;
 
-    // Only save CPhysicsBodyComponent resources � character components have no file-backed resource.
+    // Only save CPhysicsBodyComponent resources � character components have no file-backed resource.
     std::vector<CPhysicsComponent*> physComps;
     CollectPhysicsComponents(m_entityComp, physComps);
 
@@ -177,6 +183,8 @@ void EntityComponentVisualizer::CollectPhysicsComponents(ComponentSystem::Compon
         CollectPhysicsComponents(child.get(), out);
     }
 }
+
+// ── Render ───────────────────────────────────────────────────────────────────
 
 void EntityComponentVisualizer::RenderComponentHierarchy(bgfx::ViewId viewId, BgfxRenderPrimitives& prims, ComponentSystem::Component* comp)
 {
@@ -343,11 +351,13 @@ bool EntityComponentVisualizer::Render(bool* isOpen)
 
     // Build window title
     std::string title = m_windowName;
-    if (!m_fileName.empty()) {
+    if (!m_fileName.empty())
+    {
         title += " - " + m_fileName;
     }
 
-    if (!ImGui::Begin(title.c_str(), isOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+    if (!ImGui::Begin(title.c_str(), isOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+    {
         ImGui::End();
         return false;
     }

@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 
 #include "imgui.h"
 #include "Reflection/ReflectionBase.h"
@@ -8,7 +7,6 @@
 #include "ResourceManager/ResourceManager.h"
 #include "PropertyWidgetMap.h"
 #include "PropertyWidgetMapRegistry.h"
-
 #include "ClassFactory/ClassFactory.h"
 
 #include <string>
@@ -146,7 +144,7 @@ namespace ImGuiVisualizers {
 		PropertyDisplayMode m_displayMode;
 
 		// UI state
-		std::unordered_set<std::string> m_ExpandedNodes;
+		std::unordered_set<std::string> m_expandedNodes;
 		bool m_firstRender;
 
 		// Per-property string edit buffers keyed by property address
@@ -154,7 +152,7 @@ namespace ImGuiVisualizers {
 			char data[1024];
 			bool m_isBeingEdited;
 		};
-		std::unordered_map<void*, StringEditBuffer> m_StringBuffers;
+		std::unordered_map<void*, StringEditBuffer> m_stringBuffers;
 
 		// Deferred deletion for components (to avoid modifying vector during iteration)
 		struct PendingComponentDeletion {
@@ -162,7 +160,7 @@ namespace ImGuiVisualizers {
 			CReflectedBase* object;
 			size_t index;
 		};
-		std::vector<PendingComponentDeletion> m_PendingDeletions;
+		std::vector<PendingComponentDeletion> m_pendingDeletions;
 
 		// Inline-edited .obj.json resources keyed by property address
 		std::unordered_map<const void*, std::unique_ptr<CReflectedBase>> m_inlineResources;

@@ -12,6 +12,10 @@
 
 namespace ImGuiVisualizers {
 
+    /**
+     * @brief Editor visualizer for CHeightFieldMeshComponent — provides vertex picking,
+     *        height-brush painting, gizmo-based editing, and undo/redo for height field meshes.
+     */
     class HeightFieldMeshComponentVisualizer : public CombinedObjJson3DVisualizer
     {
     public:

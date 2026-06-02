@@ -1,14 +1,16 @@
 #include "HeightFieldMeshComponentVisualizer.h"
-#include <iostream>
+
 #include "imgui/imgui.h"
+#include "HeightFieldEditCommand.h"
+
+#include <iostream>
 #include <bx/bounds.h>
 #include <algorithm>
 #include <cmath>
 
-#include "HeightFieldEditCommand.h"
-
 namespace ImGuiVisualizers {
 
+// ── Component lifecycle ──────────────────────────────────────────────────────
 
     bool HeightFieldMeshComponentVisualizer::AttachMeshFromPath(const std::string& meshPath)
     {
@@ -68,6 +70,8 @@ namespace ImGuiVisualizers {
         
         m_heightFieldComp = nullptr;        
     }
+// ── Vertex selectables ───────────────────────────────────────────────────────
+
     void HeightFieldMeshComponentVisualizer::RegisterHeightFieldPoints()
     {
         if (!m_heightFieldComp)
@@ -128,6 +132,8 @@ namespace ImGuiVisualizers {
         }
         m_pointSelectables.clear();
     }
+
+// ── Gizmo & normals ──────────────────────────────────────────────────────────
 
     void HeightFieldMeshComponentVisualizer::UpdateHeightFieldFromGizmoDrag()
     {
@@ -266,6 +272,8 @@ namespace ImGuiVisualizers {
             }
         }
     }
+
+// ── Render ───────────────────────────────────────────────────────────────────
 
     void HeightFieldMeshComponentVisualizer::RenderHeightFieldPointSelection(bgfx::ViewId viewId, Rendering::BgfxRenderPrimitives& prims)
     {
@@ -415,11 +423,13 @@ namespace ImGuiVisualizers {
 
         // Build window title
         std::string title = m_windowName;
-        if (!m_fileName.empty()) {
+        if (!m_fileName.empty())
+        {
             title += " - " + m_fileName;
         }
 
-        if (!ImGui::Begin(title.c_str(), isOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse)) {
+        if (!ImGui::Begin(title.c_str(), isOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+        {
             ImGui::End();
             return false;
         }
@@ -651,11 +661,13 @@ namespace ImGuiVisualizers {
         // Right pane (property inspector)
         ImGui::BeginChild("##RightInspector", ImVec2(rightW, 0), false);
 
-        if (!m_editor.IsLoaded()) {
+        if (!m_editor.IsLoaded())
+        {
             ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f),
                 "No height field loaded. Use the Asset Browser to open a .hfield.obj.json file.");
         }
-        else if (m_heightFieldComp) {
+        else if (m_heightFieldComp)
+        {
             // Brush UI
             ImGui::Separator();
             ImGui::Text("Height Brush");
@@ -743,7 +755,8 @@ namespace ImGuiVisualizers {
             m_propertyInspector.SetObject(m_heightFieldComp);
             m_propertyInspector.RenderContent();
         }
-        else {
+        else
+        {
             ImGui::TextColored(ImVec4(0.7f, 0.7f, 0.7f, 1.0f), "Height field component not initialized");
         }
 
@@ -752,6 +765,8 @@ namespace ImGuiVisualizers {
         ImGui::End();
         return true;
     }
+
+// ── Brush ────────────────────────────────────────────────────────────────────
 
     void HeightFieldMeshComponentVisualizer::ApplyBrushAtWorldPosition(const Vector3f& worldPos, float radius, float intensity, bool invert, bool recordInitial)
     {
@@ -878,6 +893,8 @@ namespace ImGuiVisualizers {
         group.m_vbh = bgfx::createVertexBuffer(mem, mesh->m_layout);
     }
 
+// ── Action registration ──────────────────────────────────────────────────────
+
     void HeightFieldMeshComponentVisualizer::RegisterHeightFieldActions()
     {
         auto& am = GetEditor().GetActionManager();
@@ -995,6 +1012,8 @@ namespace ImGuiVisualizers {
             .sortPriority = 15
             });
     }
+
+// ── Mesh regeneration ────────────────────────────────────────────────────────
 
     void HeightFieldMeshComponentVisualizer::RegenerateGridMesh()
     {

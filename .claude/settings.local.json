@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(grep -E \"^d|\\\\.h$|\\\\.cpp$\")",
-      "Bash(powershell *)"
+      "Bash(powershell *)",
+      "Bash(grep -n \"\\) {$\" \"C:/Users/nhill/Documents/GitHub/QuickScope/Shared/ImguiVizualizers/EntityComponentVisualizer.cpp\")",
+      "Bash(grep -n \"\\) {$\" \"C:/Users/nhill/Documents/GitHub/QuickScope/Shared/ImguiVizualizers/HeightFieldMeshComponentVisualizer.cpp\")",
+      "Bash(grep -n \"\\) {$\" \"C:/Users/nhill/Documents/GitHub/QuickScope/Shared/ImguiVizualizers/LevelComponentVisualizer.cpp\")"
     ]
   }
 }

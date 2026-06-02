@@ -11,12 +11,13 @@
 #include "NavMesh/NavMeshDebugDraw.h"
 #include "NavMesh/NavMeshBuilder.h"
 #include "NavigationResource.h"
+#include "Net/NexusClient.h"
+#include "SharedNexusDefines.h"
+
 #include <imgui-docking/imgui_internal.h>
 #include <bx/bounds.h>
 #include <algorithm>
 #include <cfloat>
-#include "Net/NexusClient.h"
-#include "SharedNexusDefines.h"
 
 // Undefine Windows GDI macro that conflicts with our GetObject() method
 #undef GetObject
@@ -683,22 +684,24 @@ namespace ImGuiVisualizers {
 		ImGui::TextColored(ImVec4(0.8f, 0.8f, 1.0f, 1.0f), "Entity Assets");
 		ImGui::Separator();
 
-		if (ImGui::Button("Refresh", ImVec2(-1, 0))) {
+		if (ImGui::Button("Refresh", ImVec2(-1, 0)))
+		{
 			m_entityAssetsNeedRefresh = true;
 		}
 
 		ImGui::Separator();
 
 		// Render list of entity assets
-		if (ImGui::BeginChild("##EntityList", ImVec2(0, 0), false)) {
-			for (const auto& asset : m_entityAssets) {
+		if (ImGui::BeginChild("##EntityList", ImVec2(0, 0), false))
+		{
+			for (const auto& asset : m_entityAssets)
+			{
 				ImGui::PushID(asset.fullPath.c_str());
 
 				ImGui::Selectable(asset.fileName.c_str(), false);
 
-				// Enable drag-and-drop
-				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None)) {
-					// Set payload to carry the entity asset full path
+				if (ImGui::BeginDragDropSource(ImGuiDragDropFlags_None))
+				{
 					ImGui::SetDragDropPayload("ENTITY_ASSET", asset.fullPath.c_str(), asset.fullPath.size() + 1);
 					ImGui::Text("Add: %s", asset.fileName.c_str());
 					ImGui::EndDragDropSource();
@@ -726,9 +729,10 @@ namespace ImGuiVisualizers {
 		auto filesResult = dir->GetFiles();
 		if (!filesResult.IsSuccess()) return;
 
-		for (const auto& info : filesResult.GetValue()) {
-			// Filter for .entity files (or whatever extension you use)
-			if (info.name.ends_with(".entity") || info.name.ends_with(".json")) {
+		for (const auto& info : filesResult.GetValue())
+		{
+			if (info.name.ends_with(".entity") || info.name.ends_with(".json"))
+			{
 				EntityAssetEntry entry;
 				entry.fileName = info.name;
 				entry.fullPath = info.fullPath;
@@ -748,27 +752,27 @@ namespace ImGuiVisualizers {
 		if (!m_levelComp) return;
 
 		// Accept drag-drop payload
-		if (ImGui::BeginDragDropTarget()) {
-			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_ASSET")) {
+		if (ImGui::BeginDragDropTarget())
+		{
+			if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("ENTITY_ASSET"))
+			{
 				const char* entityPath = static_cast<const char*>(payload->Data);
 
-				// Add to the selected layer if one is active, otherwise fall back to the level root
 				CLevelComponent* targetParent = m_layersPanel.GetSelectedLayer();
 				if (!targetParent)
 					targetParent = m_levelComp;
 
-				// Create a new EntityComponent as a child of the target layer
 				CEntityComponent* newEntity = targetParent->CreateChild<CEntityComponent>();
-				if (newEntity) {
-					// Load the entity definition from file using SafeRead
+				if (newEntity)
+				{
 					auto result = newEntity->SafeRead(entityPath);
-					if (result.IsSuccess()) {
+					if (result.IsSuccess())
+					{
 						std::cout << "Successfully added entity from: " << entityPath << std::endl;
-
-						// Register any new render components from the dropped entity
 						RegisterRenderComponents(newEntity);
 					}
-					else {
+					else
+					{
 						std::cerr << "Failed to load entity from: " << entityPath
 							<< " - Error: " << result.GetError().message << std::endl;
 					}
