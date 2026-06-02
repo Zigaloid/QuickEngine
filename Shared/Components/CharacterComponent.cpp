@@ -14,6 +14,7 @@ REGISTER_COMPONENT(CCharacterComponent, "Character", "Physics");
 
 void CCharacterComponent::OnUpdate(double deltaTime)
 {
+    DECLARE_FUNC_MEDIUM();
     // Let the base class sync the physics body position back to the entity transform.
     CPhysicsComponent::OnUpdate(deltaTime);
 

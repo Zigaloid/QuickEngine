@@ -2,6 +2,7 @@
 
 #include "ComponentSystem/ComponentSystem.h"
 #include "Physics/PhysicsManager.h"
+#include "Profiler/Profiler.h"
 #include "TransformComponent.h"
 #include "Math/Matrix4f.h"
 #include "Math/Vector3f.h"
@@ -27,6 +28,7 @@ public:
 
     bool OnInitialize() override
     {
+        DECLARE_FUNC_VLOW();
         m_transformComponent.Get(this);
 
         PhysicsManager* physics = PhysicsManager::Get();
@@ -40,6 +42,7 @@ public:
 
     void OnUpdate(double /*deltaTime*/) override
     {
+        DECLARE_FUNC_MEDIUM();
         PhysicsManager* physics = PhysicsManager::Get();
 
         // Attempt deferred initialization
@@ -59,6 +62,7 @@ public:
 
     void OnShutdown() override
     {
+        DECLARE_FUNC_VLOW();
         m_shape = nullptr;
 
         if (m_bodyId.IsInvalid())

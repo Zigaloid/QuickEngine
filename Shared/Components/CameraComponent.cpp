@@ -3,6 +3,7 @@
 #include "EntityComponent.h"
 #include "Math/Vector3f.h"
 #include <bx/math.h>
+#include "Profiler/Profiler.h"
 
 REFL_DEFINE_OBJECT(CCameraComponent)
 REFL_DEFINE_END
@@ -11,11 +12,13 @@ REGISTER_COMPONENT(CCameraComponent, "Camera", "Rendering");
 
 bool CCameraComponent::OnInitialize()
 {
+    DECLARE_FUNC_VLOW();
     return true;
 }
 
 void CCameraComponent::OnUpdate(double /*deltaTime*/)
 {
+    DECLARE_FUNC_MEDIUM();
     // Get parent component
     ComponentSystem::Component* parent = GetParent();
     if (!parent)

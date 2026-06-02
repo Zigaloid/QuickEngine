@@ -13,10 +13,6 @@ public:
 
 	// ── IComponent lifecycle ────────────────────────────────────────────
 
-	bool OnInitialize() override;
-	void OnUpdate(double deltaTime) override;
-	void OnShutdown() override;
-
 	bool IsLoaded() const;
 	Matrix4f &GetTransform() { return m_matrix; }
 private:

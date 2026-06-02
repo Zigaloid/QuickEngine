@@ -8,17 +8,20 @@ REFL_DEFINE_END
 
 bool CLightManagerComponent::OnInitialize()
 {
+    DECLARE_FUNC_VLOW();
     RefreshFromScene();
     return true;
 }
 
 void CLightManagerComponent::OnUpdate(double /*deltaTime*/)
 {
+    DECLARE_FUNC_MEDIUM();
     RefreshFromScene();
 }
 
 void CLightManagerComponent::OnShutdown()
 {
+    DECLARE_FUNC_VLOW();
     m_primaryLight = nullptr;
     Component::OnShutdown();
 }

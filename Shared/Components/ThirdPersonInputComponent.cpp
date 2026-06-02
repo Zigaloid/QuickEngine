@@ -1,6 +1,7 @@
 ﻿#include "ThirdPersonInputComponent.h"
 #include "PhysicsBodyComponent.h"
 #include "CharacterComponent.h"
+#include "Profiler/Profiler.h"
 #include "CameraComponent.h"
 #include "EntityComponent.h"
 #include "Input/InputActionManager.h"
@@ -33,6 +34,7 @@ CThirdPersonInputComponent::~CThirdPersonInputComponent()
 
 bool CThirdPersonInputComponent::OnInitialize()
 {
+    DECLARE_FUNC_VLOW();
     m_character = FindSibling<CCharacterComponent>();
     m_camera = FindSibling<CCameraComponent>();
 
@@ -50,6 +52,7 @@ bool CThirdPersonInputComponent::OnInitialize()
 
 void CThirdPersonInputComponent::OnUpdate(double deltaTime)
 {
+    DECLARE_FUNC_MEDIUM();
     if (!m_character)
     {
         // Try again each frame until the sibling character is ready.
@@ -160,6 +163,7 @@ void CThirdPersonInputComponent::OnUpdate(double deltaTime)
 
 void CThirdPersonInputComponent::OnShutdown()
 {
+    DECLARE_FUNC_VLOW();
     Unsubscribe();
     // Pop our context from the action manager if it's still on top
     if (m_actionManager && m_context)

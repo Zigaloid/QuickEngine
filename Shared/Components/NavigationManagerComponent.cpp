@@ -33,6 +33,7 @@ CNavigationManagerComponent::~CNavigationManagerComponent()
  
 bool CNavigationManagerComponent::OnInitialize()
 {
+    DECLARE_FUNC_VLOW();
     // Locate the first CLevelComponent in the hierarchy.
     // Check descendants of the parent first, then walk up.
     RefreshNavMeshQuery();
@@ -41,6 +42,7 @@ bool CNavigationManagerComponent::OnInitialize()
 
 void CNavigationManagerComponent::OnUpdate(double /*deltaTime*/)
 {
+    DECLARE_FUNC_MEDIUM();
     RefreshNavMeshQuery();
     DispatchPendingQueries();
 
@@ -57,6 +59,7 @@ void CNavigationManagerComponent::OnUpdate(double /*deltaTime*/)
 
 void CNavigationManagerComponent::OnShutdown()
 {
+    DECLARE_FUNC_VLOW();
     {
         std::lock_guard<std::mutex> lock(m_queriesMutex);
         m_queries.clear();

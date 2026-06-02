@@ -24,6 +24,7 @@ REFL_DEFINE_END
 
 bool CAIComponent::OnInitialize()
 {
+	DECLARE_FUNC_VLOW();
 	m_CharacterComponent.Get(this);
 	m_NavigationManagerComponent.Get(this);
 
@@ -40,6 +41,7 @@ bool CAIComponent::OnInitialize()
 
 void CAIComponent::OnUpdate(double deltaTime)
 {
+	DECLARE_FUNC_MEDIUM();
 	CCharacterComponent* character = m_CharacterComponent.Get();
 	CNavigationManagerComponent* nav = m_NavigationManagerComponent.Get();
 
@@ -105,6 +107,7 @@ void CAIComponent::OnUpdate(double deltaTime)
 
 void CAIComponent::OnShutdown()
 {
+	DECLARE_FUNC_VLOW();
 	if (auto* nav = m_NavigationManagerComponent.Get())
 		nav->UnregisterQuery(m_navQueryPtr);
 

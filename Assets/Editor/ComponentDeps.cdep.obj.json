@@ -32,32 +32,6 @@
                 {
                     "Value": "ComponentDependencyDefinition",
                     "m_dependent": {
-                        "Value": "CMeshComponent",
-                        "Type": 3,
-                        "Size": 32
-                    },
-                    "m_dependsOn": {
-                        "Value": "CPhysicsBodyComponent",
-                        "Type": 3,
-                        "Size": 32
-                    }
-                },
-                {
-                    "Value": "ComponentDependencyDefinition",
-                    "m_dependent": {
-                        "Value": "CRenderComponent",
-                        "Type": 3,
-                        "Size": 32
-                    },
-                    "m_dependsOn": {
-                        "Value": "CPhysicsBodyComponent",
-                        "Type": 3,
-                        "Size": 32
-                    }
-                },
-                {
-                    "Value": "ComponentDependencyDefinition",
-                    "m_dependent": {
                         "Value": "CPhysicsBodyComponent",
                         "Type": 3,
                         "Size": 32
@@ -175,12 +149,103 @@
                 {
                     "Value": "ComponentDependencyDefinition",
                     "m_dependent": {
-                        "Value": "CTransformComponent",
+                        "Value": "CAIComponent",
                         "Type": 3,
                         "Size": 32
                     },
                     "m_dependsOn": {
-                        "Value": "CCharacterComponent",
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CMeshComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CAIComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CRenderComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CAIComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CDebugRenderComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CAIComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CHeightFieldMeshComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CAIComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CLightComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CPhysicsBodyComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CMeshComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CLightComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CLightManagerComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CLevelComponent",
                         "Type": 3,
                         "Size": 32
                     }
@@ -193,7 +258,59 @@
                         "Size": 32
                     },
                     "m_dependsOn": {
-                        "Value": "CTransformComponent",
+                        "Value": "CLightManagerComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CHeightFieldPhysicsComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CCharacterComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CNavigationManagerComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CCharacterComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CAIComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CNavigationManagerComponent",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "ComponentDependencyDefinition",
+                    "m_dependent": {
+                        "Value": "CAIComponent",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_dependsOn": {
+                        "Value": "CHeightFieldPhysicsComponent",
                         "Type": 3,
                         "Size": 32
                     }

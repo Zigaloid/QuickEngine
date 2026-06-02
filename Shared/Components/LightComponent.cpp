@@ -1,5 +1,6 @@
 #include "LightComponent.h"
 #include "TransformComponent.h"
+#include "Profiler/Profiler.h"
 
 REGISTER_COMPONENT(CLightComponent, "Light", "Graphics");
 
@@ -11,6 +12,7 @@ REFL_DEFINE_END
 
 bool CLightComponent::OnInitialize()
 {
+    DECLARE_FUNC_VLOW();
     m_direction = m_direction.Normalized();
     m_transform = FindParentTransform(this);
     return true;
@@ -18,12 +20,14 @@ bool CLightComponent::OnInitialize()
 
 void CLightComponent::OnUpdate(double /*deltaTime*/)
 {
+    DECLARE_FUNC_MEDIUM();
     if (m_transform)
         UpdateDirectionFromTransform();
 }
 
 void CLightComponent::OnShutdown()
 {
+    DECLARE_FUNC_VLOW();
     m_transform = nullptr;
     Component::OnShutdown();
 }

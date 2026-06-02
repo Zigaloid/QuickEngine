@@ -15,17 +15,19 @@ REFL_DEFINE_OBJECT(CLevelComponent)
 REFL_DEFINE_END
 
 bool CLevelComponent::OnInitialize()
-{   
+{
+	DECLARE_FUNC_VLOW();
 	return true;
 }
 
 void CLevelComponent::OnUpdate(double /*deltaTime*/)
 {
-
+	DECLARE_FUNC_MEDIUM();
 }
 
 void CLevelComponent::OnShutdown()
 {
+	DECLARE_FUNC_VLOW();
 	Component::OnShutdown();
 }
 

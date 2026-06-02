@@ -13,15 +13,17 @@ REFL_DEFINE_END
 
 bool CEntityComponent::OnInitialize()
 {
+	DECLARE_FUNC_VLOW();
 	return true;
 }
 
 void CEntityComponent::OnUpdate(double /*deltaTime*/)
 {
-
+	DECLARE_FUNC_MEDIUM();
 }
 
 void CEntityComponent::OnShutdown()
 {
+	DECLARE_FUNC_VLOW();
 	Component::OnShutdown();
 }

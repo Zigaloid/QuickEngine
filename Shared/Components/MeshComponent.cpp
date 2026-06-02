@@ -34,6 +34,7 @@ REFL_DEFINE_END
 
 bool CRenderComponent::OnInitialize()
 {
+	DECLARE_FUNC_VLOW();
 	static Matrix4f identity = Matrix4f::GetIdentity();
 
 	if( m_transformComponent.Get(this) )
@@ -51,10 +52,12 @@ bool CRenderComponent::OnInitialize()
 
 void CRenderComponent::OnUpdate(double /*deltaTime*/)
 {
+	DECLARE_FUNC_MEDIUM();
 }
 
 void CRenderComponent::OnShutdown()
 {	
+	DECLARE_FUNC_VLOW();
 	Component::OnShutdown();
 }
 
@@ -62,6 +65,7 @@ void CRenderComponent::OnShutdown()
 
 bool CDebugRenderComponent::OnInitialize()
 {
+	DECLARE_FUNC_VLOW();
 	if (!CRenderComponent::OnInitialize())
 		return false;
 
@@ -70,6 +74,7 @@ bool CDebugRenderComponent::OnInitialize()
 
 void CDebugRenderComponent::OnUpdate(double /*deltaTime*/)
 {
+	DECLARE_FUNC_MEDIUM();
 	auto* renderFunctionQueue = Core::CoreSystem::GetRenderFunctionQueue();
 	if (renderFunctionQueue)
 	{
@@ -82,6 +87,7 @@ void CDebugRenderComponent::OnUpdate(double /*deltaTime*/)
 
 void CDebugRenderComponent::OnShutdown()
 {
+	DECLARE_FUNC_VLOW();
 	CRenderComponent::OnShutdown();
 }
 
@@ -151,8 +157,7 @@ void CMeshComponent::OnUpdate(double deltaTime)
 }
 
 void CMeshComponent::OnShutdown()
-{
-	g_INITCOUNT--;
+{	
 	DECLARE_FUNC_VLOW();
 
 	m_materialResource = CMaterialResourceReference();
