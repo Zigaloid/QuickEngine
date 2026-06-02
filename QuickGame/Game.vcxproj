@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -96,6 +96,7 @@
   <ItemGroup>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h" />
     <ClInclude Include="..\External\ufbx\ufbx.h" />
+    <ClInclude Include="..\Shared\Components\AIComponent.h" />
     <ClInclude Include="..\Shared\Components\CameraComponent.h" />
     <ClInclude Include="..\Shared\Components\CharacterComponent.h" />
     <ClInclude Include="..\Shared\Components\EntityComponent.h" />
@@ -105,6 +106,7 @@
     <ClInclude Include="..\Shared\Components\LightComponent.h" />
     <ClInclude Include="..\Shared\Components\LightManagerComponent.h" />
     <ClInclude Include="..\Shared\Components\MeshComponent.h" />
+    <ClInclude Include="..\Shared\Components\NavQuery.h" />
     <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsComponent.h" />
@@ -198,12 +200,8 @@
     <ClInclude Include="..\Shared\utils\MathUtils.h" />
     <ClInclude Include="..\Shared\utils\ObjMeshConverter.h" />
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
-    <ClInclude Include="Core\Input\ActionContext.h" />
-    <ClInclude Include="Core\Input\InputAction.h" />
-    <ClInclude Include="Core\Input\InputActionManager.h" />
-    <ClInclude Include="Core\Input\InputBinding.h" />
     <ClInclude Include="Game.h" />
-    <ClInclude Include="logo.h" />
+    <ClInclude Include="Shared\Components\NavigationManagerComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp" />
@@ -229,6 +227,7 @@
     <ClCompile Include="..\External\imgui-docking\imgui_draw.cpp" />
     <ClCompile Include="..\External\imgui-docking\imgui_tables.cpp" />
     <ClCompile Include="..\External\ufbx\ufbx.c" />
+    <ClCompile Include="..\Shared\Components\AIComponent.cpp" />
     <ClCompile Include="..\Shared\Components\CameraComponent.cpp" />
     <ClCompile Include="..\Shared\Components\CharacterComponent.cpp" />
     <ClCompile Include="..\Shared\Components\EntityComponent.cpp" />
@@ -238,6 +237,7 @@
     <ClCompile Include="..\Shared\Components\LightComponent.cpp" />
     <ClCompile Include="..\Shared\Components\LightManagerComponent.cpp" />
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\NavQuery.cpp" />
     <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp" />
@@ -287,8 +287,6 @@
     <ClCompile Include="..\Shared\bgfx_common\ps\particle_system.cpp" />
     <ClCompile Include="..\Shared\utils\MathUtils.cpp" />
     <ClCompile Include="..\Shared\utils\StringUtils.cpp" />
-    <ClCompile Include="Core\Input\ActionContext.cpp" />
-    <ClCompile Include="Core\Input\InputBinding.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
   </ItemGroup>

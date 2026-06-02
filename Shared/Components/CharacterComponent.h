@@ -31,8 +31,9 @@ public:
         const float totalHeight = halfHeight * 2.0f + diameter;
         m_objectMatrix = Matrix4f::Scale(Vector3f(diameter, totalHeight, diameter));
     }
-    void SetMoveSpeed(float s) { m_moveSpeed = s; }
-    void SetJumpImpulse(float j) { m_jumpImpulse = j; }
+    void  SetMoveSpeed(float s)  { m_moveSpeed = s; }
+    float GetMoveSpeed()   const { return m_moveSpeed; }
+    void  SetJumpImpulse(float j) { m_jumpImpulse = j; }
 
     void DebugRender(bgfx::ViewId viewId, Matrix4f& transform) const override;
 
@@ -65,6 +66,6 @@ private:
     float m_radius     = 0.3f;
 
     // Movement parameters
-    float m_moveSpeed   = 5.0f;
+    float m_moveSpeed   = 2.0f;
     float m_jumpImpulse = 6.0f;
 };

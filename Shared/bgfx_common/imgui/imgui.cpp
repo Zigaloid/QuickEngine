@@ -620,22 +620,11 @@ struct OcornutImguiContext
 			ImGui_ImplWin32_NewFrame();
 
 #if USE_ENTRY
-			for (const uint8_t* utf8 = inputGetChar(); NULL != utf8; utf8 = inputGetChar() )
-			{
-				io.AddInputCharactersUTF8( (const char*)utf8);
-			}
-
-			const uint8_t modifiers = inputGetModifiersState();
-			io.AddKeyEvent(ImGuiMod_Shift, 0 != (modifiers & (entry::Modifier::LeftShift | entry::Modifier::RightShift) ) );
-			io.AddKeyEvent(ImGuiMod_Ctrl,  0 != (modifiers & (entry::Modifier::LeftCtrl  | entry::Modifier::RightCtrl ) ) );
-			io.AddKeyEvent(ImGuiMod_Alt,   0 != (modifiers & (entry::Modifier::LeftAlt   | entry::Modifier::RightAlt  ) ) );
-			io.AddKeyEvent(ImGuiMod_Super, 0 != (modifiers & (entry::Modifier::LeftMeta  | entry::Modifier::RightMeta ) ) );
-
-			for (int32_t ii = 0; ii < int32_t(entry::Key::Count); ++ii)
-			{
-				io.AddKeyEvent(m_keyMap[ii], inputGetKeyState(entry::Key::Enum(ii) ) );
-				io.SetKeyEventNativeData(m_keyMap[ii], 0, 0, ii);
-			}
+			// The Win32 backend handles all keyboard/character input via WM_CHAR and
+			// WM_KEY* messages processed above. Feeding the same chars from the bgfx
+			// input ring-buffer here would cause every character to be submitted twice.
+			// Drain the ring-buffer without forwarding to ImGui so it stays clean.
+			while (NULL != inputGetChar()) {}
 #endif // USE_ENTRY
 
 			// NewFrame must be inside the lock: it calls UpdateInputEvents() which

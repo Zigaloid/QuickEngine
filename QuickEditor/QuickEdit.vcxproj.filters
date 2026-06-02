@@ -477,6 +477,15 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="Core\ComponentSystem\ComponentSystem.h" />
+    <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\NavQuery.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\AIComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -782,6 +791,15 @@
     <ClCompile Include="..\Shared\NavMesh\NavMeshSerializer.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\NavigationResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\NavQuery.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\AIComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

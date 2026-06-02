@@ -51,9 +51,10 @@ JPH::BodyCreationSettings CCharacterComponent::MakeBodyCreationSettings(
         m_shape, position, rotation, JPH::EMotionType::Dynamic, objectLayer);
     settings.mMotionQuality = JPH::EMotionQuality::LinearCast;
 
-    // Use very high angular damping to prevent the character from tipping over.
-    // This keeps the character upright without locking rotation entirely.
-    settings.mAngularDamping = 1000.0f;
+    // Lock pitch and roll so the character can never tip over.
+    // Only rotation around the Y (up) axis is allowed.
+    settings.mAllowedDOFs = JPH::EAllowedDOFs::TranslationX | JPH::EAllowedDOFs::TranslationY |
+                            JPH::EAllowedDOFs::TranslationZ | JPH::EAllowedDOFs::RotationY;
 
     return settings;
 }

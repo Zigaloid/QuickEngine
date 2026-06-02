@@ -70,12 +70,6 @@
     <Filter Include="..\Shared\utils">
       <UniqueIdentifier>{2707D659-9392-431E-9CA3-C61208AE9F1E}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Core">
-      <UniqueIdentifier>{2EB4837C-1AEB-840D-C3D7-6A10AFED000F}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Core\Input">
-      <UniqueIdentifier>{AD4E7BCD-9906-BD1A-020E-9676EEE4570B}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
@@ -387,23 +381,17 @@
     <ClInclude Include="..\Shared\utils\StringUtils.h">
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
-    <ClInclude Include="Core\Input\ActionContext.h">
-      <Filter>Core\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Input\InputAction.h">
-      <Filter>Core\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Input\InputActionManager.h">
-      <Filter>Core\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\Input\InputBinding.h">
-      <Filter>Core\Input</Filter>
-    </ClInclude>
     <ClInclude Include="Game.h" />
-    <ClInclude Include="logo.h" />
     <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\NavQuery.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\AIComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="Shared\Components\NavigationManagerComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -640,15 +628,15 @@
     <ClCompile Include="..\Shared\utils\StringUtils.cpp">
       <Filter>..\Shared\utils</Filter>
     </ClCompile>
-    <ClCompile Include="Core\Input\ActionContext.cpp">
-      <Filter>Core\Input</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\Input\InputBinding.cpp">
-      <Filter>Core\Input</Filter>
-    </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\NavQuery.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\AIComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
   </ItemGroup>

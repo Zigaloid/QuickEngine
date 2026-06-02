@@ -1,0 +1,53 @@
+#include "NavQuery.h"
+
+// ?? Entity-side setters ?????????????????????????????????????????????????????
+
+void CNavQuery::SetStart(const Vector3f& start)
+{
+    m_start = start;
+}
+
+void CNavQuery::SetDestination(const Vector3f& destination)
+{
+    m_destination = destination;
+    m_dirty.store(true, std::memory_order_release);
+
+    // If the query was already settled, put it back to Pending so the manager
+    // picks it up again.  If it is InProgress the dirty flag is enough – the
+    // manager will re-queue it on the next tick after the job completes.
+    State expected = State::Ready;
+    m_state.compare_exchange_strong(expected, State::Pending, std::memory_order_acq_rel);
+
+    expected = State::Failed;
+    m_state.compare_exchange_strong(expected, State::Pending, std::memory_order_acq_rel);
+}
+
+// ?? Manager-side interface ??????????????????????????????????????????????????
+
+void CNavQuery::MarkInProgress()
+{
+    m_dirty.store(false, std::memory_order_release);
+    m_state.store(State::InProgress, std::memory_order_release);
+}
+
+void CNavQuery::SetResult(std::vector<Vector3f> path)
+{
+    {
+        std::lock_guard<std::mutex> lock(m_pathMutex);
+        m_path = std::move(path);
+    }
+    m_state.store(State::Ready, std::memory_order_release);
+}
+
+void CNavQuery::SetFailed()
+{
+    m_state.store(State::Failed, std::memory_order_release);
+}
+
+// ?? Entity-side readers ?????????????????????????????????????????????????????
+
+std::vector<Vector3f> CNavQuery::GetPath() const
+{
+    std::lock_guard<std::mutex> lock(m_pathMutex);
+    return m_path;
+}
