@@ -391,7 +391,6 @@
     <ClInclude Include="..\Shared\Components\AIComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
-    <ClInclude Include="Shared\Components\NavigationManagerComponent.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">

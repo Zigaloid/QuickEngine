@@ -31,9 +31,21 @@ public:
         const float totalHeight = halfHeight * 2.0f + diameter;
         m_objectMatrix = Matrix4f::Scale(Vector3f(diameter, totalHeight, diameter));
     }
-    void  SetMoveSpeed(float s)  { m_moveSpeed = s; }
-    float GetMoveSpeed()   const { return m_moveSpeed; }
+
+    void  SetMoveSpeed(float s)   { m_moveSpeed   = s; }
+    float GetMoveSpeed()    const { return m_moveSpeed; }
     void  SetJumpImpulse(float j) { m_jumpImpulse = j; }
+
+    /** When enabled the body smoothly rotates to face its direction of travel each frame. */
+    void  SetFaceDirectionOfTravel(bool enable)  { m_faceDirectionOfTravel = enable; }
+    bool  GetFaceDirectionOfTravel()       const { return m_faceDirectionOfTravel; }
+
+    /** Rotation speed in radians/second used when FaceDirectionOfTravel is enabled.
+     *  ~8-12 rad/s gives a responsive but non-snappy feel. */
+    void  SetRotationSpeed(float speed)          { m_rotationSpeed = speed; }
+    float GetRotationSpeed()               const { return m_rotationSpeed; }
+
+    void OnUpdate(double deltaTime) override;
 
     void DebugRender(bgfx::ViewId viewId, Matrix4f& transform) const override;
 
@@ -68,4 +80,8 @@ private:
     // Movement parameters
     float m_moveSpeed   = 2.0f;
     float m_jumpImpulse = 6.0f;
+
+    // Rotation-toward-travel parameters
+    bool  m_faceDirectionOfTravel = true;
+    float m_rotationSpeed         = 10.0f;  // rad/s
 };

@@ -33,6 +33,9 @@ private:
 	// Steers the character toward the next waypoint on the current path.
 	void FollowPath(double deltaTime);
 
+	// Submits a debug sphere at the current wander target into the render queue.
+	void DebugRenderTarget() const;
+
 	std::shared_ptr<CNavQuery> m_navQueryPtr;
 	ComponentSystem::CComponentReference<CCharacterComponent> m_CharacterComponent{ ComponentSystem::FIRST_SIBLING };
 	ComponentSystem::CComponentReference<CNavigationManagerComponent> m_NavigationManagerComponent{ ComponentSystem::FIRST_IN_HIERARCHY };
@@ -43,10 +46,14 @@ private:
 	bool m_pathConsumed  = false;
 
 	// Wander timer: when it reaches zero a new destination is chosen.
-	double m_wanderTimer  = 0.0;
+	double m_wanderTimer    = 0.0;
 	double m_wanderInterval = 5.0;   // seconds between new random targets
-	float  m_wanderRadius   = 20.0f; // metres
+	float  m_wanderRadius   = 10.0f; // metres
 
 	// Distance at which the agent considers a waypoint reached.
 	float m_waypointTolerance = 0.5f;
+
+	// Debug visualisation: the last wander destination that was submitted.
+	Vector3f m_debugTarget;
+	bool     m_hasDebugTarget = false;
 };

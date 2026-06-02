@@ -111,10 +111,8 @@ void CDebugRenderComponent::Render(bgfx::ViewId viewId)
 }
 
 // ── CMeshComponent ─────────────────────────────────────────────────────────
-int g_INITCOUNT = 0;
 bool CMeshComponent::OnInitialize()
-{
-	g_INITCOUNT++;
+{	
 	DECLARE_FUNC_VLOW();
 	CRenderComponent::OnInitialize();
 

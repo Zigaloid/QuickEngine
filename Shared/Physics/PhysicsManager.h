@@ -11,6 +11,7 @@
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/SphereShape.h>
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
+#include <Jolt/Physics/Collision/ContactListener.h>
 
 #ifdef JPH_DEBUG_RENDERER
 #include <Jolt/Physics/Body/BodyManager.h>
@@ -18,6 +19,10 @@ class JoltDebugRenderer;
 #endif
 
 JPH_SUPPRESS_WARNINGS
+
+#include <mutex>
+#include <unordered_map>
+#include <vector>
 
 // ---------------------------------------------------------------------------
 // Object / broad phase layer definitions
@@ -66,7 +71,7 @@ public:
     void Shutdown();
 
     // -----------------------------------------------------------------------
-    // Body creation helpers – return JPH::BodyID::cInvalidBodyID on failure
+    // Body creation helpers — return JPH::BodyID::cInvalidBodyID on failure
     // -----------------------------------------------------------------------
 
     /// Add a static or dynamic box to the world.
@@ -93,6 +98,15 @@ public:
 
     /// Remove and destroy a body.
     void RemoveBody(JPH::BodyID bodyId);
+
+    // -----------------------------------------------------------------------
+    // Contact queries
+    // -----------------------------------------------------------------------
+
+    /// Returns all world-space contact normals recorded for @p bodyId during
+    /// the last simulation step.  The vector is empty when the body has no
+    /// active contacts.  Thread-safe to call from the main thread after Update().
+    std::vector<JPH::Vec3> GetContactNormalsForBody(JPH::BodyID bodyId) const;
 
     // -----------------------------------------------------------------------
     // Accessors
@@ -129,6 +143,44 @@ private:
 
     JPH::ObjectLayer ObjectLayerForMotionType(JPH::EMotionType motionType) const;
 
+    // -----------------------------------------------------------------------
+    // Contact listener — records normals per-body; called from Jolt job threads
+    // -----------------------------------------------------------------------
+    struct BodyContactListener final : public JPH::ContactListener
+    {
+        void OnContactAdded(
+            const JPH::Body& inBody1,
+            const JPH::Body& inBody2,
+            const JPH::ContactManifold& inManifold,
+            JPH::ContactSettings& /*ioSettings*/) override;
+
+        void OnContactPersisted(
+            const JPH::Body& inBody1,
+            const JPH::Body& inBody2,
+            const JPH::ContactManifold& inManifold,
+            JPH::ContactSettings& /*ioSettings*/) override;
+
+        void OnContactRemoved(const JPH::SubShapeIDPair& inSubShapePair) override;
+
+        void SwapBuffers();
+
+        std::vector<JPH::Vec3> GetNormalsForBody(JPH::BodyID id) const;
+
+    private:
+        using NormalMap = std::unordered_map<JPH::uint32, std::vector<JPH::Vec3>>;
+
+        static void RecordContact(
+            NormalMap& map,
+            const JPH::Body& inBody1,
+            const JPH::Body& inBody2,
+            const JPH::ContactManifold& inManifold);
+
+        mutable std::mutex  m_writeMutex;
+        NormalMap           m_writing;
+        NormalMap           m_reading;
+        int                 m_staleFrames = 0;
+    };
+
     Config                                      m_config;
     bool                                        m_initialized = false;
     bool                                        m_broadPhaseDirty = false;
@@ -136,12 +188,13 @@ private:
     JPH::TempAllocatorImpl*                     m_tempAllocator  = nullptr;
     JPH::JobSystemThreadPool*                   m_jobSystem      = nullptr;
     JPH::PhysicsSystem*                         m_physicsSystem  = nullptr;
+    BodyContactListener                         m_contactListener;
 
 #ifdef JPH_DEBUG_RENDERER
     JoltDebugRenderer*                          m_debugRenderer  = nullptr;
 #endif
 
-    // Layer interface objects – must outlive m_physicsSystem.
+    // Layer interface objects — must outlive m_physicsSystem.
     struct BPLayerInterfaceImpl;
     struct ObjectVsBPLayerFilterImpl;
     struct ObjectLayerPairFilterImpl;

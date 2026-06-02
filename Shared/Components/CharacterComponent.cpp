@@ -1,13 +1,61 @@
-#include "CharacterComponent.h"
-#include "CharacterComponent.h"
+﻿#include "CharacterComponent.h"
 #include "BgfxRenderPrimitives.h"
+#include "Physics/PhysicsManager.h"
 #include <Jolt/Physics/Collision/Shape/CapsuleShape.h>
 #include <Jolt/Physics/Collision/Shape/RotatedTranslatedShape.h>
+#include <Jolt/Physics/Body/BodyInterface.h>
+
+#include <cmath>
 
 REFL_DEFINE_OBJECT(CCharacterComponent)    
 REFL_DEFINE_END
 
 REGISTER_COMPONENT(CCharacterComponent, "Character", "Physics");
+
+void CCharacterComponent::OnUpdate(double deltaTime)
+{
+    // Let the base class sync the physics body position back to the entity transform.
+    CPhysicsComponent::OnUpdate(deltaTime);
+
+    if (!m_faceDirectionOfTravel || m_bodyId.IsInvalid())
+        return;
+
+    PhysicsManager* physics = PhysicsManager::Get();
+    if (!physics || !physics->IsInitialized())
+        return;
+
+    JPH::BodyInterface& bi = physics->GetBodyInterface();
+
+    // Read horizontal velocity from the physics body.
+    const JPH::Vec3 vel    = bi.GetLinearVelocity(m_bodyId);
+    const float     horizX = vel.GetX();
+    const float     horizZ = vel.GetZ();
+
+    constexpr float kMinSpeedSq = 0.01f * 0.01f;   // ignore jitter / tiny drift
+    if ((horizX * horizX + horizZ * horizZ) <= kMinSpeedSq)
+        return;
+
+    constexpr float kPi = 3.14159265358979323846f;
+
+    // Target yaw from velocity direction (atan2(X,Z) matches +Z forward convention).
+    const float targetYaw = std::atan2(horizX, horizZ);
+
+    // Extract current yaw from the Y-axis quaternion:  yaw = 2 * atan2(qy, qw)
+    const JPH::Quat currentRot = bi.GetRotation(m_bodyId);
+    const float     currentYaw = 2.0f * std::atan2(currentRot.GetY(), currentRot.GetW());
+
+    // Shortest-path delta, wrapped to [-π, π].
+    float delta = targetYaw - currentYaw;
+    while (delta >  kPi) delta -= 2.0f * kPi;
+    while (delta < -kPi) delta += 2.0f * kPi;
+
+    // Clamp step so we never overshoot in a single frame.
+    const float maxStep = m_rotationSpeed * static_cast<float>(deltaTime);
+    delta = std::clamp(delta, -maxStep, maxStep);
+
+    const JPH::Quat newRot = JPH::Quat::sRotation(JPH::Vec3::sAxisY(), currentYaw + delta);
+    bi.SetRotation(m_bodyId, newRot, JPH::EActivation::DontActivate);
+}
 
 void CCharacterComponent::InitializeShape(const Matrix4f& /*scaleMtx*/)
 {
@@ -50,6 +98,10 @@ JPH::BodyCreationSettings CCharacterComponent::MakeBodyCreationSettings(
     JPH::BodyCreationSettings settings(
         m_shape, position, rotation, JPH::EMotionType::Dynamic, objectLayer);
     settings.mMotionQuality = JPH::EMotionQuality::LinearCast;
+
+    // Character bodies must never sleep — sleeping bodies stop receiving
+    // contact callbacks, which breaks ground state detection.
+    settings.mAllowSleeping = false;
 
     // Lock pitch and roll so the character can never tip over.
     // Only rotation around the Y (up) axis is allowed.

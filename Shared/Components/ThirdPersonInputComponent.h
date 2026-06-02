@@ -220,9 +220,10 @@ private:
     bool  m_jumpQueued  = false;
 
     // New: ground state tracking
-    bool     m_isGrounded     = false;
-    Vector3f m_groundNormal   = Vector3f(0.0f, 1.0f, 0.0f);
+    bool     m_isGrounded         = false;
+    Vector3f m_groundNormal       = Vector3f(0.0f, 1.0f, 0.0f);
     int      m_groundContactCount = 0;
+    float    m_groundProbeDistance = 0.7f;  // Ray length below body centre; tune to match capsule size
 
     // Listener handles for safe unsubscription
     Input::ActionListenerHandle m_hMoveX;

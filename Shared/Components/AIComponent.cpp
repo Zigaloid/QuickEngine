@@ -4,10 +4,13 @@
 #include "ShaderResource.h"
 #include "MeshResource.h"
 #include "Physics/PhysicsManager.h"
+#include "Rendering/BgfxRenderPrimitives.h"
 
 #include <Jolt/Jolt.h>
 JPH_SUPPRESS_WARNINGS
 #include <Jolt/Physics/Body/BodyInterface.h>
+
+#include <bx/math.h>
 
 #include <cmath>
 #include <cstdlib>
@@ -53,7 +56,8 @@ void CAIComponent::OnUpdate(double deltaTime)
 		return;
 
 	// Enforce navmesh containment: if the character has drifted off the mesh,
-	// snap them back to the nearest valid polygon each frame.
+	// apply a corrective velocity impulse toward the nearest valid polygon.
+	// We never teleport as that breaks the physics simulation.
 	{
 		Vector3f currentPos = character->GetWorldTransform().ExtractTranslation();
 		Vector3f snapped;
@@ -61,13 +65,28 @@ void CAIComponent::OnUpdate(double deltaTime)
 		{
 			const float dx = snapped.GetX() - currentPos.GetX();
 			const float dz = snapped.GetZ() - currentPos.GetZ();
-			const float dy = snapped.GetY() - currentPos.GetY();
-			const float distSq = dx * dx + dy * dy + dz * dz;
+			const float distSq = dx * dx + dz * dz; // XZ only — ignore vertical drift
+
+			// Only correct when the character is meaningfully outside the nav mesh.
 			if (distSq > 0.01f) // ~0.1 m threshold
 			{
-				Matrix4f corrected = character->GetWorldTransform();
-				corrected.SetTranslation(snapped);
-				character->SetWorldTransform(corrected, JPH::EActivation::Activate);
+				JPH::BodyID bodyId = character->GetBodyID();
+				PhysicsManager* physics = PhysicsManager::Get();
+				if (!bodyId.IsInvalid() && physics && physics->IsInitialized())
+				{
+					const float invDist   = 1.0f / std::sqrt(distSq);
+					const float dirX      = dx * invDist;
+					const float dirZ      = dz * invDist;
+					const float moveSpeed = character->GetMoveSpeed();
+
+					JPH::BodyInterface& bi = physics->GetBodyInterface();
+					JPH::Vec3 currentVel   = bi.GetLinearVelocity(bodyId);
+
+					// Redirect horizontal velocity toward the mesh while preserving
+					// any vertical velocity (e.g. gravity / jump).
+					bi.SetLinearVelocity(bodyId,
+						JPH::Vec3(dirX * moveSpeed, currentVel.GetY(), dirZ * moveSpeed));
+				}
 			}
 		}
 	}
@@ -81,6 +100,7 @@ void CAIComponent::OnUpdate(double deltaTime)
 	}
 
 	FollowPath(deltaTime);
+	DebugRenderTarget();
 }
 
 void CAIComponent::OnShutdown()
@@ -106,9 +126,6 @@ void CAIComponent::PickNewWanderTarget()
 	if (!character || !nav || !nav->IsReady())
 		return; // Leave m_wanderTimer <= 0 so we retry next frame.
 
-	// Commit the timer reset only once we know we can actually query.
-	m_wanderTimer = m_wanderInterval;
-
 	Vector3f currentPos = character->GetWorldTransform().ExtractTranslation();
 
 	// Random offset within a circle of radius m_wanderRadius.
@@ -121,12 +138,48 @@ void CAIComponent::PickNewWanderTarget()
 
 	// Snap candidate to the nearest valid navmesh position.
 	Vector3f snapped;
-	nav->FindNearestPoint(candidate, snapped);
-	//return; // No navmesh polygon nearby — try again next interval.
+	if (nav->FindNearestPoint(candidate, snapped) == false)
+	{
+		m_hasDebugTarget = false;
+		return; // No valid position nearby — try again next frame.
+	}
+    // Commit the timer reset only once we know we can actually query.
+    m_wanderTimer = m_wanderInterval;
+
+	m_debugTarget    = snapped;
+	m_hasDebugTarget = true;
 
 	m_navQueryPtr->SetStart(currentPos);
 	m_navQueryPtr->SetDestination(snapped);
 	m_pathConsumed = false;
+}
+
+void CAIComponent::DebugRenderTarget() const
+{
+	if (!m_hasDebugTarget)
+		return;
+
+	// Capture the target by value so the lambda is safe to execute on the
+	// render thread after this frame's update has completed.
+	const Vector3f target = m_debugTarget;
+
+	auto* renderFunctionQueue = Core::CoreSystem::GetRenderFunctionQueue();
+	if (!renderFunctionQueue)
+		return;
+
+	renderFunctionQueue->AddFunction([target]()
+		{
+			// Build a scale-translate matrix: 0.4 m radius sphere at the target.
+			float mtx[16];
+			bx::mtxSRT(mtx,
+				0.4f, 0.4f, 0.4f,           // scale
+				0.0f, 0.0f, 0.0f,           // rotation
+				target.GetX(), target.GetY(), target.GetZ()); // translation
+
+			// Solid red — ABGR format: 0xff0000ff
+			Rendering::BgfxRenderPrimitives& prims = Rendering::BgfxRenderPrimitives::Instance();
+			prims.RenderSphere(0, mtx, 0xff0000ff);
+		}, "CAIComponent::DebugRenderTarget");
 }
 
 void CAIComponent::FollowPath(double /*deltaTime*/)

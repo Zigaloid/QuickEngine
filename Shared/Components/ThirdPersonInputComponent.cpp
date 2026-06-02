@@ -1,4 +1,4 @@
-#include "ThirdPersonInputComponent.h"
+﻿#include "ThirdPersonInputComponent.h"
 #include "PhysicsBodyComponent.h"
 #include "CharacterComponent.h"
 #include "CameraComponent.h"
@@ -12,27 +12,24 @@
 JPH_SUPPRESS_WARNINGS
 #include <Jolt/Physics/Body/BodyInterface.h>
 #include <Jolt/Physics/Body/Body.h>
-#include <Jolt/Physics/Collision/CollideShape.h>
-#include <Jolt/Physics/Collision/CollisionCollectorImpl.h>
-
 #include <cmath>
 #include <bx/math.h>
 
-// ?? Reflection & registry ??????????????????????????????????????????????????????
+// ── Reflection & registry ──────────────────────────────────────────────────
 
 REFL_DEFINE_OBJECT(CThirdPersonInputComponent)
 REFL_DEFINE_END
 
 REGISTER_COMPONENT(CThirdPersonInputComponent, "ThirdPersonInput", "Input");
 
-// ?? Destructor ????????????????????????????????????????????????????????????????
+// ── Destructor ────────────────────────────────────────────────────────────
 
 CThirdPersonInputComponent::~CThirdPersonInputComponent()
 {
     Unsubscribe();
 }
 
-// ?? Lifecycle ?????????????????????????????????????????????????????????????????   
+// ── Lifecycle ─────────────────────────────────────────────────────────────
 
 bool CThirdPersonInputComponent::OnInitialize()
 {
@@ -84,7 +81,7 @@ void CThirdPersonInputComponent::OnUpdate(double deltaTime)
     // Determine if we can apply movement
     bool canMove = m_controlMovementDuringJump || m_isGrounded;
 
-    // ?? Desired horizontal velocity ?????????????????????????????????????
+    // ── Desired horizontal velocity ────────────────────────────────────────
 
     JPH::Vec3 desiredVelocity = GetDesiredVelocity();
 
@@ -94,7 +91,7 @@ void CThirdPersonInputComponent::OnUpdate(double deltaTime)
         desiredVelocity = GetCameraRelativeVelocity(desiredVelocity);
     }
 
-    // ?? Apply velocity blending ??????????????????????????????????????????????????????
+    // ── Apply velocity blending ────────────────────────────────────────────
 
     JPH::Vec3 currentVel = bi.GetLinearVelocity(bodyId);
     JPH::Vec3 newVelocity;
@@ -121,13 +118,13 @@ void CThirdPersonInputComponent::OnUpdate(double deltaTime)
 
     bi.SetLinearVelocity(bodyId, newVelocity);
 
-    // ?? Maintain upright orientation ????????????????????????????????????????
+    // ── Maintain upright orientation ───────────────────────────────────────
 
     // Prevent the character from tipping over by zeroing angular velocity
     // This keeps the character's orientation stable during movement
     bi.SetAngularVelocity(bodyId, JPH::Vec3::sZero());
 
-    // ?? Camera orbit control ???????????????????????????????????????????????????
+    // ── Camera orbit control ───────────────────────────────────────────────
 
     if (m_camera && (m_cameraInputX != 0.0f || m_cameraInputY != 0.0f))
     {
@@ -146,7 +143,7 @@ void CThirdPersonInputComponent::OnUpdate(double deltaTime)
         m_camera->Orbit(yawDelta, pitchDelta);
     }
 
-    // ?? Jump ??????????????????????????????????????????????????????????????????
+    // ── Jump ───────────────────────────────────────────────────────────────
 
     if (m_jumpQueued && (m_allowAirJump || m_isGrounded))
     {
@@ -179,7 +176,7 @@ void CThirdPersonInputComponent::OnShutdown()
     Component::OnShutdown();
 }
 
-// ?? Action manager wiring ?????????????????????????????????????????????????????
+// ── Action manager wiring ──────────────────────────────────────────────────
 
 void CThirdPersonInputComponent::SetActionManager(Input::InputActionManager* manager)
 {
@@ -206,14 +203,14 @@ void CThirdPersonInputComponent::SetActionManager(Input::InputActionManager* man
     Subscribe();
 }
 
-// ?? Subscription helpers ??????????????????????????????????????????????????????
+// ── Subscription helpers ───────────────────────────────────────────────────
 
 void CThirdPersonInputComponent::Subscribe()
 {
     if (!m_actionManager)
         return;
 
-    // MoveX � continuous axis: cache the current value each frame
+    // MoveX — continuous axis: cache the current value each frame
     m_hMoveX = m_actionManager->Subscribe(m_moveXAction, [this](const Input::ActionEvent& e)
     {
         if (e.phase == Input::ActionPhase::Ongoing || e.phase == Input::ActionPhase::Started)
@@ -222,7 +219,7 @@ void CThirdPersonInputComponent::Subscribe()
             m_inputX = 0.f;
     });
 
-    // MoveY � continuous axis: cache the current value each frame
+    // MoveY — continuous axis: cache the current value each frame
     m_hMoveY = m_actionManager->Subscribe(m_moveYAction, [this](const Input::ActionEvent& e)
     {
         if (e.phase == Input::ActionPhase::Ongoing || e.phase == Input::ActionPhase::Started)
@@ -231,7 +228,7 @@ void CThirdPersonInputComponent::Subscribe()
             m_inputZ = 0.f;
     });
 
-	// Jump � queue once on the initial press
+	// Jump — queue once on the initial press
 	m_hJump = m_actionManager->Subscribe(m_jumpAction, [this](const Input::ActionEvent& e)
 	{
 		if (e.phase == Input::ActionPhase::Started)
@@ -239,14 +236,14 @@ void CThirdPersonInputComponent::Subscribe()
 		// Note: Don't clear the flag here - let OnUpdate() consume it
 	});
 
-    // Sprint � active while the action is ongoing
+    // Sprint — active while the action is ongoing
     m_hSprint = m_actionManager->Subscribe(m_sprintAction, [this](const Input::ActionEvent& e)
     {
         m_isSprinting = (e.phase == Input::ActionPhase::Started ||
                          e.phase == Input::ActionPhase::Ongoing);
     });
 
-    // CameraX � continuous axis for yaw (left/right)
+    // CameraX — continuous axis for yaw (left/right)
     m_hCameraX = m_actionManager->Subscribe(m_cameraXAction, [this](const Input::ActionEvent& e)
     {
         if (e.phase == Input::ActionPhase::Ongoing || e.phase == Input::ActionPhase::Started)
@@ -255,7 +252,7 @@ void CThirdPersonInputComponent::Subscribe()
             m_cameraInputX = 0.f;
     });
 
-    // CameraY � continuous axis for pitch (up/down)
+    // CameraY — continuous axis for pitch (up/down)
     m_hCameraY = m_actionManager->Subscribe(m_cameraYAction, [this](const Input::ActionEvent& e)
     {
         if (e.phase == Input::ActionPhase::Ongoing || e.phase == Input::ActionPhase::Started)
@@ -293,40 +290,54 @@ void CThirdPersonInputComponent::Unsubscribe()
     m_jumpQueued   = false;
 }
 
-// ?? Private helpers ???????????????????????????????????????????????????????????
+// ── Private helpers ────────────────────────────────────────────────────────
 
 void CThirdPersonInputComponent::UpdateGroundState()
 {
-    if (!m_character)
-    {
-        m_isGrounded = false;
-        m_groundContactCount = 0;
-        return;
-    }
+    m_isGrounded         = false;
+    m_groundContactCount = 0;
+    m_groundNormal       = Vector3f(0.0f, 1.0f, 0.0f);
 
-    JPH::BodyID bodyId = m_character->GetBodyID();
-    if (bodyId.IsInvalid())
-    {
-        m_isGrounded = false;
-        m_groundContactCount = 0;
+    if (!m_character)
         return;
-    }
+
+    const JPH::BodyID bodyId = m_character->GetBodyID();
+    if (bodyId.IsInvalid())
+        return;
 
     PhysicsManager* physics = PhysicsManager::Get();
     if (!physics || !physics->IsInitialized())
-    {
-        m_isGrounded = false;
-        m_groundContactCount = 0;
         return;
+
+    // Fetch all contact normals recorded for this body during the last physics step.
+    const std::vector<JPH::Vec3> normals = physics->GetContactNormalsForBody(bodyId);
+
+    // A normal qualifies as "ground" when its upward component exceeds the cosine
+    // of the maximum walkable slope angle (e.g. cos(45°) ≈ 0.707).
+    const float cosMaxSlope = std::cos(m_maxSlopeAngleDeg * 3.14159265f / 180.0f);
+
+    JPH::Vec3 bestNormal = JPH::Vec3::sZero();
+    float bestY = -1.0f;
+
+    for (const JPH::Vec3& n : normals)
+    {
+        const float nY = n.GetY();
+        if (nY >= cosMaxSlope)
+        {
+            ++m_groundContactCount;
+            if (nY > bestY)
+            {
+                bestY       = nY;
+                bestNormal  = n;
+            }
+        }
     }
 
-    JPH::BodyInterface& bi = physics->GetBodyInterface();
-    JPH::Vec3 vel = bi.GetLinearVelocity(bodyId);
-
-    // Simple velocity-based ground check: if falling slowly or moving upward slightly, not grounded
-    // If velocity Y is very low (near zero or slightly negative), consider grounded
-    const float groundedThreshold = 0.5f;  // m/s - allow slight upward velocity
-    m_isGrounded = vel.GetY() <= groundedThreshold;
+    if (m_groundContactCount > 0)
+    {
+        m_isGrounded   = true;
+        m_groundNormal = Vector3f(bestNormal.GetX(), bestNormal.GetY(), bestNormal.GetZ());
+    }
 }
 
 
