@@ -169,6 +169,7 @@
     <ClCompile Include="Analysis\HeatMapContainer.cpp" />
     <ClCompile Include="App\ApplicationComponent.cpp" />
     <ClCompile Include="ClassFactory\ClassFactory.cpp" />
+    <ClCompile Include="ComponentSystem\Component.cpp" />
     <ClCompile Include="ComponentSystem\ComponentDependencyDefinition.cpp" />
     <ClCompile Include="ComponentSystem\ComponentRegistry.cpp" />
     <ClCompile Include="ComponentSystem\ComponentSystem.cpp" />

@@ -402,6 +402,9 @@
     <ClCompile Include="FileSystem\FileWatcher.cpp">
       <Filter>FileSystem</Filter>
     </ClCompile>
+    <ClCompile Include="ComponentSystem\Component.cpp">
+      <Filter>ComponentSystem</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\ComponentSystemDocumentation.html">
