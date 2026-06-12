@@ -36,6 +36,7 @@ void ImGuiVisualizerManager::Register(const std::string& key,
     entry.key = key;
     entry.visualizer = std::move(viz);
     entry.visible = visibleByDefault;
+    entry.wasVisible = visibleByDefault;  // ← prevents forced re-dock on first frame
     entry.initialized = false;
 
     m_keyIndex[key] = m_entries.size();

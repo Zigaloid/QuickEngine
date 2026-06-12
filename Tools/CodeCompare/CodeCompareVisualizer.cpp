@@ -532,6 +532,38 @@ void CodeCompareVisualizer::RenderDirNode(const DirCompareNode& node)
     return result;
 }
 
+void CodeCompareVisualizer::ComputeDiffBlocks()
+{
+    constexpr int contextLines = 3; // lines of context above/below each diff block
+
+    m_diffBlocks.clear();
+    m_diffRowVisible.assign(m_diffLines.size(), false);
+
+    const int total = static_cast<int>(m_diffLines.size());
+
+    // Find contiguous runs of changed lines (OnlyA or OnlyB)
+    int i = 0;
+    while (i < total)
+    {
+        if (m_diffLines[i].type != DiffLine::Type::Context)
+        {
+            int blockStart = i;
+            while (i < total && m_diffLines[i].type != DiffLine::Type::Context)
+                ++i;
+            int blockEnd = i - 1; // inclusive
+
+            m_diffBlocks.push_back({ blockStart, blockEnd });
+
+            // Mark visible rows: the block itself + context lines around it
+            const int visStart = std::max(0, blockStart - contextLines);
+            const int visEnd   = std::min(total - 1, blockEnd + contextLines);
+            for (int r = visStart; r <= visEnd; ++r)
+                m_diffRowVisible[r] = true;
+        }
+        else { ++i; }
+    }
+}
+
 void CodeCompareVisualizer::LoadFileDiff(const std::string& absPathA,
                                           const std::string& absPathB,
                                           FileCompareResult::Status status)
@@ -540,6 +572,11 @@ void CodeCompareVisualizer::LoadFileDiff(const std::string& absPathA,
     const auto linesB = absPathB.empty() ? std::vector<std::string>{} : ReadLines(absPathB);
     m_diffLines = ComputeDiff(linesA, linesB);
     m_hasDiff   = true;
+
+    // Build diff block index for compressed view and navigation
+    ComputeDiffBlocks();
+    m_diffCurrentBlock = m_diffBlocks.empty() ? -1 : 0;
+    m_diffScrollToRow  = -1;
 
     // Compute a stable cache key for this file pair
     const std::string cacheKeyStr = absPathA + "|" + absPathB;
@@ -639,6 +676,101 @@ void CodeCompareVisualizer::RenderDiffPanel()
         ImGui::Separator();
     }
 
+    // ── Toolbar: view mode toggle + navigation ────────────────────────────
+    {
+        // Compressed / Expanded toggle
+        if (ImGui::SmallButton(m_diffExpanded ? "Compressed View" : "Expanded View"))
+            m_diffExpanded = !m_diffExpanded;
+
+        const bool hasBlocks = !m_diffBlocks.empty();
+
+        // Safety clamp in case index is stale
+        if (hasBlocks && (m_diffCurrentBlock < 0 || m_diffCurrentBlock >= static_cast<int>(m_diffBlocks.size())))
+            m_diffCurrentBlock = 0;
+
+        // Navigation: Prev / Next diff block
+        ImGui::SameLine(0, 16.f);
+        if (!hasBlocks) ImGui::BeginDisabled();
+        if (ImGui::SmallButton("< Prev"))
+        {
+            if (m_diffCurrentBlock > 0)
+                --m_diffCurrentBlock;
+            else
+                m_diffCurrentBlock = static_cast<int>(m_diffBlocks.size()) - 1; // wrap
+            m_diffScrollToRow = m_diffBlocks[m_diffCurrentBlock].startRow;
+        }
+        ImGui::SameLine(0, 4.f);
+        if (ImGui::SmallButton("Next >"))
+        {
+            if (m_diffCurrentBlock < static_cast<int>(m_diffBlocks.size()) - 1)
+                ++m_diffCurrentBlock;
+            else
+                m_diffCurrentBlock = 0; // wrap
+            m_diffScrollToRow = m_diffBlocks[m_diffCurrentBlock].startRow;
+        }
+        if (!hasBlocks) ImGui::EndDisabled();
+
+        // Info label
+        if (hasBlocks)
+        {
+            ImGui::SameLine(0, 12.f);
+            ImGui::TextDisabled("Block %d / %d",
+                m_diffCurrentBlock + 1, static_cast<int>(m_diffBlocks.size()));
+        }
+
+        ImGui::Separator();
+    }
+
+    // ── Build visible row list for compressed mode ────────────────────────
+    // In compressed mode we only render visible rows + separator rows between gaps.
+    // In expanded mode we render everything.
+
+    struct DisplayRow
+    {
+        int  sourceRow;   // index into m_diffLines, or -1 for a separator
+        bool isSeparator;
+    };
+
+    std::vector<DisplayRow> displayRows;
+    if (m_diffExpanded)
+    {
+        displayRows.reserve(m_diffLines.size());
+        for (int r = 0; r < static_cast<int>(m_diffLines.size()); ++r)
+            displayRows.push_back({ r, false });
+    }
+    else
+    {
+        displayRows.reserve(m_diffLines.size());
+        bool lastWasVisible = true; // start true so no leading separator
+        for (int r = 0; r < static_cast<int>(m_diffLines.size()); ++r)
+        {
+            if (m_diffRowVisible[r])
+            {
+                if (!lastWasVisible)
+                    displayRows.push_back({ -1, true }); // separator
+                displayRows.push_back({ r, false });
+                lastWasVisible = true;
+            }
+            else { lastWasVisible = false; }
+        }
+    }
+
+    // ── Resolve scroll target into display row index ──────────────────────
+    int scrollToDisplayRow = -1;
+    if (m_diffScrollToRow >= 0)
+    {
+        for (int d = 0; d < static_cast<int>(displayRows.size()); ++d)
+        {
+            if (displayRows[d].sourceRow == m_diffScrollToRow)
+            {
+                scrollToDisplayRow = d;
+                break;
+            }
+        }
+        m_diffScrollToRow = -1;
+    }
+
+    // ── Diff table ────────────────────────────────────────────────────────
     constexpr ImGuiTableFlags tflags =
         ImGuiTableFlags_ScrollY          |
         ImGuiTableFlags_ScrollX          |
@@ -659,29 +791,66 @@ void CodeCompareVisualizer::RenderDiffPanel()
         ImGui::TableSetupColumn("B",      ImGuiTableColumnFlags_WidthFixed, codeW);
         ImGui::TableHeadersRow();
 
+        // Scroll to target row before rendering — use row height to compute offset
+        if (scrollToDisplayRow >= 0)
+        {
+            const float rowH = ImGui::GetTextLineHeightWithSpacing();
+            const float targetY = scrollToDisplayRow * rowH;
+            ImGui::SetScrollY(targetY - ImGui::GetWindowHeight() * 0.5f + rowH * 0.5f);
+        }
+
         // Background colours per row type
         constexpr ImU32 bgOnlyA  = IM_COL32( 80,  30,  30, 180);
         constexpr ImU32 bgOnlyB  = IM_COL32( 30,  70,  30, 180);
+        constexpr ImU32 bgSep    = IM_COL32( 40,  40,  50, 200);
+        constexpr ImU32 bgActive = IM_COL32( 60,  60, 120, 100); // highlight for current block
         constexpr ImU32 colNumA  = IM_COL32(180, 100, 100, 255);
         constexpr ImU32 colNumB  = IM_COL32(100, 180, 100, 255);
         constexpr ImU32 colCtx   = IM_COL32(120, 120, 120, 255);
         constexpr ImU32 colTextA = IM_COL32(230, 160, 160, 255);
         constexpr ImU32 colTextB = IM_COL32(140, 210, 140, 255);
 
+        // Determine active block row range for highlighting
+        int activeStart = -1, activeEnd = -1;
+        if (m_diffCurrentBlock >= 0 && m_diffCurrentBlock < static_cast<int>(m_diffBlocks.size()))
+        {
+            activeStart = m_diffBlocks[m_diffCurrentBlock].startRow;
+            activeEnd   = m_diffBlocks[m_diffCurrentBlock].endRow;
+        }
+
         ImGuiListClipper clipper;
-        clipper.Begin(static_cast<int>(m_diffLines.size()));
+        clipper.Begin(static_cast<int>(displayRows.size()));
         while (clipper.Step())
         {
-            for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row)
+            for (int dispIdx = clipper.DisplayStart; dispIdx < clipper.DisplayEnd; ++dispIdx)
             {
-                const DiffLine& dl = m_diffLines[row];
+                const auto& dr = displayRows[dispIdx];
 
                 ImGui::TableNextRow();
+
+                if (dr.isSeparator)
+                {
+                    ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, bgSep);
+                    ImGui::TableSetColumnIndex(0);
+                    ImGui::PushStyleColor(ImGuiCol_Text, IM_COL32(100, 100, 120, 255));
+                    ImGui::TextUnformatted("...");
+                    ImGui::PopStyleColor();
+                    continue;
+                }
+
+                const DiffLine& dl = m_diffLines[dr.sourceRow];
+
+                // Determine if this row is in the active (currently navigated) block
+                const bool inActiveBlock = (dr.sourceRow >= activeStart && dr.sourceRow <= activeEnd);
 
                 if (dl.type == DiffLine::Type::OnlyA)
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, bgOnlyA);
                 else if (dl.type == DiffLine::Type::OnlyB)
                     ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg0, bgOnlyB);
+
+                // Overlay a highlight tint on rows belonging to the active block
+                if (inActiveBlock)
+                    ImGui::TableSetBgColor(ImGuiTableBgTarget_RowBg1, bgActive);
 
                 // Line number A
                 ImGui::TableSetColumnIndex(0);

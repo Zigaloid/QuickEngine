@@ -15,14 +15,14 @@ bool CToolApp::Initialize()
 	Core::CoreSystem::GetNexusClient()->EnableAutoReconnect();
 
 	m_visualizerManager.Register("Command Console",
-		std::make_unique<CommandConsole>(), true);
+		std::make_unique<CommandConsole>(), false);
 
 	auto codeCompare = std::make_unique<CodeCompareVisualizer>();
 	codeCompare->SetAIService(&m_aiService);
 	m_visualizerManager.Register("Code Comparison", std::move(codeCompare), true);
 
 	m_visualizerManager.Register("AI Assistant",
-		std::make_unique<AIAssistantVisualizer>(m_aiService), true);
+		std::make_unique<AIAssistantVisualizer>(m_aiService), false);
 
 	m_visualizerManager.Initialize();
 	Input::KeyboardShortcutManager::Instance().Initialize();

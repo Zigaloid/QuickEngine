@@ -102,6 +102,18 @@ private:
     bool                       m_hasDiff    = false;
     ImGuiID                    m_dockspaceId = 0;
 
+    // Diff view mode and navigation
+    bool m_diffExpanded      = false;  // false = compressed (blocks only), true = full view
+    int  m_diffCurrentBlock  = -1;     // index into m_diffBlocks for navigation
+    int  m_diffScrollToRow   = -1;     // row to center in viewport next frame
+
+    // Each block stores the start row (first diff line) and end row (last diff line, inclusive)
+    struct DiffBlock { int startRow; int endRow; };
+    std::vector<DiffBlock>     m_diffBlocks;
+    std::vector<bool>          m_diffRowVisible; // per-row visibility for compressed mode
+
+    void ComputeDiffBlocks();
+
     // Visibility toggles (legend checkboxes)
     bool m_showIdentical = true;
     bool m_showDifferent = true;
