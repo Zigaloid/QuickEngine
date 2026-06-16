@@ -1,26 +1,26 @@
 {
     "RootObject": {
         "m_xSteps": {
-            "Value": 40,
+            "Value": 10,
             "Type": 1,
             "Size": 4
         },
         "m_zSteps": {
-            "Value": 40,
+            "Value": 10,
             "Type": 1,
             "Size": 4
         },
         "m_stepSize": {
-            "Value": 0.5,
+            "Value": 1.0,
             "Type": 2,
             "Size": 4
         },
         "m_blendHeights": {
             "Value": [
-                -0.4000000059604645,
+                -2.0,
+                0.0,
                 2.0,
-                5.0,
-                3.0
+                4.0
             ],
             "Type": 7,
             "Size": 16
@@ -33,7 +33,7 @@
         "m_staticMeshResource": {
             "Value": "CStaticMeshResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/staticmeshes/height.smesh.obj.json",
+                "Value": "./assets/heightfields/backdrop.smesh.obj.json",
                 "Type": 3,
                 "Size": 32
             },

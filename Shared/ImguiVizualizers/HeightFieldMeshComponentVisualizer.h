@@ -91,9 +91,20 @@ namespace ImGuiVisualizers {
         void UpdateHeightFieldFromGizmoDrag();
         void RegisterHeightFieldActions();
         void RegenerateGridMesh();
-
+        bool EnsureStaticMeshFileExists();
         // Helper to create a relative asset path from an absolute path (delegates to CResourceReference::MakeAssetPath)
         std::string MakeAssetPath(const std::string& absolutePath) const;
+
+        // Refactor helpers extracted from Render()
+        void ProcessShortcuts();
+        void EnsureSelectablesRegistered();
+        bool BeginEditorWindow(bool* isOpen, std::string& outTitle);
+        void RenderMenuAndToolbar();
+        void RenderLeftPane(float leftW, float rightW);
+        void HandleViewportInteractions(const ImVec2& viewportMin, const ImVec2& viewportSize);
+        void CommitBrushStrokeOnRelease(bool isBrushMouseDown);
+        void HandleGizmoDragStartEnd();
+        void RenderRightInspector(float rightW);
     };
 
 } // namespace ImGuiVisualizers

@@ -16,6 +16,11 @@
 #include "ResourceManager/ResourceManager.h"
 #include "QuickScopeApp.h"
 
+#if BX_PLATFORM_WINDOWS
+#include <Windows.h>
+#include "resource.h"
+#endif
+
 namespace
 {
 	QuickScopeApp theApp;
@@ -194,6 +199,21 @@ namespace
 			init.resolution.reset = m_reset;
 			bgfx::init(init);
 
+#if BX_PLATFORM_WINDOWS
+			// Load and set the app icon from the executable's resources.
+			// Ensure resource.rc is added to the QuickScope project and defines IDI_APPICON.
+			HINSTANCE hInstance = (HINSTANCE)GetModuleHandle(NULL);
+			HWND hwnd = (HWND)entry::getNativeWindowHandle(entry::kDefaultWindowHandle);
+			if (hInstance != NULL && hwnd != NULL)
+			{
+				HICON hIcon = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDI_APPICON), IMAGE_ICON,
+					GetSystemMetrics(SM_CXICON), GetSystemMetrics(SM_CYICON), LR_DEFAULTCOLOR);
+				HICON hIconSm = (HICON)LoadImage(hInstance, MAKEINTRESOURCE(IDI_APPICON), IMAGE_ICON,
+					GetSystemMetrics(SM_CXSMICON), GetSystemMetrics(SM_CYSMICON), LR_DEFAULTCOLOR);
+				if (hIcon) SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+				if (hIconSm) SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)hIconSm);
+			}
+#endif
 			// Enable debug text.
 			bgfx::setDebug(m_debug);
 

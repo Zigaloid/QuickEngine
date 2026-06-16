@@ -91,6 +91,9 @@ project "Game"
 	
 	files { "../AssetClasses/**.cpp" }
 	files { "../AssetClasses/**.h" }
+
+	files { "resources/app.rc" }
+
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.cpp" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.h" }
 	files { "../External/imgui-docking/imgui.cpp" }
@@ -125,6 +128,7 @@ project "Game"
 	files { "../Shared/Rendering/bgfx*.h" }
 
 	files { "./**.cpp", "./**.h" }      
+	files { "resources/app.rc" }
 
 	filter "configurations:Debug"
 	  defines { "DEBUG" }
@@ -149,3 +153,7 @@ project "Game"
 	  links { "detour" }
 	  staticruntime "on" -- Use /MTd
 	  links { "bimg_decode" }
+	  
+	filter "system:windows"
+    files { "resources/app.rc" }
+	filter {}

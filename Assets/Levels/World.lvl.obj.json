@@ -3,7 +3,7 @@
         "m_name": {
             "Value": "Level 1",
             "Type": 3,
-            "Size": 40
+            "Size": 32
         },
         "m_visibleInEditor": {
             "Value": true,
@@ -15,10 +15,10 @@
             "m_resourceFileName": {
                 "Value": "./assets/levels/world.lvl.nav.bin",
                 "Type": 3,
-                "Size": 40
+                "Size": 32
             },
             "Type": 4,
-            "Size": 64
+            "Size": 56
         },
         "m_active": {
             "Value": true,
@@ -33,7 +33,7 @@
                     "m_name": {
                         "Value": "Layer_0",
                         "Type": 3,
-                        "Size": 40
+                        "Size": 32
                     },
                     "m_visibleInEditor": {
                         "Value": true,
@@ -45,10 +45,10 @@
                         "m_resourceFileName": {
                             "Value": "undifined",
                             "Type": 3,
-                            "Size": 40
+                            "Size": 32
                         },
                         "Type": 4,
-                        "Size": 64
+                        "Size": 56
                     },
                     "m_active": {
                         "Value": true,
@@ -63,7 +63,7 @@
                                 "m_name": {
                                     "Value": "Managers",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -84,7 +84,7 @@
                                                 "Value": "CLightManagerComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -103,140 +103,12 @@
                                                 "Value": "CNavigationManagerComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 22,
-                                    "Size": 32
-                                }
-                            },
-                            {
-                                "Value": "CEntityComponent",
-                                "m_name": {
-                                    "Value": "SunLight",
-                                    "Type": 3,
-                                    "Size": 40
-                                },
-                                "m_active": {
-                                    "Value": true,
-                                    "Type": 12,
-                                    "Size": 1
-                                },
-                                "m_children": {
-                                    "Value": "CEntityComponent",
-                                    "Elements": [
-                                        {
-                                            "Value": "CLightComponent",
-                                            "m_direction": {
-                                                "Value": [
-                                                    0.7245716452598572,
-                                                    -0.6891994476318359,
-                                                    -0.0
-                                                ],
-                                                "Type": 13,
-                                                "Size": 12
-                                            },
-                                            "m_color": {
-                                                "Value": [
-                                                    1.0,
-                                                    1.0,
-                                                    1.0,
-                                                    1.0
-                                                ],
-                                                "Type": 7,
-                                                "Size": 16
-                                            },
-                                            "m_ambientColor": {
-                                                "Value": [
-                                                    0.15000000596046448,
-                                                    0.15000000596046448,
-                                                    0.15000000596046448,
-                                                    1.0
-                                                ],
-                                                "Type": 7,
-                                                "Size": 16
-                                            },
-                                            "m_active": {
-                                                "Value": true,
-                                                "Type": 12,
-                                                "Size": 1
-                                            },
-                                            "m_children": {
-                                                "Value": "CLightComponent",
-                                                "Elements": [],
-                                                "Type": 22,
-                                                "Size": 32
-                                            }
-                                        },
-                                        {
-                                            "Value": "CTransformComponent",
-                                            "m_matrix": {
-                                                "Value": [
-                                                    0.6891994476318359,
-                                                    0.7245716452598572,
-                                                    0.0,
-                                                    0.0,
-                                                    -0.7245716452598572,
-                                                    0.6891994476318359,
-                                                    0.0,
-                                                    0.0,
-                                                    0.0,
-                                                    0.0,
-                                                    1.0,
-                                                    0.0,
-                                                    0.0,
-                                                    4.277112007141113,
-                                                    5.834279537200928,
-                                                    1.0
-                                                ],
-                                                "Type": 8,
-                                                "Size": 64
-                                            },
-                                            "m_active": {
-                                                "Value": true,
-                                                "Type": 12,
-                                                "Size": 1
-                                            },
-                                            "m_children": {
-                                                "Value": "CTransformComponent",
-                                                "Elements": [],
-                                                "Type": 22,
-                                                "Size": 32
-                                            }
-                                        },
-                                        {
-                                            "Value": "CDebugRenderComponent",
-                                            "m_shape": {
-                                                "Value": 2,
-                                                "Type": 1,
-                                                "Size": 4
-                                            },
-                                            "m_color": {
-                                                "Value": [
-                                                    1.0,
-                                                    1.0,
-                                                    1.0,
-                                                    1.0
-                                                ],
-                                                "Type": 7,
-                                                "Size": 16
-                                            },
-                                            "m_active": {
-                                                "Value": true,
-                                                "Type": 12,
-                                                "Size": 1
-                                            },
-                                            "m_children": {
-                                                "Value": "CDebugRenderComponent",
-                                                "Elements": [],
-                                                "Type": 22,
-                                                "Size": 32
-                                            }
-                                        }
-                                    ],
-                                    "Type": 22,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -244,7 +116,7 @@
                                 "m_name": {
                                     "Value": "Height",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -287,18 +159,18 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
                                             "Value": "CHeightFieldMeshComponent",
                                             "m_xSteps": {
-                                                "Value": 40,
+                                                "Value": 20,
                                                 "Type": 1,
                                                 "Size": 4
                                             },
                                             "m_zSteps": {
-                                                "Value": 40,
+                                                "Value": 20,
                                                 "Type": 1,
                                                 "Size": 4
                                             },
@@ -322,25 +194,15 @@
                                                 "Type": 2,
                                                 "Size": 4
                                             },
-                                            "m_meshResource": {
-                                                "Value": "CMeshResourceReference",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
                                                 "m_resourceFileName": {
-                                                    "Value": "./assets/heightfields/test.mesh.bin",
+                                                    "Value": "./assets/staticmeshes/height.smesh.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
-                                            },
-                                            "m_materialResource": {
-                                                "Value": "CMaterialResourceReference",
-                                                "m_resourceFileName": {
-                                                    "Value": "./assets/materials/height.mat.obj.json",
-                                                    "Type": 3,
-                                                    "Size": 40
-                                                },
-                                                "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -351,7 +213,7 @@
                                                 "Value": "CHeightFieldMeshComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -412,12 +274,12 @@
                                                 "Value": "CHeightFieldPhysicsComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 22,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -425,7 +287,7 @@
                                 "m_name": {
                                     "Value": "Player",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -451,9 +313,9 @@
                                                     0.0,
                                                     1.0,
                                                     0.0,
-                                                    5.786507606506348,
-                                                    0.662102997303009,
-                                                    13.448474884033203,
+                                                    3.955758571624756,
+                                                    1.1383204460144043,
+                                                    7.399231433868408,
                                                     1.0
                                                 ],
                                                 "Type": 8,
@@ -468,7 +330,7 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -504,30 +366,20 @@
                                                 "Value": "CCharacterComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
                                             "Value": "CMeshComponent",
-                                            "m_meshResource": {
-                                                "Value": "CMeshResourceReference",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
                                                 "m_resourceFileName": {
-                                                    "Value": "./assets/meshes/warrior.mesh.bin",
+                                                    "Value": "./assets/staticmeshes/warrior.smesh.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
-                                            },
-                                            "m_materialResource": {
-                                                "Value": "CMaterialResourceReference",
-                                                "m_resourceFileName": {
-                                                    "Value": "./assets/materials/warrior.mat.obj.json",
-                                                    "Type": 3,
-                                                    "Size": 40
-                                                },
-                                                "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -538,7 +390,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -552,7 +404,7 @@
                                                 "Value": "CCameraComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -566,12 +418,12 @@
                                                 "Value": "CThirdPersonInputComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 22,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -579,7 +431,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -591,25 +443,15 @@
                                     "Elements": [
                                         {
                                             "Value": "CMeshComponent",
-                                            "m_meshResource": {
-                                                "Value": "CMeshResourceReference",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
                                                 "m_resourceFileName": {
-                                                    "Value": "./assets/meshes/tree.mesh.bin",
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
-                                            },
-                                            "m_materialResource": {
-                                                "Value": "CMaterialResourceReference",
-                                                "m_resourceFileName": {
-                                                    "Value": "./assets/materials/tree.mat.obj.json",
-                                                    "Type": 3,
-                                                    "Size": 40
-                                                },
-                                                "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -620,7 +462,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -639,9 +481,9 @@
                                                     0.0,
                                                     1.0,
                                                     0.0,
-                                                    3.062526226043701,
-                                                    1.012278437614441,
-                                                    8.670910835266113,
+                                                    2.8270888328552246,
+                                                    0.7401686310768127,
+                                                    8.720657348632813,
                                                     1.0
                                                 ],
                                                 "Type": 8,
@@ -656,7 +498,7 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -722,12 +564,12 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 22,
-                                    "Size": 32
+                                    "Size": 24
                                 }
                             },
                             {
@@ -735,7 +577,7 @@
                                 "m_name": {
                                     "Value": "Tree",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -747,25 +589,15 @@
                                     "Elements": [
                                         {
                                             "Value": "CMeshComponent",
-                                            "m_meshResource": {
-                                                "Value": "CMeshResourceReference",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
                                                 "m_resourceFileName": {
-                                                    "Value": "./assets/meshes/tree.mesh.bin",
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
-                                            },
-                                            "m_materialResource": {
-                                                "Value": "CMaterialResourceReference",
-                                                "m_resourceFileName": {
-                                                    "Value": "./assets/materials/tree.mat.obj.json",
-                                                    "Type": 3,
-                                                    "Size": 40
-                                                },
-                                                "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -776,7 +608,7 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -795,9 +627,9 @@
                                                     0.0,
                                                     1.0,
                                                     0.0,
-                                                    1.7530856132507324,
-                                                    0.739062488079071,
-                                                    9.52214241027832,
+                                                    2.8270888328552246,
+                                                    1.215622067451477,
+                                                    7.028083801269531,
                                                     1.0
                                                 ],
                                                 "Type": 8,
@@ -812,7 +644,7 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -878,12 +710,1472 @@
                                                 "Value": "CPhysicsBodyComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
                                     "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    4.641127109527588,
+                                                    1.103244423866272,
+                                                    7.028083801269531,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    4.641127109527588,
+                                                    0.7401686310768127,
+                                                    9.085836410522461,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    2.8270888328552246,
+                                                    0.7401686310768127,
+                                                    15.227762222290039,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    4.641127109527588,
+                                                    0.7401686310768127,
+                                                    15.592941284179688,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    4.641127109527588,
+                                                    0.7401686310768127,
+                                                    13.535188674926758,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    2.8270888328552246,
+                                                    0.7401686310768127,
+                                                    13.535188674926758,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    8.180108070373535,
+                                                    0.7401686310768127,
+                                                    15.227762222290039,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    9.994146347045898,
+                                                    0.7401686310768127,
+                                                    15.592941284179688,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    9.994146347045898,
+                                                    0.7401686310768127,
+                                                    13.535188674926758,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Tree",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/tree.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    8.180108070373535,
+                                                    0.7401686310768127,
+                                                    13.535188674926758,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CPhysicsBodyComponent",
+                                            "m_shapeType": {
+                                                "Value": 3,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_motionType": {
+                                                "Value": 0,
+                                                "Type": 1,
+                                                "Size": 4
+                                            },
+                                            "m_friction": {
+                                                "Value": 0.20000000298023224,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_restitution": {
+                                                "Value": 0.0,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_linearDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_angularDamping": {
+                                                "Value": 0.05000000074505806,
+                                                "Type": 2,
+                                                "Size": 4
+                                            },
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.42817801237106323,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.7828449010848999,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.46084555983543396,
+                                                    0.0,
+                                                    0.0,
+                                                    0.39675241708755493,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CPhysicsBodyComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
                                 }
                             },
                             {
@@ -891,7 +2183,7 @@
                                 "m_name": {
                                     "Value": "Wizard",
                                     "Type": 3,
-                                    "Size": 40
+                                    "Size": 32
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -912,7 +2204,7 @@
                                                 "Value": "CAIComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -931,9 +2223,9 @@
                                                     0.0,
                                                     1.0,
                                                     0.0,
-                                                    5.521116733551025,
-                                                    0.4220935106277466,
-                                                    13.86760425567627,
+                                                    5.1950483322143555,
+                                                    1.0663905143737793,
+                                                    13.19367504119873,
                                                     1.0
                                                 ],
                                                 "Type": 8,
@@ -948,7 +2240,7 @@
                                                 "Value": "CTransformComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
@@ -984,30 +2276,20 @@
                                                 "Value": "CCharacterComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         },
                                         {
                                             "Value": "CMeshComponent",
-                                            "m_meshResource": {
-                                                "Value": "CMeshResourceReference",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
                                                 "m_resourceFileName": {
-                                                    "Value": "./assets/meshes/wizard.mesh.bin",
+                                                    "Value": "./assets/staticmeshes/wizard.smesh.obj.json",
                                                     "Type": 3,
-                                                    "Size": 40
+                                                    "Size": 32
                                                 },
                                                 "Type": 4,
-                                                "Size": 64
-                                            },
-                                            "m_materialResource": {
-                                                "Value": "CMaterialResourceReference",
-                                                "m_resourceFileName": {
-                                                    "Value": "./assets/materials/wizard.mat.obj.json",
-                                                    "Type": 3,
-                                                    "Size": 40
-                                                },
-                                                "Type": 4,
-                                                "Size": 64
+                                                "Size": 56
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1018,22 +2300,672 @@
                                                 "Value": "CMeshComponent",
                                                 "Elements": [],
                                                 "Type": 22,
-                                                "Size": 32
+                                                "Size": 24
                                             }
                                         }
                                     ],
                                     "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Wizard",
+                                    "Type": 3,
                                     "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CAIComponent",
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CAIComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    5.1950483322143555,
+                                                    1.0663905143737793,
+                                                    11.388724327087402,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CCharacterComponent",
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0181787014007568,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.5258136987686157,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CCharacterComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/wizard.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Wizard",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CAIComponent",
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CAIComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    6.969902515411377,
+                                                    1.0663905143737793,
+                                                    11.388724327087402,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CCharacterComponent",
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0181787014007568,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.5258136987686157,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CCharacterComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/wizard.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Wizard",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CAIComponent",
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CAIComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    6.969902515411377,
+                                                    1.0663905143737793,
+                                                    15.007761001586914,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CCharacterComponent",
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0181787014007568,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.5258136987686157,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CCharacterComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/wizard.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Wizard",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CAIComponent",
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CAIComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    6.969902515411377,
+                                                    1.0663905143737793,
+                                                    16.187288284301758,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CCharacterComponent",
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0181787014007568,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.5258136987686157,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CCharacterComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/wizard.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
+                                }
+                            },
+                            {
+                                "Value": "CEntityComponent",
+                                "m_name": {
+                                    "Value": "Wizard",
+                                    "Type": 3,
+                                    "Size": 32
+                                },
+                                "m_active": {
+                                    "Value": true,
+                                    "Type": 12,
+                                    "Size": 1
+                                },
+                                "m_children": {
+                                    "Value": "CEntityComponent",
+                                    "Elements": [
+                                        {
+                                            "Value": "CAIComponent",
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CAIComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CTransformComponent",
+                                            "m_matrix": {
+                                                "Value": [
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    5.766523361206055,
+                                                    1.0663905143737793,
+                                                    16.187288284301758,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CTransformComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CCharacterComponent",
+                                            "m_objectMatrix": {
+                                                "Value": [
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0181787014007568,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.6000000238418579,
+                                                    0.0,
+                                                    0.0,
+                                                    0.5258136987686157,
+                                                    0.0,
+                                                    1.0
+                                                ],
+                                                "Type": 8,
+                                                "Size": 64
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CCharacterComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        },
+                                        {
+                                            "Value": "CMeshComponent",
+                                            "m_staticMeshResource": {
+                                                "Value": "CStaticMeshResourceReference",
+                                                "m_resourceFileName": {
+                                                    "Value": "./assets/staticmeshes/wizard.smesh.obj.json",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
+                                                "Type": 4,
+                                                "Size": 56
+                                            },
+                                            "m_active": {
+                                                "Value": true,
+                                                "Type": 12,
+                                                "Size": 1
+                                            },
+                                            "m_children": {
+                                                "Value": "CMeshComponent",
+                                                "Elements": [],
+                                                "Type": 22,
+                                                "Size": 24
+                                            }
+                                        }
+                                    ],
+                                    "Type": 22,
+                                    "Size": 24
                                 }
                             }
                         ],
                         "Type": 22,
-                        "Size": 32
+                        "Size": 24
                     }
                 }
             ],
             "Type": 22,
-            "Size": 32
+            "Size": 24
         }
     }
 }

@@ -15,11 +15,11 @@
 REGISTER_COMPONENT(CHeightFieldMeshComponent, "HeightFieldMesh", "Graphics");
 
 REFL_DEFINE_OBJECT(CHeightFieldMeshComponent)
-REFL_DEFINE_INT_MEMBER(CHeightFieldMeshComponent, m_xSteps),
-REFL_DEFINE_INT_MEMBER(CHeightFieldMeshComponent, m_zSteps),
-REFL_DEFINE_FLOAT_MEMBER(CHeightFieldMeshComponent, m_stepSize),
-REFL_DEFINE_VECTOR4_MEMBER(CHeightFieldMeshComponent, m_blendHeights),
-REFL_DEFINE_FLOAT_MEMBER(CHeightFieldMeshComponent, m_blendTransition)
+    REFL_DEFINE_INT_MEMBER(CHeightFieldMeshComponent, m_xSteps),
+    REFL_DEFINE_INT_MEMBER(CHeightFieldMeshComponent, m_zSteps),
+    REFL_DEFINE_FLOAT_MEMBER(CHeightFieldMeshComponent, m_stepSize),
+    REFL_DEFINE_VECTOR4_MEMBER(CHeightFieldMeshComponent, m_blendHeights),
+    REFL_DEFINE_FLOAT_MEMBER(CHeightFieldMeshComponent, m_blendTransition)
 REFL_DEFINE_END
 
 
@@ -60,6 +60,8 @@ void CHeightFieldMeshComponent::Render(bgfx::ViewId viewId)
 
     auto meshRes = GetMeshResource();
     if (!meshRes)
+        return;
+    if (meshRes->IsFinalized() == false)
         return;
 
     if (m_meshStateInitialized == false && IsLoaded())
@@ -103,6 +105,12 @@ void CHeightFieldMeshComponent::InitializeMesh(std::shared_ptr<CMeshResource> me
     if (!mesh)
         return;
 
+    auto matRes = GetMaterialResource();
+    if (!matRes)
+        return;
+    if (matRes->IsFinalized() == false)
+        return;
+
     // Create uniform handles for height-based texture blending if not already created
     if (!bgfx::isValid(m_blendHeightsUniform))
     {
@@ -119,11 +127,7 @@ void CHeightFieldMeshComponent::InitializeMesh(std::shared_ptr<CMeshResource> me
     bgfx::setUniform(m_lightDir, lightDir);
     bgfx::setUniform(m_lightColor, lightColor);
 
-    auto matRes = GetMaterialResource();
-    if (!matRes)
-    {
-        return;
-    }
+
 
     bgfx::setUniform(m_ambient, matRes->GetAmbientColor().data());
     bgfx::setUniform(m_materialColor, matRes->GetMaterialColor().data());
@@ -185,15 +189,11 @@ void CHeightFieldMeshComponent::InitializeMesh(std::shared_ptr<CMeshResource> me
 
 bool CHeightFieldMeshComponent::IsLoaded() const
 {
-    if (!GetMaterialResource()) return false;
-    if (!GetMaterialResource()->IsLoaded()) return false;
-    if (!GetMaterialResource()->IsFinalized()) return false;
+    auto staticMeshRes = GetStaticMeshResource();
+    if (!staticMeshRes)
+        return false;
 
-    if (!GetMeshResource()) return false;
-    if (!GetMeshResource()->IsLoaded()) return false;
-    if (!GetMeshResource()->IsFinalized()) return false;
-
-    return true;
+    return staticMeshRes->GetResource()->IsLoaded();
 }
 
 std::shared_ptr<Vector4f> CHeightFieldMeshComponent::GetBoundingSphere() const
@@ -293,8 +293,6 @@ bool CHeightFieldMeshComponent::SaveMesh(const std::string& filePath)
 
     outFile.close();
     std::cout << "CHeightFieldMeshComponent::SaveMesh: Successfully saved mesh to: " << filePath << std::endl;
-
-    m_meshResource.SetResourceFileName(filePath);
 
     return true;
 }

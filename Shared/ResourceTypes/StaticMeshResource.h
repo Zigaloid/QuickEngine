@@ -39,7 +39,17 @@ public:
 	void Finalize() override;
 
 	std::shared_ptr<CMeshResource> GetMeshResource() const { return m_meshResource.GetResourceAs<CMeshResource>(); }
+	std::string GetMeshResourceFileName() const { return m_meshResource.GetResourceFileName(); }
 	std::shared_ptr<CMaterialResource> GetMaterialResource() const { return m_materialResource.GetResourceAs<CMaterialResource>(); }
+	// Set the m_meshResource file path.
+	void SetMeshResourceFileName(const std::string& fileName)
+	{
+		m_meshResource.SetResourceFileName(fileName);
+	}
+	void SetMaterialResourceFileName(const std::string& fileName)
+	{
+		m_materialResource.SetResourceFileName(fileName);
+	}
 
 	bool Initialize();
 

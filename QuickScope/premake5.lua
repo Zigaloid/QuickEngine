@@ -53,12 +53,17 @@ project "QuickScope"
 
 	includedirs { "../External/ufbx" }   	
 	
+	files { "resource.rc" }
+
 	files { "../AssetClasses/**.cpp" }
 	files { "../AssetClasses/**.h" }
+
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.cpp" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.h" }
 	files { "../External/imgui-docking/imgui.cpp" }
 	files { "../External/imgui-docking/backends/imgui_impl_opengl3.cpp" }
+	files { "../External/imgui-docking/backends/imgui_impl_win32.cpp" }
+
 	files { "../External/imgui-docking/imgui_tables.cpp" }
 	files { "../External/imgui-docking/imgui_Widgets.cpp" }
 	files { "../External/imgui-docking/imgui_draw.cpp" }

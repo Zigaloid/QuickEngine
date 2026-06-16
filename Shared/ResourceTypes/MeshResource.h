@@ -45,6 +45,23 @@ public:
 	// Accessor
 	Mesh* GetMesh() { return m_mesh; }
 	const Mesh* GetMesh() const { return m_mesh; }
+
+	// Set an in-memory Mesh instance for this resource.
+	// Transfers ownership to the resource; any previous mesh is unloaded.
+	// Marks the resource as loaded/finalized so callers treat it as ready.
+	void SetMesh(Mesh* mesh)
+	{
+		if (m_mesh)
+		{
+			meshUnload(m_mesh);
+			m_mesh = nullptr;
+		}
+		m_mesh = mesh;
+		// Resource base class members are protected; set them to indicate ready state.
+		m_isLoaded = true;
+		m_isFinalized = true;
+	}
+
 private:
 	Mesh* m_mesh = nullptr;
 };

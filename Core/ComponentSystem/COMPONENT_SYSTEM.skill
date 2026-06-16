@@ -1,0 +1,431 @@
+# COMPONENT SYSTEM SKILL
+
+## Overview
+The QuickEngine Component System is a pool-based Entity-Component-System (ECS) architecture that manages component lifecycle, hierarchy, and memory through object pooling. Components are reflected, support parent-child relationships, and can be created/released efficiently via typed pools.
+
+## Core Concepts
+
+### 1. Component (Component.h/cpp)
+**Purpose**: Base class for all engine components with lifecycle management and hierarchy support.
+
+**Key Features**:
+- Unique ComponentId assignment (auto-incremented)
+- Lifecycle hooks: OnInitialize, OnUpdate, OnShutdown, OnActivate, OnDeactivate
+- Parent-child hierarchy with std::weak_ptr parent and std::vector<std::shared_ptr<Component>> children
+- Active state with hierarchical propagation
+- Reflection support via CReflectedBase
+- Non-copyable but movable
+
+**Lifecycle Flow**:
+```
+Creation ? Initialize() ? OnInitialize() ? Update Loop ? OnUpdate(deltaTime) 
+? SetActive(false) ? OnDeactivate() ? Shutdown() ? OnShutdown()
+```
+
+**Hierarchy Management**:
+- `AddChild(Component*)` / `AddChild(std::shared_ptr<Component>)` - Attaches child and initializes if parent is initialized
+- `CreateChild<T>()` - Creates typed child via ComponentManager and auto-attaches
+- `RemoveChild(Component*)` - Detaches and shuts down child
+
+**State Queries**:
+- `IsInitialized()` - Has OnInitialize succeeded?
+- `IsActive()` - Local active state
+- `IsActiveInHierarchy()` - Active and all ancestors active
+- `GetId()` - Unique component ID
+
+### 2. ComponentManager (ComponentManager.h)
+**Purpose**: Central registry and factory for all component types; owns all ComponentPools.
+
+**Key Features**:
+- Type-safe component creation via templates
+- String-based component creation for serialization/scripting
+- Automatic pool registration on first use
+- Shared pointer support for co-ownership with pools
+
+**Registration**:
+```cpp
+manager->RegisterComponentType<MyComponent>(initialPoolSize, maxPoolSize);
+manager->RegisterComponentType<MyComponent>("MyComponent", 10, 1000); // with string name
+```
+
+**Creation**:
+```cpp
+MyComponent* comp = manager->CreateComponent<MyComponent>();                    // Raw pointer
+std::shared_ptr<MyComponent> comp = manager->CreateComponentShared<MyComponent>(); // Shared pointer
+Component* comp = manager->CreateComponentByName("MyComponent");                // String-based
+```
+
+**Release**:
+```cpp
+manager->ReleaseComponent(comp); // Returns component to its pool
+```
+
+**Iteration**:
+- `ForEach<T>(std::function<void(T&)>)` - Iterates active components of type T
+- `GetAll<T>()` - Returns vector of all active T components
+- `GetComponentCount<T>()` - Count of active T components
+
+### 3. ComponentPool (ComponentPool.h)
+**Purpose**: Object pool for a single component type; recycles instances to avoid allocation overhead.
+
+**Key Features**:
+- Pre-allocation of `initialSize` components at construction
+- Dynamic growth up to `maxSize` when pool exhausted
+- Active/inactive tracking with std::vector<Component*>
+- Shared ownership via std::vector<std::shared_ptr<Component>> to support shared_from_this()
+- Bulk operations: UpdateAll, InitializeAll, ShutdownAll
+
+**Pool Lifecycle**:
+```
+Acquire() ? m_inactive.pop_back() ? m_active.push_back() ? SetActive(true)
+Release() ? Shutdown() ? SetActive(false) ? m_inactive.push_back()
+```
+
+**Performance Notes**:
+- Components are never destroyed until pool destruction
+- Acquire is O(1) when inactive pool is non-empty
+- Release is O(n) due to std::find in m_active
+
+### 4. ComponentFactory (ComponentFactory.h)
+**Purpose**: Abstract factory interface for creating Component instances.
+
+**Key Types**:
+- `ComponentFactory` - Pure virtual base with `Create()` and `GetComponentType()`
+- `TypedComponentFactory<T>` - Concrete factory that creates instances of T via std::make_unique<T>()
+
+**Usage**:
+Factories are owned by ComponentPool and invoked during Acquire() when pools need expansion.
+
+### 5. ComponentRegistry (ComponentRegistry.h/cpp)
+**Purpose**: Runtime registry of component types for editor/tooling discovery.
+
+**Key Features**:
+- ComponentTypeInfo: className, displayName, category
+- `Register()` / `Unregister()` / `Clear()` / `Find()`
+- Auto-registration via `AutoRegisterComponent` RAII helper
+
+**Macro Registration**:
+```cpp
+// In .h
+class MyComponent : public ComponentSystem::Component {
+    DECLARE_COMPONENT();
+};
+
+// In .cpp
+REGISTER_COMPONENT(MyComponent, "My Component", "Gameplay");
+```
+
+**Access**:
+```cpp
+ComponentRegistry& registry = GetComponentRegistry();
+const std::vector<ComponentTypeInfo>& types = registry.GetAll();
+```
+
+### 6. ComponentReference (ComponentReference.h)
+**Purpose**: Type-safe weak reference to a Component with automatic null checks.
+
+**Usage**:
+```cpp
+ComponentReference<MyComponent> ref(componentPtr);
+if (ref.IsValid()) {
+    ref.Get()->DoSomething();
+}
+```
+
+### 7. ComponentDependencyDefinition (ComponentDependencyDefinition.h/cpp)
+**Purpose**: Declares required component dependencies for automatic initialization ordering.
+
+**Not yet fully implemented** - Placeholder for future dependency graph resolution.
+
+## Architecture Patterns
+
+### Object Pooling
+- All components are pooled by type to minimize allocations
+- Pools grow dynamically up to maxSize
+- Release returns components to inactive pool without destruction
+- Shutdown() clears component state for reuse
+
+### Reflection Integration
+- All components inherit from CReflectedBase
+- Use `REFL_DECLARE_OBJECT(MyComponent, Component)` in class definition
+- Use `REFL_DEFINE_OBJECT(MyComponent, Component)` in .cpp
+- Enables serialization, editor inspection, and reflection-based factories
+
+### Hierarchy Management
+- Components form parent-child trees
+- Parent holds std::shared_ptr<Component> children
+- Children hold std::weak_ptr<Component> parent to break cycles
+- SetActive propagates to all children
+- Shutdown recursively shuts down all children
+
+### Shared Ownership
+- Pools hold std::shared_ptr<Component> to enable shared_from_this()
+- External code can hold shared_ptr via GetSharedPtr() or CreateComponentShared()
+- Components are only destroyed when both pool and all external holders release
+
+## Usage Examples
+
+### Creating a New Component Type
+
+**1. Define Component Header (MyComponent.h)**:
+```cpp
+#pragma once
+#include "ComponentSystem/ComponentSystem.h"
+
+namespace MyNamespace {
+
+class MyComponent : public ComponentSystem::Component {
+public:
+    REFL_DECLARE_OBJECT(MyComponent, ComponentSystem::Component);
+    DECLARE_COMPONENT();
+
+    void SetValue(int value) { m_value = value; }
+    int GetValue() const { return m_value; }
+
+protected:
+    bool OnInitialize() override;
+    void OnUpdate(double deltaTime) override;
+    void OnShutdown() override;
+
+private:
+    int m_value = 0;
+    double m_timer = 0.0;
+};
+
+} // namespace MyNamespace
+```
+
+**2. Implement Component Source (MyComponent.cpp)**:
+```cpp
+#include "MyComponent.h"
+#include "CoreSystem/CoreSystem.h"
+
+namespace MyNamespace {
+
+REFL_DEFINE_OBJECT(MyComponent, ComponentSystem::Component);
+REGISTER_COMPONENT(MyComponent, "My Component", "Custom");
+
+bool MyComponent::OnInitialize() {
+    m_value = 42;
+    m_timer = 0.0;
+    return true;
+}
+
+void MyComponent::OnUpdate(double deltaTime) {
+    m_timer += deltaTime;
+    if (m_timer > 1.0) {
+        m_value++;
+        m_timer = 0.0;
+    }
+}
+
+void MyComponent::OnShutdown() {
+    m_value = 0;
+    m_timer = 0.0;
+}
+
+} // namespace MyNamespace
+```
+
+**3. Register and Use**:
+```cpp
+auto* manager = Core::CoreSystem::GetComponentManager();
+manager->RegisterComponentType<MyNamespace::MyComponent>(10, 100);
+
+auto* myComp = manager->CreateComponent<MyNamespace::MyComponent>();
+if (myComp->Initialize()) {
+    myComp->SetValue(100);
+    myComp->Update(0.016); // 60 FPS
+}
+
+manager->ReleaseComponent(myComp);
+```
+
+### Building Component Hierarchies
+
+```cpp
+auto* manager = Core::CoreSystem::GetComponentManager();
+
+// Create parent component
+auto* parent = manager->CreateComponent<ParentComponent>();
+parent->Initialize();
+
+// Create and attach children
+auto* child1 = parent->CreateChild<ChildComponent>();
+auto* child2 = parent->CreateChild<ChildComponent>();
+
+// Deactivate parent (children are also deactivated)
+parent->SetActive(false);
+
+// Remove a child
+parent->RemoveChild(child1);
+
+// Shutdown (recursively shuts down all children)
+parent->Shutdown();
+manager->ReleaseComponent(parent);
+```
+
+### Iterating Components
+
+```cpp
+auto* manager = Core::CoreSystem::GetComponentManager();
+
+// Iterate all active components of type
+manager->ForEach<MyComponent>([](MyComponent& comp) {
+    comp.DoSomething();
+});
+
+// Get all active components
+auto components = manager->GetAll<MyComponent>();
+for (auto* comp : components) {
+    if (comp->IsActiveInHierarchy()) {
+        comp->Update(deltaTime);
+    }
+}
+
+// Get count
+size_t count = manager->GetComponentCount<MyComponent>();
+```
+
+## Common Patterns
+
+### Component State Management
+```cpp
+// Check if component is ready
+if (comp->IsInitialized() && comp->IsActiveInHierarchy()) {
+    comp->DoWork();
+}
+
+// Safely re-initialize
+comp->ReInitialize(); // Calls Shutdown() then Initialize()
+```
+
+### Safe Component References
+```cpp
+// Store weak reference
+ComponentReference<TargetComponent> m_targetRef;
+
+void Setup(TargetComponent* target) {
+    m_targetRef = ComponentReference<TargetComponent>(target);
+}
+
+void OnUpdate(double deltaTime) {
+    if (m_targetRef.IsValid()) {
+        m_targetRef.Get()->Interact();
+    }
+}
+```
+
+### Component Communication
+```cpp
+// Parent-to-child
+for (auto& child : GetChildren()) {
+    if (auto* specific = dynamic_cast<SpecificComponent*>(child.get())) {
+        specific->Notify();
+    }
+}
+
+// Child-to-parent
+if (auto parent = GetParent().lock()) {
+    if (auto* specificParent = dynamic_cast<ParentComponent*>(parent.get())) {
+        specificParent->HandleChildEvent();
+    }
+}
+```
+
+## Best Practices
+
+### DO:
+- ? Always call Initialize() after creating a component
+- ? Use ReleaseComponent() instead of deleting components directly
+- ? Check IsActiveInHierarchy() before updating components in hierarchy
+- ? Clear children in OnShutdown() to break reference cycles
+- ? Use shared_ptr when you need co-ownership beyond the pool
+- ? Register component types at startup for best performance
+- ? Use DECLARE_COMPONENT and REGISTER_COMPONENT for editor visibility
+
+### DON'T:
+- ? Don't delete components directly (pools own them)
+- ? Don't store raw Component* across frames without validation
+- ? Don't create circular parent-child relationships
+- ? Don't call Update() manually (ComponentManager handles this)
+- ? Don't forget to call Shutdown() before ReleaseComponent()
+- ? Don't exceed maxPoolSize (creation will fail)
+- ? Don't access m_children or m_parent directly (use provided accessors)
+
+## Performance Considerations
+
+### Memory
+- Pools pre-allocate and reuse memory; typical overhead is initialSize * sizeof(Component)
+- Components are never freed until pool destruction
+- Shared pointers add 16 bytes overhead per component
+- Hierarchy vectors grow dynamically; reserve() if child count is known
+
+### CPU
+- Acquire/Release are O(1) amortized (O(n) worst case for Release due to std::find)
+- Update iteration is linear in active component count
+- IsActiveInHierarchy() walks parent chain (O(depth))
+- Component creation without pools is slower (use RegisterComponentType early)
+
+### Optimization Tips
+- Register component types at startup to avoid lazy registration overhead
+- Use ForEach instead of GetAll to avoid vector copy
+- Batch Initialize/Shutdown operations when possible
+- Set initialPoolSize to match expected peak usage
+- Disable inactive components instead of Release/Acquire if toggling frequently
+
+## Integration Points
+
+### CoreSystem
+- `Core::CoreSystem::GetComponentManager()` - Access global ComponentManager
+- Typical initialization in CoreSystem::Initialize()
+
+### Reflection
+- Components use `REFL_DECLARE_OBJECT` / `REFL_DEFINE_OBJECT`
+- Enables ClassFactory integration for string-based creation
+- Supports property serialization and editor inspection
+
+### Serialization
+- Use ComponentManager::CreateComponentByName() with reflection class names
+- Serialize component hierarchy as nested JSON/XML
+- Store ComponentId for cross-component references
+
+## File Structure
+```
+Core/ComponentSystem/
+??? ComponentSystem.h           # Umbrella header (include this)
+??? ComponentSystem.cpp         # Component::Shutdown implementation
+??? Component.h                 # Base component class
+??? Component.cpp               # Component lifecycle implementation
+??? ComponentManager.h          # Pool manager and factory
+??? ComponentManager.cpp        # Manager implementation
+??? ComponentPool.h             # Object pool
+??? ComponentPool.cpp           # Pool implementation
+??? ComponentFactory.h          # Abstract factory (header-only)
+??? ComponentRegistry.h         # Component type registry
+??? ComponentRegistry.cpp       # Registry implementation
+??? ComponentReference.h        # Weak reference wrapper
+??? ComponentDependencyDefinition.h/.cpp  # Future dependency system
+??? ComponentFileReference.cpp  # File-based component references
+```
+
+## Related Systems
+- **CoreSystem**: Owns and initializes ComponentManager
+- **Reflection**: Enables dynamic component creation and serialization
+- **Serialization**: Loads/saves component hierarchies
+- **Editor**: Uses ComponentRegistry to populate component add menus
+
+## Future Enhancements
+- Dependency graph resolution via ComponentDependencyDefinition
+- Component messaging/event system
+- Multi-threaded Update() via job system
+- Component prefabs and templates
+- Hot-reload support for component types
+
+---
+
+**Version**: 1.0  
+**Last Updated**: 2024  
+**Maintainer**: QuickEngine Core Team  
+**Language**: C++20  
+**License**: See repository root

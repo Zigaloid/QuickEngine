@@ -66,10 +66,14 @@ project "NexusServer"
 	
 	files { "../AssetClasses/**.cpp" }
 	files { "../AssetClasses/**.h" }
+
+	files { "resource.rc" }
+
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.cpp" }
 	files { "../External/bgfx/3rdparty/meshoptimizer/src/**.h" }
 	files { "../External/imgui-docking/imgui.cpp" }
 	files { "../External/imgui-docking/backends/imgui_impl_opengl3.cpp" }
+	files { "../External/imgui-docking/backends/imgui_impl_win32.cpp" }
 	files { "../External/imgui-docking/imgui_tables.cpp" }
 	files { "../External/imgui-docking/imgui_Widgets.cpp" }
 	files { "../External/imgui-docking/imgui_draw.cpp" }
@@ -130,3 +134,4 @@ project "NexusServer"
 	  links { "bx" }	  
 	  links { "bimg_decode" }
 	  staticruntime "on" -- Use /MTd
+	  

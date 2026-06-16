@@ -49,7 +49,7 @@ void CHeightFieldPhysicsComponent::OnUpdate(double deltaTime)
     {
         Matrix4f world = ComputeWorldTransform();
         ApplyTransformToParent(world);
-    }
+    }   
 }
 
 

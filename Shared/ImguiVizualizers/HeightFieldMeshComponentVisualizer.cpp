@@ -7,6 +7,7 @@
 #include <bx/bounds.h>
 #include <algorithm>
 #include <cmath>
+#include <filesystem>
 
 namespace ImGuiVisualizers {
 
@@ -28,12 +29,12 @@ namespace ImGuiVisualizers {
             std::cerr << "HeightFieldMeshComponentVisualizer: Failed to cast loaded object to CHeightFieldMeshComponent" << std::endl;
             return false;
         }
-
+               
         if (newComponent != m_heightFieldComp)
         {
             ReleaseHeightFieldComponent();
             m_heightFieldComp = newComponent;
-
+            EnsureStaticMeshFileExists();
             if (!m_heightFieldComp->IsInitialized())
             {
                 m_heightFieldComp->Initialize();
@@ -51,6 +52,7 @@ namespace ImGuiVisualizers {
         Get3DView().SetRenderCallback([this](bgfx::ViewId viewId, Rendering::BgfxRenderPrimitives& prims) {
             if (!m_heightFieldComp) return;
             m_heightFieldComp->Render(viewId);
+            // Forward to our member functions using the same numeric view id
             RenderHeightFieldPointSelection(viewId, prims);
             RenderBrushVisualization(viewId, prims);
             });
@@ -199,6 +201,7 @@ namespace ImGuiVisualizers {
             }
         }
     }
+
     void HeightFieldMeshComponentVisualizer::RecalculateMeshNormals(Group& group, const bgfx::VertexLayout& layout)
     {
         if (!group.m_vertices || !group.m_indices || group.m_numIndices == 0)
@@ -273,9 +276,9 @@ namespace ImGuiVisualizers {
         }
     }
 
-// ── Render ───────────────────────────────────────────────────────────────────
+// ── Render helpers (extracted from Render) ───────────────────────────────────
 
-    void HeightFieldMeshComponentVisualizer::RenderHeightFieldPointSelection(bgfx::ViewId viewId, Rendering::BgfxRenderPrimitives& prims)
+    void HeightFieldMeshComponentVisualizer::RenderHeightFieldPointSelection(unsigned short viewId, Rendering::BgfxRenderPrimitives& prims)
     {
         const auto& allSelected = m_selectionManager.GetAllSelected();
         if (allSelected.empty()) return;
@@ -320,11 +323,11 @@ namespace ImGuiVisualizers {
                 ? 0xff00ffff   // yellow (ABGR)
                 : 0xffffffff;  // white  (ABGR)
 
-            prims.RenderSphere(viewId, highlightMtx, color);
+            prims.RenderSphere(static_cast<bgfx::ViewId>(viewId), highlightMtx, color);
         }
     }
 
-    void HeightFieldMeshComponentVisualizer::RenderBrushVisualization(bgfx::ViewId viewId, Rendering::BgfxRenderPrimitives& prims)
+    void HeightFieldMeshComponentVisualizer::RenderBrushVisualization(unsigned short viewId, Rendering::BgfxRenderPrimitives& prims)
     {
         if (!m_brushPainting)
             return;
@@ -397,14 +400,13 @@ namespace ImGuiVisualizers {
                 }
 
                 // Render as wireframe sphere
-                prims.RenderWireSphere(viewId, brushMtx, color);
+                prims.RenderWireSphere(static_cast<bgfx::ViewId>(viewId), brushMtx, color);
             }
         }
     }
 
-    bool HeightFieldMeshComponentVisualizer::Render(bool* isOpen)
+    void HeightFieldMeshComponentVisualizer::ProcessShortcuts()
     {
-        // Support undo/redo keyboard shortcuts
         if (ImGui::IsKeyChordPressed(ImGuiMod_Ctrl | ImGuiKey_Z))
         {
             m_history.Undo();
@@ -413,132 +415,120 @@ namespace ImGuiVisualizers {
         {
             m_history.Redo();
         }
+    }
 
-        // Check if we need to register selectables (deferred until mesh resource is loaded)
+    void HeightFieldMeshComponentVisualizer::EnsureSelectablesRegistered()
+    {
         if (m_heightFieldComp && m_heightFieldComp->isMeshInitialized() && !m_selectablesRegistered)
         {
             RegisterHeightFieldPoints();
             m_selectablesRegistered = true;
         }
+    }
 
-        // Build window title
-        std::string title = m_windowName;
+    bool HeightFieldMeshComponentVisualizer::BeginEditorWindow(bool* isOpen, std::string& outTitle)
+    {
+        outTitle = m_windowName;
         if (!m_fileName.empty())
         {
-            title += " - " + m_fileName;
+            outTitle += " - " + m_fileName;
         }
 
-        if (!ImGui::Begin(title.c_str(), isOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
+        if (!ImGui::Begin(outTitle.c_str(), isOpen, ImGuiWindowFlags_MenuBar | ImGuiWindowFlags_NoScrollbar | ImGuiWindowFlags_NoScrollWithMouse))
         {
             ImGui::End();
             return false;
         }
+        return true;
+    }
 
-        // Render menu bar (from editor actions)
+    void HeightFieldMeshComponentVisualizer::RenderMenuAndToolbar()
+    {
         if (ImGui::BeginMenuBar())
         {
             m_editor.GetActionManager().RenderMenuBar();
-
             ImGui::EndMenuBar();
         }
 
-        // Render toolbar (from editor actions)
         m_editor.GetActionManager().RenderToolbar();
+    }
 
-        // Layout: left = 3D view (approx 65%), right = inspector (35%)
-        ImVec2 avail = ImGui::GetContentRegionAvail();
-        float leftW = avail.x * 0.65f;
-        float rightW = avail.x - leftW;
+    void HeightFieldMeshComponentVisualizer::HandleViewportInteractions(const ImVec2& viewportMin, const ImVec2& viewportSize)
+    {
+        const ImVec2 mouse = ImGui::GetMousePos();
+        const bool inViewport = Get3DView().IsPointInViewport(mouse);
 
-        // Left pane (3D view)
-        ImGui::BeginChild("##Left3D", ImVec2(leftW, 0), false);
-        ImVec2 leftAvail = ImGui::GetContentRegionAvail();
-        if (leftAvail.x < 1.0f) leftAvail.x = 1.0f;
-        if (leftAvail.y < 1.0f) leftAvail.y = 1.0f;
-
-        m_view.RenderContent(leftAvail);
- 
-         // Get viewport info for selection
-         ImVec2 viewportMin = m_view.GetViewportMin();
-         ImVec2 viewportSize = m_view.GetViewportSize();
-         
-         m_selectionManager.SetViewInfo(Get3DView().GetCamera(), viewportMin, viewportSize);
-    
-        // Handle viewport interactions
+        // Delete key ? only when mouse is over the viewport
+        if (inViewport &&
+            ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
+            m_heightFieldComp && !m_selectionManager.IsGizmoDragging())
         {
-            const ImVec2 mouse = ImGui::GetMousePos();
-            const bool inViewport = Get3DView().IsPointInViewport(mouse);
+            // Could implement delete functionality here if needed
+        }
 
-            // Delete key ? only when mouse is over the viewport
-            if (inViewport &&
-                ImGui::IsKeyPressed(ImGuiKey_Delete, /*repeat=*/false) &&
-                m_heightFieldComp && !m_selectionManager.IsGizmoDragging())
+        // Left-click pick (Alt = camera pan, skip picking)
+        if (!ImGui::GetIO().KeyAlt)
+        {
+            if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
+                !ImGui::IsMouseDragging(ImGuiMouseButton_Left))
             {
-                // Could implement delete functionality here if needed
-            }
-
-            // Left-click pick (Alt = camera pan, skip picking)
-            if (!ImGui::GetIO().KeyAlt)
-            {
-                 if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) &&
-                     !ImGui::IsMouseDragging(ImGuiMouseButton_Left))
-                 {
-                    if (inViewport && !m_brushPainting)
-                         m_selectionManager.PickAtCursor();
-                 }
-             }
-
-            if (m_brushPainting && ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::GetIO().KeyAlt)
-            {
-                // Build pick ray manually (SelectionManager::BuildPickRay is private).
-                const ImVec2 mousePos = ImGui::GetMousePos();
-                const float ndcX = ((mousePos.x - viewportMin.x) / viewportSize.x) * 2.0f - 1.0f;
-                const float ndcY = 1.0f - ((mousePos.y - viewportMin.y) / viewportSize.y) * 2.0f;
-
-                const float aspect = viewportSize.x / viewportSize.y;
-                Matrix4f view, proj;
-                Get3DView().GetCamera().GetViewMatrix(view.data());
-                Get3DView().GetCamera().GetProjectionMatrix(proj.data(), aspect);
-
-                const Matrix4f invVP = (proj * view).Inverse();
-                const float nearZ = bgfx::getCaps()->homogeneousDepth ? -1.0f : 0.0f;
-                const Vector3f nearPt = invVP.TransformPoint(Vector3f(ndcX, ndcY, nearZ));
-                const Vector3f farPt  = invVP.TransformPoint(Vector3f(ndcX, ndcY, 1.0f));
-
-                Ray pickRay;
-                pickRay.pos = nearPt;
-                pickRay.dir = (farPt - nearPt).Normalized();
-
-                // Use a simple horizontal plane at the component's world Y as target
-                Matrix4f componentWorldTransform = Matrix4f::GetIdentity();
-                CTransformComponent* transformComp = m_heightFieldComp ? m_heightFieldComp->FindSibling<CTransformComponent>() : nullptr;
-                if (!transformComp && m_heightFieldComp)
-                {
-                    auto* entity = dynamic_cast<CEntityComponent*>(m_heightFieldComp->GetParent());
-                    if (entity) transformComp = entity->FindChild<CTransformComponent>();
-                }
-                if (transformComp)
-                    componentWorldTransform = transformComp->GetTransform();
-
-                const float planeY = componentWorldTransform.ExtractTranslation().y;
-                // ray-plane intersection using MathUtils convention (Ray has pos/dir)
-                float denom = pickRay.dir.y;
-                if (std::abs(denom) > 1e-6f)
-                {
-                    float t = (planeY - pickRay.pos.y) / denom;
-                    if (t > 0.0f)
-                    {
-                        Vector3f hit = pickRay.pos + pickRay.dir * t;
-                        bool recordInitial = m_brushInitialEntries.empty();
-                        ApplyBrushAtWorldPosition(hit, m_brushRadius, m_brushIntensity, m_brushInvert, recordInitial);
-                    }
-                }
-                // Note: undo commit on stroke end is handled by the action toggle / inspector toggle code.
+                if (inViewport && !m_brushPainting)
+                    m_selectionManager.PickAtCursor();
             }
         }
 
-        // Detect mouse release and commit undo if brush stroke was active
-        const bool isBrushMouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+        // Brush stroke handling while painting and left mouse down
+        if (m_brushPainting && ImGui::IsMouseDown(ImGuiMouseButton_Left) && !ImGui::GetIO().KeyAlt)
+        {
+            // Build pick ray manually (SelectionManager::BuildPickRay is private).
+            const ImVec2 mousePos = ImGui::GetMousePos();
+            const float ndcX = ((mousePos.x - viewportMin.x) / viewportSize.x) * 2.0f - 1.0f;
+            const float ndcY = 1.0f - ((mousePos.y - viewportMin.y) / viewportSize.y) * 2.0f;
+
+            const float aspect = viewportSize.x / viewportSize.y;
+            Matrix4f view, proj;
+            Get3DView().GetCamera().GetViewMatrix(view.data());
+            Get3DView().GetCamera().GetProjectionMatrix(proj.data(), aspect);
+
+            const Matrix4f invVP = (proj * view).Inverse();
+            const float nearZ = bgfx::getCaps()->homogeneousDepth ? -1.0f : 0.0f;
+            const Vector3f nearPt = invVP.TransformPoint(Vector3f(ndcX, ndcY, nearZ));
+            const Vector3f farPt  = invVP.TransformPoint(Vector3f(ndcX, ndcY, 1.0f));
+
+            Ray pickRay;
+            pickRay.pos = nearPt;
+            pickRay.dir = (farPt - nearPt).Normalized();
+
+            // Use a simple horizontal plane at the component's world Y as target
+            Matrix4f componentWorldTransform = Matrix4f::GetIdentity();
+            CTransformComponent* transformComp = m_heightFieldComp ? m_heightFieldComp->FindSibling<CTransformComponent>() : nullptr;
+            if (!transformComp && m_heightFieldComp)
+            {
+                auto* entity = dynamic_cast<CEntityComponent*>(m_heightFieldComp->GetParent());
+                if (entity) transformComp = entity->FindChild<CTransformComponent>();
+            }
+            if (transformComp)
+                componentWorldTransform = transformComp->GetTransform();
+
+            const float planeY = componentWorldTransform.ExtractTranslation().y;
+            // ray-plane intersection using MathUtils convention (Ray has pos/dir)
+            float denom = pickRay.dir.y;
+            if (std::abs(denom) > 1e-6f)
+            {
+                float t = (planeY - pickRay.pos.y) / denom;
+                if (t > 0.0f)
+                {
+                    Vector3f hit = pickRay.pos + pickRay.dir * t;
+                    bool recordInitial = m_brushInitialEntries.empty();
+                    ApplyBrushAtWorldPosition(hit, m_brushRadius, m_brushIntensity, m_brushInvert, recordInitial);
+                }
+            }
+            // Note: undo commit on stroke end is handled by the action toggle / inspector toggle code.
+        }
+    }
+
+    void HeightFieldMeshComponentVisualizer::CommitBrushStrokeOnRelease(bool isBrushMouseDown)
+    {
         if (m_brushPainting && m_wasBrushMouseDown && !isBrushMouseDown)
         {
             // Mouse was released while brush painting is active: commit the stroke to undo
@@ -549,26 +539,26 @@ namespace ImGuiVisualizers {
                 //
                 // Collect final positions and compare to initial
                 for (auto& e : m_brushInitialEntries)
-                    {
+                {
                     Vector3f currentPos(0.0f, 0.0f, 0.0f);
                     for (const auto& selectable : m_pointSelectables)
-                        {
+                    {
                         if (selectable->GetVertexIndex() == e.vertexIndex)
-                            {
+                        {
                             currentPos = selectable->GetWorldPosition();
                             break;
-                            }
                         }
+                    }
                     Vector3f delta = currentPos - e.before;
                     if (delta.Length() > 0.0005f)
-                        {
+                    {
                         CHeightFieldEditCommand::Entry out;
                         out.vertexIndex = e.vertexIndex;
                         out.before = e.before;
                         out.after = currentPos;
                         entries.push_back(std::move(out));
-                        }
                     }
+                }
                 if (!entries.empty())
                 {
                     m_history.PushAlreadyExecuted(std::make_unique<CHeightFieldEditCommand>(m_heightFieldComp, std::move(entries)));
@@ -577,13 +567,10 @@ namespace ImGuiVisualizers {
             }
         }
         m_wasBrushMouseDown = isBrushMouseDown;
-        // Render the selection gizmo and handle box selection
-        // Skip gizmo when brush painting is active
-        if (!m_brushPainting)
-        {
-            m_selectionManager.RenderSelectionGizmo(Get3DView().GetFrameBuffer(), GizmoMode::Translate, 2.0f);
-        }
+    }
 
+    void HeightFieldMeshComponentVisualizer::HandleGizmoDragStartEnd()
+    {
         // Detect gizmo drag start/end and snapshot state accordingly
         const bool nowDragging = m_selectionManager.IsGizmoDragging();
 
@@ -653,12 +640,47 @@ namespace ImGuiVisualizers {
 
         // save current dragging state for next frame
         m_wasGizmoDragging = nowDragging;
+    }
+
+    void HeightFieldMeshComponentVisualizer::RenderLeftPane(float leftW, float rightW)
+    {
+        ImGui::BeginChild("##Left3D", ImVec2(leftW, 0), false);
+        ImVec2 leftAvail = ImGui::GetContentRegionAvail();
+        if (leftAvail.x < 1.0f) leftAvail.x = 1.0f;
+        if (leftAvail.y < 1.0f) leftAvail.y = 1.0f;
+
+        m_view.RenderContent(leftAvail);
+
+        // Get viewport info for selection
+        ImVec2 viewportMin = m_view.GetViewportMin();
+        ImVec2 viewportSize = m_view.GetViewportSize();
+
+        m_selectionManager.SetViewInfo(Get3DView().GetCamera(), viewportMin, viewportSize);
+
+        // Handle viewport interactions
+        HandleViewportInteractions(viewportMin, viewportSize);
+
+        // Detect mouse release and commit undo if brush stroke was active
+        const bool isBrushMouseDown = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+        CommitBrushStrokeOnRelease(isBrushMouseDown);
+
+        // Render the selection gizmo and handle box selection
+        // Skip gizmo when brush painting is active
+        if (!m_brushPainting)
+        {
+            m_selectionManager.RenderSelectionGizmo(Get3DView().GetFrameBuffer(), GizmoMode::Translate, 2.0f);
+        }
+
+        // Handle gizmo drag start/end and history commit
+        HandleGizmoDragStartEnd();
 
         ImGui::EndChild();
 
         ImGui::SameLine();
+    }
 
-        // Right pane (property inspector)
+    void HeightFieldMeshComponentVisualizer::RenderRightInspector(float rightW)
+    {
         ImGui::BeginChild("##RightInspector", ImVec2(rightW, 0), false);
 
         if (!m_editor.IsLoaded())
@@ -718,38 +740,38 @@ namespace ImGuiVisualizers {
             }
 
             ImGui::Separator();
-             // Show the selected point info if available
-             const auto& selected = m_selectionManager.GetSelected();
-             if (auto pointSel = std::dynamic_pointer_cast<CMeshVertexSelectable>(selected))
-             {
-                 ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Selected Point:");
-                 ImGui::Text("Vertex Index: %u", pointSel->GetVertexIndex());
+            // Show the selected point info if available
+            const auto& selected = m_selectionManager.GetSelected();
+            if (auto pointSel = std::dynamic_pointer_cast<CMeshVertexSelectable>(selected))
+            {
+                ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Selected Point:");
+                ImGui::Text("Vertex Index: %u", pointSel->GetVertexIndex());
 
-                 Vector3f currentPos = pointSel->GetWorldPosition();
-                 ImGui::Text("Position: (%.2f, %.2f, %.2f)", currentPos.x, currentPos.y, currentPos.z);
+                Vector3f currentPos = pointSel->GetWorldPosition();
+                ImGui::Text("Position: (%.2f, %.2f, %.2f)", currentPos.x, currentPos.y, currentPos.z);
 
-                 float height = currentPos.y;
-                 if (ImGui::SliderFloat("Height##PointHeight", &height, -10.0f, 10.0f))
-                 {
-                     // Build a single-entry undoable command and push it
-                     Vector3f newPos = currentPos;
-                     newPos.y = height;
+                float height = currentPos.y;
+                if (ImGui::SliderFloat("Height##PointHeight", &height, -10.0f, 10.0f))
+                {
+                    // Build a single-entry undoable command and push it
+                    Vector3f newPos = currentPos;
+                    newPos.y = height;
 
-                     CHeightFieldEditCommand::Entry e;
-                     e.vertexIndex = pointSel->GetVertexIndex();
-                     e.before = currentPos;
-                     e.after = newPos;
+                    CHeightFieldEditCommand::Entry e;
+                    e.vertexIndex = pointSel->GetVertexIndex();
+                    e.before = currentPos;
+                    e.after = newPos;
 
-                     std::vector<CHeightFieldEditCommand::Entry> entries;
-                     entries.push_back(std::move(e));
+                    std::vector<CHeightFieldEditCommand::Entry> entries;
+                    entries.push_back(std::move(e));
 
-                     m_history.Push(std::make_unique<CHeightFieldEditCommand>(m_heightFieldComp, std::move(entries)));
+                    m_history.Push(std::make_unique<CHeightFieldEditCommand>(m_heightFieldComp, std::move(entries)));
 
-                     // Update the selectable transform to reflect the new position
-                     pointSel->UpdateTransform();
-                 }
-                 ImGui::Separator();
-             }
+                    // Update the selectable transform to reflect the new position
+                    pointSel->UpdateTransform();
+                }
+                ImGui::Separator();
+            }
 
             // Update the property inspector to show the component
             m_propertyInspector.SetObject(m_heightFieldComp);
@@ -761,6 +783,33 @@ namespace ImGuiVisualizers {
         }
 
         ImGui::EndChild();
+    }
+
+// ── Main Render orchestrator ─────────────────────────────────────────────────
+
+    bool HeightFieldMeshComponentVisualizer::Render(bool* isOpen)
+    {
+        ProcessShortcuts();
+        EnsureSelectablesRegistered();
+
+        std::string title;
+        if (!BeginEditorWindow(isOpen, title))
+        {
+            return false;
+        }
+
+        RenderMenuAndToolbar();
+
+        // Layout: left = 3D view (approx 65%), right = inspector (35%)
+        ImVec2 avail = ImGui::GetContentRegionAvail();
+        float leftW = avail.x * 0.65f;
+        float rightW = avail.x - leftW;
+
+        // Left pane (3D view)
+        RenderLeftPane(leftW, rightW);
+
+        // Right pane (property inspector)
+        RenderRightInspector(rightW);
 
         ImGui::End();
         return true;
@@ -836,11 +885,11 @@ namespace ImGuiVisualizers {
             // Check if this vertex is already in the snapshot
             bool alreadyRecorded = false;
             for (const auto& e : m_brushInitialEntries)
-             {
-                if (e.vertexIndex == vi) 
-                { 
-                    alreadyRecorded = true; 
-                    break; 
+            {
+                if (e.vertexIndex == vi)
+                {
+                    alreadyRecorded = true;
+                    break;
                 }
             }
 
@@ -855,7 +904,7 @@ namespace ImGuiVisualizers {
                 e.before = worldBefore;
                 e.after = e.before; // placeholder
                 m_brushInitialEntries.push_back(std::move(e));
-             }
+            }
 
             // Apply delta to local vertex Y
             posPtr[1] = posPtr[1] + deltaY;
@@ -905,9 +954,15 @@ namespace ImGuiVisualizers {
             .targets = UI::ActionTarget::Toolbar | UI::ActionTarget::Menu | UI::ActionTarget::Console,
             .callback = [this]()
             {
+                // Updated to use the base-class API that targets the new CStaticMeshResourceReference
                 // Save the editor document (the component's JSON representation)
                 if (GetEditor().Save())
                 {
+					// Now we need to save the StaticMesh obj.
+                    // 
+                    CStaticMeshResource meshRes;
+					meshRes.SetMaterialResourceFileName("./assets/materials/height.mat.obj.json");
+                    
                     // Also save the mesh to binary format if we have a height field component
                     if (m_heightFieldComp)
                     {
@@ -918,9 +973,11 @@ namespace ImGuiVisualizers {
                         if (pos != std::string::npos)
                         {
                             std::string meshPath = docPath.substr(0, pos) + ".mesh.bin";
+                            std::string smeshPath = docPath.substr(0, pos) + ".smesh.obj.json";
 
                             // Convert to relative asset path for AppConfig
                             std::string relativeMeshPath = MakeAssetPath(meshPath);
+                            std::string relativeSmeshPath = MakeAssetPath(smeshPath);
 
                             if (m_heightFieldComp->SaveMesh(relativeMeshPath))
                             {
@@ -930,8 +987,11 @@ namespace ImGuiVisualizers {
                             {
                                 std::cerr << "Failed to save height field mesh to: " << relativeMeshPath << std::endl;
                             }
+							m_heightFieldComp->SetStaticMeshResourceFileName(relativeSmeshPath);
+                            meshRes.SetMeshResourceFileName(relativeMeshPath);
+                            meshRes.SafeWrite(smeshPath);
                         }
-                    }
+                    }				
                 }
             },
             .isEnabled = [this]() { return m_heightFieldComp != nullptr && GetEditor().IsLoaded(); },
@@ -1027,12 +1087,9 @@ namespace ImGuiVisualizers {
             return;
         }
 
-        Mesh* mesh = meshRes->GetMesh();
-        if (!mesh || mesh->m_groups.empty())
-        {
-            std::cerr << "RegenerateGridMesh: No mesh groups available" << std::endl;
+        Mesh* mesh = meshRes->GetMesh();      
+        if (!mesh)
             return;
-        }
 
         uint32_t xSteps = m_heightFieldComp->GetXSteps();
         uint32_t zSteps = m_heightFieldComp->GetZSteps();
@@ -1053,15 +1110,15 @@ namespace ImGuiVisualizers {
         m_regeneratedIndexBuffer.reserve(indexCount);
 
         // Generate grid vertices with position and normals
-        for ( uint32_t z = 0; z <= zSteps; ++z )
+        for (uint32_t z = 0; z <= zSteps; ++z)
         {
-            for ( uint32_t x = 0; x <= xSteps; ++x )
+            for (uint32_t x = 0; x <= xSteps; ++x)
             {
                 uint32_t vertexIdx = z * (xSteps + 1) + x;
                 uint8_t* vertexPtr = m_regeneratedVertexBuffer.data() + (vertexIdx * stride);
 
                 // Write position
-                if ( layout.has(bgfx::Attrib::Position) )
+                if (layout.has(bgfx::Attrib::Position))
                 {
                     uint16_t offset = layout.getOffset(bgfx::Attrib::Position);
                     float* posPtr = reinterpret_cast<float*>(vertexPtr + offset);
@@ -1071,7 +1128,7 @@ namespace ImGuiVisualizers {
                 }
 
                 // Write normal pointing up (0, 1, 0) encoded as RGBA8
-                if ( layout.has(bgfx::Attrib::Normal) )
+                if (layout.has(bgfx::Attrib::Normal))
                 {
                     uint16_t offset = layout.getOffset(bgfx::Attrib::Normal);
                     uint32_t* normalPtr = reinterpret_cast<uint32_t*>(vertexPtr + offset);
@@ -1079,7 +1136,7 @@ namespace ImGuiVisualizers {
                 }
 
                 // Write TexCoord0 as grid coordinates
-                if ( layout.has(bgfx::Attrib::TexCoord0) )
+                if (layout.has(bgfx::Attrib::TexCoord0))
                 {
                     uint16_t offset = layout.getOffset(bgfx::Attrib::TexCoord0);
                     float* texCoordPtr = reinterpret_cast<float*>(vertexPtr + offset);
@@ -1090,9 +1147,9 @@ namespace ImGuiVisualizers {
         }
 
         // Generate indices (quad tessellation)
-        for ( uint32_t z = 0; z < zSteps; ++z )
+        for (uint32_t z = 0; z < zSteps; ++z)
         {
-            for ( uint32_t x = 0; x < xSteps; ++x )
+            for (uint32_t x = 0; x < xSteps; ++x)
             {
                 uint16_t v0 = (z * (xSteps + 1)) + x;
                 uint16_t v1 = v0 + 1;
@@ -1111,7 +1168,7 @@ namespace ImGuiVisualizers {
             }
         }
 
-        // Update the mesh group
+        // Update the mesh group (use first group)
         Group& group = mesh->m_groups[0];
 
         // Point to our persistent buffers
@@ -1121,7 +1178,7 @@ namespace ImGuiVisualizers {
         group.m_numIndices = static_cast<uint32_t>(m_regeneratedIndexBuffer.size());
 
         // Recreate GPU vertex buffer
-        if ( bgfx::isValid(group.m_vbh) )
+        if (bgfx::isValid(group.m_vbh))
         {
             bgfx::destroy(group.m_vbh);
         }
@@ -1129,7 +1186,7 @@ namespace ImGuiVisualizers {
         group.m_vbh = bgfx::createVertexBuffer(vbMem, layout);
 
         // Recreate GPU index buffer
-        if ( bgfx::isValid(group.m_ibh) )
+        if (bgfx::isValid(group.m_ibh))
         {
             bgfx::destroy(group.m_ibh);
         }
@@ -1190,4 +1247,70 @@ namespace ImGuiVisualizers {
     {
         return CResourceReference::MakeAssetPath(absolutePath);
     }
+
+    bool HeightFieldMeshComponentVisualizer::EnsureStaticMeshFileExists()
+    {
+        if (!m_heightFieldComp)
+            return false;
+
+        auto staticRef = m_heightFieldComp->GetStaticMeshResource();
+        if (!staticRef)
+            return false;
+
+        auto staticMeshResource = staticRef->GetResourceAs<CStaticMeshResource>();
+
+        const std::string meshFile = staticMeshResource->GetMeshResourceFileName();
+        if (meshFile.empty())
+            return false;
+
+        // Resolve to an absolute path and check existence
+        const std::string resolvedPath = Core::AppConfig::Instance().ResolvePath(meshFile);
+        if (std::filesystem::exists(resolvedPath))
+        {
+            return true; // already present
+        }
+
+        // Ensure there is an in-memory Mesh object for RegenerateGridMesh to populate.
+        // RegenerateGridMesh expects meshRes->GetMesh() to be non-null and to contain at
+        // least one Group to write into. Create a temporary Mesh and attach it to the
+        // mesh resource so RegenerateGridMesh can write directly into the visualizer's
+        // persistent buffers and the component can later save it.
+		auto meshResource = staticMeshResource->GetMeshResource();
+        if (!meshResource->GetMesh())
+        {
+            Mesh* tempMesh = new Mesh();
+
+            // Build a simple, compatible layout: Position (float3), Normal (RGBA8 packed),
+            // TexCoord0 (float2). This matches the packing used by RegenerateGridMesh.
+            bgfx::VertexLayout layout;
+            layout.begin()
+                .add(bgfx::Attrib::Position, 3, bgfx::AttribType::Float)
+                .add(bgfx::Attrib::Normal, 4, bgfx::AttribType::Uint8, true) // normalized rgba8
+                .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float);
+            layout.end();
+
+            tempMesh->m_layout = layout;
+
+            // Ensure at least one group exists for the generator to update.
+            tempMesh->m_groups.clear();
+            tempMesh->m_groups.resize(1);
+
+            meshResource->SetMesh(tempMesh);
+        }
+
+        // Not present: regenerate an in-memory mesh and save it to the expected path.
+        // RegenerateGridMesh populates the component's mesh resource with a flat grid.
+        RegenerateGridMesh();
+
+        // SaveMesh resolves the path internally via AppConfig; pass the resource file name.
+        if (m_heightFieldComp->SaveMesh(meshFile))
+        {
+            std::cout << "EnsureStaticMeshFileExists: Created and saved temporary mesh to: " << meshFile << std::endl;
+            return true;
+        }
+
+        std::cerr << "EnsureStaticMeshFileExists: Failed to create/save mesh to: " << meshFile << std::endl;
+        return false;
+    }
+
 } // namespace ImGuiVisualizers

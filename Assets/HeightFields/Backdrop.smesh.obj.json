@@ -3,7 +3,7 @@
         "m_meshResource": {
             "Value": "CMeshResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/heightfields/test.mesh.bin",
+                "Value": "./assets/heightfields/backdrop.mesh.bin",
                 "Type": 3,
                 "Size": 32
             },

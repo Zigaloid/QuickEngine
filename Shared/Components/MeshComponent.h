@@ -17,13 +17,13 @@ public:
 	{
 		m_boundingSpherePtr = std::shared_ptr<Vector4f>(&m_boundingSphere, [](Vector4f*) {});
 	};
-
+	
 	virtual std::shared_ptr<Vector4f> GetBoundingSphere() const
 	{
 		return m_boundingSpherePtr;
 	}
 
-	virtual void Render(bgfx::ViewId viewId) {};
+	virtual void Render(bgfx::ViewId viewId) {};																			
 	bool OnInitialize() override;
 	void OnUpdate(double deltaTime) override; 
 	void OnShutdown() override;
@@ -96,13 +96,14 @@ public:
 
 	void Render(bgfx::ViewId viewId) override;
 	virtual bool IsLoaded() const;
-	std::shared_ptr<CMeshResource> GetMeshResource() const { return m_meshResource.GetResourceAs<CMeshResource>(); }
-	void SetMeshResource(const CMeshResourceReference& meshRef) { m_meshResource = meshRef; m_meshStateInitialized = false; }
-
+	std::shared_ptr<CMeshResource> GetMeshResource() const;
 	std::shared_ptr<CMaterialResource> GetMaterialResource() const;
-	void SetMaterialResource(const CMaterialResourceReference& matRef);
+	std::shared_ptr<CStaticMeshResourceReference> GetStaticMeshResource() const;
+	
 
 	virtual std::shared_ptr<Vector4f> GetBoundingSphere() const override;
+	/** @brief Allow derived classes to update the static-mesh reference file name. */
+	void SetStaticMeshResourceFileName(const std::string& fileName) { m_staticMeshResource.SetResourceFileName(fileName); }
 
 protected:
 	// ── Protected API for derived classes ───────────────────────────────
@@ -118,10 +119,6 @@ protected:
 	void ApplyLightUniforms();
 
 	// ── Protected mesh state members ────────────────────────────────────────
-
-	CMaterialResourceReference m_materialResource;
-	CMeshResourceReference m_meshResource;
-
 	MeshState m_meshState;
 	MeshState::Texture m_texture[4];
 	bgfx::UniformHandle m_samplers[4] = { BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE, BGFX_INVALID_HANDLE };
@@ -133,6 +130,8 @@ protected:
 
 	/** @brief Cached pointer to the scene light manager — resolved once on initialize. */
 	CLightManagerComponent* m_lightManager = nullptr;
+
+
 private:
-	CMeshResourceReference m_staticMeshResource;
+	CStaticMeshResourceReference m_staticMeshResource;
 };

@@ -1,26 +1,26 @@
 {
     "RootObject": {
         "m_xSteps": {
-            "Value": 40,
+            "Value": 10,
             "Type": 1,
             "Size": 4
         },
         "m_zSteps": {
-            "Value": 40,
+            "Value": 10,
             "Type": 1,
             "Size": 4
         },
         "m_stepSize": {
-            "Value": 0.5,
+            "Value": 1.0,
             "Type": 2,
             "Size": 4
         },
         "m_blendHeights": {
             "Value": [
-                -0.4000000059604645,
+                -2.0,
+                0.0,
                 2.0,
-                5.0,
-                3.0
+                4.0
             ],
             "Type": 7,
             "Size": 16
@@ -30,25 +30,15 @@
             "Type": 2,
             "Size": 4
         },
-        "m_meshResource": {
-            "Value": "CMeshResourceReference",
+        "m_staticMeshResource": {
+            "Value": "CStaticMeshResourceReference",
             "m_resourceFileName": {
-                "Value": "./assets/heightfields/test.mesh.bin",
+                "Value": "./assets/heightfields/landscape.smesh.obj.json",
                 "Type": 3,
-                "Size": 40
+                "Size": 32
             },
             "Type": 4,
-            "Size": 64
-        },
-        "m_materialResource": {
-            "Value": "CMaterialResourceReference",
-            "m_resourceFileName": {
-                "Value": "./assets/materials/height.mat.obj.json",
-                "Type": 3,
-                "Size": 40
-            },
-            "Type": 4,
-            "Size": 64
+            "Size": 56
         },
         "m_active": {
             "Value": true,
@@ -58,8 +48,8 @@
         "m_children": {
             "Value": "CHeightFieldMeshComponent",
             "Elements": [],
-            "Type": 19,
-            "Size": 32
+            "Type": 22,
+            "Size": 24
         }
     }
 }

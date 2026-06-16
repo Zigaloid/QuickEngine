@@ -1,4 +1,3 @@
-#include "CoreSystem/CoreSystem.h"
 #include "ComponentSystem/ComponentSystem.h"
 #include "AIComponent.h"
 #include "ShaderResource.h"
@@ -99,6 +98,23 @@ void CAIComponent::OnUpdate(double deltaTime)
 		m_path         = m_navQueryPtr->GetPath();
 		m_pathIndex    = 0;
 		m_pathConsumed = true;
+	}
+
+	// If we're already close to the final destination of the current path,
+	// pick a new wander target immediately (horizontal distance only).
+	// This coexists with the existing timer-based re-pick above.
+	if (!m_path.empty())
+	{
+		Vector3f currentPos = character->GetWorldTransform().ExtractTranslation();
+		const Vector3f& finalTarget = m_path.back();
+		const float dx = finalTarget.GetX() - currentPos.GetX();
+		const float dz = finalTarget.GetZ() - currentPos.GetZ();
+		const float distSq = dx * dx + dz * dz;
+		const float reachThreshold = 1.0f; // 1 meter
+		if (distSq <= reachThreshold * reachThreshold)
+		{
+			PickNewWanderTarget();
+		}
 	}
 
 	FollowPath(deltaTime);

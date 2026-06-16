@@ -44,7 +44,7 @@ namespace ComponentSystem {
             : m_id(m_nextId++)
         {
         }
-
+    
         virtual ~Component() = default;
 
         // Non-copyable but movable

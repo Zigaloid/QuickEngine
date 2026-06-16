@@ -20,8 +20,7 @@ REGISTER_COMPONENT(CDebugRenderComponent, "DebugRender", "Graphics");
 REGISTER_COMPONENT(CMeshComponent, "Mesh", "Graphics");
 
 REFL_DEFINE_OBJECT(CMeshComponent)
-	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_meshResource),
-	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_materialResource)
+	REFL_DEFINE_OBJECT_MEMBER(CMeshComponent, m_staticMeshResource),	
 REFL_DEFINE_END
 
 REFL_DEFINE_OBJECT(CRenderComponent)
@@ -160,8 +159,7 @@ void CMeshComponent::OnShutdown()
 {	
 	DECLARE_FUNC_VLOW();
 
-	m_materialResource = CMaterialResourceReference();
-	m_meshResource = CMeshResourceReference();
+	m_staticMeshResource = CStaticMeshResourceReference();
 
 	bgfx::destroy(m_lightDir);
 	bgfx::destroy(m_lightColor);
@@ -184,17 +182,21 @@ void CMeshComponent::OnShutdown()
 
 std::shared_ptr<CMaterialResource> CMeshComponent::GetMaterialResource() const
 {
-	if (!m_materialResource.GetResource())
+	if( !m_staticMeshResource.GetResource() )
 		return nullptr;
-	return m_materialResource.GetResourceAs<CMaterialResource>();
+	return m_staticMeshResource.GetResourceAs<CStaticMeshResource>()->GetMaterialResource();
 }
 
-void CMeshComponent::SetMaterialResource(const CMaterialResourceReference& matRef)
+std::shared_ptr<CMeshResource> CMeshComponent::GetMeshResource() const
 {
-	m_materialResource = matRef;
-	OnMeshResourceChanged();
+	if (!m_staticMeshResource.GetResource())
+		return nullptr;
+	return m_staticMeshResource.GetResourceAs<CStaticMeshResource>()->GetMeshResource();
 }
-
+std::shared_ptr<CStaticMeshResourceReference> CMeshComponent::GetStaticMeshResource() const
+{
+	return std::make_shared<CStaticMeshResourceReference>(m_staticMeshResource);
+}
 void CMeshComponent::ApplyLightUniforms()
 {
 	// Lazy-resolve: if not yet found, walk up to the scene root and search the hierarchy.
@@ -331,15 +333,13 @@ void CMeshComponent::InitializeMesh(std::shared_ptr<CMeshResource> meshRes, bgfx
 
 bool CMeshComponent::IsLoaded() const
 {
-	if (!m_meshResource.GetResource()) return false;
-	auto meshRes = m_meshResource.GetResourceAs<CMeshResource>();
-	if (!meshRes || !meshRes->IsLoaded() || !meshRes->IsFinalized()) return false;
+	if (!m_staticMeshResource.GetResource()) return false;
+	auto staticMeshRes = m_staticMeshResource.GetResourceAs<CStaticMeshResource>();
+	if (!staticMeshRes || !staticMeshRes->IsLoaded() || !staticMeshRes->IsFinalized()) return false;
+	if (staticMeshRes && staticMeshRes->IsReady())
+		return true;
 
-	if (!m_materialResource.GetResource()) return false;
-	auto matRes = m_materialResource.GetResourceAs<CMaterialResource>();
-	if (!matRes || !matRes->IsLoaded() || !matRes->IsFinalized()) return false;
-
-	return true;
+	return false;
 }
 
 std::shared_ptr<Vector4f> CMeshComponent::GetBoundingSphere() const
