@@ -1,5 +1,5 @@
 ﻿#include "PhysicsManager.h"
-
+#include "Profiler/Profiler.h"
 #include <Jolt/Jolt.h>
 
 // Console variables
@@ -249,19 +249,22 @@ bool PhysicsManager::Initialize(const Config& config)
 
 void PhysicsManager::Update(float deltaTime)
 {
+    DECLARE_FUNC_VLOW();
     if (!m_initialized)
         return;
 
     if (m_broadPhaseDirty)
     {
+        DECLARE_SCOPE_VLOW();
         m_physicsSystem->OptimizeBroadPhase();
         m_broadPhaseDirty = false;
     }
-
-    m_physicsSystem->Update(deltaTime, m_config.collisionSteps, m_tempAllocator, m_jobSystem);
-
-    // Publish the contacts recorded during this step to the game-thread read buffer.
-    m_contactListener.SwapBuffers();
+    {
+        DECLARE_SCOPE_VLOW();
+        m_physicsSystem->Update(deltaTime, m_config.collisionSteps, m_tempAllocator, m_jobSystem);
+        // Publish the contacts recorded during this step to the game-thread read buffer.
+        m_contactListener.SwapBuffers();
+    }
 }
 
 void PhysicsManager::Shutdown()
