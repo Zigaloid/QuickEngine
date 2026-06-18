@@ -20,7 +20,9 @@
 #include "ThirdPersonInputComponent.h"
 #include "LightComponent.h"
 #include "LightManagerComponent.h"
-#include "ComponentSystem/ComponentDependencyDefinition.h"
+#include "NavigationManagerComponent.h"
+
+#include "AIComponent.h"
 #include "ComponentSystem/ComponentDependencyDefinition.h"
 #include "TransformComponent.h"
 #include "CameraComponent.h"
@@ -148,6 +150,9 @@ void GameApp::RegisterComponents()
 	auto* componentManager = Core::CoreSystem::GetComponentManager();
 	auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
 
+	componentManager->RegisterComponentType<CAIComponent>();
+	scheduler->RegisterComponentType<CAIComponent>(0, "AIComponent");
+
 	componentManager->RegisterComponentType<CLevelComponent>();
 	scheduler->RegisterComponentType<CLevelComponent>(0, "Level");
 
@@ -196,6 +201,8 @@ void GameApp::RegisterComponents()
 	componentManager->RegisterComponentType<CLightManagerComponent>();
 	scheduler->RegisterComponentType<CLightManagerComponent>(0, "LightManager");
 
+	componentManager->RegisterComponentType<CNavigationManagerComponent>();
+	scheduler->RegisterComponentType<CNavigationManagerComponent>(0, "NavigationManagerComponent");
 }
 
 void GameApp::Update(double deltaTime)

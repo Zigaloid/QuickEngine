@@ -661,35 +661,24 @@ public:
 					std::string className = valueMember->GetString();
 					ReflectionDebug.print("ReadComponentRawPtrArray: Creating component of type: " + className + "\n");
 
-					// Create component through ClassFactory
-					CReflectedBase* newObject = ClassFactory::CreateObject(className.c_str());
-					if (newObject) {
-						// Ensure it's actually a Component
-						ComponentSystem::Component* childComponent = dynamic_cast<ComponentSystem::Component*>(newObject);
-						if (childComponent) {
-							ReflectionDebug.print("ReadComponentRawPtrArray: Component created successfully\n");
-							childComponent->ReadMembers(*this);
+					auto childComponent = CreateComponentAsSharedPtr(className.c_str());
+					if (childComponent) {
+						ReflectionDebug.print("ReadComponentRawPtrArray: Component created successfully\n");
+						childComponent->ReadMembers(*this);
 
-							// If the parent is a Component, use AddChild to properly set up the relationship
-							if (parentComponent) {
-								parentComponent->AddChild(childComponent);
-								ReflectionDebug.print("ReadComponentRawPtrArray: Added child to parent via AddChild\n");
-							}
-							else {
-								// Fallback: just add to the vector if not a Component parent
-								vectorOfComponent->push_back(childComponent);
-								ReflectionDebug.print("ReadComponentRawPtrArray: Added component directly to vector\n");
-							}
+						if (parentComponent) {
+							parentComponent->AddChild(childComponent);
+							ReflectionDebug.print("ReadComponentRawPtrArray: Added child to parent via AddChild\n");
 						}
 						else {
-							ReflectionDebug.print("ReadComponentRawPtrArray: Created object is not a Component! Deleting.\n");
-							delete newObject;
+							vectorOfComponent->push_back(childComponent.get());
+							ReflectionDebug.print("ReadComponentRawPtrArray: Added component directly to vector\n");
 						}
 					}
 					else {
-							ReflectionDebug.print("ReadComponentRawPtrArray: FAILED to create component of type: " + className + "\n");
-							}
-						}
+						ReflectionDebug.print("ReadComponentRawPtrArray: FAILED to create component of type: " + className + "\n");
+					}
+				}
 			}
 			else {
 				ReflectionDebug.print("ReadComponentRawPtrArray: arrayMember is not an array!\n");

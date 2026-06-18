@@ -108,9 +108,6 @@ private:
     std::string m_currentSuggestion;
     int m_suggestionIndex;
 
-    // FunctionCallManager integration
-    FunctionCall::FunctionCallManager* m_functionManager;
-
     // Focus management
     bool m_wasWindowOpen;
     bool m_focusInputOnNextFrame;

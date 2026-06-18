@@ -15,7 +15,6 @@ CommandConsole::CommandConsole(int maxHistorySize, int maxMessageCount, bool cas
     , m_maxHistorySize(maxHistorySize)
     , m_maxMessageCount(maxMessageCount)
     , m_suggestionIndex(-1)
-    , m_functionManager(nullptr)
     , m_wasWindowOpen(false)
     , m_focusInputOnNextFrame(false)
     , m_isVisible(false)
@@ -39,10 +38,6 @@ void CommandConsole::RefreshFunctionCallManagerCommands()
 {
     DECLARE_FUNC_VLOW();
     
-    if (!m_functionManager) {
-        return;
-    }
-    
     // Remove existing FunctionCallManager commands
     m_commands.erase(
         std::remove_if(m_commands.begin(), m_commands.end(),
@@ -52,7 +47,7 @@ void CommandConsole::RefreshFunctionCallManagerCommands()
         m_commands.end());
     
     // Add current FunctionCallManager commands
-    auto registeredFunctions = m_functionManager->GetRegisteredFunctions();
+    auto registeredFunctions = Core::CoreSystem::GetFunctionManager()->GetRegisteredFunctions();
     
     for (const auto& funcSignature : registeredFunctions) {
         // Extract function name from signature (before the first '(')
@@ -79,16 +74,8 @@ void CommandConsole::InitializeFunctionCallManager()
     DECLARE_FUNC_VLOW();
 
     // Get FunctionCallManager from CoreSystem
-    m_functionManager = Core::CoreSystem::GetFunctionManager();
-    if (m_functionManager)
-    {
-        RefreshFunctionCallManagerCommands();
-        m_isEnabled = true;
-    }
-    else
-    {
-        AddWarning("CoreSystem not initialized. FunctionCallManager integration disabled.");        
-    }
+    RefreshFunctionCallManagerCommands();
+    m_isEnabled = true;
 }
 
 void CommandConsole::RegisterCommand(const std::string& name, const std::string& description)
@@ -549,13 +536,9 @@ void CommandConsole::ExecuteCommand(const std::string& commandLine)
 bool CommandConsole::TryExecuteFunctionManagerCommand(const std::string& commandLine)
 {
     DECLARE_FUNC_LOW();
-    
-    if (!m_functionManager) {
-        return false;
-    }
-    
+        
     try {
-        auto result = m_functionManager->CallFunction<void>(commandLine);
+        auto result = Core::CoreSystem::GetFunctionManager()->CallFunction<void>(commandLine);
         if (result.IsSuccess()) {
             AddSuccess("Command executed successfully");
             return true;

@@ -217,6 +217,45 @@ namespace ComponentSystem {
 			SortPhasesByPriority();
 		}
 
+		/** @brief Runtime overload: registers the concrete type of an existing component instance.
+		 *  Used by AddChild() where the compile-time type is unavailable. */
+		void RegisterComponentType(Component* component, int priority = 0)
+		{
+			if (!component) return;
+
+			std::type_index typeIndex(typeid(*component));
+
+			if (m_typeToPhaseIndex.find(typeIndex) != m_typeToPhaseIndex.end())
+				return;
+
+			m_phases.emplace_back(typeIndex, priority, typeid(*component).name());
+
+			m_componentUpdateRegistry[typeIndex] = [this, typeIndex](double deltaTime) -> std::unique_ptr<ComponentUpdateBatch>
+			{
+				JobSystem* jobSystem = GetJobSystem();
+				if (!m_componentManager || !jobSystem)
+					return std::make_unique<ComponentUpdateBatch>(typeIndex, 0);
+
+				auto components = m_componentManager->GetActiveComponents(typeIndex);
+				auto batch = std::make_unique<ComponentUpdateBatch>(typeIndex, components.size());
+
+				for (Component* comp : components)
+				{
+					if (comp && comp->IsActiveInHierarchy())
+					{
+						auto future = jobSystem->SubmitJobWithResult([comp, deltaTime]()
+						{
+							comp->Update(deltaTime);
+						});
+						batch->AddFuture(std::move(future));
+					}
+				}
+				return batch;
+			};
+
+			SortPhasesByPriority();
+		}
+
 		/** @brief Declares that T must wait for Dependency to finish before updating. */
 		template<typename T, typename Dependency>
 		void AddDependency()

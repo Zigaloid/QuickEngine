@@ -449,8 +449,5 @@
     <None Include="Documentation\index.html">
       <Filter>Documentation</Filter>
     </None>
-    <None Include="ComponentSystem\COMPONENT_SYSTEM.skill" />
-    <None Include="ResourceManager\RESOURCE_SYSTEM.skill.md" />
-    <None Include="ComponentSystem\PASSIVE_COMPONENTS_PLAN.md" />
   </ItemGroup>
 </Project>

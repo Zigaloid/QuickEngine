@@ -208,8 +208,6 @@
     <ClCompile Include="ResourceManager\ResourceManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ComponentSystem\COMPONENT_SYSTEM.skill" />
-    <None Include="ComponentSystem\PASSIVE_COMPONENTS_PLAN.md" />
     <None Include="Documentation\ComponentSystemDocumentation.html" />
     <None Include="Documentation\CoreSystemDocumentation.html" />
     <None Include="Documentation\DebugChannelDocumentation.html" />
@@ -224,7 +222,6 @@
     <None Include="Documentation\ResourceManagerDocumentation.html" />
     <None Include="Documentation\Vector3fDocumentation.html" />
     <None Include="Documentation\index.html" />
-    <None Include="ResourceManager\RESOURCE_SYSTEM.skill.md" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

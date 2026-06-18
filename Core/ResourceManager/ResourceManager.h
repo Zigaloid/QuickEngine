@@ -554,7 +554,8 @@ public:
 protected:
 	mutable std::shared_ptr<ResourceSystem::Resource> m_resource;
 private:
-	std::string m_resourceFileName = "undifined";	
+	std::string m_resourceFileName = "undifined";
+
 };
 
 template<typename TResource>

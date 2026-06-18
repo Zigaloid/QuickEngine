@@ -1,0 +1,131 @@
+{
+    "RootObject": {
+        "m_name": {
+            "Value": "Dragon",
+            "Type": 3,
+            "Size": 32
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CEntityComponent",
+            "Elements": [
+                {
+                    "Value": "CAIComponent",
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CAIComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CTransformComponent",
+                    "m_matrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CCharacterComponent",
+                    "m_objectMatrix": {
+                        "Value": [
+                            0.6000000238418579,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0181787014007568,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.6000000238418579,
+                            0.0,
+                            0.0,
+                            0.5258136987686157,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CCharacterComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    }
+                },
+                {
+                    "Value": "CMeshComponent",
+                    "m_staticMeshResource": {
+                        "Value": "CStaticMeshResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/staticmeshes/Dragon.smesh.obj.json",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "Type": 4,
+                        "Size": 56
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CMeshComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    }
+                }
+            ],
+            "Type": 22,
+            "Size": 24
+        }
+    }
+}

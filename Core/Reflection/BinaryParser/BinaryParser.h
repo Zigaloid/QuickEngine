@@ -547,26 +547,18 @@ public:
                 std::string className;
                 ReadString(className);
 
-                CReflectedBase* newObject = ClassFactory::CreateObject(className.c_str());
-                if (newObject)
+                auto childComponent = CreateComponentAsSharedPtr(className.c_str());
+                if (childComponent)
                 {
-                    ComponentSystem::Component* childComponent = dynamic_cast<ComponentSystem::Component*>(newObject);
-                    if (childComponent)
-                    {
-                        childComponent->ReadMembers(*this);
+                    childComponent->ReadMembers(*this);
 
-                        if (parentComponent)
-                        {
-                            parentComponent->AddChild(childComponent);
-                        }
-                        else
-                        {
-                            componentVector->push_back(childComponent);
-                        }
+                    if (parentComponent)
+                    {
+                        parentComponent->AddChild(childComponent);
                     }
                     else
                     {
-                        delete newObject;
+                        componentVector->push_back(childComponent.get());
                     }
                 }
             }

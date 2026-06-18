@@ -9,6 +9,7 @@
 #include "Log/ThreadSafeLog.h"
 
 #include <memory>
+#include <functional>
 #include <iostream>
 
 // Forward-declare ResourceManager to avoid circular include
@@ -76,15 +77,16 @@ inline constexpr bool HasFlag(InitFlag flags, InitFlag test)
 /** @brief Central static manager that initializes and owns all core engine subsystems. */
 class CoreSystem {
 private:
+    // Use a unique_ptr so symbol matches all translation units.
     static std::unique_ptr<FileSystem::FileSystemManager>             s_fileSystemManager;
     static std::unique_ptr<ResourceSystem::ResourceManager>           s_resourceManager;
     static std::unique_ptr<ComponentSystem::ComponentManager>         s_componentManager;
     static std::unique_ptr<JobSystem>                                 s_jobSystem;
     static std::unique_ptr<ComponentSystem::ComponentSystemScheduler> s_componentSystemScheduler;
-    static std::unique_ptr<FunctionCall::FunctionCallManager>         s_functionManager;
-    static std::unique_ptr<CThreadSafeLog>                           s_log;
-    static std::unique_ptr<CNexusClient>                             s_nexusClient;
-    static std::shared_ptr<Input::InputActionManager>                s_actionManager;
+    
+    static std::unique_ptr<CThreadSafeLog>                            s_log;
+    static std::unique_ptr<CNexusClient>                              s_nexusClient;
+    static std::shared_ptr<Input::InputActionManager>                 s_actionManager;
     static bool                                                       s_initialized;
     static InitFlag                                                   s_initFlags;
     static FunctionQueue                                              s_renderFunctionQueue;
@@ -129,7 +131,8 @@ public:
 
     static FunctionCall::FunctionCallManager* GetFunctionManager()
     {
-        return s_functionManager.get();
+        static FunctionCall::FunctionCallManager theManager;
+        return &theManager;
     }
 
     static JobSystem* GetJobSystem()
@@ -213,4 +216,26 @@ public:
     static void PrintSystemStatus();
 };
 
+template<typename T>
+class CConsoleVariable
+{
+public:
+    CConsoleVariable(const char* name, const T& value)
+        : m_value(value)
+    {
+        // Explicitly specify template arg(s) and pass a std::function so overload deduction works.
+        CoreSystem::GetFunctionManager()->RegisterFunction<void, T>(
+            name,
+            std::function<void(T)>([this](T value) { this->Set(value); }),
+            { "value" });
+    }
+    void Set(const T& value) { m_value = value; }
+    T Get() const { return m_value; }
+
+private:
+    T   m_value;
+};
+
 } // namespace Core
+
+#define CONSOLE_VARIABLE_BOOL(name,value) Core::CConsoleVariable<bool> name(#name, value);

@@ -44,7 +44,7 @@ namespace ComponentSystem {
             : m_id(m_nextId++)
         {
         }
-    
+
         virtual ~Component() = default;
 
         // Non-copyable but movable
@@ -92,17 +92,8 @@ namespace ComponentSystem {
         /** @param child Component to attach as a child of this one (raw pointer overload). */
         void AddChild(Component* child);
 
-        /** @param child Shared-pointer overload — preferred when the caller already holds a shared_ptr. */
-        void AddChild(std::shared_ptr<Component> child)
-        {
-            if (child)
-            {
-                child->m_parent = weak_from_this();
-                if (m_initialized)
-                    child->Initialize();
-                m_children.push_back(std::move(child));
-            }
-        }
+        /** @param child Shared-pointer overload â€” preferred when the caller already holds a shared_ptr. */
+        void AddChild(std::shared_ptr<Component> child);
 
         /** @brief Creates a child component of type T via the ComponentManager.
          *  @param Returns a pointer to the new child, or nullptr on failure. */
@@ -112,6 +103,9 @@ namespace ComponentSystem {
             static_assert(std::is_base_of_v<Component, T>, "T must derive from Component");
             auto* manager = Core::CoreSystem::GetComponentManager();
             assert(manager && "ComponentManager must be initialized");
+
+            if (auto* scheduler = Core::CoreSystem::GetJobSystemScheduler())
+                scheduler->template RegisterComponentType<T>();
 
             T* childPtr = manager->template CreateComponent<T>();
             if (childPtr)

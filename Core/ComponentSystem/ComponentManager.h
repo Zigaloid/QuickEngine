@@ -41,8 +41,8 @@ namespace ComponentSystem {
                 auto factory = std::make_unique<TypedComponentFactory<T>>();
                 auto pool = std::make_unique<ComponentPool>(std::move(factory), initialPoolSize, maxPoolSize);
                 m_pools[typeIndex] = std::move(pool);
-                // Auto-register the reflection class name so AddDependencyByName can resolve it
                 m_nameToTypeIndex.emplace(T::ClassName(), typeIndex);
+                m_stringFactory[T::ClassName()] = []() { return new T(); };
             }
         }
 
@@ -289,6 +289,15 @@ namespace ComponentSystem {
 
         bool IsInitialized()            const { return m_initialized; }
         size_t GetRegisteredTypeCount() const { return m_pools.size(); }
+
+        /** @brief Returns all active components in the pool matching typeIndex, unfiltered by hierarchy. */
+        std::vector<Component*> GetActiveComponents(std::type_index typeIndex) const
+        {
+            auto it = m_pools.find(typeIndex);
+            if (it != m_pools.end())
+                return it->second->GetActiveComponents();
+            return {};
+        }
 
         /** @brief Returns the pool-owned shared_ptr for a raw pointer, searching all pools.
          *  Returns nullptr if the component is not pool-managed (e.g. created with raw new). */

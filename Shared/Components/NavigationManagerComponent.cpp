@@ -2,7 +2,7 @@
 #include "CoreSystem/CoreSystem.h"
 #include "ComponentSystem/ComponentSystem.h"
 #include "JobSystem/JobSystem.h"
-
+#include "CoreSystem/FunctionCallManager.h"
 #include <DetourNavMesh.h>
 #include <DetourNavMeshQuery.h>
 
@@ -11,6 +11,8 @@
 
 #include <algorithm>
 #include <cstring>
+
+CONSOLE_VARIABLE_BOOL(g_debugRenderNavMesh, false);
 
 // ── Reflection ─────────────────────────────────────────────────────────────
 
@@ -47,13 +49,16 @@ void CNavigationManagerComponent::OnUpdate(double /*deltaTime*/)
     DispatchPendingQueries();
 
 
-    auto* renderFunctionQueue = Core::CoreSystem::GetRenderFunctionQueue();
-    if (renderFunctionQueue)
+    if (g_debugRenderNavMesh.Get())
     {
-        renderFunctionQueue->AddFunction([this]()
-            {
-                DebugRender(0);
-            }, "CNavigationManagerComponent::DebugRender");
+        auto* renderFunctionQueue = Core::CoreSystem::GetRenderFunctionQueue();
+        if (renderFunctionQueue)
+        {
+            renderFunctionQueue->AddFunction([this]()
+                {
+                    DebugRender(0);
+                }, "CNavigationManagerComponent::DebugRender");
+        }
     }
 }
 

@@ -10,6 +10,7 @@
 #include "Input/InputActionManager.h"
 
 #include <iostream>
+#include <memory>
 
 using namespace ComponentSystem;
 
@@ -17,10 +18,12 @@ namespace Core {
 
 // ── Static member definitions ─────────────────────────────────────────────────
 
+// Provide the unique_ptr definition and initialize so all translation units
+// (including those that run static initializers referencing the manager) have a valid instance.
 std::unique_ptr<FileSystem::FileSystemManager>             CoreSystem::s_fileSystemManager = nullptr;
 std::unique_ptr<ResourceSystem::ResourceManager>           CoreSystem::s_resourceManager = nullptr;
 std::unique_ptr<ComponentSystem::ComponentManager>         CoreSystem::s_componentManager = nullptr;
-std::unique_ptr<FunctionCall::FunctionCallManager>         CoreSystem::s_functionManager = nullptr;
+
 std::unique_ptr<JobSystem>                                 CoreSystem::s_jobSystem = nullptr;
 std::unique_ptr<ComponentSystem::ComponentSystemScheduler> CoreSystem::s_componentSystemScheduler = nullptr;
 std::unique_ptr<CThreadSafeLog>                           CoreSystem::s_log = nullptr;
@@ -102,13 +105,6 @@ bool CoreSystem::Initialize(InitFlag flags)
                 CoreDebug.warning("CoreSystem: Failed to initialize ComponentManager\n");
                 return false;
             }
-        }
-
-        // Initialize Function Call Manager
-        if (HasFlag(flags, InitFlag::FunctionCallManager))
-        {
-            CoreDebug.printf("CoreSystem: Creating FunctionCallManager...\n");
-            s_functionManager = std::make_unique<FunctionCall::FunctionCallManager>(false);
         }
 
         // Initialize Job System Scheduler
@@ -200,13 +196,7 @@ void CoreSystem::Shutdown()
         s_componentManager->Shutdown();
         s_componentManager.reset();
     }
-
-    if (s_functionManager)
-    {
-        CoreDebug.printf("CoreSystem: Shutting down FunctionCallManager...\n");
-        s_functionManager.reset();
-    }
-
+	
     if (s_jobSystem)
     {
         CoreDebug.printf("CoreSystem: Shutting down JobSystem...\n");
@@ -298,14 +288,7 @@ void CoreSystem::PrintSystemStatus()
         int policyIndex = static_cast<int>(s_componentSystemScheduler->GetExecutionPolicy());
         CoreDebug.printf("  Execution Policy: %s\n", policyNames[policyIndex]);
     }
-
-    CoreDebug.printf("FunctionCallManager: %s\n", (s_functionManager ? "Active" : "Null"));
-
-    if (s_functionManager)
-    {
-        CoreDebug.printf("  Registered Functions: %zu\n", s_functionManager->GetFunctionCount());
-    }
-
+    
     CoreDebug.printf("ThreadSafeLog: %s\n", (s_log ? "Active" : "Null"));
 
     if (s_log)
@@ -339,3 +322,6 @@ void CoreSystem::SetActionManager(Input::InputActionManager* mgr)
 }
 
 } // namespace Core
+
+
+
