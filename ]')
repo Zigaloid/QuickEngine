@@ -1,0 +1,1 @@
+    if ($text -notmatch '(?m)\s*#\s*include\s+[\"<]pch\.h[\" {

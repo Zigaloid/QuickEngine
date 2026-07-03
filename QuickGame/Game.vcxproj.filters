@@ -70,6 +70,9 @@
     <Filter Include="..\Shared\utils">
       <UniqueIdentifier>{2707D659-9392-431E-9CA3-C61208AE9F1E}</UniqueIdentifier>
     </Filter>
+    <Filter Include="resources">
+      <UniqueIdentifier>{202B5BA7-8C95-0F1E-D5D3-C0C3417DED72}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\External\bgfx\3rdparty\meshoptimizer\src\meshoptimizer.h">
@@ -77,6 +80,9 @@
     </ClInclude>
     <ClInclude Include="..\External\ufbx\ufbx.h">
       <Filter>..\External\ufbx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\AIComponent.h">
+      <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\CameraComponent.h">
       <Filter>..\Shared\Components</Filter>
@@ -103,6 +109,12 @@
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\MeshComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\NavQuery.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
@@ -382,15 +394,6 @@
       <Filter>..\Shared\utils</Filter>
     </ClInclude>
     <ClInclude Include="Game.h" />
-    <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\NavQuery.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\AIComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -462,6 +465,9 @@
     <ClCompile Include="..\External\ufbx\ufbx.c">
       <Filter>..\External\ufbx</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\AIComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Components\CameraComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
@@ -487,6 +493,12 @@
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\NavQuery.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
@@ -629,14 +641,10 @@
     </ClCompile>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\NavQuery.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\AIComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\app.rc">
+      <Filter>resources</Filter>
+    </ResourceCompile>
   </ItemGroup>
 </Project>

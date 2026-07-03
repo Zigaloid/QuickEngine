@@ -53,7 +53,8 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -70,7 +71,8 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <WarningLevel>Level3</WarningLevel>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>.;External;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -93,6 +95,12 @@
     <ClInclude Include="Analysis\HeatMapContainer.h" />
     <ClInclude Include="App\AppInterface.h" />
     <ClInclude Include="App\ApplicationComponent.h" />
+    <ClInclude Include="CauseAndEventSystem\Cause.h" />
+    <ClInclude Include="CauseAndEventSystem\CauseAndEventManagerComponent.h" />
+    <ClInclude Include="CauseAndEventSystem\CauseAndEventSystem.h" />
+    <ClInclude Include="CauseAndEventSystem\CauseEventDefinition.h" />
+    <ClInclude Include="CauseAndEventSystem\CauseGUID.h" />
+    <ClInclude Include="CauseAndEventSystem\Event.h" />
     <ClInclude Include="ClassFactory\ClassFactory.h" />
     <ClInclude Include="ComponentSystem\Component.h" />
     <ClInclude Include="ComponentSystem\ComponentDependencyDefinition.h" />
@@ -156,6 +164,7 @@
     <ClInclude Include="Reflection\Types\bool.h" />
     <ClInclude Include="Reflection\Types\component.h" />
     <ClInclude Include="Reflection\Types\float.h" />
+    <ClInclude Include="Reflection\Types\guid.h" />
     <ClInclude Include="Reflection\Types\int.h" />
     <ClInclude Include="Reflection\Types\object.h" />
     <ClInclude Include="Reflection\Types\primitivevector.h" />
@@ -163,11 +172,14 @@
     <ClInclude Include="Reflection\Types\stringboolmap.h" />
     <ClInclude Include="Reflection\Types\vec4.h" />
     <ClInclude Include="ResourceManager\ResourceManager.h" />
+    <ClInclude Include="pch.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp" />
     <ClCompile Include="App\ApplicationComponent.cpp" />
+    <ClCompile Include="CauseAndEventSystem\CauseAndEventManagerComponent.cpp" />
+    <ClCompile Include="CauseAndEventSystem\CauseEventDefinition.cpp" />
     <ClCompile Include="ClassFactory\ClassFactory.cpp" />
     <ClCompile Include="ComponentSystem\Component.cpp" />
     <ClCompile Include="ComponentSystem\ComponentDependencyDefinition.cpp" />
@@ -206,6 +218,9 @@
     <ClCompile Include="Reflection\ReflectionBase.cpp" />
     <ClCompile Include="Reflection\ReflectionError.cpp" />
     <ClCompile Include="ResourceManager\ResourceManager.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader>Create</PrecompiledHeader>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\ComponentSystemDocumentation.html" />

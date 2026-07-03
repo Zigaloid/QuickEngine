@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "MouseManager.h"
 
 #include "Profiler/Profiler.h"

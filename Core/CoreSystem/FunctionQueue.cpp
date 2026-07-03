@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "FunctionQueue.h"
 
 // Implementation is header-only due to templates, but you can add

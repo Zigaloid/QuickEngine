@@ -17,8 +17,13 @@
                 "Type": 3,
                 "Size": 32
             },
+            "m_rfl_guid": {
+                "Value": "ffc6e3c5-af95-4a60-bc1b-1851ff5ebc40",
+                "Type": 3,
+                "Size": 32
+            },
             "Type": 4,
-            "Size": 56
+            "Size": 104
         },
         "m_active": {
             "Value": true,
@@ -47,8 +52,13 @@
                             "Type": 3,
                             "Size": 32
                         },
+                        "m_rfl_guid": {
+                            "Value": "04196c5b-2a12-4335-b4ff-69af1a794091",
+                            "Type": 3,
+                            "Size": 32
+                        },
                         "Type": 4,
-                        "Size": 56
+                        "Size": 104
                     },
                     "m_active": {
                         "Value": true,
@@ -90,6 +100,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "1e8cc664-e8c7-49b9-9249-df78bddd2c98",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -104,11 +119,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "c06c7cbe-4c55-4c7e-854d-53f9603b236f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "e8cd31e9-5ea1-4ee6-ad4d-b43e254706e4",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -160,6 +185,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "68d6d383-2bfc-4109-bbc3-6515dc66cbc6",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -201,8 +231,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "bbb032ec-140a-4b0d-b6aa-3ec3eeeeb6c9",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -214,6 +249,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "7d6ae327-3032-42ee-a294-759c696357e7",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -275,11 +315,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "33b73db4-45db-4ce7-90d7-425380a5e748",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "f3cba3df-fb60-42e9-8efb-e4bd4a60c13c",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -331,6 +381,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "94f457f2-fbb8-4f21-b435-b60c44f6ae27",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -367,6 +422,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "a6ce25cd-2ef9-4498-a12a-44e533b464d9",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -378,8 +438,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "3fec809c-4c5c-4a6a-a76f-bb4edf021a7b",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -391,6 +456,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "aac5cadc-0ce6-47f6-81a9-17ccf760db97",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -405,6 +475,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "6c973543-5214-4b06-ac25-ff1a28f8d2ba",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -419,11 +494,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "be5525bc-3171-4700-875e-b39ae5a0f0cb",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "f1007477-7d47-408b-be27-8d73eb86a380",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -450,8 +535,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "950ff53a-be5b-4293-937f-5b268749d613",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -463,6 +553,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "b0cd19cf-bf31-4aa1-b76b-e032ea1d66bc",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -499,6 +594,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "40832dd3-5dd4-42e6-b2d3-4aa42f825db3",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -565,11 +665,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "95774bee-691e-4bc6-9cd1-2fb04f03b0e9",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "7dd25a2b-81c0-4b36-9d56-8f5f5e2bf6f3",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -596,8 +706,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "b9f16d02-92b4-4398-9d43-702f68272f9a",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -609,6 +724,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "d0aedfa3-f5a6-42fd-b98c-98f226e6a668",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -645,6 +765,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "fc59a5be-c87c-4c89-a758-3e61f9391ea5",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -711,11 +836,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "5f62f4c5-e68d-4602-a406-4928819bd9b5",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "007eb53f-ab11-4307-a62a-e9bd0ecf5734",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -742,8 +877,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "4e64a370-3833-4636-a369-1bd75f4372e6",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -755,6 +895,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "857d5406-e1ab-45ce-842d-fd7ba25e1da4",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -791,6 +936,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "3ed38415-76ff-4ab8-b11f-01395d82d5e0",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -857,11 +1007,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "2748f162-00f6-4266-863f-f599d770daf0",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "d7f72c9f-5c85-4bf7-b9b1-6f5d8c9bec71",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -888,8 +1048,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "b4d37562-08dc-465f-9e8a-84530f3d5e91",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -901,6 +1066,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "60068c6a-52f5-41d0-8113-4a10ca04c8cb",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -937,6 +1107,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "5ce09a5a-bc74-473f-a5b2-a36ae4d2e96c",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1003,11 +1178,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "b0069fd9-47a0-4ea8-a3c6-5d5a6e457433",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "4e1ced7a-5d9a-422b-9754-ecbfaab5664b",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -1034,8 +1219,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "f7c18acd-30d8-4bb1-97fc-1175cba82920",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1047,6 +1237,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "2ede5744-690d-4d37-ab36-2498c7a52820",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1083,6 +1278,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "7fd31b15-fb10-4a94-87f7-3d72783658d0",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1149,11 +1349,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "8fd526ef-0599-4d52-9449-f087210ae278",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "43837b77-842f-48c1-ae12-00367e0b433e",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -1180,8 +1390,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "8475b21b-4bad-4e28-8f90-d3cd45253911",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1193,6 +1408,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "d438f1bc-4a6b-4950-a38b-fc7d014df61c",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1229,6 +1449,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "1b18c329-08ad-4faa-a8b3-f5af3b2ea360",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1295,11 +1520,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "84eb248e-4e65-4034-83f8-707d7952ce43",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "6410f040-0150-439e-8242-5886d7722708",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -1326,8 +1561,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "87d5be07-20da-436f-8d3d-96611b66f469",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1339,6 +1579,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "6fb3c438-7739-42b1-94a0-de2e05f3460d",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1375,6 +1620,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "0edee806-5821-4049-9a81-a3af60748c0f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1441,11 +1691,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "dd03d820-a085-471d-8a20-e2ce99eaafa5",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "f6d21fbd-501b-4317-820e-f90434fc488f",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -1472,8 +1732,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "011dff5b-78f1-4534-8b05-e1be53bf5f79",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1485,6 +1750,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "07baffa4-3c98-442d-99b5-84d7e2cd8086",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1521,6 +1791,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "562495bd-c76c-4dd1-8026-b6b73de5d327",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1587,11 +1862,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "390db059-5e09-4d3f-86b2-e2d484e11eb4",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "6181f2aa-8591-4728-a854-860733d49de3",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -1618,8 +1903,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "75dec759-3d0c-48d9-8a54-8ebe81d9bff2",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1631,6 +1921,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "b9235633-84bf-484d-afae-3d9f8884058c",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1667,6 +1962,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "4f7af589-bf67-428b-b569-5abeb1476814",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1733,11 +2033,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "51f9b471-c326-4ae9-bf2d-b746c416585b",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "ca2f6d8a-7acd-4cdc-a6d1-c2fce20cf3b5",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -1764,8 +2074,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "f38829f3-4424-4dc8-89b3-6b387d56a245",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1777,6 +2092,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "e0d3a2a1-052c-4d32-84e8-aba263362054",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1813,6 +2133,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "e98d52fe-9322-4ec7-9286-bb5cf559c08c",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1879,11 +2204,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "b0d77a70-92cc-4543-bc29-5ed7f4530066",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "5b1551fa-ca94-4730-b8c7-ceb1ce084990",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -1910,8 +2245,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "ad05c53c-d5c3-4416-9f0c-c7a7ff99a2fc",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -1923,6 +2263,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "81d2cc52-e38b-4cc3-8167-059341400f23",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -1959,6 +2304,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "c835e49b-8e50-4862-a4b0-75903f569f28",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2025,11 +2375,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "f5ce3274-8225-4b8e-8688-89517c585188",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "69da86f7-c315-405c-9bc0-a1cbfe32c24c",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -2056,8 +2416,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "840129fa-ce75-4987-b18f-ef4a8c7f52e4",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2069,6 +2434,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "17e71ac5-8737-43f6-b8c1-6058b1998e27",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2105,6 +2475,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "faeadd47-d35e-43b3-bf0e-f4ca4d188ed8",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2171,11 +2546,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "84d69d42-e29f-41c1-8609-257635685f08",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "a47cd748-2a72-487b-a19f-6164d2abd886",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -2205,6 +2590,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "24c5ab9a-000c-42d0-94f6-e9fb5a5d6073",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2241,6 +2631,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "33ab2e2c-2173-44b0-86c9-4fd6b0b4e74a",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2277,6 +2672,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "31ebf90e-c0d5-438c-ae97-21b3c9ed80ca",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2288,8 +2688,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "59b1a610-9d30-41a0-87d8-7531d1a9d63a",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2301,11 +2706,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "99431162-4112-47b1-8a0c-b6d85dda5b7f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "10bf81cd-402e-49ae-bf69-b44ff9d5e0e4",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -2335,6 +2750,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "dc54aab8-a439-46a6-9dc4-56705ff5abb3",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2371,6 +2791,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "e26c824c-8a63-477f-956d-f19829a29050",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2407,6 +2832,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "c78b4c30-1000-4c8a-a7d4-6a776caf25d1",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2418,8 +2848,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "9682fb36-89fe-44fb-b0fe-332a8ea4b031",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2431,11 +2866,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "a7296373-bb57-4c67-a27a-e67e97c30ae1",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "d15a0c06-a450-4d36-af65-83e7d68f7386",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -2465,6 +2910,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "c221dbd3-b98b-4476-b731-7dfe9a229bd9",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2501,6 +2951,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "adea69ee-1531-4dbb-93e2-0b3de4f00ba8",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2537,6 +2992,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "f1b7a75e-f127-40b4-9aa2-09c17f1a2ddb",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2548,8 +3008,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "91465413-d5ae-451e-b3ed-15a6e1971b73",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2561,11 +3026,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "21e47bb9-01da-4b9a-908f-e6986a77adac",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "b0ed7485-ad3d-4da1-b3ce-f5b018800dc4",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -2595,6 +3070,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "7dcfdf62-2a54-4800-b23d-3495383950a6",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2631,6 +3111,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "927f0cc3-e480-4022-afc4-c61fb5917936",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2667,6 +3152,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "3e18ce3f-a6ea-4a0d-a9d8-373ee749303c",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2678,8 +3168,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "ce63a43e-9d35-4a34-954b-3746d7511baf",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2691,11 +3186,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "509f6420-dffb-4c6e-862f-93e99a4e8fb2",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "c57d5af1-378b-4f11-99ca-bdb9f2e80d13",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -2725,6 +3230,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "50f2f566-126a-4d34-9810-78b4cfeab9a1",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2761,6 +3271,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "6257cac8-4e32-4801-8512-403516476ca3",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2797,6 +3312,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "cc60eafb-f0d0-40f9-bc19-8023721c69b8",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2808,8 +3328,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "9f3231a3-c306-42bf-8cab-3b2c4d55a368",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2821,11 +3346,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "9c72948b-c8fd-47b7-bc35-a620a30be8ea",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "81d61b81-eb0a-43d2-aa52-549733ef597f",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -2855,6 +3390,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "4687b6fe-632f-4203-96fe-77eaf19ead92",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2891,6 +3431,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "dc9cddae-7b1f-4169-afdc-6da11381cee2",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2927,6 +3472,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "6305dfd3-7eef-45ed-bf53-c82fabd25182",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -2938,8 +3488,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "355dffa3-48a8-4c8e-b1b3-661096200d06",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -2951,11 +3506,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "9574bd52-2eb3-4712-b9f1-b7dba9499975",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "b08e3d6c-efcc-471d-af13-3683127b1bc5",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -3014,6 +3579,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "012b01b5-eaf5-438e-8d0f-ce2806601e04",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3050,6 +3620,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "b645ae4a-75ad-47be-9875-b27cc0720c4d",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3079,11 +3654,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "db361b05-e137-433c-9162-c25a842cda9d",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "c454b21a-e320-42e5-8746-1c0af44e776d",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -3113,6 +3698,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "7529e52d-27e7-4fb6-b595-e1bd979a20ad",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3149,6 +3739,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "9c73b015-b9b7-4a34-afe3-ee3424cc04cc",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3185,6 +3780,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "f003907a-0223-4ad0-ad04-e77bca9b0409",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3196,8 +3796,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "e78db594-053f-474c-9758-c19a2a949f47",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -3209,11 +3814,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "2608b5e7-758b-434e-a5d1-2f6949273883",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "a855c975-26cc-4bfa-8147-d876b4f26895",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -3243,6 +3858,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "824388e7-c8e6-4019-9aed-a55328412a10",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3279,6 +3899,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "5202210f-9615-41eb-a735-fbaae1c5e197",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3315,6 +3940,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "f9eb9eb4-8d3c-425d-9f92-a723eccbc831",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3326,8 +3956,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "9b4996aa-0675-441e-9247-141af34acbb2",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -3339,11 +3974,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "9becad25-094a-43b1-b43f-27cd3aae7cec",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "2d63cfe2-c13a-4c36-b37d-a6e89ba9ba9b",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -3373,6 +4018,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "6cdfe9cf-b9f5-4e94-9906-134765c34f47",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3409,6 +4059,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "c6b04fdc-3ad8-47be-b090-aa039f4ef1be",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3445,6 +4100,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "e6791b5e-e517-4bb1-8ff6-5a4fa563674a",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3456,8 +4116,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "dd9e6213-c4a9-44f3-932f-fd3d47b23481",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -3469,11 +4134,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "32f82243-d30c-43d6-9f35-0eeef93a6ca3",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "cb3b12a1-1fab-4e9e-b540-4d4991c46930",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -3503,6 +4178,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "9dc2426f-977a-4830-ac7a-b63deb0c1af2",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3539,6 +4219,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "890ef588-ccc9-420f-b737-9881bfa10357",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3575,6 +4260,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "28a1c368-d5ac-4aaf-b39d-78fcb47ff5a9",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3586,8 +4276,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "267924a8-af7d-46ea-a162-2c53295e0faa",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -3599,11 +4294,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "bb1a57a7-39d2-45c7-8a19-905c0156ee37",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "49f7a94c-ef02-4c06-b307-073a088c01da",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -3633,6 +4338,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "0d240cd1-fcfd-44fd-b0a0-6d9e93db7431",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3669,6 +4379,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "942814cc-74aa-46e3-be14-2754cc648e2f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3705,6 +4420,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "5ae94e3e-97bb-45f3-8ea1-1e4b8e247823",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3716,8 +4436,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "830b39d3-872c-4a0c-b284-5ebee2527771",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -3729,11 +4454,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "3458301b-5cd3-49ce-9921-f4380483945f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "d514524f-bb30-4ef1-bde5-8fb86e7d7618",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -3763,6 +4498,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "5f799694-b1ec-4e94-9081-c46b431993ca",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3799,6 +4539,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "45f345d7-0400-4cf8-a84c-ce87ca9b8836",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3835,6 +4580,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "258ab1ab-a4bd-46bd-8526-47bd2271377d",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3846,8 +4596,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "d0ef126a-9407-477b-a6df-417db80cd09d",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -3859,11 +4614,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "9c47a142-1b24-4393-ac52-319cf11c9b4f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "9282f35d-4733-4f23-a3dd-f33dd32f4fe1",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -3893,6 +4658,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "d2e979cc-e4f1-47c7-9e40-a805ad339170",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3929,6 +4699,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "706e8e61-c343-4557-af72-edb9ed7800f9",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3965,6 +4740,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "98a8a923-d9d0-440a-97be-5c3349187bff",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -3976,8 +4756,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "cb5425de-fa26-47e9-8e44-35b2f8627e01",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -3989,11 +4774,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "ed5296f9-ca1d-4bb4-b94e-917dc400a75e",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "1e39a0a8-5373-4115-a0b4-449fa6664c8d",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -4023,6 +4818,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "608fd6ec-5472-4753-828c-b1a61d28c0ec",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4059,6 +4859,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "0d6b1451-4a12-4d01-9ba0-4808335a2d35",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4095,6 +4900,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "f2d2b76d-4d83-4c76-b63f-8df99c47e554",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4106,8 +4916,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "149d216a-3f98-40bd-9eb0-7b5516108e42",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -4119,11 +4934,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "f2da6bce-01eb-4a7b-a240-4bea3c3c68c0",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "95e9f4ec-c711-48ef-81bc-aadbe43f2497",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -4153,6 +4978,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "60ccc5eb-0f88-4046-bd56-9e13e725423a",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4189,6 +5019,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "9b2b959e-e020-4de3-9491-bfbb8ea0464f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4225,6 +5060,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "0c376884-6caf-4775-bca6-6e8e5a4388b3",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4236,8 +5076,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "8fd93642-6706-4555-a2bd-dacf7176375c",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -4249,11 +5094,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "166513b4-cc4a-42f3-8b95-ad84705075f0",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "f6f437cf-3f53-4326-8933-a6ba5dfd0bfa",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -4283,6 +5138,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "d8564fe1-f0b0-48e5-9cf1-832eed5ff3b1",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4319,6 +5179,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "36ec87fd-d968-46b3-b697-fb50280009d7",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4355,6 +5220,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "bd91bd8a-6d4d-49b6-8122-37c00faa024d",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4366,8 +5236,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "7db1df70-2722-4220-bd8c-b4f34cccb753",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -4379,11 +5254,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "37f97106-0b2d-439e-8264-d8346d1d94bd",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "37dcace2-81c6-4d5d-bbd9-0117a0ac71b6",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -4413,6 +5298,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "b530a14f-2292-4ba1-8419-5916beb6eb99",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4449,6 +5339,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "24385f31-3b21-40c2-9d43-a9f0e86336d6",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4485,6 +5380,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "afae1f1a-b184-46ad-a632-40799e40fd5f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4496,8 +5396,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "286f6f39-12e2-4588-8212-7a81dd9779f4",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -4509,11 +5414,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "ab5b2c34-a699-4ec6-afed-b60eaf40fc0f",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "f22abe99-f853-4207-a072-84ced5f5f7c9",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -4543,6 +5458,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "220a65f5-603c-44f1-96d1-974dbf4d4f22",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4579,6 +5499,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "03e62887-05e3-4520-91a0-5d0f4bce7727",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4615,6 +5540,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "a1198333-9f34-4779-bd9d-6aceb4c349e3",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4626,8 +5556,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "a1a15314-53a8-4e26-90ee-f8c0f8df1afe",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -4639,11 +5574,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "42b28a76-041a-4efc-bc07-ddfb6c60589e",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "ba6fd294-aab4-46b4-b5a1-761f0fc49cb9",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -4673,6 +5618,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "8cf24df7-d97d-4621-a33f-3ce7323edf34",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4709,6 +5659,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "4423a3a8-488f-4131-ad48-18aadc68f3ba",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4745,6 +5700,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "86ec5b97-404a-4092-99e7-b48ce0a44385",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4756,8 +5716,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "86332048-486d-4f20-8eee-6de5acdba06f",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -4769,11 +5734,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "65f09a25-88d4-4074-94ef-2caf304d3cf7",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "ea4968cf-f9d0-4b2d-ba56-ae1af5a97081",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -4803,6 +5778,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "08c91354-0c16-4258-9524-31ea6d3b1cc4",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4839,6 +5819,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "c9cccaea-2e2a-404c-9ff7-3a9b1c5fd932",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4875,6 +5860,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "fed3950c-01ee-4697-9287-ac41f57e8b2a",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4886,8 +5876,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "c1b70914-5b33-412c-9924-b74914a067da",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -4899,11 +5894,21 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "08f9b7e5-81a6-458a-beb2-7058f0c5538b",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "40d4a8ee-039e-43f2-a369-cdf7fa101a40",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -4933,6 +5938,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "19a1feff-f8f2-4723-b2b5-c12765fd5128",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -4969,6 +5979,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "d6e58145-8f8b-4abe-a837-a8134051beee",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -5005,6 +6020,11 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "07c607db-366d-4103-94a4-2c9e8f1b3eec",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         },
                                         {
@@ -5016,8 +6036,13 @@
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
+                                                "m_rfl_guid": {
+                                                    "Value": "d0e2e00a-c6cc-47fe-8b1e-3ce70ed3fe84",
+                                                    "Type": 3,
+                                                    "Size": 32
+                                                },
                                                 "Type": 4,
-                                                "Size": 56
+                                                "Size": 104
                                             },
                                             "m_active": {
                                                 "Value": true,
@@ -5029,16 +6054,31 @@
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
+                                            },
+                                            "m_rfl_guid": {
+                                                "Value": "49b9a752-03d4-4627-9b5f-ffbbf5cadbfe",
+                                                "Type": 3,
+                                                "Size": 32
                                             }
                                         }
                                     ],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "d406517d-ec85-4c15-8f62-1635bd49c4a7",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             }
                         ],
                         "Type": 22,
                         "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "92eb4425-a376-4ede-99a0-54277977e065",
+                        "Type": 3,
+                        "Size": 32
                     }
                 },
                 {
@@ -5065,8 +6105,13 @@
                                         "Type": 3,
                                         "Size": 32
                                     },
+                                    "m_rfl_guid": {
+                                        "Value": "a34bb70c-b8fc-438a-b2e1-8b9a16622771",
+                                        "Type": 3,
+                                        "Size": 32
+                                    },
                                     "Type": 4,
-                                    "Size": 56
+                                    "Size": 104
                                 },
                                 "m_active": {
                                     "Value": true,
@@ -5078,6 +6123,11 @@
                                     "Elements": [],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "1c805d08-13b0-41c6-b54c-efb4ea5df95b",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -5114,6 +6164,11 @@
                                     "Elements": [],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "ba44bafd-320e-4ee3-90d6-33efa8fef2ef",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             },
                             {
@@ -5180,16 +6235,31 @@
                                     "Elements": [],
                                     "Type": 22,
                                     "Size": 24
+                                },
+                                "m_rfl_guid": {
+                                    "Value": "723ba124-d0c1-410c-9ce3-603ae47ee7a9",
+                                    "Type": 3,
+                                    "Size": 32
                                 }
                             }
                         ],
                         "Type": 22,
                         "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "d96cfa4b-3142-404b-b7bd-ef175127ccc3",
+                        "Type": 3,
+                        "Size": 32
                     }
                 }
             ],
             "Type": 22,
             "Size": 24
+        },
+        "m_rfl_guid": {
+            "Value": "4bb04a72-4df5-4a71-b9b3-443c507af713",
+            "Type": 3,
+            "Size": 32
         }
     }
 }

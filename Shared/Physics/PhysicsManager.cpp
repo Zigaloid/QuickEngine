@@ -255,12 +255,10 @@ void PhysicsManager::Update(float deltaTime)
 
     if (m_broadPhaseDirty)
     {
-        DECLARE_SCOPE_VLOW();
         m_physicsSystem->OptimizeBroadPhase();
         m_broadPhaseDirty = false;
     }
     {
-        DECLARE_SCOPE_VLOW();
         m_physicsSystem->Update(deltaTime, m_config.collisionSteps, m_tempAllocator, m_jobSystem);
         // Publish the contacts recorded during this step to the game-thread read buffer.
         m_contactListener.SwapBuffers();

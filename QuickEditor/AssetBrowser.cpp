@@ -1,4 +1,4 @@
-﻿#include "AssetBrowser.h"
+﻿#include "quickedit_pch.h"
 #include "AssetBrowser.h"
 #include "CoreSystem/CoreSystem.h"
 #include "CoreSystem/AppConfig.h"

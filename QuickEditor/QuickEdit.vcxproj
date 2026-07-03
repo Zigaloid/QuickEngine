@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -106,8 +106,8 @@
     <ClInclude Include="..\Shared\Components\LightComponent.h" />
     <ClInclude Include="..\Shared\Components\LightManagerComponent.h" />
     <ClInclude Include="..\Shared\Components\MeshComponent.h" />
-    <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h" />
     <ClInclude Include="..\Shared\Components\NavQuery.h" />
+    <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h" />
     <ClInclude Include="..\Shared\Components\PhysicsComponent.h" />
     <ClInclude Include="..\Shared\Components\ThirdPersonInputComponent.h" />
@@ -145,7 +145,6 @@
     <ClInclude Include="..\Shared\ImguiVizualizers\UnifiedActionManager.h" />
     <ClInclude Include="..\Shared\NavMesh\NavMeshBuilder.h" />
     <ClInclude Include="..\Shared\NavMesh\NavMeshDebugDraw.h" />
-    <ClInclude Include="..\Shared\ResourceTypes\NavigationResource.h" />
     <ClInclude Include="..\Shared\Physics\JoltDebugRenderer.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsManager.h" />
     <ClInclude Include="..\Shared\Physics\PhysicsSystem.h" />
@@ -156,6 +155,7 @@
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h" />
+    <ClInclude Include="..\Shared\ResourceTypes\NavigationResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\ShaderResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h" />
@@ -231,8 +231,8 @@
     <ClInclude Include="..\Shared\utils\ObjMeshConverter.h" />
     <ClInclude Include="..\Shared\utils\StringUtils.h" />
     <ClInclude Include="AssetBrowser.h" />
-    <ClInclude Include="Core\ComponentSystem\ComponentSystem.h" />
     <ClInclude Include="QuickEdit.h" />
+    <ClInclude Include="quickedit_pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp" />
@@ -268,8 +268,8 @@
     <ClCompile Include="..\Shared\Components\LightComponent.cpp" />
     <ClCompile Include="..\Shared\Components\LightManagerComponent.cpp" />
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp" />
-    <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp" />
     <ClCompile Include="..\Shared\Components\NavQuery.cpp" />
+    <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp" />
     <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp" />
     <ClCompile Include="..\Shared\Components\ThirdPersonInputComponent.cpp" />
@@ -307,10 +307,10 @@
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />
+    <ClCompile Include="..\Shared\ResourceTypes\NavigationResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ShaderResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp" />
-    <ClCompile Include="..\Shared\ResourceTypes\NavigationResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\bgfx_utils.cpp" />
     <ClCompile Include="..\Shared\bgfx_common\camera.cpp" />
@@ -344,6 +344,7 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
+    <ClCompile Include="quickedit_pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

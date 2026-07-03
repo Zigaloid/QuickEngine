@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|x64">
@@ -66,6 +66,10 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;JPH_DEBUG_RENDERER;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_USE_AVX2;JPH_USE_AVX;JPH_USE_SSE4_1;JPH_USE_SSE4_2;JPH_USE_LZCNT;JPH_USE_TZCNT;JPH_USE_F16C;JPH_USE_FMADD;DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\JoltPhysics-master;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared\Rendering;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\Physics;..\Shared\bgfx_common;..\Shared\utils;..\External\recastnavigation-main\Detour\Include;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -87,6 +91,10 @@
       <LanguageStandard>stdcpp20</LanguageStandard>
       <ExternalWarningLevel>Level3</ExternalWarningLevel>
     </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>BX_CONFIG_DEBUG;ENTRY_CONFIG_IMPLEMENT_MAIN=1;USE_ENTRY=1;JPH_DEBUG_RENDERER;JPH_PROFILE_ENABLED;JPH_OBJECT_STREAM;JPH_FLOATING_POINT_EXCEPTIONS_ENABLED;JPH_USE_AVX2;JPH_USE_AVX;JPH_USE_SSE4_1;JPH_USE_SSE4_2;JPH_USE_LZCNT;JPH_USE_TZCNT;JPH_USE_F16C;JPH_USE_FMADD;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>.;..\core;..\External\bgfx\include;..\External\bimg\include;..\External\bx\include;..\External\JoltPhysics-master;..\External\bgfx;..\External;..\Shared\ImguiVizualizers;..\Shared\Rendering;..\Shared;..\AssetClasses;..\Shared\ResourceTypes;..\Shared\Components;..\Shared\Physics;..\Shared\bgfx_common;..\Shared\utils;..\External\recastnavigation-main\Detour\Include;..\External\imgui-docking;..\External\bx\include\compat\msvc;..\External\OpenGL\Include;..\External\ufbx;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ResourceCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -288,6 +296,9 @@
     <ClCompile Include="..\Shared\utils\StringUtils.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Main.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="resources\app.rc" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Core\Core.vcxproj">

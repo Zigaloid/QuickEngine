@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "HeatMapContainer.h"
 #include <cmath>
 #include <fstream>

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ComponentSystemScheduler.h"
 #include "CoreSystem/CoreSystem.h"
 

@@ -1,4 +1,5 @@
-﻿#include "QuickEdit.h"
+﻿#include "quickedit_pch.h"
+#include "QuickEdit.h"
 #include "CommandConsole.h"
 #include "ImGui3DViewVisualizer.h"
 #include "MessageSystem/MessageBus.h"
@@ -11,6 +12,7 @@
 #include "LightManagerComponent.h"
 #include "imgui.h"
 #include "ComponentSystem/ComponentDependencyDefinition.h"
+#include "CauseAndEventSystem/CauseAndEventManagerComponent.h"
 
 ComponentDependencyDefinitionList g_Test;
 
@@ -46,6 +48,9 @@ void QuickEditApp::RegisterComponents()
 {
 	auto* componentManager = Core::CoreSystem::GetComponentManager();
 	auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
+
+	componentManager->RegisterComponentType<CCauseAndEventManagerComponent>();
+	scheduler->RegisterComponentType<CCauseAndEventManagerComponent>(0, "CauseAndEventManager");
 }
 
 void QuickEditApp::Update(double deltaTime)

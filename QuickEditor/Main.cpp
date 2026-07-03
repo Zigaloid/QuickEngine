@@ -1,3 +1,4 @@
+#include "quickedit_pch.h"
 /*
  * Copyright 2011-2026 Branimir Karadzic. All rights reserved.
  * License: https://github.com/bkaradzic/bgfx/blob/master/LICENSE

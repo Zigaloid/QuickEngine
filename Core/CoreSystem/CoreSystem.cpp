@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "CoreSystem.h"
 
 #include "ComponentSystem/ComponentSystem.h"

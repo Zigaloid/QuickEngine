@@ -81,6 +81,9 @@
     <ClInclude Include="..\External\ufbx\ufbx.h">
       <Filter>..\External\ufbx</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\AIComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\Components\CameraComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
@@ -106,6 +109,12 @@
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\MeshComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\NavQuery.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Components\PhysicsBodyComponent.h">
@@ -247,6 +256,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\MeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\NavigationResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\PhysicsBodyResource.h">
@@ -473,19 +485,7 @@
     </ClInclude>
     <ClInclude Include="AssetBrowser.h" />
     <ClInclude Include="QuickEdit.h" />
-    <ClInclude Include="..\Shared\ResourceTypes\NavigationResource.h">
-      <Filter>..\Shared\ResourceTypes</Filter>
-    </ClInclude>
-    <ClInclude Include="Core\ComponentSystem\ComponentSystem.h" />
-    <ClInclude Include="..\Shared\Components\NavigationManagerComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\NavQuery.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Shared\Components\AIComponent.h">
-      <Filter>..\Shared\Components</Filter>
-    </ClInclude>
+    <ClInclude Include="quickedit_pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\External\bgfx\3rdparty\meshoptimizer\src\allocator.cpp">
@@ -557,6 +557,9 @@
     <ClCompile Include="..\External\ufbx\ufbx.c">
       <Filter>..\External\ufbx</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\AIComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Components\CameraComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
@@ -582,6 +585,12 @@
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\MeshComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\NavQuery.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Components\PhysicsBodyComponent.cpp">
@@ -671,6 +680,9 @@
     <ClCompile Include="..\Shared\NavMesh\NavMeshDebugDraw.cpp">
       <Filter>..\Shared\NavMesh</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\NavMesh\NavMeshSerializer.cpp">
+      <Filter>..\Shared\NavMesh</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\Physics\JoltDebugRenderer.cpp">
       <Filter>..\Shared\Physics</Filter>
     </ClCompile>
@@ -690,6 +702,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\NavigationResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\PhysicsBodyResource.cpp">
@@ -788,18 +803,6 @@
     <ClCompile Include="AssetBrowser.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="QuickEdit.cpp" />
-    <ClCompile Include="..\Shared\NavMesh\NavMeshSerializer.cpp" />
-    <ClCompile Include="..\Shared\ResourceTypes\NavigationResource.cpp">
-      <Filter>..\Shared\ResourceTypes</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\NavigationManagerComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\NavQuery.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Shared\Components\AIComponent.cpp">
-      <Filter>..\Shared\Components</Filter>
-    </ClCompile>
+    <ClCompile Include="quickedit_pch.cpp" />
   </ItemGroup>
 </Project>

@@ -6,9 +6,14 @@
 #include "DebugChannel\DebugChannel.h"
 #include "ReflectionError.h"
 #include "Types/bool.h"
+#include "Types/guid.h"
+#include "Types/string.h"
 
 #include <vector>
+#include <string>
+#include <array>
 
+// Restore original behavior: do NOT inject base-class GUID into every derived class map.
 #define REFL_DECLARE_OBJECT(_O_,_P_)                                                    \
     std::vector<CReflectionMapEntry> &GetReflectionMap() { return _O_::s_ReflectionMap; }\
     virtual const char *GetRflClassName() const override { return #_O_; }               \
@@ -80,7 +85,13 @@
 class CReflectedBase
 {
 public:
-    CReflectedBase() = default;
+    CReflectedBase()
+        : m_guid(GUID128::Generate())
+    {
+        // Keep serializable string in sync with binary GUID
+        m_rfl_guid = GUID128::ToString(m_guid);
+    }
+
     virtual ~CReflectedBase() = default;
 
     /** @param fileName File to read from.
@@ -113,11 +124,42 @@ public:
     /** @return Result containing the serialized binary buffer, or an error. */
     Reflection::Result<std::vector<uint8_t>> WriteToBinaryBuffer();
 
-    virtual void ReadMembers(IRFL_Parser& doc) {}
-    virtual void WriteMembers(IRFL_Parser& doc) {}
+    // Base class reads/writes its own GUID string property so derived classes don't need to embed it in their maps.
+    virtual void ReadMembers(IRFL_Parser& doc)
+    {
+        // Build a temporary string property that describes the base-class member and ask parser to read it.
+        CStringProperty guidProp(RT_String, sizeof(std::string), offsetof(CReflectedBase, m_rfl_guid), "m_rfl_guid");
+        guidProp.Read(&doc, this);
+
+        // Try to parse the GUID string into binary form; if parsing fails, keep the previously generated GUID.
+        GUID128 parsed;
+        if (GUID128::FromString(m_rfl_guid, parsed))
+        {
+            m_guid = parsed;
+        }
+    }
+
+    virtual void WriteMembers(IRFL_Parser& doc) 
+    {
+        CStringProperty guidProp(RT_String, sizeof(std::string), offsetof(CReflectedBase, m_rfl_guid), "m_rfl_guid");
+        guidProp.Write(&doc, this);
+    }
+
     virtual const char* GetRflClassName() const { return nullptr; }
     virtual void CollectHierarchyReflectionMaps(std::vector<std::pair<const char*, std::vector<CReflectionMapEntry>*>>& hierarchyMaps) const {}
 	virtual void OnLoaded() {} // Called after successful read, can be overridden for post-processing
+
+    // GUID accessors
+    const std::string& GetGuidString() const { return m_rfl_guid; }
+    const std::array<uint8_t, 16>& GetGuidBytes() const { return m_guid.bytes; }
+    void SetGuidFromString(const std::string& s)
+    {
+        GUID128 parsed;
+        if (GUID128::FromString(s, parsed)) {
+            m_guid = parsed;
+            m_rfl_guid = s;
+        }
+    }
 
 protected:
     void InternalReadMembers(std::vector<CReflectionMapEntry>& reflectionMap, IRFL_Parser& doc);
@@ -125,4 +167,12 @@ protected:
 
     bool ValidateReflectionMap(const std::vector<CReflectionMapEntry>& reflectionMap) const;
     bool ValidateParser(IRFL_Parser& doc) const;
+    
+    std::string m_rfl_guid;
+
+private:
+    // Binary GUID storage (16 bytes)
+    GUID128 m_guid;
+    // Serializable GUID string used by reflection system
+    
 };

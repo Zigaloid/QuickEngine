@@ -41,7 +41,7 @@ externalproject "detour"
    
 project "QuickEdit"  
    kind "ConsoleApp"
-   language "C"
+   language "C++"
    targetdir "bin/%{cfg.buildcfg}"
    cppdialect "C++20"
    architecture "x86_64"
@@ -70,7 +70,7 @@ project "QuickEdit"
             "/Zc:preprocessor",
 			"/Zc:__cplusplus"
         }
-		
+   
 	includedirs { "./" }   
 	includedirs { "../core/" }      
 	includedirs { "../External/bgfx/include/" }   

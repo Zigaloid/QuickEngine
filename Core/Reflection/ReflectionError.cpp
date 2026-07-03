@@ -1,4 +1,7 @@
+﻿#include "pch.h"
+
 #include "ReflectionError.h"
+
 #include "DebugChannel\DebugChannel.h"
 
 // External declaration - defined in ReflectionBase.cpp
@@ -55,3 +58,4 @@ bool ValidatePropertyAccess(const void* ptr, const std::string& propertyName)
 }
 
 } // namespace Reflection
+

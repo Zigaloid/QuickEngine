@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "WindowsGamepad.h"
 
 #include "WindowsGamepad.h"

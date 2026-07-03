@@ -1,3 +1,4 @@
+ï»¿#include "pch.h"
 // Reflection.cpp : Defines the entry point for the console application.
 //
 
@@ -89,13 +90,13 @@ bool CReflectedBase::Read(const char* fileName)
 	}
 	catch (const Reflection::ReflectionException& e)
 	{
-		// Log directly — do NOT call REFL_ERROR here, it will throw again
+		// Log directly â€” do NOT call REFL_ERROR here, it will throw again
 		ReflectionDebug.print(std::string("[ERROR][Parsing] Reflection error during read: ") + e.what());
 		return false;
 	}
 	catch (const std::exception& e)
 	{
-		// Same — avoid going through the throwing error handler
+		// Same â€” avoid going through the throwing error handler
 		ReflectionDebug.print(std::string("[CRITICAL][Unknown] Unexpected error during read: ") + e.what());
 		return false;
 	}

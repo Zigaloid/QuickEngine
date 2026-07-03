@@ -1,4 +1,7 @@
-﻿#include "ComponentDependencyDefinition.h"
+﻿#include "pch.h"
+
+#include "ComponentDependencyDefinition.h"
+
 #include "Reflection/Reflection.h"
 
 // Include primitives renderer for DebugRender implementation
@@ -13,5 +16,5 @@ REFL_DEFINE_END
 
 // ── ComponentDependencyDefinitionList ───────────────────────────────────
 REFL_DEFINE_OBJECT(ComponentDependencyDefinitionList)
-REFL_DEFINE_OBJECT_PTR_VECTOR_MEMBER(ComponentDependencyDefinitionList, m_dependencies, ComponentDependencyDefinition)
+REFL_DEFINE_OBJECT_PTR_VECTOR_MEMBER(ComponentDependencyDefinitionList, m_dependencies)
 REFL_DEFINE_END

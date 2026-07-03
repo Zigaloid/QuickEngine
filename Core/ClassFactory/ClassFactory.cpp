@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ClassFactory.h"
 
 ClassMap* ClassFactory::s_classFactoryMap = nullptr;

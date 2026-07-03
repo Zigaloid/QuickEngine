@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "Vector4f.h"
 
 // Global operator for scalar * vector (commutative scalar multiplication)

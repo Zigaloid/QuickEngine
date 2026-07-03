@@ -80,11 +80,11 @@ template<> inline bool ConsoleVar<std::string>::SetFromString(const std::string&
 
 // Helper macros for declaring console variables. Usage:
 // CONSOLE_COMMAND(bool, PhysDebug, "description")
-#define __CONCAT(a,b) a##b
-#define _CONCAT(a,b) __CONCAT(a,b)
+#define __CONCAT_A(a,b) a##b
+#define _CONCAT_B(a,b) __CONCAT_A(a,b)
 #define CONSOLE_COMMAND(type, name, desc) \
     static type name = type(); \
-    static Console::ConsoleVar<type> _CONCAT(s_consolevar_reg_, name)(#name, &name, desc)
+    static Console::ConsoleVar<type> _CONCAT_B(s_consolevar_reg_, name)(#name, &name, desc)
 
 // Macro to get the variable by name (simply expands to the variable)
 #define CONSOLE_GET(name) (name)

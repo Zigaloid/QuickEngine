@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "GamepadManager.h"
 
 #include "Profiler/Profiler.h"

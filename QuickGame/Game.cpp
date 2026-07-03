@@ -21,6 +21,7 @@
 #include "LightComponent.h"
 #include "LightManagerComponent.h"
 #include "NavigationManagerComponent.h"
+#include "CauseAndEventSystem/CauseAndEventManagerComponent.h"
 
 #include "AIComponent.h"
 #include "ComponentSystem/ComponentDependencyDefinition.h"
@@ -203,6 +204,9 @@ void GameApp::RegisterComponents()
 
 	componentManager->RegisterComponentType<CNavigationManagerComponent>();
 	scheduler->RegisterComponentType<CNavigationManagerComponent>(0, "NavigationManagerComponent");
+
+	componentManager->RegisterComponentType<CCauseAndEventManagerComponent>();
+	scheduler->RegisterComponentType<CCauseAndEventManagerComponent>(0, "CauseAndEventManager");
 }
 
 void GameApp::Update(double deltaTime)

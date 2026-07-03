@@ -1,4 +1,6 @@
-﻿#include "FileWatcher.h"
+﻿#include "pch.h"
+
+#include "FileWatcher.h"
 
 #include <memory>
 #include <stdexcept>

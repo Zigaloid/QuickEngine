@@ -1,3 +1,4 @@
+﻿#include "pch.h"
 #include "ProfilerAnalyzer.h"
 #include "Profiler.h"
 
@@ -22,8 +23,6 @@
 
 namespace Profiler
 {
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 static std::string FormatTiming(uint64_t cycles, double cpuFrequency)
 {
@@ -54,8 +53,6 @@ static std::string FormatTiming(uint64_t cycles, double cpuFrequency)
     return oss.str();
 }
 
-// ── FlameNode ─────────────────────────────────────────────────────────────────
-
 void FlameNode::AddChild(std::unique_ptr<FlameNode> child)
 {
     if (child)
@@ -76,8 +73,6 @@ FlameNode* FlameNode::FindChild(const std::string& functionName)
     }
     return nullptr;
 }
-
-// ── TimelineThreadData ────────────────────────────────────────────────────────
 
 void TimelineThreadData::CalculateTimelineLayout()
 {
@@ -131,8 +126,6 @@ std::vector<const FrameMarker*> TimelineThreadData::GetFrameMarkersInTimeRange(u
     }
     return result;
 }
-
-// ── TimelineFlameGraphData ────────────────────────────────────────────────────
 
 TimelineThreadData* TimelineFlameGraphData::FindThread(size_t threadHash)
 {
@@ -199,8 +192,6 @@ std::vector<const FrameMarker*> TimelineFlameGraphData::GetAllFrameMarkersInTime
     return result;
 }
 
-// ── ThreadFlameData ───────────────────────────────────────────────────────────
-
 void ThreadFlameData::CalculateLayout()
 {
     if (!rootNode || rootNode->children.empty()) return;
@@ -242,8 +233,6 @@ void ThreadFlameData::CalculateNodeLayout(FlameNode* node, float startX, float w
     }
 }
 
-// ── FlameGraphData ────────────────────────────────────────────────────────────
-
 void FlameGraphData::CalculateGlobalTimeline()
 {
     for (auto& thread : threads)
@@ -251,8 +240,6 @@ void FlameGraphData::CalculateGlobalTimeline()
         thread->CalculateLayout();
     }
 }
-
-// ── ProfilerAnalyzer ──────────────────────────────────────────────────────────
 
 void ProfilerAnalyzer::LoadFromProfileEvents(const std::deque<ProfileEvent>& events, bool clearExisting)
 {
@@ -938,3 +925,4 @@ void ProfilerAnalyzer::CalculateSelfTimes(FlameNode* node) const
 }
 
 } // namespace Profiler
+

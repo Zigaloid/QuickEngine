@@ -1,0 +1,15 @@
+
+I would like to implement a cause and event system.
+The system will be composed of four main classes. 
+A Cause class that monitors for a specific event. It should have a GUID ID to it's owner component.
+A Event class that responds to a specific event. It should have a ptr to it's owner component.
+A CauseEventDefinition that holds a smart ptr to one Cause object and multiple event objects.
+
+And a CauseAndEventManagerComponent which contains a list of active CauseEventDefinitions. And handles updating causes and event propagation.
+
+
+
+
+Add GUID to all reflected types.
+
+EntityComponent:

@@ -1,3 +1,4 @@
+﻿#include "pch.h"
 #include "Profiler.h"
 #include "ProfilerAnalyzer.h"
 #include <iostream>
@@ -371,3 +372,4 @@ std::vector<uint8_t> ProfileLogger::SerializeRecentEventsBinary()
 }
 
 } // namespace Profiler
+

@@ -1,3 +1,4 @@
+#include "pch.h"
 #include "ApplicationComponent.h"
 #include "../Profiler/Profiler.h"
 #include "../Profiler/ProfilerAnalyzer.h"

@@ -3,7 +3,7 @@ workspace "Core"
 
 project "Core"
    kind "StaticLib"
-   language "C"
+   language "C++"
    targetdir "bin/%{cfg.buildcfg}"
    cppdialect "C++20"
    architecture "x86_64"
@@ -11,7 +11,10 @@ project "Core"
    includedirs { "./" }
    includedirs { "./External/"}
 
-   
+      -- Precompiled header
+   pchheader "pch.h"
+   pchsource "pch.cpp"
+  
    files { "./**.cpp", "./**.h", "./**.html" }   
    
    links

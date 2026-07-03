@@ -14,6 +14,11 @@
             "Value": 1369,
             "Type": 1,
             "Size": 4
+        },
+        "m_rfl_guid": {
+            "Value": "e9a61083-ae90-4e31-bf5d-40e35c667970",
+            "Type": 3,
+            "Size": 32
         }
     }
 }

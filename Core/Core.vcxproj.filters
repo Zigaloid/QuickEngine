@@ -7,6 +7,9 @@
     <Filter Include="App">
       <UniqueIdentifier>{46D6870B-B2DF-877C-3B5B-9E7CA763937C}</UniqueIdentifier>
     </Filter>
+    <Filter Include="CauseAndEventSystem">
+      <UniqueIdentifier>{307C01F1-9CDD-DEFE-254B-25B191AB15BE}</UniqueIdentifier>
+    </Filter>
     <Filter Include="ClassFactory">
       <UniqueIdentifier>{530DDD5E-3F70-6C03-E8F5-A4B9D4373886}</UniqueIdentifier>
     </Filter>
@@ -72,8 +75,44 @@
     <ClInclude Include="App\ApplicationComponent.h">
       <Filter>App</Filter>
     </ClInclude>
+    <ClInclude Include="CauseAndEventSystem\Cause.h">
+      <Filter>CauseAndEventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CauseAndEventSystem\CauseAndEventManagerComponent.h">
+      <Filter>CauseAndEventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CauseAndEventSystem\CauseAndEventSystem.h">
+      <Filter>CauseAndEventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CauseAndEventSystem\CauseEventDefinition.h">
+      <Filter>CauseAndEventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CauseAndEventSystem\CauseGUID.h">
+      <Filter>CauseAndEventSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="CauseAndEventSystem\Event.h">
+      <Filter>CauseAndEventSystem</Filter>
+    </ClInclude>
     <ClInclude Include="ClassFactory\ClassFactory.h">
       <Filter>ClassFactory</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\Component.h">
+      <Filter>ComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\ComponentDependencyDefinition.h">
+      <Filter>ComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\ComponentFactory.h">
+      <Filter>ComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\ComponentManager.h">
+      <Filter>ComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\ComponentPool.h">
+      <Filter>ComponentSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="ComponentSystem\ComponentReference.h">
+      <Filter>ComponentSystem</Filter>
     </ClInclude>
     <ClInclude Include="ComponentSystem\ComponentRegistry.h">
       <Filter>ComponentSystem</Filter>
@@ -109,6 +148,9 @@
       <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\FileSystemManager.h">
+      <Filter>FileSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSystem\FileWatcher.h">
       <Filter>FileSystem</Filter>
     </ClInclude>
     <ClInclude Include="FileSystem\StandardFileSystem.h">
@@ -240,6 +282,9 @@
     <ClInclude Include="Reflection\Types\float.h">
       <Filter>Reflection\Types</Filter>
     </ClInclude>
+    <ClInclude Include="Reflection\Types\guid.h">
+      <Filter>Reflection\Types</Filter>
+    </ClInclude>
     <ClInclude Include="Reflection\Types\int.h">
       <Filter>Reflection\Types</Filter>
     </ClInclude>
@@ -261,28 +306,8 @@
     <ClInclude Include="ResourceManager\ResourceManager.h">
       <Filter>ResourceManager</Filter>
     </ClInclude>
+    <ClInclude Include="pch.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="ComponentSystem\ComponentDependencyDefinition.h">
-      <Filter>ComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSystem\FileWatcher.h">
-      <Filter>FileSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentSystem\Component.h">
-      <Filter>ComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentSystem\ComponentFactory.h">
-      <Filter>ComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentSystem\ComponentManager.h">
-      <Filter>ComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentSystem\ComponentPool.h">
-      <Filter>ComponentSystem</Filter>
-    </ClInclude>
-    <ClInclude Include="ComponentSystem\ComponentReference.h">
-      <Filter>ComponentSystem</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Analysis\HeatMapContainer.cpp">
@@ -291,8 +316,20 @@
     <ClCompile Include="App\ApplicationComponent.cpp">
       <Filter>App</Filter>
     </ClCompile>
+    <ClCompile Include="CauseAndEventSystem\CauseAndEventManagerComponent.cpp">
+      <Filter>CauseAndEventSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="CauseAndEventSystem\CauseEventDefinition.cpp">
+      <Filter>CauseAndEventSystem</Filter>
+    </ClCompile>
     <ClCompile Include="ClassFactory\ClassFactory.cpp">
       <Filter>ClassFactory</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentSystem\Component.cpp">
+      <Filter>ComponentSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="ComponentSystem\ComponentDependencyDefinition.cpp">
+      <Filter>ComponentSystem</Filter>
     </ClCompile>
     <ClCompile Include="ComponentSystem\ComponentRegistry.cpp">
       <Filter>ComponentSystem</Filter>
@@ -320,6 +357,9 @@
     </ClCompile>
     <ClCompile Include="DebugChannel\DebugChannel.cpp">
       <Filter>DebugChannel</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSystem\FileWatcher.cpp">
+      <Filter>FileSystem</Filter>
     </ClCompile>
     <ClCompile Include="FileSystem\StandardFileSystem.cpp">
       <Filter>FileSystem</Filter>
@@ -396,15 +436,7 @@
     <ClCompile Include="ResourceManager\ResourceManager.cpp">
       <Filter>ResourceManager</Filter>
     </ClCompile>
-    <ClCompile Include="ComponentSystem\ComponentDependencyDefinition.cpp">
-      <Filter>ComponentSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="FileSystem\FileWatcher.cpp">
-      <Filter>FileSystem</Filter>
-    </ClCompile>
-    <ClCompile Include="ComponentSystem\Component.cpp">
-      <Filter>ComponentSystem</Filter>
-    </ClCompile>
+    <ClCompile Include="pch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Documentation\ComponentSystemDocumentation.html">
