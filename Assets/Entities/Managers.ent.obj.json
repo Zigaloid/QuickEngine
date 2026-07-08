@@ -3,7 +3,7 @@
         "m_name": {
             "Value": "Managers",
             "Type": 3,
-            "Size": 40
+            "Size": 32
         },
         "m_active": {
             "Value": true,
@@ -24,11 +24,45 @@
                         "Value": "CLightManagerComponent",
                         "Elements": [],
                         "Type": 22,
+                        "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "e0b5497a-46bb-4660-9cab-1be3b6778666",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CNavigationManagerComponent",
+                    "m_maxQueryNodes": {
+                        "Value": 2048,
+                        "Type": 1,
+                        "Size": 4
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CNavigationManagerComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "3dec7e0b-aef7-4a60-8cdd-d15adb74bcee",
+                        "Type": 3,
                         "Size": 32
                     }
                 }
             ],
             "Type": 22,
+            "Size": 24
+        },
+        "m_rfl_guid": {
+            "Value": "d6a20f42-fe28-4ccd-b516-93016be922c1",
+            "Type": 3,
             "Size": 32
         }
     }

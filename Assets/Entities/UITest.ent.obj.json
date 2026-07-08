@@ -1,0 +1,101 @@
+{
+    "RootObject": {
+        "m_name": {
+            "Value": "UI Test",
+            "Type": 3,
+            "Size": 32
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CEntityComponent",
+            "Elements": [
+                {
+                    "Value": "CUIImageComponent",
+                    "m_textureResource": {
+                        "Value": "CTextureResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/textures/bark1.dds",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "m_rfl_guid": {
+                            "Value": "65246fa7-b603-4a02-a635-285bc172a6ef",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "Type": 4,
+                        "Size": 104
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CUIImageComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "5b6e9911-bdb5-4546-8100-bcf4c8a67736",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CTransformComponent",
+                    "m_matrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "8576024e-257d-4c6a-8b39-134532fa7c93",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                }
+            ],
+            "Type": 22,
+            "Size": 24
+        },
+        "m_rfl_guid": {
+            "Value": "7d4cc207-72e3-408e-b0ea-9a9ecec4ee14",
+            "Type": 3,
+            "Size": 32
+        }
+    }
+}

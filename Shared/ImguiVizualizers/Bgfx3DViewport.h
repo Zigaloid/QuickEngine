@@ -2,9 +2,10 @@
 
 #include <bgfx/bgfx.h>
 #include <cstdint>
-#include "BgfxViewIdAllocator.h"
+#include "Rendering/BgfxViewIdAllocator.h"
 
 namespace ImGuiVisualizers {
+using Rendering::BgfxViewIdAllocator;
 /**
  * @brief Manages a BGFX offscreen framebuffer (color + depth) and a dedicated
  *        view ID so that 3D content can be rendered to a texture and then

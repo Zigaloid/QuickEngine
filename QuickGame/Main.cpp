@@ -14,6 +14,7 @@
 
 #include "..\shared\sharednexusdefines.h"
 #include "..\shared\ProfilerController.h"
+#include "Rendering/BgfxUIView.h"
 
 GameApp theApp;
 
@@ -118,6 +119,11 @@ namespace
 			// This dummy draw call is here to make sure that view 0 is cleared
 			// if no other draw calls are submitted to view 0.
 			bgfx::touch(0);
+
+			// Configure the UI overlay view (identity view/proj, depth-only
+			// clear) so UI elements submitted during the render queue flush
+			// this frame overlay the scene pass above.
+			Rendering::BgfxUIView::Instance().UpdateView(uint16_t(m_width), uint16_t(m_height));
 
 			// Use debug font to print information about this example.
 			bgfx::dbgTextClear();

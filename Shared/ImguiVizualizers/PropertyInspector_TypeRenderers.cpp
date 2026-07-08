@@ -850,7 +850,9 @@ namespace ImGuiVisualizers {
 
             for (size_t i = 0; i < vecSize(); ++i)
             {
-                const std::string elementName   = "[" + std::to_string(i) + "]";
+
+                ComponentSystem::Component* comp = getComp(i);
+				const std::string elementName = "[" + std::to_string(i) + "]" + std::string(comp->GetRflClassName() ? (" " + std::string(comp->GetRflClassName())) : "");
                 const std::string elementNodeId = GenerateTreeNodeId(elementName, getComp(i));
                 bool elementExpanded = ShouldExpandNode(elementNodeId);
 
@@ -864,7 +866,7 @@ namespace ImGuiVisualizers {
                 {
                     UpdateExpandedState(elementNodeId, true);
 
-                    ComponentSystem::Component* comp = getComp(i);
+                    
                     if (comp)
                     {
                         WidgetMapScope wms(this, comp);

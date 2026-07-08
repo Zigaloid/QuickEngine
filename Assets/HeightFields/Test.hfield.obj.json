@@ -37,8 +37,13 @@
                 "Type": 3,
                 "Size": 32
             },
+            "m_rfl_guid": {
+                "Value": "4e8615c0-48f7-48a6-942b-5e2601a70239",
+                "Type": 3,
+                "Size": 32
+            },
             "Type": 4,
-            "Size": 56
+            "Size": 104
         },
         "m_active": {
             "Value": true,
@@ -50,6 +55,11 @@
             "Elements": [],
             "Type": 22,
             "Size": 24
+        },
+        "m_rfl_guid": {
+            "Value": "3c3fbbaf-20cb-44eb-8a95-866d69363e2e",
+            "Type": 3,
+            "Size": 32
         }
     }
 }

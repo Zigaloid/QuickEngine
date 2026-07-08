@@ -120,6 +120,7 @@
     <ClInclude Include="..\Shared\Components\PhysicsComponent.h" />
     <ClInclude Include="..\Shared\Components\ThirdPersonInputComponent.h" />
     <ClInclude Include="..\Shared\Components\TransformComponent.h" />
+    <ClInclude Include="..\Shared\Components\UIElementComponent.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\IImGuiVisualizer.h" />
     <ClInclude Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.h" />
@@ -129,6 +130,8 @@
     <ClInclude Include="..\Shared\Physics\PhysicsSystem.h" />
     <ClInclude Include="..\Shared\Rendering\BgfxGameCamera.h" />
     <ClInclude Include="..\Shared\Rendering\BgfxRenderPrimitives.h" />
+    <ClInclude Include="..\Shared\Rendering\BgfxUIView.h" />
+    <ClInclude Include="..\Shared\Rendering\BgfxViewIdAllocator.h" />
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h" />
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h" />
@@ -250,6 +253,7 @@
     <ClCompile Include="..\Shared\Components\PhysicsComponent.cpp" />
     <ClCompile Include="..\Shared\Components\ThirdPersonInputComponent.cpp" />
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp" />
+    <ClCompile Include="..\Shared\Components\UIElementComponent.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\ImGuiVisualizerManager.cpp" />
     <ClCompile Include="..\Shared\ImguiVizualizers\KeyboardShortcutManager.cpp" />
@@ -257,6 +261,7 @@
     <ClCompile Include="..\Shared\Physics\PhysicsManager.cpp" />
     <ClCompile Include="..\Shared\Physics\PhysicsSystem.cpp" />
     <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp" />
+    <ClCompile Include="..\Shared\Rendering\BgfxUIView.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp" />
     <ClCompile Include="..\Shared\ResourceTypes\MeshResource.cpp" />

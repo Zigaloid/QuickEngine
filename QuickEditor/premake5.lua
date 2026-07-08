@@ -123,6 +123,7 @@ project "QuickEdit"
 	files { "../Shared/Physics/**.h" }
 	files { "../Shared/Rendering/**.cpp" }
 	files { "../Shared/Rendering/**.h" }
+
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.cpp" }
 	files { "../Shared/ImguiVizualizers/ImGuiVisualizerManager.h" }
 	files { "../Shared/ImguiVizualizers/IImGuiVisualizer.h" }	

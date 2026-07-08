@@ -60,6 +60,8 @@ public:
     
     Bgfx3DCamera&           GetCamera()        { return m_camera; }
     bgfx::FrameBufferHandle GetFrameBuffer()   const { return m_viewport.GetFrameBuffer(); }
+    uint16_t                GetViewWidth()      const { return m_viewport.GetWidth(); }
+    uint16_t                GetViewHeight()     const { return m_viewport.GetHeight(); }
 
     // Viewport bounds tracking (updated each frame in RenderContent)
     ImVec2 GetViewportMin() const { return m_viewportMin; }

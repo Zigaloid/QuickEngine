@@ -142,6 +142,11 @@ namespace
 			// if no other draw calls are submitted to view 0.
 			bgfx::touch(0);
 
+			// Note: the UI overlay view is configured per-frame inside the
+			// LevelComponentVisualizer's render callback, which binds the 3D
+			// viewport's framebuffer so UI elements render inside the viewport
+			// panel rather than over the whole editor window.
+
 			// Use debug font to print information about this example.
 			bgfx::dbgTextClear();
 

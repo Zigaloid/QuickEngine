@@ -1,0 +1,39 @@
+{
+    "RootObject": {
+        "m_meshResource": {
+            "Value": "CMeshResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/heightfields/test.mesh.bin",
+                "Type": 3,
+                "Size": 32
+            },
+            "m_rfl_guid": {
+                "Value": "04d4fc01-32f3-46f5-98c4-041b01f1c154",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 104
+        },
+        "m_materialResource": {
+            "Value": "CMaterialResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/materials/height.mat.obj.json",
+                "Type": 3,
+                "Size": 32
+            },
+            "m_rfl_guid": {
+                "Value": "e6b5ad7f-8b74-45cf-bc34-cb07b600b89b",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 104
+        },
+        "m_rfl_guid": {
+            "Value": "382fa464-9d5d-483a-a1af-a8cfcf73f3f1",
+            "Type": 3,
+            "Size": 32
+        }
+    }
+}

@@ -13,6 +13,8 @@
 #include "NavigationResource.h"
 #include "Net/NexusClient.h"
 #include "SharedNexusDefines.h"
+#include "UIElementComponent.h"
+#include "Rendering/BgfxUIView.h"
 
 #include <imgui-docking/imgui_internal.h>
 #include <bx/bounds.h>
@@ -97,6 +99,15 @@ namespace ImGuiVisualizers {
 			// up to date before any mesh component reads it during rendering.
 			if (auto* lightManager = m_levelComp->FindDescendant<CLightManagerComponent>())
 				lightManager->Update(0.0);
+
+			// Set up the UI overlay view to render into the 3D viewport's
+			// framebuffer with identity view/projection and depth-only clear.
+			// This must happen before RenderComponentHierarchy so UI components
+			// that are routed to the UI view have correct view state.
+			Rendering::BgfxUIView::Instance().UpdateView(
+				Get3DView().GetViewWidth(),
+				Get3DView().GetViewHeight(),
+				Get3DView().GetFrameBuffer());
 
 			RenderComponentHierarchy(viewId, m_levelComp);
 			m_selectionManager.RenderSelectionGizmo(Get3DView().GetFrameBuffer(), m_gizmoMode, 2.0f);
@@ -313,7 +324,13 @@ namespace ImGuiVisualizers {
 	{
 		if (renderComp->IsActive() && IsInVisibleLayer(renderComp))
 		{
-			renderComp->Render(viewId);
+			// UI elements render into the dedicated UI view which uses
+			// identity view/projection so the model matrix alone positions
+			// the quad in NDC space.
+			if (auto* uiElement = dynamic_cast<CUIElementComponent*>(renderComp))
+				uiElement->Render(Rendering::BgfxUIView::GetUIViewID());
+			else
+				renderComp->Render(viewId);
 		}
 	}
         // For other physics components (e.g. CCharacterComponent), call DebugRender

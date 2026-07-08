@@ -139,6 +139,7 @@
     <ClInclude Include="Math\ConvexHull.h" />
     <ClInclude Include="Math\Matrix4f.h" />
     <ClInclude Include="Math\Quaternion.h" />
+    <ClInclude Include="Math\Vector2f.h" />
     <ClInclude Include="Math\Vector3f.h" />
     <ClInclude Include="Math\Vector4f.h" />
     <ClInclude Include="MessageSystem\MessageBus.h" />

@@ -34,7 +34,7 @@ private:
     ImGuiVisualizers::ImGuiVisualizerManager  m_visualizerManager;
     PhysicsManager                            m_physicsManager;
 
-    // Primary game viewport camera — renders directly into bgfx view 0.
+    // Primary game viewport camera ï¿½ renders directly into bgfx view 0.
     BgfxGameCamera            m_camera;
     std::shared_ptr<GameCameraController>     m_cameraController;    
 

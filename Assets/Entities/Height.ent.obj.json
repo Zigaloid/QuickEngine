@@ -47,22 +47,27 @@
                         "Elements": [],
                         "Type": 22,
                         "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "f2d4f04f-b0a1-4283-a12f-03e54bd8e036",
+                        "Type": 3,
+                        "Size": 32
                     }
                 },
                 {
                     "Value": "CHeightFieldMeshComponent",
                     "m_xSteps": {
-                        "Value": 10,
+                        "Value": 40,
                         "Type": 1,
                         "Size": 4
                     },
                     "m_zSteps": {
-                        "Value": 10,
+                        "Value": 40,
                         "Type": 1,
                         "Size": 4
                     },
                     "m_stepSize": {
-                        "Value": 1.0,
+                        "Value": 0.5,
                         "Type": 2,
                         "Size": 4
                     },
@@ -88,8 +93,13 @@
                             "Type": 3,
                             "Size": 32
                         },
+                        "m_rfl_guid": {
+                            "Value": "731b3315-98c0-4743-9d19-621301d7f436",
+                            "Type": 3,
+                            "Size": 32
+                        },
                         "Type": 4,
-                        "Size": 56
+                        "Size": 104
                     },
                     "m_active": {
                         "Value": true,
@@ -101,6 +111,11 @@
                         "Elements": [],
                         "Type": 22,
                         "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "8a6dcb16-4ecb-49a8-9f12-e006c1ac20a8",
+                        "Type": 3,
+                        "Size": 32
                     }
                 },
                 {
@@ -162,11 +177,21 @@
                         "Elements": [],
                         "Type": 22,
                         "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "35de84ae-2e25-4385-a59e-31c33505cb75",
+                        "Type": 3,
+                        "Size": 32
                     }
                 }
             ],
             "Type": 22,
             "Size": 24
+        },
+        "m_rfl_guid": {
+            "Value": "57287057-e3bc-4b1b-85d6-b1feaa83000d",
+            "Type": 3,
+            "Size": 32
         }
     }
 }

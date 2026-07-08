@@ -31,6 +31,9 @@
 #include "Input\WindowsMouse.h"
 #include "Input\GamepadManager.h"
 #include "Input\WindowsGamepad.h"
+#include "Rendering/BgfxRenderPrimitives.h"
+#include "Rendering/BgfxUIView.h"
+#include "UIElementComponent.h"
 
 #include "entry\entry.h"
 #include "imgui.h"
@@ -41,6 +44,12 @@ bool GameApp::Initialize()
 	testTextureRef.OnLoaded();
 
 	Rendering::BgfxRenderPrimitives::Instance().Initialize();
+
+	// Initialize UI rendering system: allocate the UI bgfx view and create the
+	// shared UI shader program + unit quad buffers used by CUIElementComponent
+	// subclasses.
+	Rendering::BgfxUIView::Instance().Initialize(1, 1);
+	CUIElementComponent::InitializeUIRendering();
 
 	m_visualizerManager.Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), false);
@@ -207,6 +216,13 @@ void GameApp::RegisterComponents()
 
 	componentManager->RegisterComponentType<CCauseAndEventManagerComponent>();
 	scheduler->RegisterComponentType<CCauseAndEventManagerComponent>(0, "CauseAndEventManager");
+
+	// Register UI components
+	componentManager->RegisterComponentType<CUIElementComponent>();
+	scheduler->RegisterComponentType<CUIElementComponent>(0, "UIElement");
+
+	componentManager->RegisterComponentType<CUIImageComponent>();
+	scheduler->RegisterComponentType<CUIImageComponent>(0, "UIImage");
 }
 
 void GameApp::Update(double deltaTime)
@@ -254,7 +270,6 @@ void GameApp::Render(double deltaTime)
 #ifdef JPH_DEBUG_RENDERER
 	m_physicsManager.DebugDraw(viewMtx);
 #endif
-
 }
 
 void GameApp::ImguiUpdate()
@@ -353,6 +368,8 @@ bool GameApp::Shutdown()
 
 	PhysicsManager::SetInstance(nullptr);
 	Rendering::BgfxRenderPrimitives::Instance().Shutdown();
+	CUIElementComponent::ShutdownUIRendering();
+	Rendering::BgfxUIView::Instance().Shutdown();
 	m_physicsManager.Shutdown();
 	m_visualizerManager.Shutdown();
 	return true;

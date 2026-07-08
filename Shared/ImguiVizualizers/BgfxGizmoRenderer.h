@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "BgfxRenderPrimitives.h"
-#include "BgfxViewIdAllocator.h"
+#include "Rendering/BgfxViewIdAllocator.h"
 using namespace Rendering;
 
 namespace ImGuiVisualizers {

@@ -6,7 +6,7 @@
 
 #include <bgfx/bgfx.h>
 
-namespace ImGuiVisualizers {
+namespace Rendering {
 
 /**
  * @brief Thread-safe allocator for BGFX view IDs.
@@ -14,7 +14,7 @@ namespace ImGuiVisualizers {
  * BGFX supports up to 256 views (0-255). View 0 is reserved for the main
  * backbuffer pass, and view 255 is typically used by the ImGui overlay.
  * This allocator hands out IDs from a configurable range for offscreen
- * framebuffer passes (e.g. 3D viewport panels).
+ * framebuffer passes (e.g. 3D viewport panels, UI overlays, gizmos).
  */
 class BgfxViewIdAllocator
 {
@@ -58,8 +58,9 @@ private:
     BgfxViewIdAllocator()
     {
         m_used.resize(256, false);
-        // Reserve view 0 (main) and view 255 (imgui overlay)
+        // Reserve view 0 (main), view 200 (UI overlay), view 255 (imgui overlay)
         m_used[0]   = true;
+        m_used[200] = true;
         m_used[255] = true;
     }
 
@@ -70,7 +71,7 @@ private:
     std::mutex          m_mutex;
     std::vector<bool>   m_used;
     uint16_t            m_rangeBegin = 1;
-    uint16_t            m_rangeEnd   = 200;   // leave headroom for other systems
+    uint16_t            m_rangeEnd   = 200;   // 1–199 for viewports; 200 reserved for UI overlay
 };
 
-} // namespace ImGuiVisualizers
+} // namespace Rendering

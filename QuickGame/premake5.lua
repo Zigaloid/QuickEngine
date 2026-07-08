@@ -78,8 +78,8 @@ project "Game"
 	includedirs { "../Shared" }  
 	includedirs { "../AssetClasses" }
 	includedirs { "../Shared/ResourceTypes" }  
-	includedirs { "../Shared/Components" } 
-	includedirs { "../Shared/Physics" } 
+	includedirs { "../Shared/Components" }
+	includedirs { "../Shared/Physics" }
 	includedirs { "../Shared/bgfx_common" }   
 	includedirs { "../Shared/utils/" }
 	includedirs { "../External/recastnavigation-main/Detour/Include" }  

@@ -129,6 +129,9 @@
     <ClInclude Include="..\Shared\Components\TransformComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\UIElementComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
@@ -154,6 +157,12 @@
       <Filter>..\Shared\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\Rendering\BgfxRenderPrimitives.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\BgfxUIView.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\BgfxViewIdAllocator.h">
       <Filter>..\Shared\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h">
@@ -513,6 +522,9 @@
     <ClCompile Include="..\Shared\Components\TransformComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\UIElementComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
@@ -532,6 +544,9 @@
       <Filter>..\Shared\Physics</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\Rendering\BgfxRenderPrimitives.cpp">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\Rendering\BgfxUIView.cpp">
       <Filter>..\Shared\Rendering</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp">
