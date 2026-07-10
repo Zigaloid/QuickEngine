@@ -126,6 +126,8 @@ project "Game"
 	files { "../Shared/ImguiVizualizers/KeyboardShortcutManager.h" }
 	files { "../Shared/Rendering/bgfx*.cpp" }
 	files { "../Shared/Rendering/bgfx*.h" }
+	files { "../Shared/Rendering/FontSystem.cpp" }
+	files { "../Shared/Rendering/FontSystem.h" }
 
 	files { "./**.cpp", "./**.h" }      
 	files { "resources/app.rc" }

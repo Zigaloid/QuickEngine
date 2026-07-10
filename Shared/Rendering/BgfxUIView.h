@@ -41,6 +41,11 @@ public:
     /// elements.
     static constexpr bgfx::ViewId kUIViewID = 200;
 
+    /// Fixed view ID for text rendering. Orthographic projection maps
+    /// pixel coordinates to NDC so text pen positions are in screen-space
+    /// pixels. Rendered after UI quads (200) and before ImGui (255).
+    static constexpr bgfx::ViewId kTextViewID = 201;
+
     static BgfxUIView& Instance()
     {
         static BgfxUIView instance;
@@ -87,6 +92,9 @@ public:
 
     /** @brief The fixed bgfx view ID used for UI rendering. */
     static bgfx::ViewId GetUIViewID() { return kUIViewID; }
+
+    /** @brief The fixed bgfx view ID used for text rendering. */
+    static bgfx::ViewId GetTextViewID() { return kTextViewID; }
 
     bool IsValid() const { return m_initialized; }
 

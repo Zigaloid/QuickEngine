@@ -15,6 +15,8 @@
 #include "CauseAndEventSystem/CauseAndEventManagerComponent.h"
 #include "Rendering/BgfxUIView.h"
 #include "UIElementComponent.h"
+#include "Rendering/FontSystem.h"
+#include "UITextComponent.h"
 
 ComponentDependencyDefinitionList g_Test;
 
@@ -35,6 +37,7 @@ bool QuickEditApp::Initialize()
 	// subclasses.
 	Rendering::BgfxUIView::Instance().Initialize(1, 1);
 	CUIElementComponent::InitializeUIRendering();
+	FontSystem::Instance().Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), false);
 
 	// Create the document manager and register all asset types
@@ -57,15 +60,6 @@ void QuickEditApp::RegisterComponents()
 	auto* componentManager = Core::CoreSystem::GetComponentManager();
 	auto* scheduler = Core::CoreSystem::GetJobSystemScheduler();
 
-	componentManager->RegisterComponentType<CCauseAndEventManagerComponent>();
-	scheduler->RegisterComponentType<CCauseAndEventManagerComponent>(0, "CauseAndEventManager");
-
-	// Register UI components
-	componentManager->RegisterComponentType<CUIElementComponent>();
-	scheduler->RegisterComponentType<CUIElementComponent>(0, "UIElement");
-
-	componentManager->RegisterComponentType<CUIImageComponent>();
-	scheduler->RegisterComponentType<CUIImageComponent>(0, "UIImage");
 }
 
 void QuickEditApp::Update(double deltaTime)
@@ -132,6 +126,7 @@ bool QuickEditApp::Shutdown()
     m_physicsManager.Shutdown();
 
 	CUIElementComponent::ShutdownUIRendering();
+	FontSystem::Instance().Shutdown();
 	Rendering::BgfxUIView::Instance().Shutdown();
 
 	m_documentManager.reset();

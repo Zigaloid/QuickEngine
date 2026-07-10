@@ -12,6 +12,7 @@
 
 // Include the shared math utilities (Ray + helpers)
 #include "../Utils/MathUtils.h"
+#include "Math/Vector2f.h"
 
 namespace ImGuiVisualizers {
 
@@ -143,6 +144,28 @@ namespace ImGuiVisualizers {
 		void      ApplyScaleDrag(const Ray& ray);
 		void      ApplyRotateDrag(const Ray& ray);
 
+		// ── Screen-space (UI) gizmo path ───────────────────────────────────
+
+		/// True when every selectable in the current selection lives in
+		/// Screen space (i.e. UI elements rendered through the identity-proj
+		/// UI view). Mixed selections fall back to the world-space gizmo.
+		bool      IsSelectionScreenSpace() const;
+
+		/// Converts a point from NDC (-1..1, Y up) to absolute ImGui screen
+		/// pixels (Y down) using the cached viewport rect.
+		ImVec2    NdcToScreen(const Vector2f& ndc) const;
+		/// Converts absolute ImGui screen pixels (Y down) to NDC (Y up).
+		Vector2f  ScreenToNdc(const ImVec2& screen) const;
+
+		void      RenderSelectionGizmo2D(GizmoMode mode, float size);
+		void      DrawGizmo2D(ImDrawList* dl, GizmoMode mode,
+		                       const ImVec2& centre, float size,
+		                       GizmoAxis highlighted) const;
+		GizmoAxis HitTestGizmo2D(GizmoMode mode, const ImVec2& centre, float size) const;
+		void      BeginGizmoDrag2D(GizmoMode mode, const Vector2f& centreNdc,
+		                           const ImVec2& centrePx);
+		void      ApplyGizmoDrag2D();
+
 		// ── Data members ───────────────────────────────────────────────────
 
 		Bgfx3DCamera* m_camera = nullptr;
@@ -159,6 +182,7 @@ namespace ImGuiVisualizers {
 		struct DragState
 		{
 			bool                    active = false;
+			SpaceKind               space = SpaceKind::World;
 			GizmoMode               mode = GizmoMode::Translate;
 			GizmoAxis               axis = GizmoAxis::None;
 			Vector3f                origin;
@@ -169,6 +193,11 @@ namespace ImGuiVisualizers {
 			float                   tStart = 0.0f;
 			float                   angleStart = 0.0f;
 			std::vector<Matrix4f>   startTransforms;
+
+			// ── Screen-space (UI) drag fields ──────────────────────────────
+			ImVec2                  centrePx      = ImVec2(0.0f, 0.0f); ///< gizmo centre in screen px
+			Vector2f                originNdc;                            ///< gizmo centre in NDC
+			ImVec2                  startScreenPt  = ImVec2(0.0f, 0.0f); ///< mouse at drag start (screen px)
 		};
 
 		DragState        m_drag;

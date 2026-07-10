@@ -9,6 +9,31 @@
 
 namespace ImGuiVisualizers {
 
+    // ── Local 2D helpers (anonymous) ──────────────────────────────────────────
+
+    namespace {
+
+    /// Closest distance from point @p p to the finite segment a→b (2D, pixels).
+    float PointSegmentDist2D(const ImVec2& p, const ImVec2& a, const ImVec2& b)
+    {
+        const float dx = b.x - a.x;
+        const float dy = b.y - a.y;
+        const float len2 = dx * dx + dy * dy;
+        if (len2 < 1e-12f)
+        {
+            const float ex = p.x - a.x;
+            const float ey = p.y - a.y;
+            return std::sqrt(ex * ex + ey * ey);
+        }
+        float t = ((p.x - a.x) * dx + (p.y - a.y) * dy) / len2;
+        t = std::clamp(t, 0.0f, 1.0f);
+        const float cx = a.x + t * dx;
+        const float cy = a.y + t * dy;
+        return std::sqrt((p.x - cx) * (p.x - cx) + (p.y - cy) * (p.y - cy));
+    }
+
+    } // anonymous namespace
+
     // ── CSelectionManager ─────────────────────────────────────────────────────
 
     void CSelectionManager::SetViewInfo(Bgfx3DCamera& camera,
@@ -179,32 +204,49 @@ namespace ImGuiVisualizers {
         {
             if (!selectable) continue;
 
-            const Vector4f  bs = selectable->GetBoundingSphere();
             const Matrix4f& mtx = selectable->GetTransform();
-            const Vector3f  worldCentre = mtx.TransformPoint(Vector3f(bs.x, bs.y, bs.z));
 
-            // Project the object centre into screen space.
             ImVec2 screenCentre;
-            if (!WorldToScreen(worldCentre, screenCentre))
-                continue;   // Behind the camera – skip.
+            float  screenRadius = 20.0f;
 
-            // Estimate the screen-space radius by projecting a point displaced by
-            // the world-space radius along the camera's right axis (view matrix row 0).
-            const Vector3f  scale = mtx.ExtractScale();
-            const float     worldRadius = bs.w * std::max({ scale.x, scale.y, scale.z, 0.5f });
+            if (selectable->GetSpace() == SpaceKind::Screen)
+            {
+                // UI elements: translation is already NDC; project to pixels
+                // and derive the half-extent from the model-matrix column lengths.
+                const Vector3f t = mtx.ExtractTranslation();
+                screenCentre = NdcToScreen(Vector2f(t.GetX(), t.GetY()));
 
-            const Vector3f  camRight = Vector3f(view(0, 0), view(0, 1), view(0, 2)).Normalized();
-            ImVec2          screenEdge;
-            const float     screenRadius = [&]() -> float
-                {
-                    if (WorldToScreen(worldCentre + camRight * worldRadius, screenEdge))
+                const float halfXpx = mtx.GetColumn(0).Length() * m_viewportSize.x * 0.5f;
+                const float halfYpx = mtx.GetColumn(1).Length() * m_viewportSize.y * 0.5f;
+                screenRadius = std::max({ halfXpx, halfYpx, 8.0f });
+            }
+            else
+            {
+                const Vector4f  bs = selectable->GetBoundingSphere();
+                const Vector3f  worldCentre = mtx.TransformPoint(Vector3f(bs.x, bs.y, bs.z));
+
+                // Project the object centre into screen space.
+                if (!WorldToScreen(worldCentre, screenCentre))
+                    continue;   // Behind the camera – skip.
+
+                // Estimate the screen-space radius by projecting a point displaced by
+                // the world-space radius along the camera's right axis (view matrix row 0).
+                const Vector3f  scale = mtx.ExtractScale();
+                const float     worldRadius = bs.w * std::max({ scale.x, scale.y, scale.z, 0.5f });
+
+                const Vector3f  camRight = Vector3f(view(0, 0), view(0, 1), view(0, 2)).Normalized();
+                ImVec2          screenEdge;
+                screenRadius = [&]() -> float
                     {
-                        const float dx = screenEdge.x - screenCentre.x;
-                        const float dy = screenEdge.y - screenCentre.y;
-                        return std::sqrt(dx * dx + dy * dy);
-                    }
-                    return 20.0f;   // Fallback when the edge point is off-screen.
-                }();
+                        if (WorldToScreen(worldCentre + camRight * worldRadius, screenEdge))
+                        {
+                            const float dx = screenEdge.x - screenCentre.x;
+                            const float dy = screenEdge.y - screenCentre.y;
+                            return std::sqrt(dx * dx + dy * dy);
+                        }
+                        return 20.0f;   // Fallback when the edge point is off-screen.
+                    }();
+            }
 
             // 2D pixel distance from cursor to the projected object centre.
             const float dx = mouse.x - screenCentre.x;
@@ -391,6 +433,7 @@ namespace ImGuiVisualizers {
         };
 
         m_drag.active = true;
+        m_drag.space = SpaceKind::World;
         m_drag.mode = mode;
         m_drag.axis = m_hoveredGizmoAxis;
         m_drag.origin = origin;
@@ -479,6 +522,13 @@ namespace ImGuiVisualizers {
     {
         if (!m_drag.active || m_selection.empty())
             return;
+
+        // Screen-space (UI) drags use their own pixel→NDC math.
+        if (m_drag.space == SpaceKind::Screen)
+        {
+            ApplyGizmoDrag2D();
+            return;
+        }
 
         const Ray ray = BuildPickRay();
 
@@ -621,6 +671,14 @@ namespace ImGuiVisualizers {
         if (!m_camera)
         {
             m_hoveredGizmoAxis = GizmoAxis::None;
+            return;
+        }
+
+        // UI elements render in NDC/screen space and use a dedicated 2D gizmo
+        // path (ImGui overlay) instead of the 3D world-space manipulator.
+        if (IsSelectionScreenSpace())
+        {
+            RenderSelectionGizmo2D(mode, size);
             return;
         }
 
@@ -792,24 +850,33 @@ namespace ImGuiVisualizers {
                 // Compute contained selectables
                 std::vector<std::shared_ptr<CSelectable>> inside;
 
-                for (const auto& selectable : m_selectables)
-                {
-                    if (!selectable) continue;
-
-                    const Vector4f bs = selectable->GetBoundingSphere();
-                    const Matrix4f& mtx = selectable->GetTransform();
-                    const Vector3f worldCentre = mtx.TransformPoint(Vector3f(bs.x, bs.y, bs.z));
-
-                    ImVec2 screenPt;
-                    if (!WorldToScreen(worldCentre, screenPt))
-                        continue; // behind camera
-
-                    if (screenPt.x >= rmin.x && screenPt.x <= rmax.x &&
-                        screenPt.y >= rmin.y && screenPt.y <= rmax.y)
+for (const auto& selectable : m_selectables)
                     {
-                        inside.push_back(selectable);
+                        if (!selectable) continue;
+
+                        const Matrix4f& mtx = selectable->GetTransform();
+
+                        ImVec2 screenPt;
+                        if (selectable->GetSpace() == SpaceKind::Screen)
+                        {
+                            // UI elements: translation is NDC; project to pixels.
+                            const Vector3f t = mtx.ExtractTranslation();
+                            screenPt = NdcToScreen(Vector2f(t.GetX(), t.GetY()));
+                        }
+                        else
+                        {
+                            const Vector4f bs = selectable->GetBoundingSphere();
+                            const Vector3f worldCentre = mtx.TransformPoint(Vector3f(bs.x, bs.y, bs.z));
+                            if (!WorldToScreen(worldCentre, screenPt))
+                                continue; // behind camera
+                        }
+
+                        if (screenPt.x >= rmin.x && screenPt.x <= rmax.x &&
+                            screenPt.y >= rmin.y && screenPt.y <= rmax.y)
+                        {
+                            inside.push_back(selectable);
+                        }
                     }
-                }
 
                 const bool shiftHeld = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
                 if (shiftHeld)
@@ -871,6 +938,423 @@ namespace ImGuiVisualizers {
 
         m_camera->SetTarget(centroid.x, centroid.y, centroid.z);
         m_camera->SetDistance(maxRadius * 2.0f);
+    }
+
+    // ── Screen-space (UI) gizmo path ────────────────────────────────────────
+
+    bool CSelectionManager::IsSelectionScreenSpace() const
+    {
+        if (m_selection.empty())
+            return false;
+        for (const auto& sel : m_selection)
+            if (sel->GetSpace() != SpaceKind::Screen)
+                return false;
+        return true;
+    }
+
+    ImVec2 CSelectionManager::NdcToScreen(const Vector2f& ndc) const
+    {
+        ImVec2 r;
+        r.x = (ndc.x * 0.5f + 0.5f) * m_viewportSize.x + m_viewportMin.x;
+        r.y = (0.5f - ndc.y * 0.5f) * m_viewportSize.y + m_viewportMin.y;
+        return r;
+    }
+
+    Vector2f CSelectionManager::ScreenToNdc(const ImVec2& s) const
+    {
+        Vector2f r;
+        r.x = ((s.x - m_viewportMin.x) / m_viewportSize.x) * 2.0f - 1.0f;
+        r.y = 1.0f - ((s.y - m_viewportMin.y) / m_viewportSize.y) * 2.0f;
+        return r;
+    }
+
+    GizmoAxis CSelectionManager::HitTestGizmo2D(GizmoMode      mode,
+                                                 const ImVec2&  centre,
+                                                 float          size) const
+    {
+        const ImVec2 mouse = ImGui::GetMousePos();
+
+        // ── Rotate: single ring around the centre ──────────────────────────
+        if (mode == GizmoMode::Rotate)
+        {
+            const float dx   = mouse.x - centre.x;
+            const float dy   = mouse.y - centre.y;
+            const float d    = std::sqrt(dx * dx + dy * dy);
+            const float band = size * 0.12f;
+            return (std::abs(d - size) < band) ? GizmoAxis::Z : GizmoAxis::None;
+        }
+
+        // ── Centre handle: free move / uniform scale ───────────────────────
+        const ImVec2 endX = ImVec2(centre.x + size, centre.y);
+        const ImVec2 endY = ImVec2(centre.x, centre.y + size);
+
+        // Centre square hit (Translate = free XY, Scale = uniform).
+        if (mode == GizmoMode::Translate)
+        {
+            const float half = size * 0.12f;
+            if (std::abs(mouse.x - centre.x) <= half && std::abs(mouse.y - centre.y) <= half)
+                return GizmoAxis::XY;
+        }
+        else if (mode == GizmoMode::Scale)
+        {
+            const float half = size * 0.18f;
+            if (std::abs(mouse.x - centre.x) <= half && std::abs(mouse.y - centre.y) <= half)
+                return GizmoAxis::XY;
+        }
+
+        // ── Axis shafts (X right, Y down on screen) ────────────────────────
+        const float hitR = size * 0.10f;
+        const float dX = PointSegmentDist2D(mouse, centre, endX);
+        const float dY = PointSegmentDist2D(mouse, centre, endY);
+
+        if (dX < hitR && dX <= dY) return GizmoAxis::X;
+        if (dY < hitR)             return GizmoAxis::Y;
+        return GizmoAxis::None;
+    }
+
+    void CSelectionManager::BeginGizmoDrag2D(GizmoMode      mode,
+                                              const Vector2f& centreNdc,
+                                              const ImVec2&   centrePx)
+    {
+        if (m_selection.empty())
+            return;
+
+        // SHIFT+drag duplicates (same contract as the world-space path).
+        if ((ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift)) && m_shiftDragCallback)
+        {
+            m_shiftDragCallback();
+            if (m_selection.empty())
+                return;
+        }
+
+        m_drag.active       = true;
+        m_drag.space        = SpaceKind::Screen;
+        m_drag.mode         = mode;
+        m_drag.axis         = m_hoveredGizmoAxis;
+        m_drag.origin       = Vector3f(centreNdc.x, centreNdc.y, 0.0f);
+        m_drag.centrePx     = centrePx;
+        m_drag.originNdc    = centreNdc;
+        m_drag.startScreenPt = ImGui::GetMousePos();
+
+        m_drag.startTransforms.clear();
+        for (const auto& sel : m_selection)
+            m_drag.startTransforms.push_back(sel->GetTransform());
+
+        // Rotate uses start/current screen angles computed in ApplyGizmoDrag2D,
+        // so there is nothing to seed here. m_drag.angleStart is left untouched
+        // (it remains zero — it is only used by the world-space Rotate path).
+    }
+
+    void CSelectionManager::ApplyGizmoDrag2D()
+    {
+        const ImVec2 mp = ImGui::GetMousePos();
+
+        for (size_t i = 0; i < m_selection.size(); ++i)
+        {
+            Matrix4f* cur = m_selection[i]->GetTransformMutable();
+            if (!cur) continue;
+
+            const Matrix4f& start = m_drag.startTransforms[i];
+            *cur = start;
+
+            switch (m_drag.mode)
+            {
+            case GizmoMode::Translate:
+                {
+                    // Convert mouse delta from screen px to NDC and add to the
+                    // start translation. Axis masks keep a 1D drag clamped.
+                    Vector2f startNdc = ScreenToNdc(m_drag.startScreenPt);
+                    Vector2f curNdc   = ScreenToNdc(mp);
+                    Vector2f deltaNdc = curNdc - startNdc;
+                    if (m_drag.axis == GizmoAxis::X) deltaNdc.y = 0.0f;
+                    else if (m_drag.axis == GizmoAxis::Y) deltaNdc.x = 0.0f;
+
+                    const Vector3f t = start.ExtractTranslation();
+                    cur->SetTranslation(Vector3f(t.GetX() + deltaNdc.x,
+                                                 t.GetY() + deltaNdc.y,
+                                                 t.GetZ()));
+                }
+                break;
+
+            case GizmoMode::Scale:
+                {
+                    // Use the mouse-to-centre distance ratio in screen space.
+                    const float sdx = m_drag.startScreenPt.x - m_drag.centrePx.x;
+                    const float sdy = m_drag.startScreenPt.y - m_drag.centrePx.y;
+                    const float cdx = mp.x - m_drag.centrePx.x;
+                    const float cdy = mp.y - m_drag.centrePx.y;
+                    constexpr float kMin = 1e-3f;
+
+                    if (m_drag.axis == GizmoAxis::X)
+                    {
+                        const float s = std::max(std::abs(sdx), kMin);
+                        const float f = std::max(std::abs(cdx) / s, kMin);
+                        cur->SetColumn(0, start.GetColumn(0) * f);
+                    }
+                    else if (m_drag.axis == GizmoAxis::Y)
+                    {
+                        const float s = std::max(std::abs(sdy), kMin);
+                        const float f = std::max(std::abs(cdy) / s, kMin);
+                        cur->SetColumn(1, start.GetColumn(1) * f);
+                    }
+                    else // XY / uniform
+                    {
+                        const float sStart = std::max(std::sqrt(sdx * sdx + sdy * sdy), kMin);
+                        const float sCur   = std::sqrt(cdx * cdx + cdy * cdy);
+                        const float f = std::max(sCur / sStart, kMin);
+                        cur->SetColumn(0, start.GetColumn(0) * f);
+                        cur->SetColumn(1, start.GetColumn(1) * f);
+                    }
+                }
+                break;
+
+	case GizmoMode::Rotate:
+				{
+					// Mouse angle about the gizmo centre in screen px (Y down).
+					// NDC is Y up; negate so a clockwise screen drag produces a
+					// clockwise visual rotation about the Z axis.
+					const float sdx = m_drag.startScreenPt.x - m_drag.centrePx.x;
+					const float sdy = m_drag.startScreenPt.y - m_drag.centrePx.y;
+					const float cdx = mp.x - m_drag.centrePx.x;
+					const float cdy = mp.y - m_drag.centrePx.y;
+
+					const float angleStart = -std::atan2(sdy, sdx);
+					const float angleCur   = -std::atan2(cdy, cdx);
+					float       deltaRad   = angleCur - angleStart;
+					float       deltaDeg   = deltaRad * 180.0f / static_cast<float>(M_PI);
+
+					// CTRL snaps to 15° increments.
+					if (ImGui::IsKeyDown(ImGuiKey_LeftCtrl) || ImGui::IsKeyDown(ImGuiKey_RightCtrl))
+						deltaDeg = std::round(deltaDeg / 15.0f) * 15.0f;
+					deltaRad = deltaDeg * static_cast<float>(M_PI) / 180.0f;
+
+                    // ── Rebuild the XY basis directly from the start columns ──
+                    // The model matrix stores canonical NDC transforms.
+                    // BgfxUIView's aspect-ratio view matrix handles the
+                    // non-uniform viewport mapping at render time, so the
+                    // stored matrix needs no viewport compensation.
+                    const Vector3f col0 = start.GetColumn(0);
+                    const Vector3f col1 = start.GetColumn(1);
+
+                    const float sx      = std::max(col0.Length(), 1e-6f);
+                    const float syLen   = std::max(col1.Length(), 1e-6f);
+                    const float theta   = std::atan2(col0.GetY(), col0.GetX());
+
+                    const float crossZ  = col0.GetX() * col1.GetY()
+                                        - col0.GetY() * col1.GetX();
+                    const float sySign  = (crossZ >= 0.0f) ? 1.0f : -1.0f;
+                    const float sy      = sySign * syLen;
+
+                    const float newTheta = theta + deltaRad;
+                    const float cosN     = std::cos(newTheta);
+                    const float sinN     = std::sin(newTheta);
+
+                    *cur = start;   // preserve col2, translation, and w-row
+                    cur->SetColumn(0, Vector3f(sx  *  cosN, sx  *  sinN, 0.0f));
+                    cur->SetColumn(1, Vector3f(sy  * -sinN, sy  *  cosN, 0.0f));
+
+                    // ── Translation ──────────────────────────────────────────
+                    const Vector3f t   = start.ExtractTranslation();
+                    const Vector3f ctr(m_drag.originNdc.x, m_drag.originNdc.y, 0.0f);
+                    if ((t - ctr).MagnitudeSquared() > 1e-8f)
+                    {
+                        const Matrix4f Tc  = Matrix4f::Translation(ctr);
+                        const Matrix4f Tc2 = Matrix4f::Translation(-ctr);
+                        const Vector3f newT =
+                            (Tc * Matrix4f::RotationZ(deltaRad) * Tc2).TransformPoint(t);
+                        cur->SetTranslation(newT);
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    void CSelectionManager::DrawGizmo2D(ImDrawList*   dl,
+                                         GizmoMode     mode,
+                                         const ImVec2& centre,
+                                         float         size,
+                                         GizmoAxis     highlighted) const
+    {
+        if (!dl) return;
+
+        const ImU32 colX = (highlighted == GizmoAxis::X)  ? IM_COL32(255, 255, 0, 255) : IM_COL32(255,  60,  60, 255);
+        const ImU32 colY = (highlighted == GizmoAxis::Y)  ? IM_COL32(255, 255, 0, 255) : IM_COL32( 60, 255,  60, 255);
+        const ImU32 colC = (highlighted == GizmoAxis::XY) ? IM_COL32(255, 255, 0, 255) : IM_COL32(255, 255, 255, 255);
+        const float thick = (highlighted != GizmoAxis::None) ? 4.0f : 3.0f;
+
+        const ImVec2 endX = ImVec2(centre.x + size, centre.y);
+        const ImVec2 endY = ImVec2(centre.x, centre.y + size);
+
+        if (mode == GizmoMode::Rotate)
+        {
+            // Single ring centred on the element centre.
+            dl->AddCircle(centre, size,
+                          (highlighted == GizmoAxis::Z) ? IM_COL32(255, 255, 0, 255) : IM_COL32(255, 255, 255, 255),
+                          48, thick);
+            // Direction tick so the user sees the "0°" reference.
+            dl->AddLine(centre, endX, IM_COL32(255, 255, 255, 160), 2.0f);
+            return;
+        }
+
+        // Translate / Scale: two orthogonal shafts from the centre.
+        dl->AddLine(centre, endX, colX, thick);
+        dl->AddLine(centre, endY, colY, thick);
+
+        if (mode == GizmoMode::Translate)
+        {
+            // Arrow heads.
+            dl->AddTriangleFilled(endX,
+                                   ImVec2(endX.x - 10.0f, endX.y - 6.0f),
+                                   ImVec2(endX.x - 10.0f, endX.y + 6.0f), colX);
+            dl->AddTriangleFilled(endY,
+                                   ImVec2(endY.x - 6.0f, endY.y - 10.0f),
+                                   ImVec2(endY.x + 6.0f, endY.y - 10.0f), colY);
+            // Centre free-move square.
+            dl->AddRectFilled(ImVec2(centre.x - size * 0.12f, centre.y - size * 0.12f),
+                              ImVec2(centre.x + size * 0.12f, centre.y + size * 0.12f), colC);
+        }
+        else // Scale
+        {
+            // Box caps at the shaft ends.
+            const float b = 6.0f;
+            dl->AddRectFilled(ImVec2(endX.x - b, endX.y - b), ImVec2(endX.x + b, endX.y + b), colX);
+            dl->AddRectFilled(ImVec2(endY.x - b, endY.y - b), ImVec2(endY.x + b, endY.y + b), colY);
+            // Centre uniform-scale square.
+            const float c = size * 0.18f;
+            dl->AddRectFilled(ImVec2(centre.x - c, centre.y - c), ImVec2(centre.x + c, centre.y + c), colC);
+        }
+    }
+
+    void CSelectionManager::RenderSelectionGizmo2D(GizmoMode mode, float /*size*/)
+    {
+        // The UI gizmo is drawn entirely in screen pixels via ImGui's
+        // foreground draw list, so its size is a fixed fraction of the
+        // viewport rather than a camera-distance-scaled world size.
+        constexpr float kUISize = 80.0f;
+
+        const bool mouseDown     = ImGui::IsMouseDown(ImGuiMouseButton_Left);
+        const bool mousePressed  = ImGui::IsMouseClicked(ImGuiMouseButton_Left);
+        const bool mouseReleased = ImGui::IsMouseReleased(ImGuiMouseButton_Left);
+
+        if (mousePressed)  m_mouseDownStartedInViewport = IsMouseInViewport();
+        if (mouseReleased) m_mouseDownStartedInViewport = false;
+
+        // ── 1. Apply ongoing drag ──────────────────────────────────────────
+        if (m_drag.active)
+        {
+            if (mouseReleased) { ApplyGizmoDrag2D(); EndGizmoDrag(); }
+            else if (mouseDown) { ApplyGizmoDrag2D(); }
+        }
+
+        // ── 2. Compute gizmo centre (NDC → screen) ─────────────────────────
+        const bool hasSelection = !m_selection.empty();
+        Vector2f centreNdc(0.0f, 0.0f);
+        if (hasSelection)
+        {
+            for (const auto& sel : m_selection)
+            {
+                const Vector3f t = sel->GetTransform().ExtractTranslation();
+                centreNdc.x += t.GetX();
+                centreNdc.y += t.GetY();
+            }
+            centreNdc = centreNdc * (1.0f / static_cast<float>(m_selection.size()));
+        }
+        const ImVec2 centrePx = NdcToScreen(centreNdc);
+
+        // ── 3. Hover detection / drag initiation (idle) ────────────────────
+        const bool altHeld = ImGui::IsKeyDown(ImGuiKey_LeftAlt) || ImGui::IsKeyDown(ImGuiKey_RightAlt);
+        if (!m_drag.active && !altHeld)
+        {
+            if (hasSelection)
+            {
+                m_hoveredGizmoAxis = HitTestGizmo2D(mode, centrePx, kUISize);
+
+                if (mousePressed && m_hoveredGizmoAxis != GizmoAxis::None && IsMouseInViewport())
+                {
+                    BeginGizmoDrag2D(mode, centreNdc, centrePx);
+                }
+                else if (ImGui::IsMouseDragging(ImGuiMouseButton_Left) &&
+                         m_hoveredGizmoAxis == GizmoAxis::None &&
+                         m_mouseDownStartedInViewport && IsMouseInViewport())
+                {
+                    ImVec2 current = ImGui::GetMousePos();
+                    ImVec2 delta   = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.0f);
+                    m_boxDrag.start   = ImVec2{ current.x - delta.x, current.y - delta.y };
+                    m_boxDrag.current = current;
+                    m_boxDrag.active  = true;
+                }
+            }
+            else
+            {
+                m_hoveredGizmoAxis = GizmoAxis::None;
+                if (ImGui::IsMouseDragging(ImGuiMouseButton_Left) &&
+                    m_mouseDownStartedInViewport && IsMouseInViewport())
+                {
+                    ImVec2 current = ImGui::GetMousePos();
+                    ImVec2 delta   = ImGui::GetMouseDragDelta(ImGuiMouseButton_Left, 0.0f);
+                    m_boxDrag.start   = ImVec2{ current.x - delta.x, current.y - delta.y };
+                    m_boxDrag.current = current;
+                    m_boxDrag.active  = true;
+                }
+            }
+        }
+
+        // ── 4. Box-drag selection (same overlay as 3D path) ────────────────
+        if (m_boxDrag.active)
+        {
+            if (mouseDown)
+                m_boxDrag.current = ImGui::GetMousePos();
+
+            ImVec2 a = m_boxDrag.start;
+            ImVec2 b = m_boxDrag.current;
+            ImVec2 rmin = { std::min(a.x, b.x), std::min(a.y, b.y) };
+            ImVec2 rmax = { std::max(a.x, b.x), std::max(a.y, b.y) };
+
+            ImDrawList* dl = ImGui::GetForegroundDrawList();
+            if (dl)
+            {
+                dl->AddRectFilled(rmin, rmax, IM_COL32(0, 122, 204, 64));
+                dl->AddRect(rmin, rmax, IM_COL32(0, 122, 204, 192), 0.0f, 0, 2.0f);
+            }
+
+            if (mouseReleased)
+            {
+                std::vector<std::shared_ptr<CSelectable>> inside;
+                for (const auto& selectable : m_selectables)
+                {
+                    if (!selectable) continue;
+                    if (selectable->GetSpace() != SpaceKind::Screen) continue;
+
+                    const Matrix4f& mtx = selectable->GetTransform();
+                    const Vector3f  t   = mtx.ExtractTranslation();
+                    const ImVec2    sp  = NdcToScreen(Vector2f(t.GetX(), t.GetY()));
+
+                    if (sp.x >= rmin.x && sp.x <= rmax.x &&
+                        sp.y >= rmin.y && sp.y <= rmax.y)
+                        inside.push_back(selectable);
+                }
+
+                const bool shiftHeld = ImGui::IsKeyDown(ImGuiKey_LeftShift) || ImGui::IsKeyDown(ImGuiKey_RightShift);
+                if (shiftHeld)
+                {
+                    for (const auto& s : inside) AddToSelection(s);
+                }
+                else
+                {
+                    m_selection = inside;
+                }
+                m_lastSelected = m_selection.empty() ? nullptr : m_selection.back();
+                m_boxDrag.active = false;
+            }
+        }
+
+        // ── 5. Draw the 2D gizmo overlay ───────────────────────────────────
+        if (hasSelection)
+        {
+            ImDrawList* dl = ImGui::GetForegroundDrawList();
+            DrawGizmo2D(dl, mode, centrePx, kUISize, m_hoveredGizmoAxis);
+        }
     }
 
     } // namespace ImGuiVisualizers

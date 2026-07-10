@@ -16,7 +16,7 @@ namespace ImGuiVisualizers {
  * The owner is set to the first CEntityComponent found by walking up
  * the component hierarchy from the given render component.
  */
-class CRenderComponentSelectable final : public CSelectable
+class CRenderComponentSelectable : public CSelectable
 {
 public:
     explicit CRenderComponentSelectable(CRenderComponent* component)

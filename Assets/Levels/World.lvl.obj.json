@@ -303,21 +303,21 @@
                                             "Value": "CTransformComponent",
                                             "m_matrix": {
                                                 "Value": [
-                                                    1.0,
+                                                    0.7171708941459656,
                                                     0.0,
-                                                    0.0,
-                                                    0.0,
-                                                    0.0,
-                                                    1.0,
-                                                    0.0,
-                                                    0.0,
+                                                    -0.6968973875045776,
                                                     0.0,
                                                     0.0,
                                                     1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.6968973875045776,
+                                                    0.0,
+                                                    0.7171708941459656,
                                                     0.0,
                                                     5.019355773925781,
                                                     1.2579545974731445,
-                                                    9.048290252685547,
+                                                    7.52397346496582,
                                                     1.0
                                                 ],
                                                 "Type": 8,
@@ -832,17 +832,17 @@
                                             "Value": "CTransformComponent",
                                             "m_matrix": {
                                                 "Value": [
-                                                    1.0,
+                                                    0.9679694175720215,
                                                     0.0,
-                                                    0.0,
-                                                    0.0,
-                                                    0.0,
-                                                    1.0,
-                                                    0.0,
-                                                    0.0,
+                                                    -0.2510680854320526,
                                                     0.0,
                                                     0.0,
                                                     1.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.2510680854320526,
+                                                    0.0,
+                                                    0.9679694175720215,
                                                     0.0,
                                                     4.675490856170654,
                                                     0.8665496110916138,
@@ -2974,20 +2974,20 @@
                                             "Value": "CTransformComponent",
                                             "m_matrix": {
                                                 "Value": [
-                                                    0.3492870032787323,
+                                                    0.17941750586032867,
                                                     0.0,
                                                     0.0,
                                                     0.0,
                                                     0.0,
-                                                    0.7546144723892212,
+                                                    0.15030567348003387,
                                                     0.0,
                                                     0.0,
                                                     0.0,
                                                     0.0,
                                                     1.0,
                                                     0.0,
-                                                    -0.43190455436706543,
-                                                    0.4423363208770752,
+                                                    0.8780455589294434,
+                                                    0.2265806794166565,
                                                     0.0,
                                                     1.0
                                                 ],
@@ -3024,7 +3024,7 @@
                             {
                                 "Value": "CEntityComponent",
                                 "m_name": {
-                                    "Value": "UI Test",
+                                    "Value": "UI Text",
                                     "Type": 3,
                                     "Size": 32
                                 },
@@ -3037,16 +3037,41 @@
                                     "Value": "CEntityComponent",
                                     "Elements": [
                                         {
-                                            "Value": "CUIImageComponent",
-                                            "m_textureResource": {
-                                                "Value": "CTextureResourceReference",
+                                            "Value": "CUITextComponent",
+                                            "m_text": {
+                                                "Value": "Hello World",
+                                                "Type": 3,
+                                                "Size": 32
+                                            },
+                                            "m_textColor": {
+                                                "Value": [
+                                                    1.0,
+                                                    1.0,
+                                                    1.0,
+                                                    1.0
+                                                ],
+                                                "Type": 7,
+                                                "Size": 16
+                                            },
+                                            "m_bgColor": {
+                                                "Value": [
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0
+                                                ],
+                                                "Type": 7,
+                                                "Size": 16
+                                            },
+                                            "m_fontResource": {
+                                                "Value": "CFontResourceReference",
                                                 "m_resourceFileName": {
-                                                    "Value": "./assets/textures/bark1.dds",
+                                                    "Value": "./assets/font/basefont.font.obj.json",
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
                                                 "m_rfl_guid": {
-                                                    "Value": "65246fa7-b603-4a02-a635-285bc172a6ef",
+                                                    "Value": "4671263d-680e-4376-82fa-bbf6d29ad7db",
                                                     "Type": 3,
                                                     "Size": 32
                                                 },
@@ -3059,13 +3084,13 @@
                                                 "Size": 1
                                             },
                                             "m_children": {
-                                                "Value": "CUIImageComponent",
+                                                "Value": "CUITextComponent",
                                                 "Elements": [],
                                                 "Type": 22,
                                                 "Size": 24
                                             },
                                             "m_rfl_guid": {
-                                                "Value": "5b6e9911-bdb5-4546-8100-bcf4c8a67736",
+                                                "Value": "8bfac83c-9e25-439e-9540-7e5560cbe9ae",
                                                 "Type": 3,
                                                 "Size": 32
                                             }
@@ -3074,20 +3099,20 @@
                                             "Value": "CTransformComponent",
                                             "m_matrix": {
                                                 "Value": [
-                                                    0.3492870032787323,
-                                                    0.0,
-                                                    0.0,
-                                                    0.0,
-                                                    0.0,
-                                                    0.7546144723892212,
+                                                    1.0,
                                                     0.0,
                                                     0.0,
                                                     0.0,
                                                     0.0,
                                                     1.0,
                                                     0.0,
-                                                    0.7549879550933838,
-                                                    0.4423363208770752,
+                                                    0.0,
+                                                    0.0,
+                                                    0.0,
+                                                    1.0,
+                                                    0.0,
+                                                    0.4904780387878418,
+                                                    0.2809523344039917,
                                                     0.0,
                                                     1.0
                                                 ],
@@ -3106,7 +3131,7 @@
                                                 "Size": 24
                                             },
                                             "m_rfl_guid": {
-                                                "Value": "8576024e-257d-4c6a-8b39-134532fa7c93",
+                                                "Value": "f515ada3-abf9-4203-aa77-dcedb80c0ab8",
                                                 "Type": 3,
                                                 "Size": 32
                                             }
@@ -3116,7 +3141,7 @@
                                     "Size": 24
                                 },
                                 "m_rfl_guid": {
-                                    "Value": "7d4cc207-72e3-408e-b0ea-9a9ecec4ee14",
+                                    "Value": "0a3a91dd-fdbf-413e-8741-c544b55f48c3",
                                     "Type": 3,
                                     "Size": 32
                                 }

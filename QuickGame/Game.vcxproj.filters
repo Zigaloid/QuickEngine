@@ -132,6 +132,9 @@
     <ClInclude Include="..\Shared\Components\UIElementComponent.h">
       <Filter>..\Shared\Components</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Components\UITextComponent.h">
+      <Filter>..\Shared\Components</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ImguiVizualizers\CommandConsole.h">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClInclude>
@@ -165,10 +168,16 @@
     <ClInclude Include="..\Shared\Rendering\BgfxViewIdAllocator.h">
       <Filter>..\Shared\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="..\Shared\Rendering\FontSystem.h">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\ComponentResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\FbxMeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\FontResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\MaterialResource.h">
@@ -187,6 +196,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\StaticMeshResource.h">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Shared\ResourceTypes\TTFResource.h">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClInclude>
     <ClInclude Include="..\Shared\ResourceTypes\TextureResource.h">
@@ -525,6 +537,9 @@
     <ClCompile Include="..\Shared\Components\UIElementComponent.cpp">
       <Filter>..\Shared\Components</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Components\UITextComponent.cpp">
+      <Filter>..\Shared\Components</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\ImguiVizualizers\CommandConsole.cpp">
       <Filter>..\Shared\ImguiVizualizers</Filter>
     </ClCompile>
@@ -549,7 +564,13 @@
     <ClCompile Include="..\Shared\Rendering\BgfxUIView.cpp">
       <Filter>..\Shared\Rendering</Filter>
     </ClCompile>
+    <ClCompile Include="..\Shared\Rendering\FontSystem.cpp">
+      <Filter>..\Shared\Rendering</Filter>
+    </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\ComponentResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\FontResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\MaterialResource.cpp">
@@ -568,6 +589,9 @@
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\StaticMeshResource.cpp">
+      <Filter>..\Shared\ResourceTypes</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Shared\ResourceTypes\TTFResource.cpp">
       <Filter>..\Shared\ResourceTypes</Filter>
     </ClCompile>
     <ClCompile Include="..\Shared\ResourceTypes\TextureResource.cpp">

@@ -1,0 +1,126 @@
+{
+    "RootObject": {
+        "m_name": {
+            "Value": "UI Text",
+            "Type": 3,
+            "Size": 32
+        },
+        "m_active": {
+            "Value": true,
+            "Type": 12,
+            "Size": 1
+        },
+        "m_children": {
+            "Value": "CEntityComponent",
+            "Elements": [
+                {
+                    "Value": "CUITextComponent",
+                    "m_text": {
+                        "Value": "Hello World",
+                        "Type": 3,
+                        "Size": 32
+                    },
+                    "m_textColor": {
+                        "Value": [
+                            1.0,
+                            1.0,
+                            1.0,
+                            1.0
+                        ],
+                        "Type": 7,
+                        "Size": 16
+                    },
+                    "m_bgColor": {
+                        "Value": [
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0
+                        ],
+                        "Type": 7,
+                        "Size": 16
+                    },
+                    "m_fontResource": {
+                        "Value": "CFontResourceReference",
+                        "m_resourceFileName": {
+                            "Value": "./assets/font/basefont.font.obj.json",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "m_rfl_guid": {
+                            "Value": "4671263d-680e-4376-82fa-bbf6d29ad7db",
+                            "Type": 3,
+                            "Size": 32
+                        },
+                        "Type": 4,
+                        "Size": 104
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CUITextComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "8bfac83c-9e25-439e-9540-7e5560cbe9ae",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                },
+                {
+                    "Value": "CTransformComponent",
+                    "m_matrix": {
+                        "Value": [
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            0.0,
+                            1.0
+                        ],
+                        "Type": 8,
+                        "Size": 64
+                    },
+                    "m_active": {
+                        "Value": true,
+                        "Type": 12,
+                        "Size": 1
+                    },
+                    "m_children": {
+                        "Value": "CTransformComponent",
+                        "Elements": [],
+                        "Type": 22,
+                        "Size": 24
+                    },
+                    "m_rfl_guid": {
+                        "Value": "f515ada3-abf9-4203-aa77-dcedb80c0ab8",
+                        "Type": 3,
+                        "Size": 32
+                    }
+                }
+            ],
+            "Type": 22,
+            "Size": 24
+        },
+        "m_rfl_guid": {
+            "Value": "0a3a91dd-fdbf-413e-8741-c544b55f48c3",
+            "Type": 3,
+            "Size": 32
+        }
+    }
+}

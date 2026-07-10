@@ -23,13 +23,13 @@ REFL_DEFINE_OBJECT(CUIImageComponent)
 REFL_DEFINE_END
 
 // ── Shared static state definitions ───────────────────────────────────────
-bgfx::VertexLayout      UIElementVertex::ms_layout;
+bgfx::VertexLayout       UIElementVertex::ms_layout;
 bgfx::ProgramHandle      CUIElementComponent::s_uiProgram    = BGFX_INVALID_HANDLE;
-bgfx::UniformHandle     CUIElementComponent::s_tintUniform  = BGFX_INVALID_HANDLE;
-bgfx::UniformHandle     CUIElementComponent::s_texSampler   = BGFX_INVALID_HANDLE;
-bgfx::VertexBufferHandle CUIElementComponent::s_quadVbh     = BGFX_INVALID_HANDLE;
+bgfx::UniformHandle      CUIElementComponent::s_tintUniform   = BGFX_INVALID_HANDLE;
+bgfx::UniformHandle      CUIElementComponent::s_texSampler    = BGFX_INVALID_HANDLE;
+bgfx::VertexBufferHandle CUIElementComponent::s_quadVbh      = BGFX_INVALID_HANDLE;
 bgfx::IndexBufferHandle  CUIElementComponent::s_quadIbh      = BGFX_INVALID_HANDLE;
-bool                    CUIElementComponent::s_uiInitialised = false;
+bool                     CUIElementComponent::s_uiInitialised = false;
 
 static const bgfx::EmbeddedShader s_uiShaders[] =
 {

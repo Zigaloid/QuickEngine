@@ -7,6 +7,15 @@
 
 namespace ImGuiVisualizers {
 
+/// Coordinate space a selectable lives in. `World` selectables are transformed
+/// by the 3D camera's view/projection; `Screen` selectables (UI elements) use
+/// identity view/projection so their model-matrix translation is already NDC.
+enum class SpaceKind
+{
+    World,
+    Screen,
+};
+
 /**
  * @brief Represents any object that can participate in the generalized
  *        selection system managed by CSelectionManager.
@@ -33,6 +42,10 @@ public:
     {}
 
     virtual ~CSelectable() = default;
+
+    /// Coordinate space this selectable's transform lives in. Derived classes
+    /// that draw into the identity-projection UI view override to return Screen.
+    virtual SpaceKind GetSpace() const { return SpaceKind::World; }
 
     // --- Accessors ----------------------------------------------------
 

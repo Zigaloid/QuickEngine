@@ -280,6 +280,7 @@ void DocumentManager::InitializeLaunchers()
     m_launchers["PhysicsBodyObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".phys.obj.json", "CPhysicsBodyResource");
     m_launchers["ComponentDependencyObjJson"] = std::make_unique<ComponentDependencyGraphLauncher>(*this, ".cdep.obj.json");
     m_launchers["HeightFieldObjJson"] = std::make_unique<HeightFieldMeshLauncher>(*this, ".hfield.obj.json", "CHeightFieldMeshComponent");
+    m_launchers["FontObjJson"] = std::make_unique<ObjJsonLauncher>(*this, ".font.obj.json", "CFontResource");
     // Texture launcher (TODO)
     m_launchers["Texture"] = std::make_unique<NoOpLauncher>();
 }
@@ -305,6 +306,7 @@ std::vector<DocumentManager::AssetTypeConfig> DocumentManager::GetAssetTypeConfi
         { ".phys.obj.json",     "Physics Body Resource",  IM_COL32(100, 200, 255, 255),   "O",  "PhysicsBodyObjJson", true, false },
 		{ ".cdep.obj.json",     "Component Dependencies", IM_COL32(100, 200, 255, 255),   "O",  "ComponentDependencyObjJson", true, false },
         { ".hfield.obj.json",   "Height Field Mesh",      IM_COL32(100, 200, 255, 255),   "O",  "HeightFieldObjJson", true, false },
+        { ".font.obj.json",     "Font Resource",          IM_COL32(100, 200, 255, 255),   "O",  "FontObjJson",    true, false },
         { ".png",               "PNG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
         { ".bmp",               "BMP Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },
         { ".jpg",               "JPG Texture",            IM_COL32(200, 150, 255, 255),   "T",  "Texture",        false,  true },

@@ -14,6 +14,7 @@
 #include "Net/NexusClient.h"
 #include "SharedNexusDefines.h"
 #include "UIElementComponent.h"
+#include "UIElementSelectable.h"
 #include "Rendering/BgfxUIView.h"
 
 #include <imgui-docking/imgui_internal.h>
@@ -266,7 +267,11 @@ namespace ImGuiVisualizers {
 
 		for (CRenderComponent* rc : renderComps)
 		{
-			auto selectable = std::make_shared<CRenderComponentSelectable>(rc);
+			std::shared_ptr<CRenderComponentSelectable> selectable;
+			if (auto* uiElement = dynamic_cast<CUIElementComponent*>(rc))
+				selectable = std::make_shared<CUIElementSelectable>(uiElement);
+			else
+				selectable = std::make_shared<CRenderComponentSelectable>(rc);
 			m_componentSelectables.push_back(selectable);
 			m_selectionManager.AddSelectable(selectable);
 			result.push_back(selectable);
@@ -414,9 +419,48 @@ namespace ImGuiVisualizers {
         if (!comp || !comp->IsActive()) continue;
 		if (!IsInVisibleLayer(comp)) continue;
 
-			const Vector4f bs = *comp->GetBoundingSphere();
 			auto modelMatrixPtr = comp->GetModelMatrix();
 			if (!modelMatrixPtr) continue;
+
+			// Most-recently-picked object renders in yellow; others in white
+			const uint32_t color = (selectable == lastSelected)
+				? 0xff00ffff   // yellow (ABGR)
+				: 0xffffffff;  // white  (ABGR)
+
+			// UI elements live in NDC/screen space — draw a 2D quad outline via
+			// the ImGui foreground draw list instead of the 3D bounding sphere.
+			if (auto* uiElement = dynamic_cast<CUIElementComponent*>(comp))
+			{
+				const Matrix4f& m = *modelMatrixPtr;
+				const ImVec2 vmin  = Get3DView().GetViewportMin();
+				const ImVec2 vsize = Get3DView().GetViewportSize();
+
+				auto NdcToScreenPx = [&](float ndcX, float ndcY) -> ImVec2
+				{
+					return ImVec2((ndcX * 0.5f + 0.5f) * vsize.x + vmin.x,
+					              (0.5f - ndcY * 0.5f) * vsize.y + vmin.y);
+				};
+
+				// Unit quad corners in local space (matches UIElementVertex layout).
+				const Vector3f localCorners[4] = {
+					Vector3f(-0.5f,  0.5f, 0.0f),
+					Vector3f( 0.5f,  0.5f, 0.0f),
+					Vector3f( 0.5f, -0.5f, 0.0f),
+					Vector3f(-0.5f, -0.5f, 0.0f),
+				};
+				ImVec2 screen[4];
+				for (int i = 0; i < 4; ++i)
+				{
+					const Vector3f p = m.TransformPoint(localCorners[i]);
+					screen[i] = NdcToScreenPx(p.GetX(), p.GetY());
+				}
+				ImDrawList* dl = ImGui::GetForegroundDrawList();
+				if (dl)
+					dl->AddPolyline(screen, 4, color, /*closed=*/true, 2.0f);
+				continue;
+			}
+
+			const Vector4f bs = *comp->GetBoundingSphere();
 			const float* m = modelMatrixPtr->data();
 
 			const float cx = m[0] * bs.x + m[4] * bs.y + m[8] * bs.z + m[12];
@@ -431,11 +475,6 @@ namespace ImGuiVisualizers {
 
 			float highlightMtx[16];
 			bx::mtxSRT(highlightMtx, r, r, r, 0.0f, 0.0f, 0.0f, cx, cy, cz);
-
-			// Most-recently-picked object renders in yellow; others in white
-			const uint32_t color = (selectable == lastSelected)
-				? 0xff00ffff   // yellow (ABGR)
-				: 0xffffffff;  // white  (ABGR)
 
 			prims.RenderSphere(viewId, highlightMtx, color);
 		}

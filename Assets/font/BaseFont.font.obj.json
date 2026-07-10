@@ -1,0 +1,39 @@
+{
+    "RootObject": {
+        "m_ttfResource": {
+            "Value": "CTTFResourceReference",
+            "m_resourceFileName": {
+                "Value": "./assets/font/droidsans.ttf",
+                "Type": 3,
+                "Size": 32
+            },
+            "m_rfl_guid": {
+                "Value": "15c45cec-2be8-471d-b49d-bcd65e79541e",
+                "Type": 3,
+                "Size": 32
+            },
+            "Type": 4,
+            "Size": 104
+        },
+        "m_pixelSize": {
+            "Value": 24.0,
+            "Type": 2,
+            "Size": 4
+        },
+        "m_fontType": {
+            "Value": 1024,
+            "Type": 1,
+            "Size": 4
+        },
+        "m_sdfPadding": {
+            "Value": 4.0,
+            "Type": 2,
+            "Size": 4
+        },
+        "m_rfl_guid": {
+            "Value": "085b1280-8fa6-4123-bf17-80c9434d93d5",
+            "Type": 3,
+            "Size": 32
+        }
+    }
+}

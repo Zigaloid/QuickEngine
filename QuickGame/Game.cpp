@@ -34,6 +34,8 @@
 #include "Rendering/BgfxRenderPrimitives.h"
 #include "Rendering/BgfxUIView.h"
 #include "UIElementComponent.h"
+#include "Rendering/FontSystem.h"
+#include "UITextComponent.h"
 
 #include "entry\entry.h"
 #include "imgui.h"
@@ -50,6 +52,7 @@ bool GameApp::Initialize()
 	// subclasses.
 	Rendering::BgfxUIView::Instance().Initialize(1, 1);
 	CUIElementComponent::InitializeUIRendering();
+	FontSystem::Instance().Initialize();
 
 	m_visualizerManager.Initialize();
 	m_visualizerManager.Register("Command Console", std::make_unique<CommandConsole>(), false);
@@ -223,6 +226,9 @@ void GameApp::RegisterComponents()
 
 	componentManager->RegisterComponentType<CUIImageComponent>();
 	scheduler->RegisterComponentType<CUIImageComponent>(0, "UIImage");
+
+	componentManager->RegisterComponentType<CUITextComponent>();
+	scheduler->RegisterComponentType<CUITextComponent>(0, "UIText");
 }
 
 void GameApp::Update(double deltaTime)
@@ -369,6 +375,7 @@ bool GameApp::Shutdown()
 	PhysicsManager::SetInstance(nullptr);
 	Rendering::BgfxRenderPrimitives::Instance().Shutdown();
 	CUIElementComponent::ShutdownUIRendering();
+	FontSystem::Instance().Shutdown();
 	Rendering::BgfxUIView::Instance().Shutdown();
 	m_physicsManager.Shutdown();
 	m_visualizerManager.Shutdown();
