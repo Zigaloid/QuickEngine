@@ -84,23 +84,41 @@ void CUITextComponent::Render(bgfx::ViewId /*viewId*/)
 	if (!modelMatrix)
 		return;
 
+	// The sibling CTransformComponent's translation is authored in the same
+	// NDC space as every other CUIElementComponent (the editor's gizmo drags
+	// CUITextComponent through CUIElementSelectable, SpaceKind::Screen, which
+	// writes NDC coordinates — see ApplyGizmoDrag2D()). kUIViewID renders
+	// quads with an identity view/projection so the model matrix alone
+	// produces NDC. kTextViewID, however, uses a pixel-space orthographic
+	// projection, so TextBufferManager pen positions must be converted from
+	// NDC to render-target pixels here.
 	const float* m = modelMatrix->GetData().data();
-	const float penX = m[12];
-	const float penY = m[13];
+	auto& uiView = Rendering::BgfxUIView::Instance();
+	const float penX = (m[12] * 0.5f + 0.5f) * static_cast<float>(uiView.GetWidth());
+	const float penY = (0.5f - m[13] * 0.5f) * static_cast<float>(uiView.GetHeight());
 
-	if (m_textDirty)
-		RebuildTextBuffer();
+	// Glyph vertex positions are baked relative to the pen position at the
+	// moment TextBuffer::appendText() runs — setPenPosition() called *after*
+	// appendText() has zero effect on already-baked geometry. So the pen
+	// must be positioned before (re)building the buffer, and the buffer
+	// must be rebuilt whenever the position changes, not just when the
+	// text/color content changes.
+	if (m_textDirty || penX != m_lastPenX || penY != m_lastPenY)
+	{
+		m_lastPenX = penX;
+		m_lastPenY = penY;
+		RebuildTextBuffer(penX, penY);
+	}
 
-	tbMgr.setPenPosition(m_textBuffer, penX, penY);
 	tbMgr.submitTextBuffer(m_textBuffer, Rendering::BgfxUIView::GetTextViewID());
 }
 
-void CUITextComponent::RebuildTextBuffer()
+void CUITextComponent::RebuildTextBuffer(float penX, float penY)
 {
 	auto& tbMgr = FontSystem::Instance().GetTextBufferManager();
 
 	tbMgr.clearTextBuffer(m_textBuffer);
-	tbMgr.setPenPosition(m_textBuffer, 0.0f, 0.0f);
+	tbMgr.setPenPosition(m_textBuffer, penX, penY);
 	tbMgr.setTextColor(m_textBuffer, PackColorRGBA(m_textColor));
 
 	if (m_bgColor.w > 0.0f)

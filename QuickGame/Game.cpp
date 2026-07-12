@@ -374,6 +374,7 @@ bool GameApp::Shutdown()
 
 	PhysicsManager::SetInstance(nullptr);
 	Rendering::BgfxRenderPrimitives::Instance().Shutdown();
+
 	CUIElementComponent::ShutdownUIRendering();
 	FontSystem::Instance().Shutdown();
 	Rendering::BgfxUIView::Instance().Shutdown();

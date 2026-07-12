@@ -12,9 +12,13 @@
  *        bgfx font rendering pipeline (FontManager + TextBufferManager).
  *
  * The text is submitted into the dedicated text view (BgfxUIView::kTextViewID)
- * which uses an orthographic projection, so pen positions are in pixel
- * coordinates. The component's CTransformComponent sibling supplies the
- * on-screen pixel position (X,Y = pixels from top-left, Z = depth for ordering).
+ * which uses a pixel-space orthographic projection. The component's sibling
+ * CTransformComponent, however, is authored in the same NDC space as every
+ * other CUIElementComponent (the editor's selection gizmo drags any
+ * CUIElementComponent-derived component, including this one, through
+ * CUIElementSelectable's SpaceKind::Screen path, which writes NDC
+ * coordinates). CUITextComponent::Render() converts that NDC translation
+ * into text-view pixel coordinates before positioning the pen.
  *
  * The font is loaded asynchronously through a CFontResourceReference; no text
  * is drawn until the referenced .font.json asset is fully finalized.
@@ -58,7 +62,7 @@ public:
 	void   SetVerticalAlign(VAlign v) { m_verticalAlign = v; }
 
 private:
-	void RebuildTextBuffer();
+	void RebuildTextBuffer(float penX, float penY);
 	static uint32_t PackColorRGBA(const Vector4f& c);
 
 	// ── Reflected members ───────────────────────────────────────────────
@@ -73,4 +77,10 @@ private:
 	TextBufferHandle m_textBuffer   = { UINT16_MAX };
 	bool             m_textDirty    = true;
 	FontHandle       m_currentFont  = { UINT16_MAX };
+
+	// Last pen position the buffer was baked with — used to detect when the
+	// sibling transform has moved and the buffer needs to be rebuilt, since
+	// glyph vertices bake in the pen position at appendText() time.
+	float            m_lastPenX     = 0.0f;
+	float            m_lastPenY     = 0.0f;
 };

@@ -98,6 +98,10 @@ public:
 
     bool IsValid() const { return m_initialized; }
 
+    /** @brief Current render-target width/height (pixels) set by the last UpdateView() call. */
+    uint16_t GetWidth()  const { return m_width; }
+    uint16_t GetHeight() const { return m_height; }
+
 private:
     BgfxUIView() = default;
 
