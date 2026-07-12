@@ -375,6 +375,19 @@ bool GameApp::Shutdown()
 	PhysicsManager::SetInstance(nullptr);
 	Rendering::BgfxRenderPrimitives::Instance().Shutdown();
 
+	// Release the level (and therefore its component children — including
+	// any CUITextComponent instances) BEFORE shutting down the FontSystem.
+	// CUITextComponent::OnShutdown calls FontSystem::ReleaseTextBuffer, which
+	// must run while the TextBufferManager is still alive; otherwise
+	// TextBufferManager's destructor asserts that text buffers remain
+	// undestroyed and crashes via bx::debugBreak().
+	auto* componentManager = Core::CoreSystem::GetComponentManager();
+	if (m_RootLevel && componentManager && componentManager->IsInitialized())
+	{
+		componentManager->ReleaseComponent(m_RootLevel);
+		m_RootLevel = nullptr;
+	}
+
 	CUIElementComponent::ShutdownUIRendering();
 	FontSystem::Instance().Shutdown();
 	Rendering::BgfxUIView::Instance().Shutdown();

@@ -954,17 +954,28 @@ for (const auto& selectable : m_selectables)
 
     ImVec2 CSelectionManager::NdcToScreen(const Vector2f& ndc) const
     {
+        // Must match BgfxUIView's aspect-compensated kUIViewID view matrix
+        // exactly: 1 NDC unit X -> width/2 px, 1 NDC unit Y -> width/2 px
+        // (i.e. ndc.y is pre-multiplied by aspect before the standard
+        // [-1,1] -> [0,sizeY] viewport mapping). Keeping this in sync with
+        // the rendered UI quad keeps the gizmo glued to the quad's visual
+        // position on non-square viewports.
+        const float aspect = (m_viewportSize.x > 0.0f && m_viewportSize.y > 0.0f)
+            ? m_viewportSize.x / m_viewportSize.y : 1.0f;
         ImVec2 r;
         r.x = (ndc.x * 0.5f + 0.5f) * m_viewportSize.x + m_viewportMin.x;
-        r.y = (0.5f - ndc.y * 0.5f) * m_viewportSize.y + m_viewportMin.y;
+        r.y = (0.5f - ndc.y * aspect * 0.5f) * m_viewportSize.y + m_viewportMin.y;
         return r;
     }
 
     Vector2f CSelectionManager::ScreenToNdc(const ImVec2& s) const
     {
+        // Inverse of NdcToScreen — see above for the aspect rationale.
+        const float aspect = (m_viewportSize.x > 0.0f && m_viewportSize.y > 0.0f)
+            ? m_viewportSize.x / m_viewportSize.y : 1.0f;
         Vector2f r;
         r.x = ((s.x - m_viewportMin.x) / m_viewportSize.x) * 2.0f - 1.0f;
-        r.y = 1.0f - ((s.y - m_viewportMin.y) / m_viewportSize.y) * 2.0f;
+        r.y = (1.0f - ((s.y - m_viewportMin.y) / m_viewportSize.y) * 2.0f) / aspect;
         return r;
     }
 
@@ -1129,10 +1140,12 @@ for (const auto& selectable : m_selectables)
 					deltaRad = deltaDeg * static_cast<float>(M_PI) / 180.0f;
 
                     // ── Rebuild the XY basis directly from the start columns ──
-                    // The model matrix stores canonical NDC transforms.
-                    // BgfxUIView's aspect-ratio view matrix handles the
-                    // non-uniform viewport mapping at render time, so the
-                    // stored matrix needs no viewport compensation.
+                    // The model matrix stores canonical NDC transforms and
+                    // BgfxUIView::kUIViewID applies an aspect-compensated
+                    // scale(1, aspect, 1) view matrix at render time, so
+                    // rotated quads stay visually square on non-square
+                    // viewports without any viewport compensation inside the
+                    // stored matrix itself.
                     const Vector3f col0 = start.GetColumn(0);
                     const Vector3f col1 = start.GetColumn(1);
 

@@ -437,8 +437,13 @@ namespace ImGuiVisualizers {
 
 				auto NdcToScreenPx = [&](float ndcX, float ndcY) -> ImVec2
 				{
+					// Match BgfxUIView's aspect-compensated kUIViewID + the
+					// gizmo's NdcToScreen so the highlight outline stays
+					// glued to the rendered UIImage quad.
+					const float aspect = (vsize.x > 0.0f && vsize.y > 0.0f)
+						? vsize.x / vsize.y : 1.0f;
 					return ImVec2((ndcX * 0.5f + 0.5f) * vsize.x + vmin.x,
-					              (0.5f - ndcY * 0.5f) * vsize.y + vmin.y);
+					              (0.5f - ndcY * aspect * 0.5f) * vsize.y + vmin.y);
 				};
 
 				// Unit quad corners in local space (matches UIElementVertex layout).

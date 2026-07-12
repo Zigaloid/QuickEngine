@@ -102,11 +102,17 @@ public:
     uint16_t GetWidth()  const { return m_width; }
     uint16_t GetHeight() const { return m_height; }
 
+    /** @brief Current viewport aspect ratio (width / height) — used by every
+     *         consumer that converts between NDC and screen pixels so the
+     *         gizmo, UIImage, and UIText all share one aspect-aware mapping. */
+    float GetAspect() const { return m_aspect; }
+
 private:
     BgfxUIView() = default;
 
     uint16_t     m_width  = 0;
     uint16_t     m_height = 0;
+    float        m_aspect = 1.0f;
     bool         m_initialized = false;
 };
 

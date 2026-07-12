@@ -94,8 +94,14 @@ void CUITextComponent::Render(bgfx::ViewId /*viewId*/)
 	// NDC to render-target pixels here.
 	const float* m = modelMatrix->GetData().data();
 	auto& uiView = Rendering::BgfxUIView::Instance();
+	// Match BgfxUIView's aspect-compensated kUIViewID view matrix: the
+	// quad view pre-scales NDC.y by aspect before [-1,1]->[0,H] mapping.
+	// The text view (kTextViewID) uses a raw pixel-space ortho, so we apply
+	// the same aspect term here to land the pen at the same screen pixel as
+	// the matching UIImage quad. (See SelectionManager::NdcToScreen.)
+	const float aspect = uiView.GetAspect();
 	const float penX = (m[12] * 0.5f + 0.5f) * static_cast<float>(uiView.GetWidth());
-	const float penY = (0.5f - m[13] * 0.5f) * static_cast<float>(uiView.GetHeight());
+	const float penY = (0.5f - m[13] * aspect * 0.5f) * static_cast<float>(uiView.GetHeight());
 
 	// Glyph vertex positions are baked relative to the pen position at the
 	// moment TextBuffer::appendText() runs — setPenPosition() called *after*

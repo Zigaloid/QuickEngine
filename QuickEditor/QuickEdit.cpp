@@ -125,11 +125,20 @@ bool QuickEditApp::Shutdown()
 {
     m_physicsManager.Shutdown();
 
+	// Destroy the DocumentManager (and therefore all open editor documents,
+	// including any LevelComponentVisualizer holding a CLevelComponent with
+	// CUITextComponent children) BEFORE shutting down the FontSystem.
+	// LevelComponentVisualizer::~LevelComponentVisualizer -> ReleaseLevelComponent()
+	// -> m_levelComp->Shutdown() cascades into CUITextComponent::OnShutdown ->
+	// FontSystem::ReleaseTextBuffer, which must run while the TextBufferManager
+	// is still alive; otherwise TextBufferManager's destructor asserts that
+	// text buffers remain undestroyed and crashes via bx::debugBreak().
+	m_documentManager.reset();
+
 	CUIElementComponent::ShutdownUIRendering();
 	FontSystem::Instance().Shutdown();
 	Rendering::BgfxUIView::Instance().Shutdown();
 
-	m_documentManager.reset();
 	m_visualizerManager.Shutdown();
 	return true;
 }
